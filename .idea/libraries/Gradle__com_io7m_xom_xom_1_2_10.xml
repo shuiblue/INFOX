@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.io7m.xom:xom:1.2.10">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.io7m.xom/xom/1.2.10/4165e25bef19aad134f6498cc277110b9bc5e52b/xom-1.2.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.io7m.xom/xom/1.2.10/9fe08ddbc0987f1fad88ce86bc36e260b9cbee9d/xom-1.2.10-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
