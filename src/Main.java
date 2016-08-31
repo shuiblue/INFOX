@@ -22,7 +22,11 @@ public class Main {
     static String analysisDirName = "DPGraph";
     static final String FS = File.separator;
 
-    //-------------------Changable Variables------------------------
+    /*-------------------Changable Variables------------------------
+    * DIR : source code directory
+    * GROUNDTRUTH: REAL / IFDEF
+    * numOfCuts: This is the number of edge-cutting of Community Detection algorithm.
+    * */
     static String DIR = "C:\\Users\\shuruiz\\Documents\\components\\rel\\mcs.mpss\\";
     static GroundTruth GROUNDTRUTH = REAL;
     static int numOfCuts = 10;
@@ -32,13 +36,18 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
+        /*
+        Initialize Rengine to call igraph R library.
+         */
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {
             System.out.println("Cannot load R");
             return;
         }
+
+        /* testCase specifys the repository that need to be parsed.      */
         String testCase = "test\\Email";
-//        String testCase = "6.1";
+
         sourcecodeDir = DIR + testCase + FS;
         analysisDir = sourcecodeDir + analysisDirName + FS;
 
@@ -46,12 +55,12 @@ public class Main {
             for (int dirNum = 1; dirNum < 2; dirNum++) {
 //                ArrayList<String> macroList = selectTargetMacros(numOfTargetMacro);
 //                ArrayList<String> macroList = selectApacheMacros(numOfTargetMacro);
-                ArrayList<String> macroList = new ArrayList<>();
-//                    macroList.add("CL_DEBUG");
-//                    StringBuffer sb = new StringBuffer();
-//                    for (int i = 1; i <= macroList.size(); i++) {
-//                        sb.append("<h3>" + i + ") " + macroList.get(i - 1) + "</h3>\n");
-//                    }
+                  ArrayList<String> macroList = new ArrayList<>();
+//                macroList.add("CL_DEBUG");
+//                StringBuffer sb = new StringBuffer();
+//                for (int i = 1; i <= macroList.size(); i++) {
+//                    sb.append("<h3>" + i + ") " + macroList.get(i - 1) + "</h3>\n");
+//                }
 //                    iof.rewriteFile(sb.toString(), analysisDir + dirNum + "/testedMacros.txt");
                 new File(analysisDir + dirNum).mkdir();
                 commitList = new ArrayList<>();
