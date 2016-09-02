@@ -193,8 +193,11 @@ public class ProcessingText {
         }
     }
 
-
-    public static void preprocessFile(String inputFile) {
+    /**
+     * This method replace source code that cannot be correctly parsed by srcML,
+     * @param inputFile
+     */
+    public static void removeSrcmlCannotHandleText(String inputFile) {
         boolean removeCppParathesis = false;
         ProcessingText io = new ProcessingText();
         StringBuffer sb = new StringBuffer();

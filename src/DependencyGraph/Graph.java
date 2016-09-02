@@ -3,8 +3,8 @@ package DependencyGraph;
 /**
  * Created by shuruiz on 6/2/2016.
  *
- * The graph object contains the nodelist and edgelist.
- * The reverseEdgeList is in the inverted sequence of edgelist, for ___ purpose.
+ * The graph object contains the nodelist and edgelist (key: edge_id , value: edge_label).
+ * The reverseEdgeList switch the key-value position: (key: edge_label, value: edge_id), for ___??___ purpose
  *
  */
 

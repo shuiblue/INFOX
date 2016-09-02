@@ -17,68 +17,93 @@ import org.apache.commons.io.FileUtils;
 
 /**
  * Created by shuruiz on 12/10/15.
+ * The DependencyGraph object corresponds to a source code file.
+ * There are 3 kinds of dependency graph:
+ * todo: rename dependencyGraph to forkAddedDependencyGraph
+ *     1) dependencyGraph only contains fork added node
+ *     2) completGraph: contains all the nodes from the file
+ *     3) compactGraph: if the file has not been changed, then the whole file is one node
  */
 public class DependencyGraph {
-    public boolean HIERACHICAL = true;
-    public boolean CONSECUTIVE = true;
+
+    /** There are four kinds of edges in current Dependency Graph
+     * 1) Def-use of types, fields, methods, variables
+     * 2) Hierarchical relation
+     * 3) Control flow information
+     * 4) Consecutive lines
+    **/
+    static public boolean HIERACHICAL = true;
     static final public boolean CONTROL_FLOW = true;
+    static public boolean CONSECUTIVE = true;
+
+     public String current_OS = "MAC"; // "WINDOWS"
+
     static final public String CONTROLFLOW_LABEL = "<Control-Flow>";
 
     ProcessingText ProcessingText = new ProcessingText();
-    //symbol Table stores all the declaration nodes.
+
+    /** symbol Table stores all the declaration nodes.* */
     HashSet<Symbol> symbolTable = new HashSet<>();
 
-    // lonelySymbolSet stores all the nodes that haven't find any node that could be point to.
+    /** lonelySymbolSet stores all the nodes that haven't find any node that could be point to.   **/
     HashSet<Symbol> lonelySymbolSet = new HashSet<>();
 
-    // this map stores nodes that have same name, used for search, in order to find dependencies effectively.
+    /** This map stores nodes that have same name, used for search, in order to find dependencies effectively. **/
     HashMap<String, HashSet<Symbol>> sameNameMap = new HashMap<>();
 
 
-    //---------------------- dependency Graph ---------------------------------
-    ArrayList<String> forkaddedNodeList;
-    // node id
-    int id = 0;
+    /**---------------------- dependency Graph ---------------------------------**/
     // key: node label
     HashMap<String, HashSet<String[]>> dependencyGraph = new HashMap<>();
     HashMap<String, HashSet<String[]>> completeGraph = new HashMap<>();
+    ArrayList<String> forkaddedNodeList;
+    // node id
+    int id = 0;
     //node list stores  the id for the node, used for create graph file. HashMap<String, Integer>
     HashMap<String, Integer> nodeList = new HashMap<>();
+
     //edge list stores all the edges, used for testing
     HashSet<String> edgeList = new HashSet<>();
 
 
-    /*----------------------compact Graph ------------------------------
-    *    if the file is not changed in 6.1 vs 6.0, then the whole file is a node
+    /**----------------------compact Graph ------------------------------
+    *    if the file is not changed, then the whole file is a node
     */
     static HashSet<String> changedFiles;
     static int compact_graph_node_id = 0;
     HashMap<String, HashSet<String[]>> compactGraph = new HashMap<>();
+
     //node list stores  the id for the node, used for create graph file. HashMap<String, Integer>
     HashMap<String, Integer> compact_nodeList = new HashMap<>();
+
     //edge list stores all the edges, used for testing
     HashSet<String> compact_edgeList = new HashSet<>();
 
 
-    //used for similarity calculation, LD algorithm
+    /**   used for Similarity Calculation, LD algorithm   **/
     ArrayList<String> candidateStrings = new ArrayList<>();
     //map nodeID in graph -> stringID in candidateString list
     HashMap<Integer, Integer> idMap = new HashMap<>();
 
+    /**  This flag is used for checking whether the macro is a header guard or not **/
     boolean foundHeaderGuard = false;
 
     static final String FS = File.separator;
-    // used for srcml
+
+    /** These two var are used for srcML  **/
     static final public String NAMESPACEURI = "http://www.sdml.info/srcML/src";
     static final public String NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
 
+    /**----------------  Specifying paths  -----------------------**/
+    static String Root_Dir = "";
+    /**   analysis Dir stores the output of INFOX   **/
     String analysisDir = "";
+    /**   sourceCode Dir stores the source code to be analyzed   **/
     String sourcecodeDir = "";
-    static String WIN_Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
-    static String MAC_Root_Dir = " /Users/shuruiz/Work/";
     static String tmpXmlPath = "tmpXMLFile" + FS;
     static String analysisDirName = "DPGraph";
     String edgeListTxt, parsedLineTxt, forkAddedNodeTxt, compact_graph_edgeList_txt;
+
 
     /**
      * This function just call the create Dependency Graph, used for cluster nodes.
@@ -90,16 +115,26 @@ public class DependencyGraph {
         this.analysisDir = sourcecodeDir + analysisDirName + FS;
         this.sourcecodeDir = sourcecodeDir;
 
+        if(current_OS.equals("MAC")){
+            Root_Dir = " /Users/shuruiz/Work/";
+        }else if(current_OS=="WINDOWS"){
+            Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
+        }
+
+        /**------------ Specify paths --------------**/
         forkAddedNodeTxt = analysisDir + "forkAddedNode.txt";
         edgeListTxt = analysisDir + "edgeList.txt";
         compact_graph_edgeList_txt = analysisDir + "compact_edgeList.txt";
         parsedLineTxt = analysisDir + "parsedLines.txt";
-        changedFiles = new HashSet<>();
 
+        /**------------ Preparing for writing into output files  --------------**/
         ProcessingText.rewriteFile("", edgeListTxt);
         ProcessingText.rewriteFile("", compact_graph_edgeList_txt);
         ProcessingText.rewriteFile("", parsedLineTxt);
 
+        changedFiles = new HashSet<>();
+
+        /** Check whether forkAddedNode file exists **/
         if (new File(forkAddedNodeTxt).exists()) {
             try {
                 forkaddedNodeList = getForkAddedNodeList();
@@ -110,6 +145,7 @@ public class DependencyGraph {
             System.out.println("file forkAddedNode.txt does not exist!");
             forkaddedNodeList = new ArrayList<>();
         }
+
         //parse every source code file in the project
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
@@ -121,20 +157,28 @@ public class DependencyGraph {
             e.printStackTrace();
         }
 
-        //create edges cross files
+        /** generating edges cross files  **/
         addEdgesCrossFiles();
 
-        //generate edge about consecutive lines
+        /**  if CONSECUTIVE is true, generating edges for consecutive lines  **/
         if (CONSECUTIVE) {
             createNeighborEdges();
         }
+
+        /****   Write dependency graphs into pajek files  ****/
         ProcessingText.writeToPajekFile(dependencyGraph, nodeList, analysisDir + "changedCode.pajek.net");
         ProcessingText.writeToPajekFile(completeGraph, nodeList, analysisDir + "complete.pajek.net");
         ProcessingText.writeToPajekFile(compactGraph, compact_nodeList, analysisDir + "compact.pajek.net");
-//        writeStringsToFile(candidateStrings);
+
         return edgeList;
     }
 
+
+    /**
+     * This function will collect all the fork added node from  "forkAddedNode.txt", and generate a list of forkAddedNode
+     * @return Arraylist of fork Added Nodes
+     * @throws IOException
+     */
     private ArrayList getForkAddedNodeList() throws IOException {
         String[] lines = ProcessingText.readResult(forkAddedNodeTxt).split("\n");
         ArrayList<String> forkAddedNodeList = new ArrayList<>();
@@ -142,28 +186,31 @@ public class DependencyGraph {
             String node = s.split(" ")[0];
             forkAddedNodeList.add(node);
             String filename = node.split("-")[0];
+
+            // used for generating compact dependency Graph
             if (!changedFiles.contains(filename)) {
                 changedFiles.add(filename);
             }
         }
-
         return forkAddedNodeList;
     }
 
-    private boolean isCFile(String filePath) {
-        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
-    }
+
 
     /**
-     * This function parse each  source code files
+     * This function parses one source code file
      *
-     * @param filePath
+     * @param filePath path of source file
      */
     public void parseSingleFile(Path filePath) {
-        String fileName = diffString(filePath.toString(), sourcecodeDir);
         foundHeaderGuard = false;
 
-        String tmpFilePath = WIN_Root_Dir + tmpXmlPath + filePath.toString().replace(WIN_Root_Dir, "");
+        //get fileName
+        String fileName = diffString(filePath.toString(), sourcecodeDir);
+
+
+        /**   re-write source code file in case the misinterpretation of srcml   **/
+        String tmpFilePath = Root_Dir + tmpXmlPath + filePath.toString().replace(Root_Dir, "");
         if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
             tmpFilePath += ".cpp";
         }
@@ -172,17 +219,17 @@ public class DependencyGraph {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //preprocess file in case the misinterpretation of srcml
-        ProcessingText.preprocessFile(tmpFilePath);
 
-        // get xml file using src2srcml
+        /** replace text that cannot be correctly parsed by srcML  **/
+        ProcessingText.removeSrcmlCannotHandleText(tmpFilePath);
+
+        /** generating xml file by src2srcml **/
         String xmlFilePath = ProcessingText.getXmlFile(tmpFilePath);
 
-        //parse dependency graph in each file
+        /** generating DOM tree by xmlParser (xom) **/
         Element root = ProcessingText.getXmlDom(xmlFilePath).getRootElement();
 
-
-        //Rewrite the file name for html purpose
+        /** Rewrite the file name for the convenience of generating html files later **/
         String newFileName = ProcessingText.changeFileName(fileName);
 
 /*  for Apache
@@ -840,7 +887,7 @@ public class DependencyGraph {
      */
     private void addControlFlowDependency(String headLocation, ArrayList<String> stmtList, String label) {
         boolean allBelongToNewCode = true;
-        if(forkaddedNodeList.size()>0) {
+        if (forkaddedNodeList.size() > 0) {
             boolean stmtIsNew = true;
             for (String stmtLoc : stmtList) {
                 stmtIsNew = stmtIsNew && forkaddedNodeList.contains(stmtLoc);
@@ -850,9 +897,9 @@ public class DependencyGraph {
                 }
             }
         }
-        if(!allBelongToNewCode){
-            linkChildToParent(stmtList,headLocation,"<Control-Flow>");
-        }else {
+        if (!allBelongToNewCode) {
+            linkChildToParent(stmtList, headLocation, "<Control-Flow>");
+        } else {
             addEdgesToFile(stmtList.get(0), headLocation, CONTROLFLOW_LABEL + " " + label);
             for (int i = 0; i < stmtList.size() - 1; i++) {
                 String pre_loc = stmtList.get(i);
@@ -934,11 +981,11 @@ public class DependencyGraph {
         String type;
         Element type_Node = element.getFirstChildElement("type", NAMESPACEURI);
         if (type_Node != null) {
-            Element name_ele =  type_Node.getFirstChildElement("name", NAMESPACEURI);
-            if(name_ele!=null) {
-                type =name_ele.getValue();
-            }else {
-                type=type_Node.getValue();
+            Element name_ele = type_Node.getFirstChildElement("name", NAMESPACEURI);
+            if (name_ele != null) {
+                type = name_ele.getValue();
+            } else {
+                type = type_Node.getValue();
             }
 //            type = type_Node.getValue();
         } else {
@@ -1724,5 +1771,14 @@ public class DependencyGraph {
                 }
             }
         }
+    }
+
+    /**
+     * This function checks whether the file is a C files when parsing the source code directory
+     * @param filePath
+     * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
+     */
+    private boolean isCFile(String filePath) {
+        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
 }

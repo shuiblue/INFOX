@@ -1,11 +1,12 @@
 package CommunityDetection;
-import DependencyGraph.Graph;
-        import Util.ProcessingText;
-        import org.rosuda.JRI.REXP;
-        import org.rosuda.JRI.Rengine;
 
-        import java.io.*;
-        import java.util.*;
+import DependencyGraph.Graph;
+import Util.ProcessingText;
+import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.Rengine;
+import java.io.*;
+import java.util.*;
+
 /**
  * Created by shuruiz on 8/29/16.
  */
@@ -312,7 +313,7 @@ public class R_CommunityDetection {
         ioFunc.rewriteFile(sb.toString(), fileDir + "/" + numOfClusters + "_distanceBetweenCommunityies.txt");
         ioFunc.rewriteFile(clusterIDList.toString(), fileDir + "/" + numOfClusters + "_clusterIdList.txt");
 */
-        ioFunc.rewriteFile(sb.toString(), fileDir +  numOfClusters + "_distanceBetweenCommunityies.txt");
+        ioFunc.rewriteFile(sb.toString(), fileDir + numOfClusters + "_distanceBetweenCommunityies.txt");
         ioFunc.rewriteFile(clusterIDList.toString(), fileDir + numOfClusters + "_clusterIdList.txt");
     }
 
