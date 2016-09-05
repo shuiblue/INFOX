@@ -206,7 +206,7 @@ public class DependencyGraph {
         foundHeaderGuard = false;
 
         //get fileName
-        String fileName = diffString(filePath.toString(), sourcecodeDir);
+        String fileName = getFileNameFromDir(filePath.toString(), sourcecodeDir);
 
 
         /**   re-write source code file in case the misinterpretation of srcml   **/
@@ -232,27 +232,32 @@ public class DependencyGraph {
         /** Rewrite the file name for the convenience of generating html files later **/
         String newFileName = ProcessingText.changeFileName(fileName);
 
-/*  for Apache
+        /*  for Apache
                 if (!newFileName.equals("server/util_expr_parseC")) {
- */
+        */
 
-      /* for Marlin
-      if (!fileName.contains("pcre_globals")) {*/
+        /* for Marlin
+                 if (!fileName.contains("pcre_globals")) {
+        */
         String parentLocation = "";
-        parseDependencyForSubTree(root, newFileName, 1, parentLocation);
+        /** Generating dependency graph for  **/
+        generatingDependencyGraphForSubTree(root, newFileName, 1, parentLocation);
 
     }
 
-    public static String diffString(String str1, String str2) {
-        int index = str1.lastIndexOf(str2);
-        if (index > -1) {
-            return str1.substring(str2.length());
-        }
-        return str1;
-    }
 
-    public ArrayList<String> parseDependencyForSubTree(Element subTreeRoot, String fileName, int scope, String parentLocation) {
-        return parseDependencyForSubTree(subTreeRoot, fileName, scope, parentLocation, false);
+    /**
+     * This method is calling the generatingDependencyGraphForSubTree function by setting isinit = false
+     * @param subTreeRoot dom tree
+     * @param fileName name of the file
+     * @param scope  is the scope of the variable declaration, used for finding the correct def-use relation
+     *              scope = 1: global variable, defined in a class
+     *              scope = currentScope +1 , local variable , defined in a function declaration, if statement, etc.
+     * @param parentLocation
+     * @return
+     */
+    public ArrayList<String> generatingDependencyGraphForSubTree(Element subTreeRoot, String fileName, int scope, String parentLocation) {
+        return generatingDependencyGraphForSubTree(subTreeRoot, fileName, scope, parentLocation, false);
     }
 
     /**
@@ -264,7 +269,7 @@ public class DependencyGraph {
      * @param parentLocation parent node of the root, used for creating edge: root->parent
      * @return a list of statement locations of the subtree
      */
-    public ArrayList<String> parseDependencyForSubTree(Element subTreeRoot, String fileName, int scope, String parentLocation, boolean isinit) {
+    public ArrayList<String> generatingDependencyGraphForSubTree(Element subTreeRoot, String fileName, int scope, String parentLocation, boolean isinit) {
         ArrayList<String> tmpStmtList = new ArrayList<>();
         Elements elements = subTreeRoot.getChildElements();
         for (int i = 0; i < elements.size(); i++) {
@@ -277,7 +282,7 @@ public class DependencyGraph {
             Element ele = elements.get(i);
 
             if (ele.getLocalName().equals("define")) {
-                parseDefine(fileName, scope, ele);
+                parseDefineNode(fileName, scope, ele);
             } else if (ele.getLocalName().equals("function") || ele.getLocalName().equals("constructor") || ele.getLocalName().equals("function_decl")) {
                 parseFunctionNode(ele, fileName, scope);
             } else if (ele.getLocalName().equals("if") && !ele.getNamespacePrefix().equals("cpp")) {
@@ -311,9 +316,9 @@ public class DependencyGraph {
             } else if (ele.getLocalName().equals("macro")) {
                 parseMacros(ele, fileName, scope);
             } else if (ele.getLocalName().equals("block")) {
-                tmpStmtList.addAll(parseDependencyForSubTree(ele, fileName, scope + 1, parentLocation, isinit));
+                tmpStmtList.addAll(generatingDependencyGraphForSubTree(ele, fileName, scope + 1, parentLocation, isinit));
             } else if (ele.getLocalName().equals("extern")) {
-                tmpStmtList.addAll(parseDependencyForSubTree(ele, fileName, scope, parentLocation, isinit));
+                tmpStmtList.addAll(generatingDependencyGraphForSubTree(ele, fileName, scope, parentLocation, isinit));
                 //todo : hierachy?
             } else if (ele.getLocalName().equals("do")) {
                 tmpStmtList.add(parseDoWhile(ele, fileName, scope));
@@ -353,10 +358,19 @@ public class DependencyGraph {
         return tmpStmtList;
     }
 
-
+    /**
+     * This method parses declaration statement <decl_stmt> node
+     * @param fileName
+     * @param scope
+     * @param parentLocation
+     * @param ele decl_stmt node
+     * @return
+     */
     private String parseDeclStmt(String fileName, int scope, String parentLocation, Element ele) {
         Element decl = ele.getFirstChildElement("decl", NAMESPACEURI);
         Symbol declSymbol = addDeclarationSymbol(decl, "decl_stmt", fileName, scope, parentLocation, "");
+
+        //---TODO: following could be removed?----
         if (declSymbol != null) {
             return declSymbol.getLocation();
         }
@@ -364,7 +378,17 @@ public class DependencyGraph {
         return "";
     }
 
-    private void parseDefine(String fileName, int scope, Element ele) {
+
+    /**
+     * This method parses 'define' node, including macro, parameter, function_declaration.
+     * if the tag is "macro" , then the node could be macro or parameter node,
+     * otherwise, it is a function_declaration node.
+     *
+     * @param fileName
+     * @param scope
+     * @param ele
+     */
+    private void parseDefineNode(String fileName, int scope, Element ele) {
         Element macroEle = ele.getFirstChildElement("macro", NAMESPACEURI_CPP);
         Element paramEle = macroEle.getFirstChildElement("parameter_list", NAMESPACEURI);
         String tag;
@@ -377,11 +401,13 @@ public class DependencyGraph {
         String macroName = nameEle.getValue();
         boolean isHeaderGuard = false;
 
+        /** Checking whether the macro is a header guard or not,
+         *  if it is a header guard, it will not be stored into the symbol table   **/
         if (!foundHeaderGuard && fileName.endsWith("H") && isHeaderGuard(macroName, fileName)) {
             isHeaderGuard = true;
             foundHeaderGuard = true;
         }
-        String location = "";
+        String location;
         if (!isHeaderGuard) {
             location = getLocationOfElement(nameEle, fileName);
             Symbol macro = new Symbol(macroName, "", location, tag, scope);
@@ -439,7 +465,7 @@ public class DependencyGraph {
         ArrayList<String> stmtList = new ArrayList<>();
         storeIntoNodeList(parentLocation);
 
-        stmtList.addAll(parseDependencyForSubTree(ele, fileName, scope + 1, parentLocation));
+        stmtList.addAll(generatingDependencyGraphForSubTree(ele, fileName, scope + 1, parentLocation));
 
         //while <condition>
         Element conditionEle = ele.getFirstChildElement("condition", NAMESPACEURI);
@@ -468,7 +494,7 @@ public class DependencyGraph {
         String caseLocation = fileName + "-" + getLineNumOfElement(ele);
         storeIntoNodeList(caseLocation);
         ArrayList<String> case_tmpStmtList = new ArrayList<>();
-        case_tmpStmtList.addAll(parseDependencyForSubTree(ele, fileName, scope + 1, caseLocation));
+        case_tmpStmtList.addAll(generatingDependencyGraphForSubTree(ele, fileName, scope + 1, caseLocation));
         String label = "";
         if (ele.getLocalName().equals("case")) {
             label = "case-block";
@@ -653,7 +679,7 @@ public class DependencyGraph {
                         Element group = block.getChildElements().get(s);
 
                         //get children
-                        ArrayList<String> children = parseDependencyForSubTree(group, fileName, scope, parentLocation);
+                        ArrayList<String> children = generatingDependencyGraphForSubTree(group, fileName, scope, parentLocation);
                         boolean tmpHierarchy = true;
                         if (!HIERACHICAL) {
                             tmpHierarchy = HIERACHICAL;
@@ -668,7 +694,7 @@ public class DependencyGraph {
 
                 } else {
                     //get children
-                    ArrayList<String> children = parseDependencyForSubTree(block, fileName, scope, parentLocation);
+                    ArrayList<String> children = generatingDependencyGraphForSubTree(block, fileName, scope, parentLocation);
                     boolean tmpHierarchy = true;
                     if (!HIERACHICAL) {
                         tmpHierarchy = HIERACHICAL;
@@ -687,7 +713,7 @@ public class DependencyGraph {
     /**
      * This function parses the function node.
      * First, create symbol for the function, scope is 1
-     * Second, use {@link #parseDependencyForSubTree(Element, String, int, String)} function to parse the <block> subtree
+     * Second, use {@link #generatingDependencyGraphForSubTree(Element, String, int, String)} function to parse the <block> subtree
      *
      * @param element  function element
      * @param fileName current filename, used for mark dependency graph's node name (lineNumber-fileName)
@@ -723,7 +749,7 @@ public class DependencyGraph {
         //check block
         Element block = element.getFirstChildElement("block", NAMESPACEURI);
         if (block != null) {
-            ArrayList<String> stmtInBlock = parseDependencyForSubTree(block, fileName, scope + 1, parentLocation);
+            ArrayList<String> stmtInBlock = generatingDependencyGraphForSubTree(block, fileName, scope + 1, parentLocation);
             if (HIERACHICAL) {
                 linkChildToParent(stmtInBlock, parentLocation, "<Hierarchy> function-block");
             }
@@ -755,9 +781,9 @@ public class DependencyGraph {
         if (then_Node != null) {
             if (then_Node.getFirstChildElement("block", NAMESPACEURI) != null) {
                 Element block = then_Node.getFirstChildElement("block", NAMESPACEURI);
-                symbolsInThen = parseDependencyForSubTree(block, fileName, scope, ifStmtLocation);
+                symbolsInThen = generatingDependencyGraphForSubTree(block, fileName, scope, ifStmtLocation);
             } else {
-                symbolsInThen = parseDependencyForSubTree(then_Node, fileName, scope, ifStmtLocation);
+                symbolsInThen = generatingDependencyGraphForSubTree(then_Node, fileName, scope, ifStmtLocation);
             }
 
             //else is optional
@@ -766,9 +792,9 @@ public class DependencyGraph {
             if (else_Node != null) {
                 if (else_Node.getFirstChildElement("block", NAMESPACEURI) != null) {
                     Element block = else_Node.getFirstChildElement("block", NAMESPACEURI);
-                    symbolsInElse = parseDependencyForSubTree(block, fileName, scope, ifStmtLocation);
+                    symbolsInElse = generatingDependencyGraphForSubTree(block, fileName, scope, ifStmtLocation);
                 } else {
-                    symbolsInElse = parseDependencyForSubTree(else_Node, fileName, scope, ifStmtLocation);
+                    symbolsInElse = generatingDependencyGraphForSubTree(else_Node, fileName, scope, ifStmtLocation);
                 }
             }
 
@@ -859,7 +885,7 @@ public class DependencyGraph {
         //Block
         Element block = ele.getFirstChildElement("block", NAMESPACEURI);
         if (block != null) {
-            stmtList.addAll(parseDependencyForSubTree(block, fileName, scope + 1, whileLocation));
+            stmtList.addAll(generatingDependencyGraphForSubTree(block, fileName, scope + 1, whileLocation));
         }
         Element expr = ele.getFirstChildElement("expr_stmt", NAMESPACEURI);
         if (expr != null) {
@@ -954,7 +980,7 @@ public class DependencyGraph {
         storeIntoNodeList(forLocation);
         Element block = ele.getFirstChildElement("block", NAMESPACEURI);
         if (block != null && block.getChildElements().size() > 0) {
-            tmpStmtList.addAll(parseDependencyForSubTree(block, fileName, scope + 1, forLocation));
+            tmpStmtList.addAll(generatingDependencyGraphForSubTree(block, fileName, scope + 1, forLocation));
             addControlFlowDependency(forLocation, tmpStmtList, "for-loop");
         }
         Element expr = ele.getFirstChildElement("expr_stmt", NAMESPACEURI);
@@ -1233,7 +1259,7 @@ public class DependencyGraph {
                     parentLocation = fileName + "-" + getLineNumOfElement(exprBlockEle);
                     storeIntoNodeList(parentLocation);
                 }
-                ArrayList<String> tmpStmtList = parseDependencyForSubTree(exprBlockEle, fileName, scope + 1, parentLocation, isInit);
+                ArrayList<String> tmpStmtList = generatingDependencyGraphForSubTree(exprBlockEle, fileName, scope + 1, parentLocation, isInit);
                 linkChildToParent(tmpStmtList, parentLocation, "<init>");
             }
 
@@ -1773,6 +1799,19 @@ public class DependencyGraph {
         }
     }
 
+    /**
+     * This method get file name by check the difference of (filePath - dirPath)
+     * @param filePath
+     * @param dirPath
+     * @return
+     */
+    public static String getFileNameFromDir(String filePath, String dirPath) {
+        int index = filePath.lastIndexOf(dirPath);
+        if (index > -1) {
+            return filePath.substring(dirPath.length());
+        }
+        return filePath;
+    }
     /**
      * This function checks whether the file is a C files when parsing the source code directory
      * @param filePath

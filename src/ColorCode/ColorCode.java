@@ -30,6 +30,10 @@ public class ColorCode {
     boolean print = false;
     StringBuilder sb = new StringBuilder();
 
+
+    int expectClustersNum;
+
+
     public void parseSourceCodeFromFile(String fileName) {
         File currentFile = new File(sourcecodeDir + "/" + fileName);
         //            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
@@ -360,8 +364,11 @@ public class ColorCode {
      * This function parse the cluster.txt file, to analyze each clustering result after removing a bridge
      */
          /*------------include dirNum----------------------
-    public void parseEachUsefulClusteringResult(String projectPath, String repo, int dirNum, ArrayList<String> macroList) {
-         ------------include dirNum----------------------*/
+         * Used for marlin
+
+    public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
+        //----for Marlin repo structure----
+      */
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir) {
 //        String filePath = projectPath + repo + "\\";
         this.sourcecodeDir=sourcecodeDir;
@@ -378,8 +385,6 @@ public class ColorCode {
         String clusterFilePath = analysisDir + "clusterTMP.txt";
         String clusterResultListString = "";
 
-        //----for Marlin repo structure----
-//        this.expectClustersNum = macroList.size();
 
 
         //get fork added node
