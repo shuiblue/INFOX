@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/variants/standard/pins_arduino.h.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  pins_arduino.h - Pin definition functions for Arduino
+  Part of Arduino - http://www.arduino.cc/
+
+  Copyright (c) 2007 David A. Mellis
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General
+  Public License along with this library; if not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  Boston, MA  02111-1307  USA
+
+  $Id: wiring.h 249 2007-02-03 16:52:51Z mellis $
+*/</comment>
+
+<cpp:ifndef PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">ifndef</cpp:directive> <name PREFIX:line="25" PREFIX:column="9">Pins_Arduino_h</name></cpp:ifndef>
+<cpp:define PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="26" PREFIX:column="9">Pins_Arduino_h</name></cpp:macro></cpp:define>
+
+<cpp:include PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="28" PREFIX:column="10">&lt;avr/pgmspace.h&gt;</cpp:file></cpp:include>
+
+<cpp:define PREFIX:line="30" PREFIX:column="1">#<cpp:directive PREFIX:line="30" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="30" PREFIX:column="9">NUM_DIGITAL_PINS</name></cpp:macro>            <cpp:value PREFIX:line="30" PREFIX:column="37">20</cpp:value></cpp:define>
+<cpp:define PREFIX:line="31" PREFIX:column="1">#<cpp:directive PREFIX:line="31" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="31" PREFIX:column="9">NUM_ANALOG_INPUTS</name></cpp:macro>           <cpp:value PREFIX:line="31" PREFIX:column="37">6</cpp:value></cpp:define>
+<cpp:define PREFIX:line="32" PREFIX:column="1">#<cpp:directive PREFIX:line="32" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="32" PREFIX:column="9">analogInputToDigitalPin</name><parameter_list PREFIX:line="32" PREFIX:column="32">(<param><type><name PREFIX:line="32" PREFIX:column="33">p</name></type></param>)</parameter_list></cpp:macro>  <cpp:value PREFIX:line="32" PREFIX:column="37">((p &lt; 6) ? (p) + 14 : -1)</cpp:value></cpp:define>
+
+<cpp:if PREFIX:line="34" PREFIX:column="1">#<cpp:directive PREFIX:line="34" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="34" PREFIX:column="5">defined</name><argument_list PREFIX:line="34" PREFIX:column="12">(<argument><expr><name PREFIX:line="34" PREFIX:column="13">__AVR_ATmega8__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<cpp:define PREFIX:line="35" PREFIX:column="1">#<cpp:directive PREFIX:line="35" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="35" PREFIX:column="9">digitalPinHasPWM</name><parameter_list PREFIX:line="35" PREFIX:column="25">(<param><type><name PREFIX:line="35" PREFIX:column="26">p</name></type></param>)</parameter_list></cpp:macro>         <cpp:value PREFIX:line="35" PREFIX:column="37">((p) == 9 || (p) == 10 || (p) == 11)</cpp:value></cpp:define>
+<cpp:else PREFIX:line="36" PREFIX:column="1">#<cpp:directive PREFIX:line="36" PREFIX:column="2">else</cpp:directive></cpp:else>
+<cpp:define PREFIX:line="37" PREFIX:column="1">#<cpp:directive PREFIX:line="37" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="37" PREFIX:column="9">digitalPinHasPWM</name><parameter_list PREFIX:line="37" PREFIX:column="25">(<param><type><name PREFIX:line="37" PREFIX:column="26">p</name></type></param>)</parameter_list></cpp:macro>         <cpp:value PREFIX:line="37" PREFIX:column="37">((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11)</cpp:value></cpp:define>
+<cpp:endif PREFIX:line="38" PREFIX:column="1">#<cpp:directive PREFIX:line="38" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<decl_stmt><decl><type><specifier PREFIX:line="40" PREFIX:column="1">static</specifier>  <name PREFIX:line="40" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="40" PREFIX:column="17">SS</name>   <init PREFIX:line="40" PREFIX:column="22">= <expr PREFIX:line="40" PREFIX:column="24">10</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="41" PREFIX:column="1">static</specifier>  <name PREFIX:line="41" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="41" PREFIX:column="17">MOSI</name> <init PREFIX:line="41" PREFIX:column="22">= <expr PREFIX:line="41" PREFIX:column="24">11</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="42" PREFIX:column="1">static</specifier>  <name PREFIX:line="42" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="42" PREFIX:column="17">MISO</name> <init PREFIX:line="42" PREFIX:column="22">= <expr PREFIX:line="42" PREFIX:column="24">12</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="43" PREFIX:column="1">static</specifier>  <name PREFIX:line="43" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="43" PREFIX:column="17">SCK</name>  <init PREFIX:line="43" PREFIX:column="22">= <expr PREFIX:line="43" PREFIX:column="24">13</expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><specifier PREFIX:line="45" PREFIX:column="1">static</specifier>  <name PREFIX:line="45" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="45" PREFIX:column="17">SDA</name> <init PREFIX:line="45" PREFIX:column="21">= <expr PREFIX:line="45" PREFIX:column="23">18</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="46" PREFIX:column="1">static</specifier>  <name PREFIX:line="46" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="46" PREFIX:column="17">SCL</name> <init PREFIX:line="46" PREFIX:column="21">= <expr PREFIX:line="46" PREFIX:column="23">19</expr></init></decl>;</decl_stmt>
+<cpp:define PREFIX:line="47" PREFIX:column="1">#<cpp:directive PREFIX:line="47" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="47" PREFIX:column="9">LED_BUILTIN</name></cpp:macro> <cpp:value PREFIX:line="47" PREFIX:column="21">13</cpp:value></cpp:define>
+
+<decl_stmt><decl><type><specifier PREFIX:line="49" PREFIX:column="1">static</specifier>  <name PREFIX:line="49" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="49" PREFIX:column="17">A0</name> <init PREFIX:line="49" PREFIX:column="20">= <expr PREFIX:line="49" PREFIX:column="22">14</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="50" PREFIX:column="1">static</specifier>  <name PREFIX:line="50" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="50" PREFIX:column="17">A1</name> <init PREFIX:line="50" PREFIX:column="20">= <expr PREFIX:line="50" PREFIX:column="22">15</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="51" PREFIX:column="1">static</specifier>  <name PREFIX:line="51" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="51" PREFIX:column="17">A2</name> <init PREFIX:line="51" PREFIX:column="20">= <expr PREFIX:line="51" PREFIX:column="22">16</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="52" PREFIX:column="1">static</specifier>  <name PREFIX:line="52" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="52" PREFIX:column="17">A3</name> <init PREFIX:line="52" PREFIX:column="20">= <expr PREFIX:line="52" PREFIX:column="22">17</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="53" PREFIX:column="1">static</specifier>  <name PREFIX:line="53" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="53" PREFIX:column="17">A4</name> <init PREFIX:line="53" PREFIX:column="20">= <expr PREFIX:line="53" PREFIX:column="22">18</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="54" PREFIX:column="1">static</specifier>  <name PREFIX:line="54" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="54" PREFIX:column="17">A5</name> <init PREFIX:line="54" PREFIX:column="20">= <expr PREFIX:line="54" PREFIX:column="22">19</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="55" PREFIX:column="1">static</specifier>  <name PREFIX:line="55" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="55" PREFIX:column="17">A6</name> <init PREFIX:line="55" PREFIX:column="20">= <expr PREFIX:line="55" PREFIX:column="22">20</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="56" PREFIX:column="1">static</specifier>  <name PREFIX:line="56" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="56" PREFIX:column="17">A7</name> <init PREFIX:line="56" PREFIX:column="20">= <expr PREFIX:line="56" PREFIX:column="22">21</expr></init></decl>;</decl_stmt>
+
+<cpp:define PREFIX:line="58" PREFIX:column="1">#<cpp:directive PREFIX:line="58" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="58" PREFIX:column="9">digitalPinToPCICR</name><parameter_list PREFIX:line="58" PREFIX:column="26">(<param><type><name PREFIX:line="58" PREFIX:column="27">p</name></type></param>)</parameter_list></cpp:macro>    <cpp:value PREFIX:line="58" PREFIX:column="33">(((p) &gt;= 0 &amp;&amp; (p) &lt;= 21) ? (&amp;PCICR) : ((uint8_t *)0))</cpp:value></cpp:define>
+<cpp:define PREFIX:line="59" PREFIX:column="1">#<cpp:directive PREFIX:line="59" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="59" PREFIX:column="9">digitalPinToPCICRbit</name><parameter_list PREFIX:line="59" PREFIX:column="29">(<param><type><name PREFIX:line="59" PREFIX:column="30">p</name></type></param>)</parameter_list></cpp:macro> <cpp:value PREFIX:line="59" PREFIX:column="33">(((p) &lt;= 7) ? 2 : (((p) &lt;= 13) ? 0 : 1))</cpp:value></cpp:define>
+<cpp:define PREFIX:line="60" PREFIX:column="1">#<cpp:directive PREFIX:line="60" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="60" PREFIX:column="9">digitalPinToPCMSK</name><parameter_list PREFIX:line="60" PREFIX:column="26">(<param><type><name PREFIX:line="60" PREFIX:column="27">p</name></type></param>)</parameter_list></cpp:macro>    <cpp:value PREFIX:line="60" PREFIX:column="33">(((p) &lt;= 7) ? (&amp;PCMSK2) : (((p) &lt;= 13) ? (&amp;PCMSK0) : (((p) &lt;= 21) ? (&amp;PCMSK1) : ((uint8_t *)0))))</cpp:value></cpp:define>
+<cpp:define PREFIX:line="61" PREFIX:column="1">#<cpp:directive PREFIX:line="61" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="61" PREFIX:column="9">digitalPinToPCMSKbit</name><parameter_list PREFIX:line="61" PREFIX:column="29">(<param><type><name PREFIX:line="61" PREFIX:column="30">p</name></type></param>)</parameter_list></cpp:macro> <cpp:value PREFIX:line="61" PREFIX:column="33">(((p) &lt;= 7) ? (p) : (((p) &lt;= 13) ? ((p) - 8) : ((p) - 14)))</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="63" PREFIX:column="1">#<cpp:directive PREFIX:line="63" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="63" PREFIX:column="9">digitalPinToInterrupt</name><parameter_list PREFIX:line="63" PREFIX:column="30">(<param><type><name PREFIX:line="63" PREFIX:column="31">p</name></type></param>)</parameter_list></cpp:macro>  <cpp:value PREFIX:line="63" PREFIX:column="35">((p) == 2 ? 0 : ((p) == 3 ? 1 : NOT_AN_INTERRUPT))</cpp:value></cpp:define>
+
+<cpp:ifdef PREFIX:line="65" PREFIX:column="1">#<cpp:directive PREFIX:line="65" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="65" PREFIX:column="8">ARDUINO_MAIN</name></cpp:ifdef>
+
+<comment type="line" PREFIX:line="67" PREFIX:column="1">// On the Arduino board, digital pins are also used</comment>
+<comment type="line" PREFIX:line="68" PREFIX:column="1">// for the analog output (software PWM).  Analog input</comment>
+<comment type="line" PREFIX:line="69" PREFIX:column="1">// pins are a separate set.</comment>
+
+<comment type="line" PREFIX:line="71" PREFIX:column="1">// ATMEL ATMEGA8 &amp; 168 / ARDUINO</comment>
+<comment type="line" PREFIX:line="72" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="73" PREFIX:column="1">//                  +-\/-+</comment>
+<comment type="line" PREFIX:line="74" PREFIX:column="1">//            PC6  1|    |28  PC5 (AI 5)</comment>
+<comment type="line" PREFIX:line="75" PREFIX:column="1">//      (D 0) PD0  2|    |27  PC4 (AI 4)</comment>
+<comment type="line" PREFIX:line="76" PREFIX:column="1">//      (D 1) PD1  3|    |26  PC3 (AI 3)</comment>
+<comment type="line" PREFIX:line="77" PREFIX:column="1">//      (D 2) PD2  4|    |25  PC2 (AI 2)</comment>
+<comment type="line" PREFIX:line="78" PREFIX:column="1">// PWM+ (D 3) PD3  5|    |24  PC1 (AI 1)</comment>
+<comment type="line" PREFIX:line="79" PREFIX:column="1">//      (D 4) PD4  6|    |23  PC0 (AI 0)</comment>
+<comment type="line" PREFIX:line="80" PREFIX:column="1">//            VCC  7|    |22  GND</comment>
+<comment type="line" PREFIX:line="81" PREFIX:column="1">//            GND  8|    |21  AREF</comment>
+<comment type="line" PREFIX:line="82" PREFIX:column="1">//            PB6  9|    |20  AVCC</comment>
+<comment type="line" PREFIX:line="83" PREFIX:column="1">//            PB7 10|    |19  PB5 (D 13)</comment>
+<comment type="line" PREFIX:line="84" PREFIX:column="1">// PWM+ (D 5) PD5 11|    |18  PB4 (D 12)</comment>
+<comment type="line" PREFIX:line="85" PREFIX:column="1">// PWM+ (D 6) PD6 12|    |17  PB3 (D 11) PWM</comment>
+<comment type="line" PREFIX:line="86" PREFIX:column="1">//      (D 7) PD7 13|    |16  PB2 (D 10) PWM</comment>
+<comment type="line" PREFIX:line="87" PREFIX:column="1">//      (D 8) PB0 14|    |15  PB1 (D 9) PWM</comment>
+<comment type="line" PREFIX:line="88" PREFIX:column="1">//                  +----+</comment>
+<comment type="line" PREFIX:line="89" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="90" PREFIX:column="1">// (PWM+ indicates the additional PWM pins on the ATmega168.)</comment>
+
+<comment type="line" PREFIX:line="92" PREFIX:column="1">// ATMEL ATMEGA1280 / ARDUINO</comment>
+<comment type="line" PREFIX:line="93" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="94" PREFIX:column="1">// 0-7 PE0-PE7   works</comment>
+<comment type="line" PREFIX:line="95" PREFIX:column="1">// 8-13 PB0-PB5  works</comment>
+<comment type="line" PREFIX:line="96" PREFIX:column="1">// 14-21 PA0-PA7 works </comment>
+<comment type="line" PREFIX:line="97" PREFIX:column="1">// 22-29 PH0-PH7 works</comment>
+<comment type="line" PREFIX:line="98" PREFIX:column="1">// 30-35 PG5-PG0 works</comment>
+<comment type="line" PREFIX:line="99" PREFIX:column="1">// 36-43 PC7-PC0 works</comment>
+<comment type="line" PREFIX:line="100" PREFIX:column="1">// 44-51 PJ7-PJ0 works</comment>
+<comment type="line" PREFIX:line="101" PREFIX:column="1">// 52-59 PL7-PL0 works</comment>
+<comment type="line" PREFIX:line="102" PREFIX:column="1">// 60-67 PD7-PD0 works</comment>
+<comment type="line" PREFIX:line="103" PREFIX:column="1">// A0-A7 PF0-PF7</comment>
+<comment type="line" PREFIX:line="104" PREFIX:column="1">// A8-A15 PK0-PK7</comment>
+
+
+<comment type="line" PREFIX:line="107" PREFIX:column="1">// these arrays map port names (e.g. port B) to the</comment>
+<comment type="line" PREFIX:line="108" PREFIX:column="1">// appropriate addresses for various functions (e.g. reading</comment>
+<comment type="line" PREFIX:line="109" PREFIX:column="1">// and writing)</comment>
+ <decl_stmt><decl><type><name PREFIX:line="110" PREFIX:column="2">uint16_t</name> <name PREFIX:line="110" PREFIX:column="11">PROGMEM</name></type> <name><name PREFIX:line="110" PREFIX:column="19">port_to_mode_PGM</name><index PREFIX:line="110" PREFIX:column="35">[]</index></name> <init PREFIX:line="110" PREFIX:column="38">= <expr><block PREFIX:line="110" PREFIX:column="40">{
+	<expr><name PREFIX:line="111" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr><name PREFIX:line="112" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr PREFIX:line="113" PREFIX:column="9">(<name PREFIX:line="113" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="113" PREFIX:column="21">DDRB</name></expr>,
+	<expr PREFIX:line="114" PREFIX:column="9">(<name PREFIX:line="114" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="114" PREFIX:column="21">DDRC</name></expr>,
+	<expr PREFIX:line="115" PREFIX:column="9">(<name PREFIX:line="115" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="115" PREFIX:column="21">DDRD</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="118" PREFIX:column="2">uint16_t</name> <name PREFIX:line="118" PREFIX:column="11">PROGMEM</name></type> <name><name PREFIX:line="118" PREFIX:column="19">port_to_output_PGM</name><index PREFIX:line="118" PREFIX:column="37">[]</index></name> <init PREFIX:line="118" PREFIX:column="40">= <expr><block PREFIX:line="118" PREFIX:column="42">{
+	<expr><name PREFIX:line="119" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr><name PREFIX:line="120" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr PREFIX:line="121" PREFIX:column="9">(<name PREFIX:line="121" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="121" PREFIX:column="21">PORTB</name></expr>,
+	<expr PREFIX:line="122" PREFIX:column="9">(<name PREFIX:line="122" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="122" PREFIX:column="21">PORTC</name></expr>,
+	<expr PREFIX:line="123" PREFIX:column="9">(<name PREFIX:line="123" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="123" PREFIX:column="21">PORTD</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="126" PREFIX:column="2">uint16_t</name> <name PREFIX:line="126" PREFIX:column="11">PROGMEM</name></type> <name><name PREFIX:line="126" PREFIX:column="19">port_to_input_PGM</name><index PREFIX:line="126" PREFIX:column="36">[]</index></name> <init PREFIX:line="126" PREFIX:column="39">= <expr><block PREFIX:line="126" PREFIX:column="41">{
+	<expr><name PREFIX:line="127" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr><name PREFIX:line="128" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr PREFIX:line="129" PREFIX:column="9">(<name PREFIX:line="129" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="129" PREFIX:column="21">PINB</name></expr>,
+	<expr PREFIX:line="130" PREFIX:column="9">(<name PREFIX:line="130" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="130" PREFIX:column="21">PINC</name></expr>,
+	<expr PREFIX:line="131" PREFIX:column="9">(<name PREFIX:line="131" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="131" PREFIX:column="21">PIND</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="134" PREFIX:column="2">uint8_t</name> <name PREFIX:line="134" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="134" PREFIX:column="18">digital_pin_to_port_PGM</name><index PREFIX:line="134" PREFIX:column="41">[]</index></name> <init PREFIX:line="134" PREFIX:column="44">= <expr><block PREFIX:line="134" PREFIX:column="46">{
+	<expr><name PREFIX:line="135" PREFIX:column="9">PD</name></expr>, <comment type="block" PREFIX:line="135" PREFIX:column="13">/* 0 */</comment>
+	<expr><name PREFIX:line="136" PREFIX:column="9">PD</name></expr>,
+	<expr><name PREFIX:line="137" PREFIX:column="9">PD</name></expr>,
+	<expr><name PREFIX:line="138" PREFIX:column="9">PD</name></expr>,
+	<expr><name PREFIX:line="139" PREFIX:column="9">PD</name></expr>,
+	<expr><name PREFIX:line="140" PREFIX:column="9">PD</name></expr>,
+	<expr><name PREFIX:line="141" PREFIX:column="9">PD</name></expr>,
+	<expr><name PREFIX:line="142" PREFIX:column="9">PD</name></expr>,
+	<expr><name PREFIX:line="143" PREFIX:column="9">PB</name></expr>, <comment type="block" PREFIX:line="143" PREFIX:column="13">/* 8 */</comment>
+	<expr><name PREFIX:line="144" PREFIX:column="9">PB</name></expr>,
+	<expr><name PREFIX:line="145" PREFIX:column="9">PB</name></expr>,
+	<expr><name PREFIX:line="146" PREFIX:column="9">PB</name></expr>,
+	<expr><name PREFIX:line="147" PREFIX:column="9">PB</name></expr>,
+	<expr><name PREFIX:line="148" PREFIX:column="9">PB</name></expr>,
+	<expr><name PREFIX:line="149" PREFIX:column="9">PC</name></expr>, <comment type="block" PREFIX:line="149" PREFIX:column="13">/* 14 */</comment>
+	<expr><name PREFIX:line="150" PREFIX:column="9">PC</name></expr>,
+	<expr><name PREFIX:line="151" PREFIX:column="9">PC</name></expr>,
+	<expr><name PREFIX:line="152" PREFIX:column="9">PC</name></expr>,
+	<expr><name PREFIX:line="153" PREFIX:column="9">PC</name></expr>,
+	<expr><name PREFIX:line="154" PREFIX:column="9">PC</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="157" PREFIX:column="2">uint8_t</name> <name PREFIX:line="157" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="157" PREFIX:column="18">digital_pin_to_bit_mask_PGM</name><index PREFIX:line="157" PREFIX:column="45">[]</index></name> <init PREFIX:line="157" PREFIX:column="48">= <expr><block PREFIX:line="157" PREFIX:column="50">{
+	<expr><call><name PREFIX:line="158" PREFIX:column="9">_BV</name><argument_list PREFIX:line="158" PREFIX:column="12">(<argument><expr PREFIX:line="158" PREFIX:column="13">0</expr></argument>)</argument_list></call></expr>, <comment type="block" PREFIX:line="158" PREFIX:column="17">/* 0, port D */</comment>
+	<expr><call><name PREFIX:line="159" PREFIX:column="9">_BV</name><argument_list PREFIX:line="159" PREFIX:column="12">(<argument><expr PREFIX:line="159" PREFIX:column="13">1</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="160" PREFIX:column="9">_BV</name><argument_list PREFIX:line="160" PREFIX:column="12">(<argument><expr PREFIX:line="160" PREFIX:column="13">2</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="161" PREFIX:column="9">_BV</name><argument_list PREFIX:line="161" PREFIX:column="12">(<argument><expr PREFIX:line="161" PREFIX:column="13">3</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="162" PREFIX:column="9">_BV</name><argument_list PREFIX:line="162" PREFIX:column="12">(<argument><expr PREFIX:line="162" PREFIX:column="13">4</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="163" PREFIX:column="9">_BV</name><argument_list PREFIX:line="163" PREFIX:column="12">(<argument><expr PREFIX:line="163" PREFIX:column="13">5</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="164" PREFIX:column="9">_BV</name><argument_list PREFIX:line="164" PREFIX:column="12">(<argument><expr PREFIX:line="164" PREFIX:column="13">6</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="165" PREFIX:column="9">_BV</name><argument_list PREFIX:line="165" PREFIX:column="12">(<argument><expr PREFIX:line="165" PREFIX:column="13">7</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="166" PREFIX:column="9">_BV</name><argument_list PREFIX:line="166" PREFIX:column="12">(<argument><expr PREFIX:line="166" PREFIX:column="13">0</expr></argument>)</argument_list></call></expr>, <comment type="block" PREFIX:line="166" PREFIX:column="17">/* 8, port B */</comment>
+	<expr><call><name PREFIX:line="167" PREFIX:column="9">_BV</name><argument_list PREFIX:line="167" PREFIX:column="12">(<argument><expr PREFIX:line="167" PREFIX:column="13">1</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="168" PREFIX:column="9">_BV</name><argument_list PREFIX:line="168" PREFIX:column="12">(<argument><expr PREFIX:line="168" PREFIX:column="13">2</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="169" PREFIX:column="9">_BV</name><argument_list PREFIX:line="169" PREFIX:column="12">(<argument><expr PREFIX:line="169" PREFIX:column="13">3</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="170" PREFIX:column="9">_BV</name><argument_list PREFIX:line="170" PREFIX:column="12">(<argument><expr PREFIX:line="170" PREFIX:column="13">4</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="171" PREFIX:column="9">_BV</name><argument_list PREFIX:line="171" PREFIX:column="12">(<argument><expr PREFIX:line="171" PREFIX:column="13">5</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="172" PREFIX:column="9">_BV</name><argument_list PREFIX:line="172" PREFIX:column="12">(<argument><expr PREFIX:line="172" PREFIX:column="13">0</expr></argument>)</argument_list></call></expr>, <comment type="block" PREFIX:line="172" PREFIX:column="17">/* 14, port C */</comment>
+	<expr><call><name PREFIX:line="173" PREFIX:column="9">_BV</name><argument_list PREFIX:line="173" PREFIX:column="12">(<argument><expr PREFIX:line="173" PREFIX:column="13">1</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="174" PREFIX:column="9">_BV</name><argument_list PREFIX:line="174" PREFIX:column="12">(<argument><expr PREFIX:line="174" PREFIX:column="13">2</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="175" PREFIX:column="9">_BV</name><argument_list PREFIX:line="175" PREFIX:column="12">(<argument><expr PREFIX:line="175" PREFIX:column="13">3</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="176" PREFIX:column="9">_BV</name><argument_list PREFIX:line="176" PREFIX:column="12">(<argument><expr PREFIX:line="176" PREFIX:column="13">4</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="177" PREFIX:column="9">_BV</name><argument_list PREFIX:line="177" PREFIX:column="12">(<argument><expr PREFIX:line="177" PREFIX:column="13">5</expr></argument>)</argument_list></call></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="180" PREFIX:column="2">uint8_t</name> <name PREFIX:line="180" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="180" PREFIX:column="18">digital_pin_to_timer_PGM</name><index PREFIX:line="180" PREFIX:column="42">[]</index></name> <init PREFIX:line="180" PREFIX:column="45">= <expr><block PREFIX:line="180" PREFIX:column="47">{
+	<expr><name PREFIX:line="181" PREFIX:column="9">NOT_ON_TIMER</name></expr>, <comment type="block" PREFIX:line="181" PREFIX:column="23">/* 0 - port D */</comment>
+	<expr><name PREFIX:line="182" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="183" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<comment type="line" PREFIX:line="184" PREFIX:column="9">// on the ATmega168, digital pin 3 has hardware pwm</comment>
+<cpp:if PREFIX:line="185" PREFIX:column="1">#<cpp:directive PREFIX:line="185" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="185" PREFIX:column="5">defined</name><argument_list PREFIX:line="185" PREFIX:column="12">(<argument><expr><name PREFIX:line="185" PREFIX:column="13">__AVR_ATmega8__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr><name PREFIX:line="186" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+<cpp:else PREFIX:line="187" PREFIX:column="1">#<cpp:directive PREFIX:line="187" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<expr><name PREFIX:line="188" PREFIX:column="9">TIMER2B</name></expr>,
+<cpp:endif PREFIX:line="189" PREFIX:column="1">#<cpp:directive PREFIX:line="189" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+	<expr><name PREFIX:line="190" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<comment type="line" PREFIX:line="191" PREFIX:column="9">// on the ATmega168, digital pins 5 and 6 have hardware pwm</comment>
+<cpp:if PREFIX:line="192" PREFIX:column="1">#<cpp:directive PREFIX:line="192" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="192" PREFIX:column="5">defined</name><argument_list PREFIX:line="192" PREFIX:column="12">(<argument><expr><name PREFIX:line="192" PREFIX:column="13">__AVR_ATmega8__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr><name PREFIX:line="193" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="194" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+<cpp:else PREFIX:line="195" PREFIX:column="1">#<cpp:directive PREFIX:line="195" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<expr><name PREFIX:line="196" PREFIX:column="9">TIMER0B</name></expr>,
+	<expr><name PREFIX:line="197" PREFIX:column="9">TIMER0A</name></expr>,
+<cpp:endif PREFIX:line="198" PREFIX:column="1">#<cpp:directive PREFIX:line="198" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+	<expr><name PREFIX:line="199" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="200" PREFIX:column="9">NOT_ON_TIMER</name></expr>, <comment type="block" PREFIX:line="200" PREFIX:column="23">/* 8 - port B */</comment>
+	<expr><name PREFIX:line="201" PREFIX:column="9">TIMER1A</name></expr>,
+	<expr><name PREFIX:line="202" PREFIX:column="9">TIMER1B</name></expr>,
+<cpp:if PREFIX:line="203" PREFIX:column="1">#<cpp:directive PREFIX:line="203" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="203" PREFIX:column="5">defined</name><argument_list PREFIX:line="203" PREFIX:column="12">(<argument><expr><name PREFIX:line="203" PREFIX:column="13">__AVR_ATmega8__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr><name PREFIX:line="204" PREFIX:column="9">TIMER2</name></expr>,
+<cpp:else PREFIX:line="205" PREFIX:column="1">#<cpp:directive PREFIX:line="205" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<expr><name PREFIX:line="206" PREFIX:column="9">TIMER2A</name></expr>,
+<cpp:endif PREFIX:line="207" PREFIX:column="1">#<cpp:directive PREFIX:line="207" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+	<expr><name PREFIX:line="208" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="209" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="210" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="211" PREFIX:column="9">NOT_ON_TIMER</name></expr>, <comment type="block" PREFIX:line="211" PREFIX:column="23">/* 14 - port C */</comment>
+	<expr><name PREFIX:line="212" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="213" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="214" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+	<expr><name PREFIX:line="215" PREFIX:column="9">NOT_ON_TIMER</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+<cpp:endif PREFIX:line="218" PREFIX:column="1">#<cpp:directive PREFIX:line="218" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<comment type="line" PREFIX:line="220" PREFIX:column="1">// These serial port names are intended to allow libraries and architecture-neutral</comment>
+<comment type="line" PREFIX:line="221" PREFIX:column="1">// sketches to automatically default to the correct port name for a particular type</comment>
+<comment type="line" PREFIX:line="222" PREFIX:column="1">// of use.  For example, a GPS module would normally connect to SERIAL_PORT_HARDWARE_OPEN,</comment>
+<comment type="line" PREFIX:line="223" PREFIX:column="1">// the first hardware serial port whose RX/TX pins are not dedicated to another use.</comment>
+<comment type="line" PREFIX:line="224" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="225" PREFIX:column="1">// SERIAL_PORT_MONITOR        Port which normally prints to the Arduino Serial Monitor</comment>
+<comment type="line" PREFIX:line="226" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="227" PREFIX:column="1">// SERIAL_PORT_USBVIRTUAL     Port which is USB virtual serial</comment>
+<comment type="line" PREFIX:line="228" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="229" PREFIX:column="1">// SERIAL_PORT_LINUXBRIDGE    Port which connects to a Linux system via Bridge library</comment>
+<comment type="line" PREFIX:line="230" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="231" PREFIX:column="1">// SERIAL_PORT_HARDWARE       Hardware serial port, physical RX &amp; TX pins.</comment>
+<comment type="line" PREFIX:line="232" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="233" PREFIX:column="1">// SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX &amp; TX</comment>
+<comment type="line" PREFIX:line="234" PREFIX:column="1">//                            pins are NOT connected to anything by default.</comment>
+<cpp:define PREFIX:line="235" PREFIX:column="1">#<cpp:directive PREFIX:line="235" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="235" PREFIX:column="9">SERIAL_PORT_MONITOR</name></cpp:macro>   <cpp:value PREFIX:line="235" PREFIX:column="31">Serial</cpp:value></cpp:define>
+<cpp:define PREFIX:line="236" PREFIX:column="1">#<cpp:directive PREFIX:line="236" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="236" PREFIX:column="9">SERIAL_PORT_HARDWARE</name></cpp:macro>  <cpp:value PREFIX:line="236" PREFIX:column="31">Serial</cpp:value></cpp:define>
+
+<cpp:endif PREFIX:line="238" PREFIX:column="1">#<cpp:directive PREFIX:line="238" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+</unit>

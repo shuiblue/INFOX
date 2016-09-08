@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/SPI/SPI.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+ * Copyright (c) 2010 by Cristian Maglie &lt;c.maglie@bug.st&gt;
+ * SPI Master library for arduino.
+ *
+ * This file is free software; you can redistribute it and/or modify
+ * it under the terms of either the GNU General Public License version 2
+ * or the GNU Lesser General Public License version 2.1, both as
+ * published by the Free Software Foundation.
+ */</comment>
+
+<cpp:include PREFIX:line="11" PREFIX:column="1">#<cpp:directive PREFIX:line="11" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="11" PREFIX:column="10">"pins_arduino.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="12" PREFIX:column="1">#<cpp:directive PREFIX:line="12" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="12" PREFIX:column="10">"SPI.h"</cpp:file></cpp:include>
+
+<decl_stmt><decl><type><name PREFIX:line="14" PREFIX:column="1">SPIClass</name></type> <name PREFIX:line="14" PREFIX:column="10">SPI</name></decl>;</decl_stmt>
+
+<function><type><name PREFIX:line="16" PREFIX:column="1">void</name></type> <name><name PREFIX:line="16" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="16" PREFIX:column="16">begin</name></name><parameter_list PREFIX:line="16" PREFIX:column="21">()</parameter_list> <block PREFIX:line="16" PREFIX:column="24">{
+
+  <comment type="line" PREFIX:line="18" PREFIX:column="3">// Set SS to high so a connected chip will be "deselected" by default</comment>
+  <expr_stmt><expr><call><name PREFIX:line="19" PREFIX:column="3">digitalWrite</name><argument_list PREFIX:line="19" PREFIX:column="15">(<argument><expr><name PREFIX:line="19" PREFIX:column="16">SS</name></expr></argument>, <argument><expr><name PREFIX:line="19" PREFIX:column="20">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="21" PREFIX:column="3">// When the SS pin is set as OUTPUT, it can be used as</comment>
+  <comment type="line" PREFIX:line="22" PREFIX:column="3">// a general purpose output port (it doesn't influence</comment>
+  <comment type="line" PREFIX:line="23" PREFIX:column="3">// SPI operations).</comment>
+  <expr_stmt><expr><call><name PREFIX:line="24" PREFIX:column="3">pinMode</name><argument_list PREFIX:line="24" PREFIX:column="10">(<argument><expr><name PREFIX:line="24" PREFIX:column="11">SS</name></expr></argument>, <argument><expr><name PREFIX:line="24" PREFIX:column="15">OUTPUT</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="26" PREFIX:column="3">// Warning: if the SS pin ever becomes a LOW INPUT then SPI</comment>
+  <comment type="line" PREFIX:line="27" PREFIX:column="3">// automatically switches to Slave, so the data direction of</comment>
+  <comment type="line" PREFIX:line="28" PREFIX:column="3">// the SS pin MUST be kept as OUTPUT.</comment>
+  <expr_stmt><expr><name PREFIX:line="29" PREFIX:column="3">SPCR</name> |= <call><name PREFIX:line="29" PREFIX:column="11">_BV</name><argument_list PREFIX:line="29" PREFIX:column="14">(<argument><expr><name PREFIX:line="29" PREFIX:column="15">MSTR</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="30" PREFIX:column="3">SPCR</name> |= <call><name PREFIX:line="30" PREFIX:column="11">_BV</name><argument_list PREFIX:line="30" PREFIX:column="14">(<argument><expr><name PREFIX:line="30" PREFIX:column="15">SPE</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="32" PREFIX:column="3">// Set direction register for SCK and MOSI pin.</comment>
+  <comment type="line" PREFIX:line="33" PREFIX:column="3">// MISO pin automatically overrides to INPUT.</comment>
+  <comment type="line" PREFIX:line="34" PREFIX:column="3">// By doing this AFTER enabling SPI, we avoid accidentally</comment>
+  <comment type="line" PREFIX:line="35" PREFIX:column="3">// clocking in a single bit since the lines go directly</comment>
+  <comment type="line" PREFIX:line="36" PREFIX:column="3">// from "input" to SPI control.  </comment>
+  <comment type="line" PREFIX:line="37" PREFIX:column="3">// http://code.google.com/p/arduino/issues/detail?id=888</comment>
+  <expr_stmt><expr><call><name PREFIX:line="38" PREFIX:column="3">pinMode</name><argument_list PREFIX:line="38" PREFIX:column="10">(<argument><expr><name PREFIX:line="38" PREFIX:column="11">SCK</name></expr></argument>, <argument><expr><name PREFIX:line="38" PREFIX:column="16">OUTPUT</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="39" PREFIX:column="3">pinMode</name><argument_list PREFIX:line="39" PREFIX:column="10">(<argument><expr><name PREFIX:line="39" PREFIX:column="11">MOSI</name></expr></argument>, <argument><expr><name PREFIX:line="39" PREFIX:column="17">OUTPUT</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+
+<function><type><name PREFIX:line="43" PREFIX:column="1">void</name></type> <name><name PREFIX:line="43" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="43" PREFIX:column="16">end</name></name><parameter_list PREFIX:line="43" PREFIX:column="19">()</parameter_list> <block PREFIX:line="43" PREFIX:column="22">{
+  <expr_stmt><expr><name PREFIX:line="44" PREFIX:column="3">SPCR</name> &amp;= ~<call><name PREFIX:line="44" PREFIX:column="12">_BV</name><argument_list PREFIX:line="44" PREFIX:column="15">(<argument><expr><name PREFIX:line="44" PREFIX:column="16">SPE</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="47" PREFIX:column="1">void</name></type> <name><name PREFIX:line="47" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="47" PREFIX:column="16">setBitOrder</name></name><parameter_list PREFIX:line="47" PREFIX:column="27">(<param><decl><type><name PREFIX:line="47" PREFIX:column="28">uint8_t</name></type> <name PREFIX:line="47" PREFIX:column="36">bitOrder</name></decl></param>)</parameter_list>
+<block PREFIX:line="48" PREFIX:column="1">{
+  <if PREFIX:line="49" PREFIX:column="3">if<condition PREFIX:line="49" PREFIX:column="5">(<expr><name PREFIX:line="49" PREFIX:column="6">bitOrder</name> == <name PREFIX:line="49" PREFIX:column="18">LSBFIRST</name></expr>)</condition><then PREFIX:line="49" PREFIX:column="27"> <block PREFIX:line="49" PREFIX:column="28">{
+    <expr_stmt><expr><name PREFIX:line="50" PREFIX:column="5">SPCR</name> |= <call><name PREFIX:line="50" PREFIX:column="13">_BV</name><argument_list PREFIX:line="50" PREFIX:column="16">(<argument><expr><name PREFIX:line="50" PREFIX:column="17">DORD</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then> <else PREFIX:line="51" PREFIX:column="5">else <block PREFIX:line="51" PREFIX:column="10">{
+    <expr_stmt><expr><name PREFIX:line="52" PREFIX:column="5">SPCR</name> &amp;= ~(<call><name PREFIX:line="52" PREFIX:column="15">_BV</name><argument_list PREFIX:line="52" PREFIX:column="18">(<argument><expr><name PREFIX:line="52" PREFIX:column="19">DORD</name></expr></argument>)</argument_list></call>)</expr>;</expr_stmt>
+  }</block></else></if>
+}</block></function>
+
+<function><type><name PREFIX:line="56" PREFIX:column="1">void</name></type> <name><name PREFIX:line="56" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="56" PREFIX:column="16">setDataMode</name></name><parameter_list PREFIX:line="56" PREFIX:column="27">(<param><decl><type><name PREFIX:line="56" PREFIX:column="28">uint8_t</name></type> <name PREFIX:line="56" PREFIX:column="36">mode</name></decl></param>)</parameter_list>
+<block PREFIX:line="57" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="58" PREFIX:column="3">SPCR</name> = (<name PREFIX:line="58" PREFIX:column="11">SPCR</name> &amp; ~<name PREFIX:line="58" PREFIX:column="19">SPI_MODE_MASK</name>) | <name PREFIX:line="58" PREFIX:column="36">mode</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="61" PREFIX:column="1">void</name></type> <name><name PREFIX:line="61" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="61" PREFIX:column="16">setClockDivider</name></name><parameter_list PREFIX:line="61" PREFIX:column="31">(<param><decl><type><name PREFIX:line="61" PREFIX:column="32">uint8_t</name></type> <name PREFIX:line="61" PREFIX:column="40">rate</name></decl></param>)</parameter_list>
+<block PREFIX:line="62" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="63" PREFIX:column="3">SPCR</name> = (<name PREFIX:line="63" PREFIX:column="11">SPCR</name> &amp; ~<name PREFIX:line="63" PREFIX:column="19">SPI_CLOCK_MASK</name>) | (<name PREFIX:line="63" PREFIX:column="38">rate</name> &amp; <name PREFIX:line="63" PREFIX:column="45">SPI_CLOCK_MASK</name>)</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="64" PREFIX:column="3">SPSR</name> = (<name PREFIX:line="64" PREFIX:column="11">SPSR</name> &amp; ~<name PREFIX:line="64" PREFIX:column="19">SPI_2XCLOCK_MASK</name>) | ((<name PREFIX:line="64" PREFIX:column="41">rate</name> &gt;&gt; 2) &amp; <name PREFIX:line="64" PREFIX:column="54">SPI_2XCLOCK_MASK</name>)</expr>;</expr_stmt>
+}</block></function>
+
+</unit>

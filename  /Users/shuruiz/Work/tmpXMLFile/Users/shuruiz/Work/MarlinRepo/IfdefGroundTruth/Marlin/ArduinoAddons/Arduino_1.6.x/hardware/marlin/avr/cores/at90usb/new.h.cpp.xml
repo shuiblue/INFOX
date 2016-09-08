@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/at90usb/new.h.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/* Header to define new/delete operators as they aren't provided by avr-gcc by default
+   Taken from http://www.avrfreaks.net/index.php?name=PNphpBB2&amp;file=viewtopic&amp;t=59453 
+ */</comment>
+
+<cpp:ifndef PREFIX:line="5" PREFIX:column="1">#<cpp:directive PREFIX:line="5" PREFIX:column="2">ifndef</cpp:directive> <name PREFIX:line="5" PREFIX:column="9">NEW_H</name></cpp:ifndef>
+<cpp:define PREFIX:line="6" PREFIX:column="1">#<cpp:directive PREFIX:line="6" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="6" PREFIX:column="9">NEW_H</name></cpp:macro></cpp:define>
+
+<cpp:include PREFIX:line="8" PREFIX:column="1">#<cpp:directive PREFIX:line="8" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="8" PREFIX:column="10">&lt;stdlib.h&gt;</cpp:file></cpp:include>
+
+<function_decl><type><name PREFIX:line="10" PREFIX:column="1">void</name> *</type> <name PREFIX:line="10" PREFIX:column="8">operator new</name><parameter_list PREFIX:line="10" PREFIX:column="20">(<param><decl><type><name PREFIX:line="10" PREFIX:column="21">size_t</name></type> <name PREFIX:line="10" PREFIX:column="28">size</name></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name PREFIX:line="11" PREFIX:column="1">void</name></type> <name PREFIX:line="11" PREFIX:column="6">operator delete</name><parameter_list PREFIX:line="11" PREFIX:column="21">(<param><decl><type><name PREFIX:line="11" PREFIX:column="22">void</name> *</type> <name PREFIX:line="11" PREFIX:column="29">ptr</name></decl></param>)</parameter_list>;</function_decl> 
+
+<macro><name PREFIX:line="13" PREFIX:column="1">__extension__</name></macro> <typedef PREFIX:line="13" PREFIX:column="15">typedef <type><name PREFIX:line="13" PREFIX:column="23">int</name> <name PREFIX:line="13" PREFIX:column="27">__guard</name></type> <name PREFIX:line="13" PREFIX:column="35">__attribute__</name>((<name PREFIX:line="13" PREFIX:column="50">mode</name> (<name PREFIX:line="13" PREFIX:column="56">__DI__</name>)));</typedef>
+
+<extern PREFIX:line="15" PREFIX:column="1">extern "C" <function_decl><type><name PREFIX:line="15" PREFIX:column="12">int</name></type> <name PREFIX:line="15" PREFIX:column="16">__cxa_guard_acquire</name><parameter_list PREFIX:line="15" PREFIX:column="35">(<param><decl><type><name PREFIX:line="15" PREFIX:column="36">__guard</name> *</type></decl></param>)</parameter_list>;</function_decl></extern>
+<extern PREFIX:line="16" PREFIX:column="1">extern "C" <function_decl><type><name PREFIX:line="16" PREFIX:column="12">void</name></type> <name PREFIX:line="16" PREFIX:column="17">__cxa_guard_release</name> <parameter_list PREFIX:line="16" PREFIX:column="37">(<param><decl><type><name PREFIX:line="16" PREFIX:column="38">__guard</name> *</type></decl></param>)</parameter_list>;</function_decl></extern>
+<extern PREFIX:line="17" PREFIX:column="1">extern "C" <function_decl><type><name PREFIX:line="17" PREFIX:column="12">void</name></type> <name PREFIX:line="17" PREFIX:column="17">__cxa_guard_abort</name> <parameter_list PREFIX:line="17" PREFIX:column="35">(<param><decl><type><name PREFIX:line="17" PREFIX:column="36">__guard</name> *</type></decl></param>)</parameter_list>;</function_decl></extern> 
+
+<extern PREFIX:line="19" PREFIX:column="1">extern "C" <function_decl><type><name PREFIX:line="19" PREFIX:column="12">void</name></type> <name PREFIX:line="19" PREFIX:column="17">__cxa_pure_virtual</name><parameter_list PREFIX:line="19" PREFIX:column="35">(<param><decl><type><name PREFIX:line="19" PREFIX:column="36">void</name></type></decl></param>)</parameter_list>;</function_decl></extern>
+
+<cpp:endif PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+</unit>

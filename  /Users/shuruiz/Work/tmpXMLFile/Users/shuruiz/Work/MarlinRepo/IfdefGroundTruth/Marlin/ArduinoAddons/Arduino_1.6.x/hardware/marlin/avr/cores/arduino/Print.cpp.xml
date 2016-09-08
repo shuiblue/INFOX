@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/arduino/Print.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+ Print.cpp - Base class that provides print() and println()
+ Copyright (c) 2008 David A. Mellis.  All right reserved.
+ 
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ 
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ 
+ Modified 23 November 2006 by David A. Mellis
+ */</comment>
+
+<cpp:include PREFIX:line="22" PREFIX:column="1">#<cpp:directive PREFIX:line="22" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="22" PREFIX:column="10">&lt;stdlib.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="23" PREFIX:column="10">&lt;stdio.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="24" PREFIX:column="1">#<cpp:directive PREFIX:line="24" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="24" PREFIX:column="10">&lt;string.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="25" PREFIX:column="10">&lt;math.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="26" PREFIX:column="10">"Arduino.h"</cpp:file></cpp:include>
+
+<cpp:include PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="28" PREFIX:column="10">"Print.h"</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="30" PREFIX:column="1">// Public Methods //////////////////////////////////////////////////////////////</comment>
+
+<comment type="block" PREFIX:line="32" PREFIX:column="1">/* default implementation: may be overridden */</comment>
+<function><type><name PREFIX:line="33" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="33" PREFIX:column="8">Print</name>::<name PREFIX:line="33" PREFIX:column="15">write</name></name><parameter_list PREFIX:line="33" PREFIX:column="20">( <param><decl><type><name PREFIX:line="33" PREFIX:column="22">uint8_t</name> *</type><name PREFIX:line="33" PREFIX:column="31">buffer</name></decl></param>, <param><decl><type><name PREFIX:line="33" PREFIX:column="39">size_t</name></type> <name PREFIX:line="33" PREFIX:column="46">size</name></decl></param>)</parameter_list>
+<block PREFIX:line="34" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="35" PREFIX:column="3">size_t</name></type> <name PREFIX:line="35" PREFIX:column="10">n</name> <init PREFIX:line="35" PREFIX:column="12">= <expr PREFIX:line="35" PREFIX:column="14">0</expr></init></decl>;</decl_stmt>
+  <while PREFIX:line="36" PREFIX:column="3">while <condition PREFIX:line="36" PREFIX:column="9">(<expr><name PREFIX:line="36" PREFIX:column="10">size</name>--</expr>)</condition> <block PREFIX:line="36" PREFIX:column="18">{
+    <expr_stmt><expr><name PREFIX:line="37" PREFIX:column="5">n</name> += <call><name PREFIX:line="37" PREFIX:column="10">write</name><argument_list PREFIX:line="37" PREFIX:column="15">(<argument><expr PREFIX:line="37" PREFIX:column="16">*<name PREFIX:line="37" PREFIX:column="17">buffer</name>++</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></while>
+  <return PREFIX:line="39" PREFIX:column="3">return <expr><name PREFIX:line="39" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="42" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="42" PREFIX:column="8">Print</name>::<name PREFIX:line="42" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="42" PREFIX:column="20">( <param><decl><type><name PREFIX:line="42" PREFIX:column="22">__FlashStringHelper</name> *</type><name PREFIX:line="42" PREFIX:column="43">ifsh</name></decl></param>)</parameter_list>
+<block PREFIX:line="43" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="44" PREFIX:column="3">PGM_P</name></type> <name PREFIX:line="44" PREFIX:column="9">p</name> <init PREFIX:line="44" PREFIX:column="11">= <expr><call><name><name PREFIX:line="44" PREFIX:column="13">reinterpret_cast</name><argument_list PREFIX:line="44" PREFIX:column="29">&lt;<argument><expr><name PREFIX:line="44" PREFIX:column="30">PGM_P</name></expr></argument>&gt;</argument_list></name><argument_list PREFIX:line="44" PREFIX:column="36">(<argument><expr><name PREFIX:line="44" PREFIX:column="37">ifsh</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="45" PREFIX:column="3">size_t</name></type> <name PREFIX:line="45" PREFIX:column="10">n</name> <init PREFIX:line="45" PREFIX:column="12">= <expr PREFIX:line="45" PREFIX:column="14">0</expr></init></decl>;</decl_stmt>
+  <while PREFIX:line="46" PREFIX:column="3">while <condition PREFIX:line="46" PREFIX:column="9">(<expr PREFIX:line="46" PREFIX:column="10">1</expr>)</condition> <block PREFIX:line="46" PREFIX:column="13">{
+    <decl_stmt><decl><type><name PREFIX:line="47" PREFIX:column="5">unknowntype</name> <name PREFIX:line="47" PREFIX:column="17">char</name></type> <name PREFIX:line="47" PREFIX:column="22">c</name> <init PREFIX:line="47" PREFIX:column="24">= <expr><call><name PREFIX:line="47" PREFIX:column="26">pgm_read_byte</name><argument_list PREFIX:line="47" PREFIX:column="39">(<argument><expr><name PREFIX:line="47" PREFIX:column="40">p</name>++</expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+    <if PREFIX:line="48" PREFIX:column="5">if <condition PREFIX:line="48" PREFIX:column="8">(<expr><name PREFIX:line="48" PREFIX:column="9">c</name> == 0</expr>)</condition><then PREFIX:line="48" PREFIX:column="16"> <break PREFIX:line="48" PREFIX:column="17">break;</break></then></if>
+    <expr_stmt><expr><name PREFIX:line="49" PREFIX:column="5">n</name> += <call><name PREFIX:line="49" PREFIX:column="10">write</name><argument_list PREFIX:line="49" PREFIX:column="15">(<argument><expr><name PREFIX:line="49" PREFIX:column="16">c</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></while>
+  <return PREFIX:line="51" PREFIX:column="3">return <expr><name PREFIX:line="51" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="54" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="54" PREFIX:column="8">Print</name>::<name PREFIX:line="54" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="54" PREFIX:column="20">( <param><decl><type><name PREFIX:line="54" PREFIX:column="22">String</name> &amp;</type><name PREFIX:line="54" PREFIX:column="30">s</name></decl></param>)</parameter_list>
+<block PREFIX:line="55" PREFIX:column="1">{
+  <return PREFIX:line="56" PREFIX:column="3">return <expr><call><name PREFIX:line="56" PREFIX:column="10">write</name><argument_list PREFIX:line="56" PREFIX:column="15">(<argument><expr><call><name><name PREFIX:line="56" PREFIX:column="16">s</name>.<name PREFIX:line="56" PREFIX:column="18">c_str</name></name><argument_list PREFIX:line="56" PREFIX:column="23">()</argument_list></call></expr></argument>, <argument><expr><call><name><name PREFIX:line="56" PREFIX:column="27">s</name>.<name PREFIX:line="56" PREFIX:column="29">length</name></name><argument_list PREFIX:line="56" PREFIX:column="35">()</argument_list></call></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="59" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="59" PREFIX:column="8">Print</name>::<name PREFIX:line="59" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="59" PREFIX:column="20">( <param><decl><type><name PREFIX:line="59" PREFIX:column="22">char</name></type> <name><name PREFIX:line="59" PREFIX:column="27">str</name><index PREFIX:line="59" PREFIX:column="30">[]</index></name></decl></param>)</parameter_list>
+<block PREFIX:line="60" PREFIX:column="1">{
+  <return PREFIX:line="61" PREFIX:column="3">return <expr><call><name PREFIX:line="61" PREFIX:column="10">write</name><argument_list PREFIX:line="61" PREFIX:column="15">(<argument><expr><name PREFIX:line="61" PREFIX:column="16">str</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="64" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="64" PREFIX:column="8">Print</name>::<name PREFIX:line="64" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="64" PREFIX:column="20">(<param><decl><type><name PREFIX:line="64" PREFIX:column="21">char</name></type> <name PREFIX:line="64" PREFIX:column="26">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="65" PREFIX:column="1">{
+  <return PREFIX:line="66" PREFIX:column="3">return <expr><call><name PREFIX:line="66" PREFIX:column="10">write</name><argument_list PREFIX:line="66" PREFIX:column="15">(<argument><expr><name PREFIX:line="66" PREFIX:column="16">c</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="69" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="69" PREFIX:column="8">Print</name>::<name PREFIX:line="69" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="69" PREFIX:column="20">(<param><decl><type><name PREFIX:line="69" PREFIX:column="21">unknowntype</name> <name PREFIX:line="69" PREFIX:column="33">char</name></type> <name PREFIX:line="69" PREFIX:column="38">b</name></decl></param>, <param><decl><type><name PREFIX:line="69" PREFIX:column="41">int</name></type> <name PREFIX:line="69" PREFIX:column="45">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="70" PREFIX:column="1">{
+  <return PREFIX:line="71" PREFIX:column="3">return <expr><call><name PREFIX:line="71" PREFIX:column="10">print</name><argument_list PREFIX:line="71" PREFIX:column="15">(<argument><expr PREFIX:line="71" PREFIX:column="16">(<name PREFIX:line="71" PREFIX:column="17">unknowntype</name> <name PREFIX:line="71" PREFIX:column="29">long</name>) <name PREFIX:line="71" PREFIX:column="35">b</name></expr></argument>, <argument><expr><name PREFIX:line="71" PREFIX:column="38">base</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="74" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="74" PREFIX:column="8">Print</name>::<name PREFIX:line="74" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="74" PREFIX:column="20">(<param><decl><type><name PREFIX:line="74" PREFIX:column="21">int</name></type> <name PREFIX:line="74" PREFIX:column="25">n</name></decl></param>, <param><decl><type><name PREFIX:line="74" PREFIX:column="28">int</name></type> <name PREFIX:line="74" PREFIX:column="32">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="75" PREFIX:column="1">{
+  <return PREFIX:line="76" PREFIX:column="3">return <expr><call><name PREFIX:line="76" PREFIX:column="10">print</name><argument_list PREFIX:line="76" PREFIX:column="15">(<argument><expr PREFIX:line="76" PREFIX:column="16">(<name PREFIX:line="76" PREFIX:column="17">long</name>) <name PREFIX:line="76" PREFIX:column="23">n</name></expr></argument>, <argument><expr><name PREFIX:line="76" PREFIX:column="26">base</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="79" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="79" PREFIX:column="8">Print</name>::<name PREFIX:line="79" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="79" PREFIX:column="20">(<param><decl><type><name PREFIX:line="79" PREFIX:column="21">unknowntype</name> <name PREFIX:line="79" PREFIX:column="33">int</name></type> <name PREFIX:line="79" PREFIX:column="37">n</name></decl></param>, <param><decl><type><name PREFIX:line="79" PREFIX:column="40">int</name></type> <name PREFIX:line="79" PREFIX:column="44">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="80" PREFIX:column="1">{
+  <return PREFIX:line="81" PREFIX:column="3">return <expr><call><name PREFIX:line="81" PREFIX:column="10">print</name><argument_list PREFIX:line="81" PREFIX:column="15">(<argument><expr PREFIX:line="81" PREFIX:column="16">(<name PREFIX:line="81" PREFIX:column="17">unknowntype</name> <name PREFIX:line="81" PREFIX:column="29">long</name>) <name PREFIX:line="81" PREFIX:column="35">n</name></expr></argument>, <argument><expr><name PREFIX:line="81" PREFIX:column="38">base</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="84" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="84" PREFIX:column="8">Print</name>::<name PREFIX:line="84" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="84" PREFIX:column="20">(<param><decl><type><name PREFIX:line="84" PREFIX:column="21">long</name></type> <name PREFIX:line="84" PREFIX:column="26">n</name></decl></param>, <param><decl><type><name PREFIX:line="84" PREFIX:column="29">int</name></type> <name PREFIX:line="84" PREFIX:column="33">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="85" PREFIX:column="1">{
+  <if PREFIX:line="86" PREFIX:column="3">if <condition PREFIX:line="86" PREFIX:column="6">(<expr><name PREFIX:line="86" PREFIX:column="7">base</name> == 0</expr>)</condition><then PREFIX:line="86" PREFIX:column="17"> <block PREFIX:line="86" PREFIX:column="18">{
+    <return PREFIX:line="87" PREFIX:column="5">return <expr><call><name PREFIX:line="87" PREFIX:column="12">write</name><argument_list PREFIX:line="87" PREFIX:column="17">(<argument><expr><name PREFIX:line="87" PREFIX:column="18">n</name></expr></argument>)</argument_list></call></expr>;</return>
+  }</block></then> <else PREFIX:line="88" PREFIX:column="5">else <if PREFIX:line="88" PREFIX:column="10">if <condition PREFIX:line="88" PREFIX:column="13">(<expr><name PREFIX:line="88" PREFIX:column="14">base</name> == 10</expr>)</condition><then PREFIX:line="88" PREFIX:column="25"> <block PREFIX:line="88" PREFIX:column="26">{
+    <if PREFIX:line="89" PREFIX:column="5">if <condition PREFIX:line="89" PREFIX:column="8">(<expr><name PREFIX:line="89" PREFIX:column="9">n</name> &lt; 0</expr>)</condition><then PREFIX:line="89" PREFIX:column="15"> <block PREFIX:line="89" PREFIX:column="16">{
+      <decl_stmt><decl><type><name PREFIX:line="90" PREFIX:column="7">int</name></type> <name PREFIX:line="90" PREFIX:column="11">t</name> <init PREFIX:line="90" PREFIX:column="13">= <expr><call><name PREFIX:line="90" PREFIX:column="15">print</name><argument_list PREFIX:line="90" PREFIX:column="20">(<argument><expr PREFIX:line="90" PREFIX:column="21">'-'</expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+      <expr_stmt><expr><name PREFIX:line="91" PREFIX:column="7">n</name> = -<name PREFIX:line="91" PREFIX:column="12">n</name></expr>;</expr_stmt>
+      <return PREFIX:line="92" PREFIX:column="7">return <expr><call><name PREFIX:line="92" PREFIX:column="14">printNumber</name><argument_list PREFIX:line="92" PREFIX:column="25">(<argument><expr><name PREFIX:line="92" PREFIX:column="26">n</name></expr></argument>, <argument><expr PREFIX:line="92" PREFIX:column="29">10</expr></argument>)</argument_list></call> + <name PREFIX:line="92" PREFIX:column="35">t</name></expr>;</return>
+    }</block></then></if>
+    <return PREFIX:line="94" PREFIX:column="5">return <expr><call><name PREFIX:line="94" PREFIX:column="12">printNumber</name><argument_list PREFIX:line="94" PREFIX:column="23">(<argument><expr><name PREFIX:line="94" PREFIX:column="24">n</name></expr></argument>, <argument><expr PREFIX:line="94" PREFIX:column="27">10</expr></argument>)</argument_list></call></expr>;</return>
+  }</block></then> <else PREFIX:line="95" PREFIX:column="5">else <block PREFIX:line="95" PREFIX:column="10">{
+    <return PREFIX:line="96" PREFIX:column="5">return <expr><call><name PREFIX:line="96" PREFIX:column="12">printNumber</name><argument_list PREFIX:line="96" PREFIX:column="23">(<argument><expr><name PREFIX:line="96" PREFIX:column="24">n</name></expr></argument>, <argument><expr><name PREFIX:line="96" PREFIX:column="27">base</name></expr></argument>)</argument_list></call></expr>;</return>
+  }</block></else></if></else></if>
+}</block></function>
+
+<function><type><name PREFIX:line="100" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="100" PREFIX:column="8">Print</name>::<name PREFIX:line="100" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="100" PREFIX:column="20">(<param><decl><type><name PREFIX:line="100" PREFIX:column="21">unknowntype</name> <name PREFIX:line="100" PREFIX:column="33">long</name></type> <name PREFIX:line="100" PREFIX:column="38">n</name></decl></param>, <param><decl><type><name PREFIX:line="100" PREFIX:column="41">int</name></type> <name PREFIX:line="100" PREFIX:column="45">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="101" PREFIX:column="1">{
+  <if PREFIX:line="102" PREFIX:column="3">if <condition PREFIX:line="102" PREFIX:column="6">(<expr><name PREFIX:line="102" PREFIX:column="7">base</name> == 0</expr>)</condition><then PREFIX:line="102" PREFIX:column="17"> <return PREFIX:line="102" PREFIX:column="18">return <expr><call><name PREFIX:line="102" PREFIX:column="25">write</name><argument_list PREFIX:line="102" PREFIX:column="30">(<argument><expr><name PREFIX:line="102" PREFIX:column="31">n</name></expr></argument>)</argument_list></call></expr>;</return></then>
+  <else PREFIX:line="103" PREFIX:column="3">else <return PREFIX:line="103" PREFIX:column="8">return <expr><call><name PREFIX:line="103" PREFIX:column="15">printNumber</name><argument_list PREFIX:line="103" PREFIX:column="26">(<argument><expr><name PREFIX:line="103" PREFIX:column="27">n</name></expr></argument>, <argument><expr><name PREFIX:line="103" PREFIX:column="30">base</name></expr></argument>)</argument_list></call></expr>;</return></else></if>
+}</block></function>
+
+<function><type><name PREFIX:line="106" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="106" PREFIX:column="8">Print</name>::<name PREFIX:line="106" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="106" PREFIX:column="20">(<param><decl><type><name PREFIX:line="106" PREFIX:column="21">double</name></type> <name PREFIX:line="106" PREFIX:column="28">n</name></decl></param>, <param><decl><type><name PREFIX:line="106" PREFIX:column="31">int</name></type> <name PREFIX:line="106" PREFIX:column="35">digits</name></decl></param>)</parameter_list>
+<block PREFIX:line="107" PREFIX:column="1">{
+  <return PREFIX:line="108" PREFIX:column="3">return <expr><call><name PREFIX:line="108" PREFIX:column="10">printFloat</name><argument_list PREFIX:line="108" PREFIX:column="20">(<argument><expr><name PREFIX:line="108" PREFIX:column="21">n</name></expr></argument>, <argument><expr><name PREFIX:line="108" PREFIX:column="24">digits</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="111" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="111" PREFIX:column="8">Print</name>::<name PREFIX:line="111" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="111" PREFIX:column="22">( <param><decl><type><name PREFIX:line="111" PREFIX:column="24">__FlashStringHelper</name> *</type><name PREFIX:line="111" PREFIX:column="45">ifsh</name></decl></param>)</parameter_list>
+<block PREFIX:line="112" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="113" PREFIX:column="3">size_t</name></type> <name PREFIX:line="113" PREFIX:column="10">n</name> <init PREFIX:line="113" PREFIX:column="12">= <expr><call><name PREFIX:line="113" PREFIX:column="14">print</name><argument_list PREFIX:line="113" PREFIX:column="19">(<argument><expr><name PREFIX:line="113" PREFIX:column="20">ifsh</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="114" PREFIX:column="3">n</name> += <call><name PREFIX:line="114" PREFIX:column="8">println</name><argument_list PREFIX:line="114" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="115" PREFIX:column="3">return <expr><name PREFIX:line="115" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="118" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="118" PREFIX:column="8">Print</name>::<name PREFIX:line="118" PREFIX:column="15">print</name></name><parameter_list PREFIX:line="118" PREFIX:column="20">( <param><decl><type><name PREFIX:line="118" PREFIX:column="22">Printable</name>&amp;</type> <name PREFIX:line="118" PREFIX:column="33">x</name></decl></param>)</parameter_list>
+<block PREFIX:line="119" PREFIX:column="1">{
+  <return PREFIX:line="120" PREFIX:column="3">return <expr><call><name><name PREFIX:line="120" PREFIX:column="10">x</name>.<name PREFIX:line="120" PREFIX:column="12">printTo</name></name><argument_list PREFIX:line="120" PREFIX:column="19">(<argument><expr PREFIX:line="120" PREFIX:column="20">*<name PREFIX:line="120" PREFIX:column="21">this</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="123" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="123" PREFIX:column="8">Print</name>::<name PREFIX:line="123" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="123" PREFIX:column="22">(<param><decl><type><name PREFIX:line="123" PREFIX:column="23">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="124" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="125" PREFIX:column="3">size_t</name></type> <name PREFIX:line="125" PREFIX:column="10">n</name> <init PREFIX:line="125" PREFIX:column="12">= <expr><call><name PREFIX:line="125" PREFIX:column="14">print</name><argument_list PREFIX:line="125" PREFIX:column="19">(<argument><expr PREFIX:line="125" PREFIX:column="20">'\r'</expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="126" PREFIX:column="3">n</name> += <call><name PREFIX:line="126" PREFIX:column="8">print</name><argument_list PREFIX:line="126" PREFIX:column="13">(<argument><expr PREFIX:line="126" PREFIX:column="14">'\n'</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="127" PREFIX:column="3">return <expr><name PREFIX:line="127" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="130" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="130" PREFIX:column="8">Print</name>::<name PREFIX:line="130" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="130" PREFIX:column="22">( <param><decl><type><name PREFIX:line="130" PREFIX:column="24">String</name> &amp;</type><name PREFIX:line="130" PREFIX:column="32">s</name></decl></param>)</parameter_list>
+<block PREFIX:line="131" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="132" PREFIX:column="3">size_t</name></type> <name PREFIX:line="132" PREFIX:column="10">n</name> <init PREFIX:line="132" PREFIX:column="12">= <expr><call><name PREFIX:line="132" PREFIX:column="14">print</name><argument_list PREFIX:line="132" PREFIX:column="19">(<argument><expr><name PREFIX:line="132" PREFIX:column="20">s</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="133" PREFIX:column="3">n</name> += <call><name PREFIX:line="133" PREFIX:column="8">println</name><argument_list PREFIX:line="133" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="134" PREFIX:column="3">return <expr><name PREFIX:line="134" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="137" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="137" PREFIX:column="8">Print</name>::<name PREFIX:line="137" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="137" PREFIX:column="22">( <param><decl><type><name PREFIX:line="137" PREFIX:column="24">char</name></type> <name><name PREFIX:line="137" PREFIX:column="29">c</name><index PREFIX:line="137" PREFIX:column="30">[]</index></name></decl></param>)</parameter_list>
+<block PREFIX:line="138" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="139" PREFIX:column="3">size_t</name></type> <name PREFIX:line="139" PREFIX:column="10">n</name> <init PREFIX:line="139" PREFIX:column="12">= <expr><call><name PREFIX:line="139" PREFIX:column="14">print</name><argument_list PREFIX:line="139" PREFIX:column="19">(<argument><expr><name PREFIX:line="139" PREFIX:column="20">c</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="140" PREFIX:column="3">n</name> += <call><name PREFIX:line="140" PREFIX:column="8">println</name><argument_list PREFIX:line="140" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="141" PREFIX:column="3">return <expr><name PREFIX:line="141" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="144" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="144" PREFIX:column="8">Print</name>::<name PREFIX:line="144" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="144" PREFIX:column="22">(<param><decl><type><name PREFIX:line="144" PREFIX:column="23">char</name></type> <name PREFIX:line="144" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="145" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="146" PREFIX:column="3">size_t</name></type> <name PREFIX:line="146" PREFIX:column="10">n</name> <init PREFIX:line="146" PREFIX:column="12">= <expr><call><name PREFIX:line="146" PREFIX:column="14">print</name><argument_list PREFIX:line="146" PREFIX:column="19">(<argument><expr><name PREFIX:line="146" PREFIX:column="20">c</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="147" PREFIX:column="3">n</name> += <call><name PREFIX:line="147" PREFIX:column="8">println</name><argument_list PREFIX:line="147" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="148" PREFIX:column="3">return <expr><name PREFIX:line="148" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="151" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="151" PREFIX:column="8">Print</name>::<name PREFIX:line="151" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="151" PREFIX:column="22">(<param><decl><type><name PREFIX:line="151" PREFIX:column="23">unknowntype</name> <name PREFIX:line="151" PREFIX:column="35">char</name></type> <name PREFIX:line="151" PREFIX:column="40">b</name></decl></param>, <param><decl><type><name PREFIX:line="151" PREFIX:column="43">int</name></type> <name PREFIX:line="151" PREFIX:column="47">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="152" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="153" PREFIX:column="3">size_t</name></type> <name PREFIX:line="153" PREFIX:column="10">n</name> <init PREFIX:line="153" PREFIX:column="12">= <expr><call><name PREFIX:line="153" PREFIX:column="14">print</name><argument_list PREFIX:line="153" PREFIX:column="19">(<argument><expr><name PREFIX:line="153" PREFIX:column="20">b</name></expr></argument>, <argument><expr><name PREFIX:line="153" PREFIX:column="23">base</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="154" PREFIX:column="3">n</name> += <call><name PREFIX:line="154" PREFIX:column="8">println</name><argument_list PREFIX:line="154" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="155" PREFIX:column="3">return <expr><name PREFIX:line="155" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="158" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="158" PREFIX:column="8">Print</name>::<name PREFIX:line="158" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="158" PREFIX:column="22">(<param><decl><type><name PREFIX:line="158" PREFIX:column="23">int</name></type> <name PREFIX:line="158" PREFIX:column="27">num</name></decl></param>, <param><decl><type><name PREFIX:line="158" PREFIX:column="32">int</name></type> <name PREFIX:line="158" PREFIX:column="36">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="159" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="160" PREFIX:column="3">size_t</name></type> <name PREFIX:line="160" PREFIX:column="10">n</name> <init PREFIX:line="160" PREFIX:column="12">= <expr><call><name PREFIX:line="160" PREFIX:column="14">print</name><argument_list PREFIX:line="160" PREFIX:column="19">(<argument><expr><name PREFIX:line="160" PREFIX:column="20">num</name></expr></argument>, <argument><expr><name PREFIX:line="160" PREFIX:column="25">base</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="161" PREFIX:column="3">n</name> += <call><name PREFIX:line="161" PREFIX:column="8">println</name><argument_list PREFIX:line="161" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="162" PREFIX:column="3">return <expr><name PREFIX:line="162" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="165" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="165" PREFIX:column="8">Print</name>::<name PREFIX:line="165" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="165" PREFIX:column="22">(<param><decl><type><name PREFIX:line="165" PREFIX:column="23">unknowntype</name> <name PREFIX:line="165" PREFIX:column="35">int</name></type> <name PREFIX:line="165" PREFIX:column="39">num</name></decl></param>, <param><decl><type><name PREFIX:line="165" PREFIX:column="44">int</name></type> <name PREFIX:line="165" PREFIX:column="48">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="166" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="167" PREFIX:column="3">size_t</name></type> <name PREFIX:line="167" PREFIX:column="10">n</name> <init PREFIX:line="167" PREFIX:column="12">= <expr><call><name PREFIX:line="167" PREFIX:column="14">print</name><argument_list PREFIX:line="167" PREFIX:column="19">(<argument><expr><name PREFIX:line="167" PREFIX:column="20">num</name></expr></argument>, <argument><expr><name PREFIX:line="167" PREFIX:column="25">base</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="168" PREFIX:column="3">n</name> += <call><name PREFIX:line="168" PREFIX:column="8">println</name><argument_list PREFIX:line="168" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="169" PREFIX:column="3">return <expr><name PREFIX:line="169" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="172" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="172" PREFIX:column="8">Print</name>::<name PREFIX:line="172" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="172" PREFIX:column="22">(<param><decl><type><name PREFIX:line="172" PREFIX:column="23">long</name></type> <name PREFIX:line="172" PREFIX:column="28">num</name></decl></param>, <param><decl><type><name PREFIX:line="172" PREFIX:column="33">int</name></type> <name PREFIX:line="172" PREFIX:column="37">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="173" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="174" PREFIX:column="3">size_t</name></type> <name PREFIX:line="174" PREFIX:column="10">n</name> <init PREFIX:line="174" PREFIX:column="12">= <expr><call><name PREFIX:line="174" PREFIX:column="14">print</name><argument_list PREFIX:line="174" PREFIX:column="19">(<argument><expr><name PREFIX:line="174" PREFIX:column="20">num</name></expr></argument>, <argument><expr><name PREFIX:line="174" PREFIX:column="25">base</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="175" PREFIX:column="3">n</name> += <call><name PREFIX:line="175" PREFIX:column="8">println</name><argument_list PREFIX:line="175" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="176" PREFIX:column="3">return <expr><name PREFIX:line="176" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="179" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="179" PREFIX:column="8">Print</name>::<name PREFIX:line="179" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="179" PREFIX:column="22">(<param><decl><type><name PREFIX:line="179" PREFIX:column="23">unknowntype</name> <name PREFIX:line="179" PREFIX:column="35">long</name></type> <name PREFIX:line="179" PREFIX:column="40">num</name></decl></param>, <param><decl><type><name PREFIX:line="179" PREFIX:column="45">int</name></type> <name PREFIX:line="179" PREFIX:column="49">base</name></decl></param>)</parameter_list>
+<block PREFIX:line="180" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="181" PREFIX:column="3">size_t</name></type> <name PREFIX:line="181" PREFIX:column="10">n</name> <init PREFIX:line="181" PREFIX:column="12">= <expr><call><name PREFIX:line="181" PREFIX:column="14">print</name><argument_list PREFIX:line="181" PREFIX:column="19">(<argument><expr><name PREFIX:line="181" PREFIX:column="20">num</name></expr></argument>, <argument><expr><name PREFIX:line="181" PREFIX:column="25">base</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="182" PREFIX:column="3">n</name> += <call><name PREFIX:line="182" PREFIX:column="8">println</name><argument_list PREFIX:line="182" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="183" PREFIX:column="3">return <expr><name PREFIX:line="183" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="186" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="186" PREFIX:column="8">Print</name>::<name PREFIX:line="186" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="186" PREFIX:column="22">(<param><decl><type><name PREFIX:line="186" PREFIX:column="23">double</name></type> <name PREFIX:line="186" PREFIX:column="30">num</name></decl></param>, <param><decl><type><name PREFIX:line="186" PREFIX:column="35">int</name></type> <name PREFIX:line="186" PREFIX:column="39">digits</name></decl></param>)</parameter_list>
+<block PREFIX:line="187" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="188" PREFIX:column="3">size_t</name></type> <name PREFIX:line="188" PREFIX:column="10">n</name> <init PREFIX:line="188" PREFIX:column="12">= <expr><call><name PREFIX:line="188" PREFIX:column="14">print</name><argument_list PREFIX:line="188" PREFIX:column="19">(<argument><expr><name PREFIX:line="188" PREFIX:column="20">num</name></expr></argument>, <argument><expr><name PREFIX:line="188" PREFIX:column="25">digits</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="189" PREFIX:column="3">n</name> += <call><name PREFIX:line="189" PREFIX:column="8">println</name><argument_list PREFIX:line="189" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="190" PREFIX:column="3">return <expr><name PREFIX:line="190" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="193" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="193" PREFIX:column="8">Print</name>::<name PREFIX:line="193" PREFIX:column="15">println</name></name><parameter_list PREFIX:line="193" PREFIX:column="22">( <param><decl><type><name PREFIX:line="193" PREFIX:column="24">Printable</name>&amp;</type> <name PREFIX:line="193" PREFIX:column="35">x</name></decl></param>)</parameter_list>
+<block PREFIX:line="194" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="195" PREFIX:column="3">size_t</name></type> <name PREFIX:line="195" PREFIX:column="10">n</name> <init PREFIX:line="195" PREFIX:column="12">= <expr><call><name PREFIX:line="195" PREFIX:column="14">print</name><argument_list PREFIX:line="195" PREFIX:column="19">(<argument><expr><name PREFIX:line="195" PREFIX:column="20">x</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="196" PREFIX:column="3">n</name> += <call><name PREFIX:line="196" PREFIX:column="8">println</name><argument_list PREFIX:line="196" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="197" PREFIX:column="3">return <expr><name PREFIX:line="197" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="200" PREFIX:column="1">// Private Methods /////////////////////////////////////////////////////////////</comment>
+
+<function><type><name PREFIX:line="202" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="202" PREFIX:column="8">Print</name>::<name PREFIX:line="202" PREFIX:column="15">printNumber</name></name><parameter_list PREFIX:line="202" PREFIX:column="26">(<param><decl><type><name PREFIX:line="202" PREFIX:column="27">unknowntype</name> <name PREFIX:line="202" PREFIX:column="39">long</name></type> <name PREFIX:line="202" PREFIX:column="44">n</name></decl></param>, <param><decl><type><name PREFIX:line="202" PREFIX:column="47">uint8_t</name></type> <name PREFIX:line="202" PREFIX:column="55">base</name></decl></param>)</parameter_list> <block PREFIX:line="202" PREFIX:column="61">{
+  <decl_stmt><decl><type><name PREFIX:line="203" PREFIX:column="3">char</name></type> <name><name PREFIX:line="203" PREFIX:column="8">buf</name><index PREFIX:line="203" PREFIX:column="11">[<expr PREFIX:line="203" PREFIX:column="12">8 * <sizeof PREFIX:line="203" PREFIX:column="16">sizeof<argument_list PREFIX:line="203" PREFIX:column="22">(<argument><expr><name PREFIX:line="203" PREFIX:column="23">long</name></expr></argument>)</argument_list></sizeof> + 1</expr>]</index></name></decl>;</decl_stmt> <comment type="line" PREFIX:line="203" PREFIX:column="35">// Assumes 8-bit chars plus zero byte.</comment>
+  <decl_stmt><decl><type><name PREFIX:line="204" PREFIX:column="3">char</name> *</type><name PREFIX:line="204" PREFIX:column="9">str</name> <init PREFIX:line="204" PREFIX:column="13">= <expr PREFIX:line="204" PREFIX:column="15">&amp;<name><name PREFIX:line="204" PREFIX:column="16">buf</name><index PREFIX:line="204" PREFIX:column="19">[<expr><sizeof PREFIX:line="204" PREFIX:column="20">sizeof<argument_list PREFIX:line="204" PREFIX:column="26">(<argument><expr><name PREFIX:line="204" PREFIX:column="27">buf</name></expr></argument>)</argument_list></sizeof> - 1</expr>]</index></name></expr></init></decl>;</decl_stmt>
+
+  <expr_stmt><expr PREFIX:line="206" PREFIX:column="3">*<name PREFIX:line="206" PREFIX:column="4">str</name> = '\0'</expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="208" PREFIX:column="3">// prevent crash if called with base == 1</comment>
+  <if PREFIX:line="209" PREFIX:column="3">if <condition PREFIX:line="209" PREFIX:column="6">(<expr><name PREFIX:line="209" PREFIX:column="7">base</name> &lt; 2</expr>)</condition><then PREFIX:line="209" PREFIX:column="16"> <expr_stmt><expr><name PREFIX:line="209" PREFIX:column="17">base</name> = 10</expr>;</expr_stmt></then></if>
+
+  <do PREFIX:line="211" PREFIX:column="3">do <block PREFIX:line="211" PREFIX:column="6">{
+    <decl_stmt><decl><type><name PREFIX:line="212" PREFIX:column="5">unknowntype</name> <name PREFIX:line="212" PREFIX:column="17">long</name></type> <name PREFIX:line="212" PREFIX:column="22">m</name> <init PREFIX:line="212" PREFIX:column="24">= <expr><name PREFIX:line="212" PREFIX:column="26">n</name></expr></init></decl>;</decl_stmt>
+    <expr_stmt><expr><name PREFIX:line="213" PREFIX:column="5">n</name> /= <name PREFIX:line="213" PREFIX:column="10">base</name></expr>;</expr_stmt>
+    <decl_stmt><decl><type><name PREFIX:line="214" PREFIX:column="5">char</name></type> <name PREFIX:line="214" PREFIX:column="10">c</name> <init PREFIX:line="214" PREFIX:column="12">= <expr><name PREFIX:line="214" PREFIX:column="14">m</name> - <name PREFIX:line="214" PREFIX:column="18">base</name> * <name PREFIX:line="214" PREFIX:column="25">n</name></expr></init></decl>;</decl_stmt>
+    <expr_stmt><expr PREFIX:line="215" PREFIX:column="5">*--<name PREFIX:line="215" PREFIX:column="8">str</name> = <name PREFIX:line="215" PREFIX:column="14">c</name> &lt; 10 ? <name PREFIX:line="215" PREFIX:column="23">c</name> + '0' : <name PREFIX:line="215" PREFIX:column="33">c</name> + 'A' - 10</expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="216" PREFIX:column="10">(<expr><name PREFIX:line="216" PREFIX:column="11">n</name></expr>)</condition>;</do>
+
+  <return PREFIX:line="218" PREFIX:column="3">return <expr><call><name PREFIX:line="218" PREFIX:column="10">write</name><argument_list PREFIX:line="218" PREFIX:column="15">(<argument><expr><name PREFIX:line="218" PREFIX:column="16">str</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="221" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="221" PREFIX:column="8">Print</name>::<name PREFIX:line="221" PREFIX:column="15">printFloat</name></name><parameter_list PREFIX:line="221" PREFIX:column="25">(<param><decl><type><name PREFIX:line="221" PREFIX:column="26">double</name></type> <name PREFIX:line="221" PREFIX:column="33">number</name></decl></param>, <param><decl><type><name PREFIX:line="221" PREFIX:column="41">uint8_t</name></type> <name PREFIX:line="221" PREFIX:column="49">digits</name></decl></param>)</parameter_list> 
+<block PREFIX:line="222" PREFIX:column="1">{ 
+  <decl_stmt><decl><type><name PREFIX:line="223" PREFIX:column="3">size_t</name></type> <name PREFIX:line="223" PREFIX:column="10">n</name> <init PREFIX:line="223" PREFIX:column="12">= <expr PREFIX:line="223" PREFIX:column="14">0</expr></init></decl>;</decl_stmt>
+  
+  <if PREFIX:line="225" PREFIX:column="3">if <condition PREFIX:line="225" PREFIX:column="6">(<expr><call><name PREFIX:line="225" PREFIX:column="7">isnan</name><argument_list PREFIX:line="225" PREFIX:column="12">(<argument><expr><name PREFIX:line="225" PREFIX:column="13">number</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="225" PREFIX:column="21"> <return PREFIX:line="225" PREFIX:column="22">return <expr><call><name PREFIX:line="225" PREFIX:column="29">print</name><argument_list PREFIX:line="225" PREFIX:column="34">(<argument><expr PREFIX:line="225" PREFIX:column="35">"nan"</expr></argument>)</argument_list></call></expr>;</return></then></if>
+  <if PREFIX:line="226" PREFIX:column="3">if <condition PREFIX:line="226" PREFIX:column="6">(<expr><call><name PREFIX:line="226" PREFIX:column="7">isinf</name><argument_list PREFIX:line="226" PREFIX:column="12">(<argument><expr><name PREFIX:line="226" PREFIX:column="13">number</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="226" PREFIX:column="21"> <return PREFIX:line="226" PREFIX:column="22">return <expr><call><name PREFIX:line="226" PREFIX:column="29">print</name><argument_list PREFIX:line="226" PREFIX:column="34">(<argument><expr PREFIX:line="226" PREFIX:column="35">"inf"</expr></argument>)</argument_list></call></expr>;</return></then></if>
+  <if PREFIX:line="227" PREFIX:column="3">if <condition PREFIX:line="227" PREFIX:column="6">(<expr><name PREFIX:line="227" PREFIX:column="7">number</name> &gt; 4294967040.0</expr>)</condition><then PREFIX:line="227" PREFIX:column="29"> <return PREFIX:line="227" PREFIX:column="30">return <expr><call><name PREFIX:line="227" PREFIX:column="37">print</name> <argument_list PREFIX:line="227" PREFIX:column="43">(<argument><expr PREFIX:line="227" PREFIX:column="44">"ovf"</expr></argument>)</argument_list></call></expr>;</return></then></if>  <comment type="line" PREFIX:line="227" PREFIX:column="53">// ant determined empirically</comment>
+  <if PREFIX:line="228" PREFIX:column="3">if <condition PREFIX:line="228" PREFIX:column="6">(<expr><name PREFIX:line="228" PREFIX:column="7">number</name> &lt;-4294967040.0</expr>)</condition><then PREFIX:line="228" PREFIX:column="29"> <return PREFIX:line="228" PREFIX:column="30">return <expr><call><name PREFIX:line="228" PREFIX:column="37">print</name> <argument_list PREFIX:line="228" PREFIX:column="43">(<argument><expr PREFIX:line="228" PREFIX:column="44">"ovf"</expr></argument>)</argument_list></call></expr>;</return></then></if>  <comment type="line" PREFIX:line="228" PREFIX:column="53">// ant determined empirically</comment>
+  
+  <comment type="line" PREFIX:line="230" PREFIX:column="3">// Handle negative numbers</comment>
+  <if PREFIX:line="231" PREFIX:column="3">if <condition PREFIX:line="231" PREFIX:column="6">(<expr><name PREFIX:line="231" PREFIX:column="7">number</name> &lt; 0.0</expr>)</condition><then PREFIX:line="231" PREFIX:column="20">
+  <block PREFIX:line="232" PREFIX:column="3">{
+     <expr_stmt><expr><name PREFIX:line="233" PREFIX:column="6">n</name> += <call><name PREFIX:line="233" PREFIX:column="11">print</name><argument_list PREFIX:line="233" PREFIX:column="16">(<argument><expr PREFIX:line="233" PREFIX:column="17">'-'</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+     <expr_stmt><expr><name PREFIX:line="234" PREFIX:column="6">number</name> = -<name PREFIX:line="234" PREFIX:column="16">number</name></expr>;</expr_stmt>
+  }</block></then></if>
+
+  <comment type="line" PREFIX:line="237" PREFIX:column="3">// Round correctly so that print(1.999, 2) prints as "2.00"</comment>
+  <decl_stmt><decl><type><name PREFIX:line="238" PREFIX:column="3">double</name></type> <name PREFIX:line="238" PREFIX:column="10">rounding</name> <init PREFIX:line="238" PREFIX:column="19">= <expr PREFIX:line="238" PREFIX:column="21">0.5</expr></init></decl>;</decl_stmt>
+  <for PREFIX:line="239" PREFIX:column="3">for (<init><decl><type><name PREFIX:line="239" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="239" PREFIX:column="16">i</name><init PREFIX:line="239" PREFIX:column="17">=<expr PREFIX:line="239" PREFIX:column="18">0</expr></init></decl>;</init> <condition><expr><name PREFIX:line="239" PREFIX:column="21">i</name>&lt;<name PREFIX:line="239" PREFIX:column="23">digits</name></expr>;</condition> <incr><expr PREFIX:line="239" PREFIX:column="31">++<name PREFIX:line="239" PREFIX:column="33">i</name></expr></incr>)
+    <expr_stmt><expr><name PREFIX:line="240" PREFIX:column="5">rounding</name> /= 10.0</expr>;</expr_stmt></for>
+  
+  <expr_stmt><expr><name PREFIX:line="242" PREFIX:column="3">number</name> += <name PREFIX:line="242" PREFIX:column="13">rounding</name></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="244" PREFIX:column="3">// Extract the integer part of the number and print it</comment>
+  <decl_stmt><decl><type><name PREFIX:line="245" PREFIX:column="3">unknowntype</name> <name PREFIX:line="245" PREFIX:column="15">long</name></type> <name PREFIX:line="245" PREFIX:column="20">int_part</name> <init PREFIX:line="245" PREFIX:column="29">= <expr PREFIX:line="245" PREFIX:column="31">(<name PREFIX:line="245" PREFIX:column="32">unknowntype</name> <name PREFIX:line="245" PREFIX:column="44">long</name>)<name PREFIX:line="245" PREFIX:column="49">number</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="246" PREFIX:column="3">double</name></type> <name PREFIX:line="246" PREFIX:column="10">remainder</name> <init PREFIX:line="246" PREFIX:column="20">= <expr><name PREFIX:line="246" PREFIX:column="22">number</name> - (<name PREFIX:line="246" PREFIX:column="32">double</name>)<name PREFIX:line="246" PREFIX:column="39">int_part</name></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="247" PREFIX:column="3">n</name> += <call><name PREFIX:line="247" PREFIX:column="8">print</name><argument_list PREFIX:line="247" PREFIX:column="13">(<argument><expr><name PREFIX:line="247" PREFIX:column="14">int_part</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="249" PREFIX:column="3">// Print the decimal point, but only if there are digits beyond</comment>
+  <if PREFIX:line="250" PREFIX:column="3">if <condition PREFIX:line="250" PREFIX:column="6">(<expr><name PREFIX:line="250" PREFIX:column="7">digits</name> &gt; 0</expr>)</condition><then PREFIX:line="250" PREFIX:column="18"> <block PREFIX:line="250" PREFIX:column="19">{
+    <expr_stmt><expr><name PREFIX:line="251" PREFIX:column="5">n</name> += <call><name PREFIX:line="251" PREFIX:column="10">print</name><argument_list PREFIX:line="251" PREFIX:column="15">(<argument><expr PREFIX:line="251" PREFIX:column="16">"."</expr></argument>)</argument_list></call></expr>;</expr_stmt> 
+  }</block></then></if>
+
+  <comment type="line" PREFIX:line="254" PREFIX:column="3">// Extract digits from the remainder one at a time</comment>
+  <while PREFIX:line="255" PREFIX:column="3">while <condition PREFIX:line="255" PREFIX:column="9">(<expr><name PREFIX:line="255" PREFIX:column="10">digits</name>-- &gt; 0</expr>)</condition>
+  <block PREFIX:line="256" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="257" PREFIX:column="5">remainder</name> *= 10.0</expr>;</expr_stmt>
+    <decl_stmt><decl><type><name PREFIX:line="258" PREFIX:column="5">int</name></type> <name PREFIX:line="258" PREFIX:column="9">toPrint</name> <init PREFIX:line="258" PREFIX:column="17">= <expr><call><name PREFIX:line="258" PREFIX:column="19">int</name><argument_list PREFIX:line="258" PREFIX:column="22">(<argument><expr><name PREFIX:line="258" PREFIX:column="23">remainder</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+    <expr_stmt><expr><name PREFIX:line="259" PREFIX:column="5">n</name> += <call><name PREFIX:line="259" PREFIX:column="10">print</name><argument_list PREFIX:line="259" PREFIX:column="15">(<argument><expr><name PREFIX:line="259" PREFIX:column="16">toPrint</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="260" PREFIX:column="5">remainder</name> -= <name PREFIX:line="260" PREFIX:column="18">toPrint</name></expr>;</expr_stmt> 
+  }</block></while> 
+  
+  <return PREFIX:line="263" PREFIX:column="3">return <expr><name PREFIX:line="263" PREFIX:column="10">n</name></expr>;</return>
+}</block></function>
+</unit>

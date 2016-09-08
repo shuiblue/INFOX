@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/U8glib/utility/u8g_dev_st7565_lm6063.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_dev_st7565_lm6063.c
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  
+*/</comment>
+
+<cpp:include PREFIX:line="37" PREFIX:column="1">#<cpp:directive PREFIX:line="37" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="37" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<cpp:define PREFIX:line="39" PREFIX:column="1">#<cpp:directive PREFIX:line="39" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="39" PREFIX:column="9">WIDTH</name></cpp:macro> <cpp:value PREFIX:line="39" PREFIX:column="15">128</cpp:value></cpp:define>
+<cpp:define PREFIX:line="40" PREFIX:column="1">#<cpp:directive PREFIX:line="40" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="40" PREFIX:column="9">HEIGHT</name></cpp:macro> <cpp:value PREFIX:line="40" PREFIX:column="16">64</cpp:value></cpp:define>
+<cpp:define PREFIX:line="41" PREFIX:column="1">#<cpp:directive PREFIX:line="41" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="41" PREFIX:column="9">PAGE_HEIGHT</name></cpp:macro> <cpp:value PREFIX:line="41" PREFIX:column="21">8</cpp:value></cpp:define>
+
+<cpp:ifdef PREFIX:line="43" PREFIX:column="1">#<cpp:directive PREFIX:line="43" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="43" PREFIX:column="8">OLD_ADAFRUIT_CODE</name></cpp:ifdef>
+<decl_stmt><decl><type><specifier PREFIX:line="44" PREFIX:column="1">static</specifier>  <name PREFIX:line="44" PREFIX:column="9">uint8_t</name> <name PREFIX:line="44" PREFIX:column="17">OLD_u8g_dev_st7565_lm6063_init_seq</name><index PREFIX:line="44" PREFIX:column="51">[]</index></type> <name PREFIX:line="44" PREFIX:column="54">PROGMEM</name> <init PREFIX:line="44" PREFIX:column="62">= <expr><block PREFIX:line="44" PREFIX:column="64">{
+  <expr><call><name PREFIX:line="45" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="45" PREFIX:column="13">(<argument><expr PREFIX:line="45" PREFIX:column="14">0</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="45" PREFIX:column="30">/* disable chip */</comment>
+  <expr><call><name PREFIX:line="46" PREFIX:column="3">U8G_ESC_ADR</name><argument_list PREFIX:line="46" PREFIX:column="14">(<argument><expr PREFIX:line="46" PREFIX:column="15">0</expr></argument>)</argument_list></call></expr>,           <comment type="block" PREFIX:line="46" PREFIX:column="29">/* instruction mode */</comment>
+  <expr><call><name PREFIX:line="47" PREFIX:column="3">U8G_ESC_RST</name><argument_list PREFIX:line="47" PREFIX:column="14">(<argument><expr PREFIX:line="47" PREFIX:column="15">1</expr></argument>)</argument_list></call></expr>,           <comment type="block" PREFIX:line="47" PREFIX:column="29">/* do reset low pulse with (1*16)+2 milliseconds */</comment>
+  <expr><call><name PREFIX:line="48" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="48" PREFIX:column="13">(<argument><expr PREFIX:line="48" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="48" PREFIX:column="30">/* enable chip */</comment>
+  
+  <expr PREFIX:line="50" PREFIX:column="3">0x040</expr>,		                <comment type="block" PREFIX:line="50" PREFIX:column="41">/* set display start line */</comment>
+  <expr PREFIX:line="51" PREFIX:column="3">0x0a1</expr>,		                <comment type="block" PREFIX:line="51" PREFIX:column="41">/* ADC set to reverse */</comment>
+  <expr PREFIX:line="52" PREFIX:column="3">0x0c8</expr>,		                <comment type="block" PREFIX:line="52" PREFIX:column="41">/* common output mode: set scan direction normal operation/SHL Select / 17 Jan: seems to be a bug, must be 0x0c0 */</comment>
+  <expr PREFIX:line="53" PREFIX:column="3">0x0a6</expr>,                           <comment type="block" PREFIX:line="53" PREFIX:column="36">/* display normal, bit val 0: LCD pixel off. */</comment>
+  <expr PREFIX:line="54" PREFIX:column="3">0x0a2</expr>,		                <comment type="block" PREFIX:line="54" PREFIX:column="41">/* LCD bias 1/9 */</comment>
+  <expr PREFIX:line="55" PREFIX:column="3">0x02f</expr>,		                <comment type="block" PREFIX:line="55" PREFIX:column="41">/* all power  control circuits on */</comment>
+  <comment type="block" PREFIX:line="56" PREFIX:column="3">/*0x0f8,*/</comment>		                <comment type="block" PREFIX:line="56" PREFIX:column="41">/* set booster ratio to */</comment>
+  <comment type="block" PREFIX:line="57" PREFIX:column="3">/*0x000,	*/</comment>	                <comment type="block" PREFIX:line="57" PREFIX:column="41">/* 4x */</comment>
+  <comment type="block" PREFIX:line="58" PREFIX:column="3">/*0x027,*/</comment>		                <comment type="block" PREFIX:line="58" PREFIX:column="41">/* set V0 voltage resistor ratio to large */</comment>
+  <expr PREFIX:line="59" PREFIX:column="3">0x081</expr>,		                <comment type="block" PREFIX:line="59" PREFIX:column="41">/* set contrast */</comment>
+  <expr PREFIX:line="60" PREFIX:column="3">0x018</expr>,		                <comment type="block" PREFIX:line="60" PREFIX:column="41">/* contrast value*/</comment>
+  <expr PREFIX:line="61" PREFIX:column="3">0x0ac</expr>,		                <comment type="block" PREFIX:line="61" PREFIX:column="41">/* indicator */</comment>
+  <expr PREFIX:line="62" PREFIX:column="3">0x000</expr>,		                <comment type="block" PREFIX:line="62" PREFIX:column="41">/* disable */</comment>
+  <expr PREFIX:line="63" PREFIX:column="3">0x0af</expr>,		                <comment type="block" PREFIX:line="63" PREFIX:column="41">/* display on */</comment>
+
+  <expr><call><name PREFIX:line="65" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="65" PREFIX:column="14">(<argument><expr PREFIX:line="65" PREFIX:column="15">100</expr></argument>)</argument_list></call></expr>,       <comment type="block" PREFIX:line="65" PREFIX:column="27">/* delay 100 ms */</comment>
+  <expr PREFIX:line="66" PREFIX:column="3">0x0a5</expr>,		                <comment type="block" PREFIX:line="66" PREFIX:column="41">/* display all points, ST7565 */</comment>
+  <expr><call><name PREFIX:line="67" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="67" PREFIX:column="14">(<argument><expr PREFIX:line="67" PREFIX:column="15">100</expr></argument>)</argument_list></call></expr>,       <comment type="block" PREFIX:line="67" PREFIX:column="27">/* delay 100 ms */</comment>
+  <expr><call><name PREFIX:line="68" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="68" PREFIX:column="14">(<argument><expr PREFIX:line="68" PREFIX:column="15">100</expr></argument>)</argument_list></call></expr>,       <comment type="block" PREFIX:line="68" PREFIX:column="27">/* delay 100 ms */</comment>
+  <expr PREFIX:line="69" PREFIX:column="3">0x0a4</expr>,		                <comment type="block" PREFIX:line="69" PREFIX:column="41">/* normal display */</comment>
+  <expr><call><name PREFIX:line="70" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="70" PREFIX:column="13">(<argument><expr PREFIX:line="70" PREFIX:column="14">0</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="70" PREFIX:column="30">/* disable chip */</comment>
+  <expr><name PREFIX:line="71" PREFIX:column="3">U8G_ESC_END</name></expr>                <comment type="block" PREFIX:line="71" PREFIX:column="30">/* end of sequence */</comment>
+}</block></expr></init></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="73" PREFIX:column="1">#<cpp:directive PREFIX:line="73" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<comment type="block" PREFIX:line="75" PREFIX:column="1">/* init sequence from https://github.com/adafruit/ST7565-LCD/blob/master/ST7565/ST7565.cpp */</comment>
+<decl_stmt><decl><type><specifier PREFIX:line="76" PREFIX:column="1">static</specifier>  <name PREFIX:line="76" PREFIX:column="9">uint8_t</name> <name PREFIX:line="76" PREFIX:column="17">u8g_dev_st7565_lm6063_init_seq</name><index PREFIX:line="76" PREFIX:column="47">[]</index></type> <name PREFIX:line="76" PREFIX:column="50">PROGMEM</name> <init PREFIX:line="76" PREFIX:column="58">= <expr><block PREFIX:line="76" PREFIX:column="60">{
+  <expr><call><name PREFIX:line="77" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="77" PREFIX:column="13">(<argument><expr PREFIX:line="77" PREFIX:column="14">0</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="77" PREFIX:column="30">/* disable chip */</comment>
+  <expr><call><name PREFIX:line="78" PREFIX:column="3">U8G_ESC_ADR</name><argument_list PREFIX:line="78" PREFIX:column="14">(<argument><expr PREFIX:line="78" PREFIX:column="15">0</expr></argument>)</argument_list></call></expr>,           <comment type="block" PREFIX:line="78" PREFIX:column="29">/* instruction mode */</comment>
+  <expr><call><name PREFIX:line="79" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="79" PREFIX:column="13">(<argument><expr PREFIX:line="79" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="79" PREFIX:column="30">/* enable chip */</comment>
+  <expr><call><name PREFIX:line="80" PREFIX:column="3">U8G_ESC_RST</name><argument_list PREFIX:line="80" PREFIX:column="14">(<argument><expr PREFIX:line="80" PREFIX:column="15">15</expr></argument>)</argument_list></call></expr>,           <comment type="block" PREFIX:line="80" PREFIX:column="30">/* do reset low pulse with (15*16)+2 milliseconds (=maximum delay)*/</comment>
+
+  <expr PREFIX:line="82" PREFIX:column="3">0x0a3</expr>,		                <comment type="block" PREFIX:line="82" PREFIX:column="41">/* 0x0a2: LCD bias 1/9 (suggested for the LM6063), 0x0a3: Used by Adafruit */</comment>
+  <expr PREFIX:line="83" PREFIX:column="3">0x0a1</expr>,		                <comment type="block" PREFIX:line="83" PREFIX:column="41">/* 0x0a1: ADC set to reverse (suggested for the LM6063), 0x0a0: Used by Adafruit -&gt; normal mode */</comment>
+  <expr PREFIX:line="84" PREFIX:column="3">0x0c0</expr>,                            <comment type="block" PREFIX:line="84" PREFIX:column="37">/* common output mode: set scan direction normal operation/SHL Select, 0x0c0 --&gt; SHL = 0, normal, 0x0c8 --&gt; SHL = 1 */</comment>
+  <expr PREFIX:line="85" PREFIX:column="3">0x040</expr>,		                <comment type="block" PREFIX:line="85" PREFIX:column="41">/* set display start line */</comment>
+  
+  <expr PREFIX:line="87" PREFIX:column="3">0x028 | 0x04</expr>,                 <comment type="block" PREFIX:line="87" PREFIX:column="33">/* power control: turn on voltage converter */</comment>
+  <expr><call><name PREFIX:line="88" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="88" PREFIX:column="14">(<argument><expr PREFIX:line="88" PREFIX:column="15">50</expr></argument>)</argument_list></call></expr>,         <comment type="block" PREFIX:line="88" PREFIX:column="28">/* delay 50 ms */</comment>
+
+  <expr PREFIX:line="90" PREFIX:column="3">0x028 | 0x06</expr>,                 <comment type="block" PREFIX:line="90" PREFIX:column="33">/* power control: turn on voltage regulator */</comment>
+  <expr><call><name PREFIX:line="91" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="91" PREFIX:column="14">(<argument><expr PREFIX:line="91" PREFIX:column="15">50</expr></argument>)</argument_list></call></expr>,         <comment type="block" PREFIX:line="91" PREFIX:column="28">/* delay 50 ms */</comment>
+  
+  <expr PREFIX:line="93" PREFIX:column="3">0x028 | 0x07</expr>,                 <comment type="block" PREFIX:line="93" PREFIX:column="33">/* power control: turn on voltage follower */</comment>
+  <expr><call><name PREFIX:line="94" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="94" PREFIX:column="14">(<argument><expr PREFIX:line="94" PREFIX:column="15">50</expr></argument>)</argument_list></call></expr>,         <comment type="block" PREFIX:line="94" PREFIX:column="28">/* delay 50 ms */</comment>
+
+  <expr PREFIX:line="96" PREFIX:column="3">0x026</expr>,		                <comment type="block" PREFIX:line="96" PREFIX:column="41">/* set V0 voltage resistor ratio to 6 (Adafruit Value, no info from LM6063 Manual) */</comment>
+  
+  <expr PREFIX:line="98" PREFIX:column="3">0x0a6</expr>,                           <comment type="block" PREFIX:line="98" PREFIX:column="36">/* display normal, bit val 0: LCD pixel off. */</comment>
+  
+  <expr PREFIX:line="100" PREFIX:column="3">0x081</expr>,		                <comment type="block" PREFIX:line="100" PREFIX:column="41">/* set contrast */</comment>
+  <expr PREFIX:line="101" PREFIX:column="3">0x018</expr>,		                <comment type="block" PREFIX:line="101" PREFIX:column="41">/* contrast value*/</comment>
+  
+  <comment type="block" PREFIX:line="103" PREFIX:column="3">/*0x0ac,*/</comment>		                <comment type="block" PREFIX:line="103" PREFIX:column="41">/* indicator */</comment>
+  <comment type="block" PREFIX:line="104" PREFIX:column="3">/*0x000,*/</comment>		                <comment type="block" PREFIX:line="104" PREFIX:column="41">/* disable */</comment>
+  
+  <expr PREFIX:line="106" PREFIX:column="3">0x0af</expr>,		                <comment type="block" PREFIX:line="106" PREFIX:column="41">/* display on */</comment>
+
+  <expr><call><name PREFIX:line="108" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="108" PREFIX:column="14">(<argument><expr PREFIX:line="108" PREFIX:column="15">100</expr></argument>)</argument_list></call></expr>,       <comment type="block" PREFIX:line="108" PREFIX:column="27">/* delay 100 ms */</comment>
+  <expr PREFIX:line="109" PREFIX:column="3">0x0a5</expr>,		                <comment type="block" PREFIX:line="109" PREFIX:column="41">/* display all points, ST7565 */</comment>
+  <expr><call><name PREFIX:line="110" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="110" PREFIX:column="14">(<argument><expr PREFIX:line="110" PREFIX:column="15">100</expr></argument>)</argument_list></call></expr>,       <comment type="block" PREFIX:line="110" PREFIX:column="27">/* delay 100 ms */</comment>
+  <expr><call><name PREFIX:line="111" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="111" PREFIX:column="14">(<argument><expr PREFIX:line="111" PREFIX:column="15">100</expr></argument>)</argument_list></call></expr>,       <comment type="block" PREFIX:line="111" PREFIX:column="27">/* delay 100 ms */</comment>
+  <expr PREFIX:line="112" PREFIX:column="3">0x0a4</expr>,		                <comment type="block" PREFIX:line="112" PREFIX:column="41">/* normal display */</comment>
+  <expr><call><name PREFIX:line="113" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="113" PREFIX:column="13">(<argument><expr PREFIX:line="113" PREFIX:column="14">0</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="113" PREFIX:column="30">/* disable chip */</comment>
+  <expr><name PREFIX:line="114" PREFIX:column="3">U8G_ESC_END</name></expr>                <comment type="block" PREFIX:line="114" PREFIX:column="30">/* end of sequence */</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><specifier PREFIX:line="117" PREFIX:column="1">static</specifier>  <name PREFIX:line="117" PREFIX:column="9">uint8_t</name> <name PREFIX:line="117" PREFIX:column="17">u8g_dev_st7565_lm6063_data_start</name><index PREFIX:line="117" PREFIX:column="49">[]</index></type> <name PREFIX:line="117" PREFIX:column="52">PROGMEM</name> <init PREFIX:line="117" PREFIX:column="60">= <expr><block PREFIX:line="117" PREFIX:column="62">{
+  <expr><call><name PREFIX:line="118" PREFIX:column="3">U8G_ESC_ADR</name><argument_list PREFIX:line="118" PREFIX:column="14">(<argument><expr PREFIX:line="118" PREFIX:column="15">0</expr></argument>)</argument_list></call></expr>,           <comment type="block" PREFIX:line="118" PREFIX:column="29">/* instruction mode */</comment>
+  <expr><call><name PREFIX:line="119" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="119" PREFIX:column="13">(<argument><expr PREFIX:line="119" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="119" PREFIX:column="30">/* enable chip */</comment>
+  <expr PREFIX:line="120" PREFIX:column="3">0x010</expr>,		<comment type="block" PREFIX:line="120" PREFIX:column="25">/* set upper 4 bit of the col adr to 0 */</comment>
+  <expr PREFIX:line="121" PREFIX:column="3">0x000</expr>,		<comment type="block" PREFIX:line="121" PREFIX:column="25">/* set lower 4 bit of the col adr to 0 */</comment>      
+  <expr><name PREFIX:line="122" PREFIX:column="3">U8G_ESC_END</name></expr>                <comment type="block" PREFIX:line="122" PREFIX:column="30">/* end of sequence */</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><specifier PREFIX:line="125" PREFIX:column="1">static</specifier>  <name PREFIX:line="125" PREFIX:column="9">uint8_t</name> <name PREFIX:line="125" PREFIX:column="17">u8g_dev_st7565_st7565_sleep_on</name><index PREFIX:line="125" PREFIX:column="47">[]</index></type> <name PREFIX:line="125" PREFIX:column="50">PROGMEM</name> <init PREFIX:line="125" PREFIX:column="58">= <expr><block PREFIX:line="125" PREFIX:column="60">{
+  <expr><call><name PREFIX:line="126" PREFIX:column="3">U8G_ESC_ADR</name><argument_list PREFIX:line="126" PREFIX:column="14">(<argument><expr PREFIX:line="126" PREFIX:column="15">0</expr></argument>)</argument_list></call></expr>,           <comment type="block" PREFIX:line="126" PREFIX:column="29">/* instruction mode */</comment>
+  <expr><call><name PREFIX:line="127" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="127" PREFIX:column="13">(<argument><expr PREFIX:line="127" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="127" PREFIX:column="30">/* enable chip */</comment>
+  <expr PREFIX:line="128" PREFIX:column="3">0x0ac</expr>,		<comment type="block" PREFIX:line="128" PREFIX:column="25">/* static indicator off */</comment>
+  <expr PREFIX:line="129" PREFIX:column="3">0x000</expr>,		                <comment type="block" PREFIX:line="129" PREFIX:column="41">/* indicator register set (not sure if this is required) */</comment>
+  <expr PREFIX:line="130" PREFIX:column="3">0x0ae</expr>,		<comment type="block" PREFIX:line="130" PREFIX:column="25">/* display off */</comment>      
+  <expr PREFIX:line="131" PREFIX:column="3">0x0a5</expr>,		<comment type="block" PREFIX:line="131" PREFIX:column="25">/* all points on */</comment>      
+  <expr><call><name PREFIX:line="132" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="132" PREFIX:column="13">(<argument><expr PREFIX:line="132" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="132" PREFIX:column="30">/* disable chip */</comment>
+  <expr><name PREFIX:line="133" PREFIX:column="3">U8G_ESC_END</name></expr>                <comment type="block" PREFIX:line="133" PREFIX:column="30">/* end of sequence */</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><specifier PREFIX:line="136" PREFIX:column="1">static</specifier>  <name PREFIX:line="136" PREFIX:column="9">uint8_t</name> <name PREFIX:line="136" PREFIX:column="17">u8g_dev_st7565_st7565_sleep_off</name><index PREFIX:line="136" PREFIX:column="48">[]</index></type> <name PREFIX:line="136" PREFIX:column="51">PROGMEM</name> <init PREFIX:line="136" PREFIX:column="59">= <expr><block PREFIX:line="136" PREFIX:column="61">{
+  <expr><call><name PREFIX:line="137" PREFIX:column="3">U8G_ESC_ADR</name><argument_list PREFIX:line="137" PREFIX:column="14">(<argument><expr PREFIX:line="137" PREFIX:column="15">0</expr></argument>)</argument_list></call></expr>,           <comment type="block" PREFIX:line="137" PREFIX:column="29">/* instruction mode */</comment>
+  <expr><call><name PREFIX:line="138" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="138" PREFIX:column="13">(<argument><expr PREFIX:line="138" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="138" PREFIX:column="30">/* enable chip */</comment>
+  <expr PREFIX:line="139" PREFIX:column="3">0x0a4</expr>,		<comment type="block" PREFIX:line="139" PREFIX:column="25">/* all points off */</comment>      
+  <expr PREFIX:line="140" PREFIX:column="3">0x0af</expr>,		<comment type="block" PREFIX:line="140" PREFIX:column="25">/* display on */</comment>      
+  <expr><call><name PREFIX:line="141" PREFIX:column="3">U8G_ESC_DLY</name><argument_list PREFIX:line="141" PREFIX:column="14">(<argument><expr PREFIX:line="141" PREFIX:column="15">50</expr></argument>)</argument_list></call></expr>,       <comment type="block" PREFIX:line="141" PREFIX:column="26">/* delay 50 ms */</comment>
+  <expr><call><name PREFIX:line="142" PREFIX:column="3">U8G_ESC_CS</name><argument_list PREFIX:line="142" PREFIX:column="13">(<argument><expr PREFIX:line="142" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>,             <comment type="block" PREFIX:line="142" PREFIX:column="30">/* disable chip */</comment>
+  <expr><name PREFIX:line="143" PREFIX:column="3">U8G_ESC_END</name></expr>                <comment type="block" PREFIX:line="143" PREFIX:column="30">/* end of sequence */</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+
+<function><type><name PREFIX:line="147" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="147" PREFIX:column="9">u8g_dev_st7565_lm6063_fn</name><parameter_list PREFIX:line="147" PREFIX:column="33">(<param><decl><type><name PREFIX:line="147" PREFIX:column="34">u8g_t</name> *</type><name PREFIX:line="147" PREFIX:column="41">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="147" PREFIX:column="46">u8g_dev_t</name> *</type><name PREFIX:line="147" PREFIX:column="57">dev</name></decl></param>, <param><decl><type><name PREFIX:line="147" PREFIX:column="62">uint8_t</name></type> <name PREFIX:line="147" PREFIX:column="70">msg</name></decl></param>, <param><decl><type><name PREFIX:line="147" PREFIX:column="75">void</name> *</type><name PREFIX:line="147" PREFIX:column="81">arg</name></decl></param>)</parameter_list>
+<block PREFIX:line="148" PREFIX:column="1">{
+  <switch PREFIX:line="149" PREFIX:column="3">switch<condition PREFIX:line="149" PREFIX:column="9">(<expr><name PREFIX:line="149" PREFIX:column="10">msg</name></expr>)</condition>
+  <block PREFIX:line="150" PREFIX:column="3">{
+    <case PREFIX:line="151" PREFIX:column="5">case <expr><name PREFIX:line="151" PREFIX:column="10">U8G_DEV_MSG_INIT</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="152" PREFIX:column="7">u8g_InitCom</name><argument_list PREFIX:line="152" PREFIX:column="18">(<argument><expr><name PREFIX:line="152" PREFIX:column="19">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="152" PREFIX:column="24">dev</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="153" PREFIX:column="7">u8g_WriteEscSeqP</name><argument_list PREFIX:line="153" PREFIX:column="23">(<argument><expr><name PREFIX:line="153" PREFIX:column="24">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="153" PREFIX:column="29">dev</name></expr></argument>, <argument><expr><name PREFIX:line="153" PREFIX:column="34">u8g_dev_st7565_lm6063_init_seq</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="154" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="155" PREFIX:column="5">case <expr><name PREFIX:line="155" PREFIX:column="10">U8G_DEV_MSG_STOP</name></expr>:
+      <break PREFIX:line="156" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="157" PREFIX:column="5">case <expr><name PREFIX:line="157" PREFIX:column="10">U8G_DEV_MSG_PAGE_NEXT</name></expr>:
+      <block PREFIX:line="158" PREFIX:column="7">{
+        <decl_stmt><decl><type><name PREFIX:line="159" PREFIX:column="9">u8g_pb_t</name> *</type><name PREFIX:line="159" PREFIX:column="19">pb</name> <init PREFIX:line="159" PREFIX:column="22">= <expr><call PREFIX:line="159" PREFIX:column="24">(<name PREFIX:line="159" PREFIX:column="25">u8g_pb_t</name> *)<argument_list PREFIX:line="159" PREFIX:column="36">(<argument><expr><name><name PREFIX:line="159" PREFIX:column="37">dev</name>-&gt;<name PREFIX:line="159" PREFIX:column="42">dev_mem</name></name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="160" PREFIX:column="9">u8g_WriteEscSeqP</name><argument_list PREFIX:line="160" PREFIX:column="25">(<argument><expr><name PREFIX:line="160" PREFIX:column="26">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="160" PREFIX:column="31">dev</name></expr></argument>, <argument><expr><name PREFIX:line="160" PREFIX:column="36">u8g_dev_st7565_lm6063_data_start</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>    
+        <expr_stmt><expr><call><name PREFIX:line="161" PREFIX:column="9">u8g_WriteByte</name><argument_list PREFIX:line="161" PREFIX:column="22">(<argument><expr><name PREFIX:line="161" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="161" PREFIX:column="28">dev</name></expr></argument>, <argument><expr PREFIX:line="161" PREFIX:column="33">0x0b0 | <name><name PREFIX:line="161" PREFIX:column="41">pb</name>-&gt;<name PREFIX:line="161" PREFIX:column="45">p</name>.<name PREFIX:line="161" PREFIX:column="47">page</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <comment type="block" PREFIX:line="161" PREFIX:column="54">/* select current page (ST7565R) */</comment>
+        <expr_stmt><expr><call><name PREFIX:line="162" PREFIX:column="9">u8g_SetAddress</name><argument_list PREFIX:line="162" PREFIX:column="23">(<argument><expr><name PREFIX:line="162" PREFIX:column="24">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="162" PREFIX:column="29">dev</name></expr></argument>, <argument><expr PREFIX:line="162" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>           <comment type="block" PREFIX:line="162" PREFIX:column="48">/* data mode */</comment>
+        <if PREFIX:line="163" PREFIX:column="9">if <condition PREFIX:line="163" PREFIX:column="12">( <expr><call><name PREFIX:line="163" PREFIX:column="14">u8g_pb_WriteBuffer</name><argument_list PREFIX:line="163" PREFIX:column="32">(<argument><expr><name PREFIX:line="163" PREFIX:column="33">pb</name></expr></argument>, <argument><expr><name PREFIX:line="163" PREFIX:column="37">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="163" PREFIX:column="42">dev</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="163" PREFIX:column="53">
+          <return PREFIX:line="164" PREFIX:column="11">return <expr PREFIX:line="164" PREFIX:column="18">0</expr>;</return></then></if>
+        <expr_stmt><expr><call><name PREFIX:line="165" PREFIX:column="9">u8g_SetChipSelect</name><argument_list PREFIX:line="165" PREFIX:column="26">(<argument><expr><name PREFIX:line="165" PREFIX:column="27">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="165" PREFIX:column="32">dev</name></expr></argument>, <argument><expr PREFIX:line="165" PREFIX:column="37">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      }</block>
+      <break PREFIX:line="167" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="168" PREFIX:column="5">case <expr><name PREFIX:line="168" PREFIX:column="10">U8G_DEV_MSG_CONTRAST</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="169" PREFIX:column="7">u8g_SetChipSelect</name><argument_list PREFIX:line="169" PREFIX:column="24">(<argument><expr><name PREFIX:line="169" PREFIX:column="25">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="169" PREFIX:column="30">dev</name></expr></argument>, <argument><expr PREFIX:line="169" PREFIX:column="35">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="170" PREFIX:column="7">u8g_SetAddress</name><argument_list PREFIX:line="170" PREFIX:column="21">(<argument><expr><name PREFIX:line="170" PREFIX:column="22">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="170" PREFIX:column="27">dev</name></expr></argument>, <argument><expr PREFIX:line="170" PREFIX:column="32">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>          <comment type="block" PREFIX:line="170" PREFIX:column="45">/* instruction mode */</comment>
+      <expr_stmt><expr><call><name PREFIX:line="171" PREFIX:column="7">u8g_WriteByte</name><argument_list PREFIX:line="171" PREFIX:column="20">(<argument><expr><name PREFIX:line="171" PREFIX:column="21">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="171" PREFIX:column="26">dev</name></expr></argument>, <argument><expr PREFIX:line="171" PREFIX:column="31">0x081</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="172" PREFIX:column="7">u8g_WriteByte</name><argument_list PREFIX:line="172" PREFIX:column="20">(<argument><expr><name PREFIX:line="172" PREFIX:column="21">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="172" PREFIX:column="26">dev</name></expr></argument>, <argument><expr PREFIX:line="172" PREFIX:column="31">(*(<name PREFIX:line="172" PREFIX:column="34">uint8_t</name> *)<name PREFIX:line="172" PREFIX:column="44">arg</name>) &gt;&gt; 2</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="173" PREFIX:column="7">u8g_SetChipSelect</name><argument_list PREFIX:line="173" PREFIX:column="24">(<argument><expr><name PREFIX:line="173" PREFIX:column="25">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="173" PREFIX:column="30">dev</name></expr></argument>, <argument><expr PREFIX:line="173" PREFIX:column="35">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>      
+      <return PREFIX:line="174" PREFIX:column="7">return <expr PREFIX:line="174" PREFIX:column="14">1</expr>;</return>
+    </case><case PREFIX:line="175" PREFIX:column="5">case <expr><name PREFIX:line="175" PREFIX:column="10">U8G_DEV_MSG_SLEEP_ON</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="176" PREFIX:column="7">u8g_WriteEscSeqP</name><argument_list PREFIX:line="176" PREFIX:column="23">(<argument><expr><name PREFIX:line="176" PREFIX:column="24">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="176" PREFIX:column="29">dev</name></expr></argument>, <argument><expr><name PREFIX:line="176" PREFIX:column="34">u8g_dev_st7565_st7565_sleep_on</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>    
+      <return PREFIX:line="177" PREFIX:column="7">return <expr PREFIX:line="177" PREFIX:column="14">1</expr>;</return>
+    </case><case PREFIX:line="178" PREFIX:column="5">case <expr><name PREFIX:line="178" PREFIX:column="10">U8G_DEV_MSG_SLEEP_OFF</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="179" PREFIX:column="7">u8g_WriteEscSeqP</name><argument_list PREFIX:line="179" PREFIX:column="23">(<argument><expr><name PREFIX:line="179" PREFIX:column="24">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="179" PREFIX:column="29">dev</name></expr></argument>, <argument><expr><name PREFIX:line="179" PREFIX:column="34">u8g_dev_st7565_st7565_sleep_off</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>    
+      <return PREFIX:line="180" PREFIX:column="7">return <expr PREFIX:line="180" PREFIX:column="14">1</expr>;</return>
+  </case>}</block></switch>
+  <return PREFIX:line="182" PREFIX:column="3">return <expr><call><name PREFIX:line="182" PREFIX:column="10">u8g_dev_pb8v1_base_fn</name><argument_list PREFIX:line="182" PREFIX:column="31">(<argument><expr><name PREFIX:line="182" PREFIX:column="32">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="182" PREFIX:column="37">dev</name></expr></argument>, <argument><expr><name PREFIX:line="182" PREFIX:column="42">msg</name></expr></argument>, <argument><expr><name PREFIX:line="182" PREFIX:column="47">arg</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<expr_stmt><expr><call><name PREFIX:line="185" PREFIX:column="1">U8G_PB_DEV</name><argument_list PREFIX:line="185" PREFIX:column="11">(<argument><expr><name PREFIX:line="185" PREFIX:column="12">u8g_dev_st7565_lm6063_sw_spi</name></expr></argument>, <argument><expr><name PREFIX:line="185" PREFIX:column="42">WIDTH</name></expr></argument>, <argument><expr><name PREFIX:line="185" PREFIX:column="49">HEIGHT</name></expr></argument>, <argument><expr><name PREFIX:line="185" PREFIX:column="57">PAGE_HEIGHT</name></expr></argument>, <argument><expr><name PREFIX:line="185" PREFIX:column="70">u8g_dev_st7565_lm6063_fn</name></expr></argument>, <argument><expr><name PREFIX:line="185" PREFIX:column="96">U8G_COM_SW_SPI</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<expr_stmt><expr><call><name PREFIX:line="186" PREFIX:column="1">U8G_PB_DEV</name><argument_list PREFIX:line="186" PREFIX:column="11">(<argument><expr><name PREFIX:line="186" PREFIX:column="12">u8g_dev_st7565_lm6063_hw_spi</name></expr></argument>, <argument><expr><name PREFIX:line="186" PREFIX:column="42">WIDTH</name></expr></argument>, <argument><expr><name PREFIX:line="186" PREFIX:column="49">HEIGHT</name></expr></argument>, <argument><expr><name PREFIX:line="186" PREFIX:column="57">PAGE_HEIGHT</name></expr></argument>, <argument><expr><name PREFIX:line="186" PREFIX:column="70">u8g_dev_st7565_lm6063_fn</name></expr></argument>, <argument><expr><name PREFIX:line="186" PREFIX:column="96">U8G_COM_HW_SPI</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+
+</unit>

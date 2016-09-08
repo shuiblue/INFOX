@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/at90usb/Platform.h.cpp" PREFIX:tabs="8" PREFIX:line="1" PREFIX:column="1">
+<cpp:ifndef PREFIX:line="2" PREFIX:column="1">#<cpp:directive PREFIX:line="2" PREFIX:column="2">ifndef</cpp:directive> <name PREFIX:line="2" PREFIX:column="9">__PLATFORM_H__</name></cpp:ifndef>
+<cpp:define PREFIX:line="3" PREFIX:column="1">#<cpp:directive PREFIX:line="3" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="3" PREFIX:column="9">__PLATFORM_H__</name></cpp:macro></cpp:define>
+
+<cpp:include PREFIX:line="5" PREFIX:column="1">#<cpp:directive PREFIX:line="5" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="5" PREFIX:column="10">&lt;inttypes.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="6" PREFIX:column="1">#<cpp:directive PREFIX:line="6" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="6" PREFIX:column="10">&lt;avr/pgmspace.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="7" PREFIX:column="1">#<cpp:directive PREFIX:line="7" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="7" PREFIX:column="10">&lt;avr/eeprom.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="8" PREFIX:column="1">#<cpp:directive PREFIX:line="8" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="8" PREFIX:column="10">&lt;avr/interrupt.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="9" PREFIX:column="1">#<cpp:directive PREFIX:line="9" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="9" PREFIX:column="10">&lt;util/delay.h&gt;</cpp:file></cpp:include>
+
+<typedef PREFIX:line="11" PREFIX:column="1">typedef <type><name PREFIX:line="11" PREFIX:column="9">unknowntype</name> <name PREFIX:line="11" PREFIX:column="21">char</name></type> <name PREFIX:line="11" PREFIX:column="26">u8</name>;</typedef>
+<typedef PREFIX:line="12" PREFIX:column="1">typedef <type><name PREFIX:line="12" PREFIX:column="9">unknowntype</name> <name PREFIX:line="12" PREFIX:column="21">short</name></type> <name PREFIX:line="12" PREFIX:column="27">u16</name>;</typedef>
+<typedef PREFIX:line="13" PREFIX:column="1">typedef <type><name PREFIX:line="13" PREFIX:column="9">unknowntype</name> <name PREFIX:line="13" PREFIX:column="21">long</name></type> <name PREFIX:line="13" PREFIX:column="26">u32</name>;</typedef>
+
+<cpp:include PREFIX:line="15" PREFIX:column="1">#<cpp:directive PREFIX:line="15" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="15" PREFIX:column="10">"Arduino.h"</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="17" PREFIX:column="1">#<cpp:directive PREFIX:line="17" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="17" PREFIX:column="5">defined</name><argument_list PREFIX:line="17" PREFIX:column="12">(<argument><expr><name PREFIX:line="17" PREFIX:column="13">USBCON</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<cpp:include PREFIX:line="18" PREFIX:column="9">#<cpp:directive PREFIX:line="18" PREFIX:column="10">include</cpp:directive> <cpp:file PREFIX:line="18" PREFIX:column="18">"USBDesc.h"</cpp:file></cpp:include>
+	<cpp:include PREFIX:line="19" PREFIX:column="9">#<cpp:directive PREFIX:line="19" PREFIX:column="10">include</cpp:directive> <cpp:file PREFIX:line="19" PREFIX:column="18">"USBCore.h"</cpp:file></cpp:include>
+	<cpp:include PREFIX:line="20" PREFIX:column="9">#<cpp:directive PREFIX:line="20" PREFIX:column="10">include</cpp:directive> <cpp:file PREFIX:line="20" PREFIX:column="18">"USBAPI.h"</cpp:file></cpp:include>
+<cpp:endif PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">endif</cpp:directive></cpp:endif> <comment type="block" PREFIX:line="21" PREFIX:column="8">/* if defined(USBCON) */</comment>
+
+<cpp:endif PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+</unit>

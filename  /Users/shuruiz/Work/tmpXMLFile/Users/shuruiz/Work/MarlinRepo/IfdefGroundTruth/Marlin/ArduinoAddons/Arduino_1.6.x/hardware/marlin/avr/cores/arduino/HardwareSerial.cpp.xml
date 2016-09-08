@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/arduino/HardwareSerial.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  HardwareSerial.cpp - Hardware serial library for Wiring
+  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  
+  Modified 23 November 2006 by David A. Mellis
+  Modified 28 September 2010 by Mark Sproul
+  Modified 14 August 2012 by Alarus
+  Modified 3 December 2013 by Matthijs Kooijman
+*/</comment>
+
+<cpp:include PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="25" PREFIX:column="10">&lt;stdlib.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="26" PREFIX:column="10">&lt;stdio.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="27" PREFIX:column="1">#<cpp:directive PREFIX:line="27" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="27" PREFIX:column="10">&lt;string.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="28" PREFIX:column="10">&lt;inttypes.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="29" PREFIX:column="1">#<cpp:directive PREFIX:line="29" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="29" PREFIX:column="10">"Arduino.h"</cpp:file></cpp:include>
+
+<cpp:include PREFIX:line="31" PREFIX:column="1">#<cpp:directive PREFIX:line="31" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="31" PREFIX:column="10">"HardwareSerial.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="32" PREFIX:column="1">#<cpp:directive PREFIX:line="32" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="32" PREFIX:column="10">"HardwareSerial_private.h"</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="34" PREFIX:column="1">// this next line disables the entire HardwareSerial.cpp, </comment>
+<comment type="line" PREFIX:line="35" PREFIX:column="1">// this is so I can support Attiny series and any other chip without a uart</comment>
+<cpp:if PREFIX:line="36" PREFIX:column="1">#<cpp:directive PREFIX:line="36" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="36" PREFIX:column="5">defined</name><argument_list PREFIX:line="36" PREFIX:column="12">(<argument><expr><name PREFIX:line="36" PREFIX:column="13">HAVE_HWSERIAL0</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="36" PREFIX:column="32">defined</name><argument_list PREFIX:line="36" PREFIX:column="39">(<argument><expr><name PREFIX:line="36" PREFIX:column="40">HAVE_HWSERIAL1</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="36" PREFIX:column="59">defined</name><argument_list PREFIX:line="36" PREFIX:column="66">(<argument><expr><name PREFIX:line="36" PREFIX:column="67">HAVE_HWSERIAL2</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="36" PREFIX:column="86">defined</name><argument_list PREFIX:line="36" PREFIX:column="93">(<argument><expr><name PREFIX:line="36" PREFIX:column="94">HAVE_HWSERIAL3</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<comment type="line" PREFIX:line="38" PREFIX:column="1">// SerialEvent functions are weak, so when the user doesn't define them,</comment>
+<comment type="line" PREFIX:line="39" PREFIX:column="1">// the linker just sets their address to 0 (which is checked below).</comment>
+<comment type="line" PREFIX:line="40" PREFIX:column="1">// The Serialx_available is just a wrapper around Serialx.available(),</comment>
+<comment type="line" PREFIX:line="41" PREFIX:column="1">// but we can refer to it weakly so we don't pull in the entire</comment>
+<comment type="line" PREFIX:line="42" PREFIX:column="1">// HardwareSerial instance if the user doesn't also refer to it.</comment>
+<cpp:if PREFIX:line="43" PREFIX:column="1">#<cpp:directive PREFIX:line="43" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="43" PREFIX:column="5">defined</name><argument_list PREFIX:line="43" PREFIX:column="12">(<argument><expr><name PREFIX:line="43" PREFIX:column="13">HAVE_HWSERIAL0</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <decl_stmt><decl><type><name PREFIX:line="44" PREFIX:column="3">void</name></type> <name PREFIX:line="44" PREFIX:column="8">serialEvent</name><argument_list PREFIX:line="44" PREFIX:column="19">()</argument_list> <name PREFIX:line="44" PREFIX:column="22">__attribute__</name><argument_list PREFIX:line="44" PREFIX:column="35">(<argument><expr PREFIX:line="44" PREFIX:column="36">(<name PREFIX:line="44" PREFIX:column="37">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="45" PREFIX:column="3">bool</name></type> <name PREFIX:line="45" PREFIX:column="8">Serial0_available</name><argument_list PREFIX:line="45" PREFIX:column="25">()</argument_list> <name PREFIX:line="45" PREFIX:column="28">__attribute__</name><argument_list PREFIX:line="45" PREFIX:column="41">(<argument><expr PREFIX:line="45" PREFIX:column="42">(<name PREFIX:line="45" PREFIX:column="43">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="46" PREFIX:column="1">#<cpp:directive PREFIX:line="46" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="48" PREFIX:column="1">#<cpp:directive PREFIX:line="48" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="48" PREFIX:column="5">defined</name><argument_list PREFIX:line="48" PREFIX:column="12">(<argument><expr><name PREFIX:line="48" PREFIX:column="13">HAVE_HWSERIAL1</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <decl_stmt><decl><type><name PREFIX:line="49" PREFIX:column="3">void</name></type> <name PREFIX:line="49" PREFIX:column="8">serialEvent1</name><argument_list PREFIX:line="49" PREFIX:column="20">()</argument_list> <name PREFIX:line="49" PREFIX:column="23">__attribute__</name><argument_list PREFIX:line="49" PREFIX:column="36">(<argument><expr PREFIX:line="49" PREFIX:column="37">(<name PREFIX:line="49" PREFIX:column="38">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="50" PREFIX:column="3">bool</name></type> <name PREFIX:line="50" PREFIX:column="8">Serial1_available</name><argument_list PREFIX:line="50" PREFIX:column="25">()</argument_list> <name PREFIX:line="50" PREFIX:column="28">__attribute__</name><argument_list PREFIX:line="50" PREFIX:column="41">(<argument><expr PREFIX:line="50" PREFIX:column="42">(<name PREFIX:line="50" PREFIX:column="43">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="51" PREFIX:column="1">#<cpp:directive PREFIX:line="51" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="53" PREFIX:column="1">#<cpp:directive PREFIX:line="53" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="53" PREFIX:column="5">defined</name><argument_list PREFIX:line="53" PREFIX:column="12">(<argument><expr><name PREFIX:line="53" PREFIX:column="13">HAVE_HWSERIAL2</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <decl_stmt><decl><type><name PREFIX:line="54" PREFIX:column="3">void</name></type> <name PREFIX:line="54" PREFIX:column="8">serialEvent2</name><argument_list PREFIX:line="54" PREFIX:column="20">()</argument_list> <name PREFIX:line="54" PREFIX:column="23">__attribute__</name><argument_list PREFIX:line="54" PREFIX:column="36">(<argument><expr PREFIX:line="54" PREFIX:column="37">(<name PREFIX:line="54" PREFIX:column="38">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="55" PREFIX:column="3">bool</name></type> <name PREFIX:line="55" PREFIX:column="8">Serial2_available</name><argument_list PREFIX:line="55" PREFIX:column="25">()</argument_list> <name PREFIX:line="55" PREFIX:column="28">__attribute__</name><argument_list PREFIX:line="55" PREFIX:column="41">(<argument><expr PREFIX:line="55" PREFIX:column="42">(<name PREFIX:line="55" PREFIX:column="43">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="56" PREFIX:column="1">#<cpp:directive PREFIX:line="56" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="58" PREFIX:column="1">#<cpp:directive PREFIX:line="58" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="58" PREFIX:column="5">defined</name><argument_list PREFIX:line="58" PREFIX:column="12">(<argument><expr><name PREFIX:line="58" PREFIX:column="13">HAVE_HWSERIAL3</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <decl_stmt><decl><type><name PREFIX:line="59" PREFIX:column="3">void</name></type> <name PREFIX:line="59" PREFIX:column="8">serialEvent3</name><argument_list PREFIX:line="59" PREFIX:column="20">()</argument_list> <name PREFIX:line="59" PREFIX:column="23">__attribute__</name><argument_list PREFIX:line="59" PREFIX:column="36">(<argument><expr PREFIX:line="59" PREFIX:column="37">(<name PREFIX:line="59" PREFIX:column="38">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="60" PREFIX:column="3">bool</name></type> <name PREFIX:line="60" PREFIX:column="8">Serial3_available</name><argument_list PREFIX:line="60" PREFIX:column="25">()</argument_list> <name PREFIX:line="60" PREFIX:column="28">__attribute__</name><argument_list PREFIX:line="60" PREFIX:column="41">(<argument><expr PREFIX:line="60" PREFIX:column="42">(<name PREFIX:line="60" PREFIX:column="43">weak</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="61" PREFIX:column="1">#<cpp:directive PREFIX:line="61" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<function><type><name PREFIX:line="63" PREFIX:column="1">void</name></type> <name PREFIX:line="63" PREFIX:column="6">serialEventRun</name><parameter_list PREFIX:line="63" PREFIX:column="20">(<param><decl><type><name PREFIX:line="63" PREFIX:column="21">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="64" PREFIX:column="1">{
+<cpp:if PREFIX:line="65" PREFIX:column="1">#<cpp:directive PREFIX:line="65" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="65" PREFIX:column="5">defined</name><argument_list PREFIX:line="65" PREFIX:column="12">(<argument><expr><name PREFIX:line="65" PREFIX:column="13">HAVE_HWSERIAL0</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <if PREFIX:line="66" PREFIX:column="3">if <condition PREFIX:line="66" PREFIX:column="6">(<expr><name PREFIX:line="66" PREFIX:column="7">Serial0_available</name> &amp;&amp; <name PREFIX:line="66" PREFIX:column="28">serialEvent</name> &amp;&amp; <call><name PREFIX:line="66" PREFIX:column="43">Serial0_available</name><argument_list PREFIX:line="66" PREFIX:column="60">()</argument_list></call></expr>)</condition><then PREFIX:line="66" PREFIX:column="63"> <expr_stmt><expr><call><name PREFIX:line="66" PREFIX:column="64">serialEvent</name><argument_list PREFIX:line="66" PREFIX:column="75">()</argument_list></call></expr>;</expr_stmt></then></if>
+<cpp:endif PREFIX:line="67" PREFIX:column="1">#<cpp:directive PREFIX:line="67" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="68" PREFIX:column="1">#<cpp:directive PREFIX:line="68" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="68" PREFIX:column="5">defined</name><argument_list PREFIX:line="68" PREFIX:column="12">(<argument><expr><name PREFIX:line="68" PREFIX:column="13">HAVE_HWSERIAL1</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <if PREFIX:line="69" PREFIX:column="3">if <condition PREFIX:line="69" PREFIX:column="6">(<expr><name PREFIX:line="69" PREFIX:column="7">Serial1_available</name> &amp;&amp; <name PREFIX:line="69" PREFIX:column="28">serialEvent1</name> &amp;&amp; <call><name PREFIX:line="69" PREFIX:column="44">Serial1_available</name><argument_list PREFIX:line="69" PREFIX:column="61">()</argument_list></call></expr>)</condition><then PREFIX:line="69" PREFIX:column="64"> <expr_stmt><expr><call><name PREFIX:line="69" PREFIX:column="65">serialEvent1</name><argument_list PREFIX:line="69" PREFIX:column="77">()</argument_list></call></expr>;</expr_stmt></then></if>
+<cpp:endif PREFIX:line="70" PREFIX:column="1">#<cpp:directive PREFIX:line="70" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="71" PREFIX:column="1">#<cpp:directive PREFIX:line="71" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="71" PREFIX:column="5">defined</name><argument_list PREFIX:line="71" PREFIX:column="12">(<argument><expr><name PREFIX:line="71" PREFIX:column="13">HAVE_HWSERIAL2</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <if PREFIX:line="72" PREFIX:column="3">if <condition PREFIX:line="72" PREFIX:column="6">(<expr><name PREFIX:line="72" PREFIX:column="7">Serial2_available</name> &amp;&amp; <name PREFIX:line="72" PREFIX:column="28">serialEvent2</name> &amp;&amp; <call><name PREFIX:line="72" PREFIX:column="44">Serial2_available</name><argument_list PREFIX:line="72" PREFIX:column="61">()</argument_list></call></expr>)</condition><then PREFIX:line="72" PREFIX:column="64"> <expr_stmt><expr><call><name PREFIX:line="72" PREFIX:column="65">serialEvent2</name><argument_list PREFIX:line="72" PREFIX:column="77">()</argument_list></call></expr>;</expr_stmt></then></if>
+<cpp:endif PREFIX:line="73" PREFIX:column="1">#<cpp:directive PREFIX:line="73" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="74" PREFIX:column="1">#<cpp:directive PREFIX:line="74" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="74" PREFIX:column="5">defined</name><argument_list PREFIX:line="74" PREFIX:column="12">(<argument><expr><name PREFIX:line="74" PREFIX:column="13">HAVE_HWSERIAL3</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <if PREFIX:line="75" PREFIX:column="3">if <condition PREFIX:line="75" PREFIX:column="6">(<expr><name PREFIX:line="75" PREFIX:column="7">Serial3_available</name> &amp;&amp; <name PREFIX:line="75" PREFIX:column="28">serialEvent3</name> &amp;&amp; <call><name PREFIX:line="75" PREFIX:column="44">Serial3_available</name><argument_list PREFIX:line="75" PREFIX:column="61">()</argument_list></call></expr>)</condition><then PREFIX:line="75" PREFIX:column="64"> <expr_stmt><expr><call><name PREFIX:line="75" PREFIX:column="65">serialEvent3</name><argument_list PREFIX:line="75" PREFIX:column="77">()</argument_list></call></expr>;</expr_stmt></then></if>
+<cpp:endif PREFIX:line="76" PREFIX:column="1">#<cpp:directive PREFIX:line="76" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+}</block></function>
+
+<comment type="line" PREFIX:line="79" PREFIX:column="1">// Actual interrupt handlers //////////////////////////////////////////////////////////////</comment>
+
+<function><type><name PREFIX:line="81" PREFIX:column="1">void</name></type> <name><name PREFIX:line="81" PREFIX:column="6">HardwareSerial</name>::<name PREFIX:line="81" PREFIX:column="22">_tx_udr_empty_irq</name></name><parameter_list PREFIX:line="81" PREFIX:column="39">(<param><decl><type><name PREFIX:line="81" PREFIX:column="40">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="82" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="83" PREFIX:column="3">// If interrupts are enabled, there must be more data in the output</comment>
+  <comment type="line" PREFIX:line="84" PREFIX:column="3">// buffer. Send the next byte</comment>
+  <decl_stmt><decl><type><name PREFIX:line="85" PREFIX:column="3">unknowntype</name> <name PREFIX:line="85" PREFIX:column="15">char</name></type> <name PREFIX:line="85" PREFIX:column="20">c</name> <init PREFIX:line="85" PREFIX:column="22">= <expr><name><name PREFIX:line="85" PREFIX:column="24">_tx_buffer</name><index PREFIX:line="85" PREFIX:column="34">[<expr><name PREFIX:line="85" PREFIX:column="35">_tx_buffer_tail</name></expr>]</index></name></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="86" PREFIX:column="3">_tx_buffer_tail</name> = (<name PREFIX:line="86" PREFIX:column="22">_tx_buffer_tail</name> + 1) % <name PREFIX:line="86" PREFIX:column="45">SERIAL_TX_BUFFER_SIZE</name></expr>;</expr_stmt>
+
+  <expr_stmt><expr PREFIX:line="88" PREFIX:column="3">*<name PREFIX:line="88" PREFIX:column="4">_udr</name> = <name PREFIX:line="88" PREFIX:column="11">c</name></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="90" PREFIX:column="3">// clear the TXC bit -- "can be cleared by writing a one to its bit</comment>
+  <comment type="line" PREFIX:line="91" PREFIX:column="3">// location". This makes sure flush() won't return until the bytes</comment>
+  <comment type="line" PREFIX:line="92" PREFIX:column="3">// actually got written</comment>
+  <expr_stmt><expr><call><name PREFIX:line="93" PREFIX:column="3">sbi</name><argument_list PREFIX:line="93" PREFIX:column="6">(<argument><expr PREFIX:line="93" PREFIX:column="7">*<name PREFIX:line="93" PREFIX:column="8">_ucsra</name></expr></argument>, <argument><expr><name PREFIX:line="93" PREFIX:column="16">TXC0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <if PREFIX:line="95" PREFIX:column="3">if <condition PREFIX:line="95" PREFIX:column="6">(<expr><name PREFIX:line="95" PREFIX:column="7">_tx_buffer_head</name> == <name PREFIX:line="95" PREFIX:column="26">_tx_buffer_tail</name></expr>)</condition><then PREFIX:line="95" PREFIX:column="42"> <block PREFIX:line="95" PREFIX:column="43">{
+    <comment type="line" PREFIX:line="96" PREFIX:column="5">// Buffer empty, so disable interrupts</comment>
+    <expr_stmt><expr><call><name PREFIX:line="97" PREFIX:column="5">cbi</name><argument_list PREFIX:line="97" PREFIX:column="8">(<argument><expr PREFIX:line="97" PREFIX:column="9">*<name PREFIX:line="97" PREFIX:column="10">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="97" PREFIX:column="18">UDRIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then></if>
+}</block></function>
+
+<comment type="line" PREFIX:line="101" PREFIX:column="1">// Public Methods //////////////////////////////////////////////////////////////</comment>
+
+<function><type><name PREFIX:line="103" PREFIX:column="1">void</name></type> <name><name PREFIX:line="103" PREFIX:column="6">HardwareSerial</name>::<name PREFIX:line="103" PREFIX:column="22">begin</name></name><parameter_list PREFIX:line="103" PREFIX:column="27">(<param><decl><type><name PREFIX:line="103" PREFIX:column="28">unknowntype</name> <name PREFIX:line="103" PREFIX:column="40">long</name></type> <name PREFIX:line="103" PREFIX:column="45">baud</name></decl></param>, <param><decl><type><name PREFIX:line="103" PREFIX:column="51">byte</name></type> <name PREFIX:line="103" PREFIX:column="56">config</name></decl></param>)</parameter_list>
+<block PREFIX:line="104" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="105" PREFIX:column="3">// Try u2x mode first</comment>
+  <decl_stmt><decl><type><name PREFIX:line="106" PREFIX:column="3">uint16_t</name></type> <name PREFIX:line="106" PREFIX:column="12">baud_setting</name> <init PREFIX:line="106" PREFIX:column="25">= <expr PREFIX:line="106" PREFIX:column="27">(<name PREFIX:line="106" PREFIX:column="28">F_CPU</name> / 4 / <name PREFIX:line="106" PREFIX:column="40">baud</name> - 1) / 2</expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr PREFIX:line="107" PREFIX:column="3">*<name PREFIX:line="107" PREFIX:column="4">_ucsra</name> = 1 &lt;&lt; <name PREFIX:line="107" PREFIX:column="18">U2X0</name></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="109" PREFIX:column="3">// hardcoded exception for 57600 for compatibility with the bootloader</comment>
+  <comment type="line" PREFIX:line="110" PREFIX:column="3">// shipped with the Duemilanove and previous boards and the firmware</comment>
+  <comment type="line" PREFIX:line="111" PREFIX:column="3">// on the 8U2 on the Uno and Mega 2560. Also, The baud_setting cannot</comment>
+  <comment type="line" PREFIX:line="112" PREFIX:column="3">// be &gt; 4095, so switch back to non-u2x mode if the baud rate is too</comment>
+  <comment type="line" PREFIX:line="113" PREFIX:column="3">// low.</comment>
+  <if PREFIX:line="114" PREFIX:column="3">if <condition PREFIX:line="114" PREFIX:column="6">(<expr PREFIX:line="114" PREFIX:column="7">((<name PREFIX:line="114" PREFIX:column="9">F_CPU</name> == 16000000UL) &amp;&amp; (<name PREFIX:line="114" PREFIX:column="34">baud</name> == 57600)) || (<name PREFIX:line="114" PREFIX:column="54">baud_setting</name> &gt;4095)</expr>)</condition><then PREFIX:line="114" PREFIX:column="74">
+  <block PREFIX:line="115" PREFIX:column="3">{
+    <expr_stmt><expr PREFIX:line="116" PREFIX:column="5">*<name PREFIX:line="116" PREFIX:column="6">_ucsra</name> = 0</expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="117" PREFIX:column="5">baud_setting</name> = (<name PREFIX:line="117" PREFIX:column="21">F_CPU</name> / 8 / <name PREFIX:line="117" PREFIX:column="33">baud</name> - 1) / 2</expr>;</expr_stmt>
+  }</block></then></if>
+
+  <comment type="line" PREFIX:line="120" PREFIX:column="3">// assign the baud_setting, a.k.a. ubrr (USART Baud Rate Register)</comment>
+  <expr_stmt><expr PREFIX:line="121" PREFIX:column="3">*<name PREFIX:line="121" PREFIX:column="4">_ubrrh</name> = <name PREFIX:line="121" PREFIX:column="13">baud_setting</name> &gt;&gt; 8</expr>;</expr_stmt>
+  <expr_stmt><expr PREFIX:line="122" PREFIX:column="3">*<name PREFIX:line="122" PREFIX:column="4">_ubrrl</name> = <name PREFIX:line="122" PREFIX:column="13">baud_setting</name></expr>;</expr_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="124" PREFIX:column="3">_written</name> = false</expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="126" PREFIX:column="3">//set the data bits, parity, and stop bits</comment>
+<cpp:if PREFIX:line="127" PREFIX:column="1">#<cpp:directive PREFIX:line="127" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="127" PREFIX:column="5">defined</name><argument_list PREFIX:line="127" PREFIX:column="12">(<argument><expr><name PREFIX:line="127" PREFIX:column="13">__AVR_ATmega8__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+  <expr_stmt><expr><name PREFIX:line="128" PREFIX:column="3">config</name> |= 0x80</expr>;</expr_stmt> <comment type="line" PREFIX:line="128" PREFIX:column="19">// select UCSRC register (shared with UBRRH)</comment>
+<cpp:endif PREFIX:line="129" PREFIX:column="1">#<cpp:directive PREFIX:line="129" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+  <expr_stmt><expr PREFIX:line="130" PREFIX:column="3">*<name PREFIX:line="130" PREFIX:column="4">_ucsrc</name> = <name PREFIX:line="130" PREFIX:column="13">config</name></expr>;</expr_stmt>
+  
+  <expr_stmt><expr><call><name PREFIX:line="132" PREFIX:column="3">sbi</name><argument_list PREFIX:line="132" PREFIX:column="6">(<argument><expr PREFIX:line="132" PREFIX:column="7">*<name PREFIX:line="132" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="132" PREFIX:column="16">RXEN0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="133" PREFIX:column="3">sbi</name><argument_list PREFIX:line="133" PREFIX:column="6">(<argument><expr PREFIX:line="133" PREFIX:column="7">*<name PREFIX:line="133" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="133" PREFIX:column="16">TXEN0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="134" PREFIX:column="3">sbi</name><argument_list PREFIX:line="134" PREFIX:column="6">(<argument><expr PREFIX:line="134" PREFIX:column="7">*<name PREFIX:line="134" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="134" PREFIX:column="16">RXCIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="135" PREFIX:column="3">cbi</name><argument_list PREFIX:line="135" PREFIX:column="6">(<argument><expr PREFIX:line="135" PREFIX:column="7">*<name PREFIX:line="135" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="135" PREFIX:column="16">UDRIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="138" PREFIX:column="1">void</name></type> <name><name PREFIX:line="138" PREFIX:column="6">HardwareSerial</name>::<name PREFIX:line="138" PREFIX:column="22">end</name></name><parameter_list PREFIX:line="138" PREFIX:column="25">()</parameter_list>
+<block PREFIX:line="139" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="140" PREFIX:column="3">// wait for transmission of outgoing data</comment>
+  <while PREFIX:line="141" PREFIX:column="3">while <condition PREFIX:line="141" PREFIX:column="9">(<expr><name PREFIX:line="141" PREFIX:column="10">_tx_buffer_head</name> != <name PREFIX:line="141" PREFIX:column="29">_tx_buffer_tail</name></expr>)</condition>
+    <empty_stmt PREFIX:line="142" PREFIX:column="5">;</empty_stmt></while>
+
+  <expr_stmt><expr><call><name PREFIX:line="144" PREFIX:column="3">cbi</name><argument_list PREFIX:line="144" PREFIX:column="6">(<argument><expr PREFIX:line="144" PREFIX:column="7">*<name PREFIX:line="144" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="144" PREFIX:column="16">RXEN0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="145" PREFIX:column="3">cbi</name><argument_list PREFIX:line="145" PREFIX:column="6">(<argument><expr PREFIX:line="145" PREFIX:column="7">*<name PREFIX:line="145" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="145" PREFIX:column="16">TXEN0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="146" PREFIX:column="3">cbi</name><argument_list PREFIX:line="146" PREFIX:column="6">(<argument><expr PREFIX:line="146" PREFIX:column="7">*<name PREFIX:line="146" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="146" PREFIX:column="16">RXCIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="147" PREFIX:column="3">cbi</name><argument_list PREFIX:line="147" PREFIX:column="6">(<argument><expr PREFIX:line="147" PREFIX:column="7">*<name PREFIX:line="147" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="147" PREFIX:column="16">UDRIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  
+  <comment type="line" PREFIX:line="149" PREFIX:column="3">// clear any received data</comment>
+  <expr_stmt><expr><name PREFIX:line="150" PREFIX:column="3">_rx_buffer_head</name> = <name PREFIX:line="150" PREFIX:column="21">_rx_buffer_tail</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="153" PREFIX:column="1">int</name></type> <name><name PREFIX:line="153" PREFIX:column="5">HardwareSerial</name>::<name PREFIX:line="153" PREFIX:column="21">available</name></name><parameter_list PREFIX:line="153" PREFIX:column="30">(<param><decl><type><name PREFIX:line="153" PREFIX:column="31">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="154" PREFIX:column="1">{
+  <return PREFIX:line="155" PREFIX:column="3">return <expr PREFIX:line="155" PREFIX:column="10">(<call PREFIX:line="155" PREFIX:column="11">(<name PREFIX:line="155" PREFIX:column="12">unknowntype</name> <name PREFIX:line="155" PREFIX:column="24">int</name>)<argument_list PREFIX:line="155" PREFIX:column="28">(<argument><expr><name PREFIX:line="155" PREFIX:column="29">SERIAL_RX_BUFFER_SIZE</name> + <name PREFIX:line="155" PREFIX:column="53">_rx_buffer_head</name> - <name PREFIX:line="155" PREFIX:column="71">_rx_buffer_tail</name></expr></argument>)</argument_list></call>) % <name PREFIX:line="155" PREFIX:column="91">SERIAL_RX_BUFFER_SIZE</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="158" PREFIX:column="1">int</name></type> <name><name PREFIX:line="158" PREFIX:column="5">HardwareSerial</name>::<name PREFIX:line="158" PREFIX:column="21">peek</name></name><parameter_list PREFIX:line="158" PREFIX:column="25">(<param><decl><type><name PREFIX:line="158" PREFIX:column="26">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="159" PREFIX:column="1">{
+  <if PREFIX:line="160" PREFIX:column="3">if <condition PREFIX:line="160" PREFIX:column="6">(<expr><name PREFIX:line="160" PREFIX:column="7">_rx_buffer_head</name> == <name PREFIX:line="160" PREFIX:column="26">_rx_buffer_tail</name></expr>)</condition><then PREFIX:line="160" PREFIX:column="42"> <block PREFIX:line="160" PREFIX:column="43">{
+    <return PREFIX:line="161" PREFIX:column="5">return <expr PREFIX:line="161" PREFIX:column="12">-1</expr>;</return>
+  }</block></then> <else PREFIX:line="162" PREFIX:column="5">else <block PREFIX:line="162" PREFIX:column="10">{
+    <return PREFIX:line="163" PREFIX:column="5">return <expr><name><name PREFIX:line="163" PREFIX:column="12">_rx_buffer</name><index PREFIX:line="163" PREFIX:column="22">[<expr><name PREFIX:line="163" PREFIX:column="23">_rx_buffer_tail</name></expr>]</index></name></expr>;</return>
+  }</block></else></if>
+}</block></function>
+
+<function><type><name PREFIX:line="167" PREFIX:column="1">int</name></type> <name><name PREFIX:line="167" PREFIX:column="5">HardwareSerial</name>::<name PREFIX:line="167" PREFIX:column="21">read</name></name><parameter_list PREFIX:line="167" PREFIX:column="25">(<param><decl><type><name PREFIX:line="167" PREFIX:column="26">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="168" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="169" PREFIX:column="3">// if the head isn't ahead of the tail, we don't have any characters</comment>
+  <if PREFIX:line="170" PREFIX:column="3">if <condition PREFIX:line="170" PREFIX:column="6">(<expr><name PREFIX:line="170" PREFIX:column="7">_rx_buffer_head</name> == <name PREFIX:line="170" PREFIX:column="26">_rx_buffer_tail</name></expr>)</condition><then PREFIX:line="170" PREFIX:column="42"> <block PREFIX:line="170" PREFIX:column="43">{
+    <return PREFIX:line="171" PREFIX:column="5">return <expr PREFIX:line="171" PREFIX:column="12">-1</expr>;</return>
+  }</block></then> <else PREFIX:line="172" PREFIX:column="5">else <block PREFIX:line="172" PREFIX:column="10">{
+    <decl_stmt><decl><type><name PREFIX:line="173" PREFIX:column="5">unknowntype</name> <name PREFIX:line="173" PREFIX:column="17">char</name></type> <name PREFIX:line="173" PREFIX:column="22">c</name> <init PREFIX:line="173" PREFIX:column="24">= <expr><name><name PREFIX:line="173" PREFIX:column="26">_rx_buffer</name><index PREFIX:line="173" PREFIX:column="36">[<expr><name PREFIX:line="173" PREFIX:column="37">_rx_buffer_tail</name></expr>]</index></name></expr></init></decl>;</decl_stmt>
+    <expr_stmt><expr><name PREFIX:line="174" PREFIX:column="5">_rx_buffer_tail</name> = <call PREFIX:line="174" PREFIX:column="23">(<name PREFIX:line="174" PREFIX:column="24">rx_buffer_index_t</name>)<argument_list PREFIX:line="174" PREFIX:column="42">(<argument><expr><name PREFIX:line="174" PREFIX:column="43">_rx_buffer_tail</name> + 1</expr></argument>)</argument_list></call> % <name PREFIX:line="174" PREFIX:column="66">SERIAL_RX_BUFFER_SIZE</name></expr>;</expr_stmt>
+    <return PREFIX:line="175" PREFIX:column="5">return <expr><name PREFIX:line="175" PREFIX:column="12">c</name></expr>;</return>
+  }</block></else></if>
+}</block></function>
+
+<function><type><name PREFIX:line="179" PREFIX:column="1">int</name></type> <name><name PREFIX:line="179" PREFIX:column="5">HardwareSerial</name>::<name PREFIX:line="179" PREFIX:column="21">availableForWrite</name></name><parameter_list PREFIX:line="179" PREFIX:column="38">(<param><decl><type><name PREFIX:line="179" PREFIX:column="39">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="180" PREFIX:column="1">{
+<cpp:if PREFIX:line="181" PREFIX:column="1">#<cpp:directive PREFIX:line="181" PREFIX:column="2">if</cpp:directive> <expr PREFIX:line="181" PREFIX:column="5">(<name PREFIX:line="181" PREFIX:column="6">SERIAL_TX_BUFFER_SIZE</name>&gt;256)</expr></cpp:if>
+  <decl_stmt><decl><type><name PREFIX:line="182" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="182" PREFIX:column="11">oldSREG</name> <init PREFIX:line="182" PREFIX:column="19">= <expr><name PREFIX:line="182" PREFIX:column="21">SREG</name></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="183" PREFIX:column="3">cli</name><argument_list PREFIX:line="183" PREFIX:column="6">()</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="184" PREFIX:column="1">#<cpp:directive PREFIX:line="184" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+  <decl_stmt><decl><type><name PREFIX:line="185" PREFIX:column="3">tx_buffer_index_t</name></type> <name PREFIX:line="185" PREFIX:column="21">head</name> <init PREFIX:line="185" PREFIX:column="26">= <expr><name PREFIX:line="185" PREFIX:column="28">_tx_buffer_head</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="186" PREFIX:column="3">tx_buffer_index_t</name></type> <name PREFIX:line="186" PREFIX:column="21">tail</name> <init PREFIX:line="186" PREFIX:column="26">= <expr><name PREFIX:line="186" PREFIX:column="28">_tx_buffer_tail</name></expr></init></decl>;</decl_stmt>
+<cpp:if PREFIX:line="187" PREFIX:column="1">#<cpp:directive PREFIX:line="187" PREFIX:column="2">if</cpp:directive> <expr PREFIX:line="187" PREFIX:column="5">(<name PREFIX:line="187" PREFIX:column="6">SERIAL_TX_BUFFER_SIZE</name>&gt;256)</expr></cpp:if>
+  <expr_stmt><expr><name PREFIX:line="188" PREFIX:column="3">SREG</name> = <name PREFIX:line="188" PREFIX:column="10">oldSREG</name></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="189" PREFIX:column="1">#<cpp:directive PREFIX:line="189" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+  <if PREFIX:line="190" PREFIX:column="3">if <condition PREFIX:line="190" PREFIX:column="6">(<expr><name PREFIX:line="190" PREFIX:column="7">head</name> &gt;= <name PREFIX:line="190" PREFIX:column="15">tail</name></expr>)</condition><then PREFIX:line="190" PREFIX:column="20"> <return PREFIX:line="190" PREFIX:column="21">return <expr><name PREFIX:line="190" PREFIX:column="28">SERIAL_TX_BUFFER_SIZE</name> - 1 - <name PREFIX:line="190" PREFIX:column="56">head</name> + <name PREFIX:line="190" PREFIX:column="63">tail</name></expr>;</return></then></if>
+  <return PREFIX:line="191" PREFIX:column="3">return <expr><name PREFIX:line="191" PREFIX:column="10">tail</name> - <name PREFIX:line="191" PREFIX:column="17">head</name> - 1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="194" PREFIX:column="1">void</name></type> <name><name PREFIX:line="194" PREFIX:column="6">HardwareSerial</name>::<name PREFIX:line="194" PREFIX:column="22">flush</name></name><parameter_list PREFIX:line="194" PREFIX:column="27">()</parameter_list>
+<block PREFIX:line="195" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="196" PREFIX:column="3">// If we have never written a byte, no need to flush. This special</comment>
+  <comment type="line" PREFIX:line="197" PREFIX:column="3">// case is needed since there is no way to force the TXC (transmit</comment>
+  <comment type="line" PREFIX:line="198" PREFIX:column="3">// complete) bit to 1 during initialization</comment>
+  <if PREFIX:line="199" PREFIX:column="3">if <condition PREFIX:line="199" PREFIX:column="6">(<expr PREFIX:line="199" PREFIX:column="7">!<name PREFIX:line="199" PREFIX:column="8">_written</name></expr>)</condition><then PREFIX:line="199" PREFIX:column="17">
+    <return PREFIX:line="200" PREFIX:column="5">return;</return></then></if>
+
+  <while PREFIX:line="202" PREFIX:column="3">while <condition PREFIX:line="202" PREFIX:column="9">(<expr><call><name PREFIX:line="202" PREFIX:column="10">bit_is_set</name><argument_list PREFIX:line="202" PREFIX:column="20">(<argument><expr PREFIX:line="202" PREFIX:column="21">*<name PREFIX:line="202" PREFIX:column="22">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="202" PREFIX:column="30">UDRIE0</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="202" PREFIX:column="41">bit_is_clear</name><argument_list PREFIX:line="202" PREFIX:column="53">(<argument><expr PREFIX:line="202" PREFIX:column="54">*<name PREFIX:line="202" PREFIX:column="55">_ucsra</name></expr></argument>, <argument><expr><name PREFIX:line="202" PREFIX:column="63">TXC0</name></expr></argument>)</argument_list></call></expr>)</condition> <block PREFIX:line="202" PREFIX:column="70">{
+    <if PREFIX:line="203" PREFIX:column="5">if <condition PREFIX:line="203" PREFIX:column="8">(<expr><call><name PREFIX:line="203" PREFIX:column="9">bit_is_clear</name><argument_list PREFIX:line="203" PREFIX:column="21">(<argument><expr><name PREFIX:line="203" PREFIX:column="22">SREG</name></expr></argument>, <argument><expr><name PREFIX:line="203" PREFIX:column="28">SREG_I</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="203" PREFIX:column="39">bit_is_set</name><argument_list PREFIX:line="203" PREFIX:column="49">(<argument><expr PREFIX:line="203" PREFIX:column="50">*<name PREFIX:line="203" PREFIX:column="51">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="203" PREFIX:column="59">UDRIE0</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="203" PREFIX:column="67">
+	<comment type="line" PREFIX:line="204" PREFIX:column="9">// Interrupts are globally disabled, but the DR empty</comment>
+	<comment type="line" PREFIX:line="205" PREFIX:column="9">// interrupt should be enabled, so poll the DR empty flag to</comment>
+	<comment type="line" PREFIX:line="206" PREFIX:column="9">// prevent deadlock</comment>
+	<if PREFIX:line="207" PREFIX:column="9">if <condition PREFIX:line="207" PREFIX:column="12">(<expr><call><name PREFIX:line="207" PREFIX:column="13">bit_is_set</name><argument_list PREFIX:line="207" PREFIX:column="23">(<argument><expr PREFIX:line="207" PREFIX:column="24">*<name PREFIX:line="207" PREFIX:column="25">_ucsra</name></expr></argument>, <argument><expr><name PREFIX:line="207" PREFIX:column="33">UDRE0</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="207" PREFIX:column="40">
+	  <expr_stmt><expr><call><name PREFIX:line="208" PREFIX:column="11">_tx_udr_empty_irq</name><argument_list PREFIX:line="208" PREFIX:column="28">()</argument_list></call></expr>;</expr_stmt></then></if></then></if>
+  }</block></while>
+  <comment type="line" PREFIX:line="210" PREFIX:column="3">// If we get here, nothing is queued anymore (DRIE is disabled) and</comment>
+  <comment type="line" PREFIX:line="211" PREFIX:column="3">// the hardware finished tranmission (TXC is set).</comment>
+}</block></function>
+
+<function><type><name PREFIX:line="214" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="214" PREFIX:column="8">HardwareSerial</name>::<name PREFIX:line="214" PREFIX:column="24">write</name></name><parameter_list PREFIX:line="214" PREFIX:column="29">(<param><decl><type><name PREFIX:line="214" PREFIX:column="30">uint8_t</name></type> <name PREFIX:line="214" PREFIX:column="38">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="215" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="216" PREFIX:column="3">// If the buffer and the data register is empty, just write the byte</comment>
+  <comment type="line" PREFIX:line="217" PREFIX:column="3">// to the data register and be done. This shortcut helps</comment>
+  <comment type="line" PREFIX:line="218" PREFIX:column="3">// significantly improve the effective datarate at high (&gt;</comment>
+  <comment type="line" PREFIX:line="219" PREFIX:column="3">// 500kbit/s) bitrates, where interrupt overhead becomes a slowdown.</comment>
+  <if PREFIX:line="220" PREFIX:column="3">if <condition PREFIX:line="220" PREFIX:column="6">(<expr><name PREFIX:line="220" PREFIX:column="7">_tx_buffer_head</name> == <name PREFIX:line="220" PREFIX:column="26">_tx_buffer_tail</name> &amp;&amp; <call><name PREFIX:line="220" PREFIX:column="45">bit_is_set</name><argument_list PREFIX:line="220" PREFIX:column="55">(<argument><expr PREFIX:line="220" PREFIX:column="56">*<name PREFIX:line="220" PREFIX:column="57">_ucsra</name></expr></argument>, <argument><expr><name PREFIX:line="220" PREFIX:column="65">UDRE0</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="220" PREFIX:column="72"> <block PREFIX:line="220" PREFIX:column="73">{
+    <expr_stmt><expr PREFIX:line="221" PREFIX:column="5">*<name PREFIX:line="221" PREFIX:column="6">_udr</name> = <name PREFIX:line="221" PREFIX:column="13">c</name></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="222" PREFIX:column="5">sbi</name><argument_list PREFIX:line="222" PREFIX:column="8">(<argument><expr PREFIX:line="222" PREFIX:column="9">*<name PREFIX:line="222" PREFIX:column="10">_ucsra</name></expr></argument>, <argument><expr><name PREFIX:line="222" PREFIX:column="18">TXC0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <return PREFIX:line="223" PREFIX:column="5">return <expr PREFIX:line="223" PREFIX:column="12">1</expr>;</return>
+  }</block></then></if>
+  <decl_stmt><decl><type><name PREFIX:line="225" PREFIX:column="3">tx_buffer_index_t</name></type> <name PREFIX:line="225" PREFIX:column="21">i</name> <init PREFIX:line="225" PREFIX:column="23">= <expr PREFIX:line="225" PREFIX:column="25">(<name PREFIX:line="225" PREFIX:column="26">_tx_buffer_head</name> + 1) % <name PREFIX:line="225" PREFIX:column="49">SERIAL_TX_BUFFER_SIZE</name></expr></init></decl>;</decl_stmt>
+	
+  <comment type="line" PREFIX:line="227" PREFIX:column="3">// If the output buffer is full, there's nothing for it other than to </comment>
+  <comment type="line" PREFIX:line="228" PREFIX:column="3">// wait for the interrupt handler to empty it a bit</comment>
+  <while PREFIX:line="229" PREFIX:column="3">while <condition PREFIX:line="229" PREFIX:column="9">(<expr><name PREFIX:line="229" PREFIX:column="10">i</name> == <name PREFIX:line="229" PREFIX:column="15">_tx_buffer_tail</name></expr>)</condition> <block PREFIX:line="229" PREFIX:column="32">{
+    <if PREFIX:line="230" PREFIX:column="5">if <condition PREFIX:line="230" PREFIX:column="8">(<expr><call><name PREFIX:line="230" PREFIX:column="9">bit_is_clear</name><argument_list PREFIX:line="230" PREFIX:column="21">(<argument><expr><name PREFIX:line="230" PREFIX:column="22">SREG</name></expr></argument>, <argument><expr><name PREFIX:line="230" PREFIX:column="28">SREG_I</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="230" PREFIX:column="36"> <block PREFIX:line="230" PREFIX:column="37">{
+      <comment type="line" PREFIX:line="231" PREFIX:column="7">// Interrupts are disabled, so we'll have to poll the data</comment>
+      <comment type="line" PREFIX:line="232" PREFIX:column="7">// register empty flag ourselves. If it is set, pretend an</comment>
+      <comment type="line" PREFIX:line="233" PREFIX:column="7">// interrupt has happened and call the handler to free up</comment>
+      <comment type="line" PREFIX:line="234" PREFIX:column="7">// space for us.</comment>
+      <if PREFIX:line="235" PREFIX:column="7">if<condition PREFIX:line="235" PREFIX:column="9">(<expr><call><name PREFIX:line="235" PREFIX:column="10">bit_is_set</name><argument_list PREFIX:line="235" PREFIX:column="20">(<argument><expr PREFIX:line="235" PREFIX:column="21">*<name PREFIX:line="235" PREFIX:column="22">_ucsra</name></expr></argument>, <argument><expr><name PREFIX:line="235" PREFIX:column="30">UDRE0</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="235" PREFIX:column="37">
+	<expr_stmt><expr><call><name PREFIX:line="236" PREFIX:column="9">_tx_udr_empty_irq</name><argument_list PREFIX:line="236" PREFIX:column="26">()</argument_list></call></expr>;</expr_stmt></then></if>
+    }</block></then> <else PREFIX:line="237" PREFIX:column="7">else <block PREFIX:line="237" PREFIX:column="12">{
+      <comment type="line" PREFIX:line="238" PREFIX:column="7">// nop, the interrupt handler will free up space for us</comment>
+    }</block></else></if>
+  }</block></while>
+
+  <expr_stmt><expr><name><name PREFIX:line="242" PREFIX:column="3">_tx_buffer</name><index PREFIX:line="242" PREFIX:column="13">[<expr><name PREFIX:line="242" PREFIX:column="14">_tx_buffer_head</name></expr>]</index></name> = <name PREFIX:line="242" PREFIX:column="33">c</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="243" PREFIX:column="3">_tx_buffer_head</name> = <name PREFIX:line="243" PREFIX:column="21">i</name></expr>;</expr_stmt>
+	
+  <expr_stmt><expr><call><name PREFIX:line="245" PREFIX:column="3">sbi</name><argument_list PREFIX:line="245" PREFIX:column="6">(<argument><expr PREFIX:line="245" PREFIX:column="7">*<name PREFIX:line="245" PREFIX:column="8">_ucsrb</name></expr></argument>, <argument><expr><name PREFIX:line="245" PREFIX:column="16">UDRIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="246" PREFIX:column="3">_written</name> = true</expr>;</expr_stmt>
+  
+  <return PREFIX:line="248" PREFIX:column="3">return <expr PREFIX:line="248" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+
+<cpp:endif PREFIX:line="252" PREFIX:column="1">#<cpp:directive PREFIX:line="252" PREFIX:column="2">endif</cpp:directive></cpp:endif> <comment type="line" PREFIX:line="252" PREFIX:column="8">// whole file</comment>
+</unit>

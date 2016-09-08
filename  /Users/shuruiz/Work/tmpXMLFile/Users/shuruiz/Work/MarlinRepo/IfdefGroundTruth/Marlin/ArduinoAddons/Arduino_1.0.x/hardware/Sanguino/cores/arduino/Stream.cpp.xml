@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/hardware/Sanguino/cores/arduino/Stream.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+ Stream.cpp - adds parsing methods to Stream class
+ Copyright (c) 2008 David A. Mellis.  All right reserved.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ Created July 2011
+ parsing functions based on TextFinder library by Michael Margolis
+ */</comment>
+
+<cpp:include PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="23" PREFIX:column="10">"Arduino.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="24" PREFIX:column="1">#<cpp:directive PREFIX:line="24" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="24" PREFIX:column="10">"Stream.h"</cpp:file></cpp:include>
+
+<cpp:define PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="26" PREFIX:column="9">PARSE_TIMEOUT</name></cpp:macro> <cpp:value PREFIX:line="26" PREFIX:column="23">1000</cpp:value></cpp:define>  <comment type="line" PREFIX:line="26" PREFIX:column="29">// default number of milli-seconds to wait</comment>
+<cpp:define PREFIX:line="27" PREFIX:column="1">#<cpp:directive PREFIX:line="27" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="27" PREFIX:column="9">NO_SKIP_CHAR</name></cpp:macro>  <cpp:value PREFIX:line="27" PREFIX:column="23">1</cpp:value></cpp:define>  <comment type="line" PREFIX:line="27" PREFIX:column="26">// a magic char not found in a valid ASCII numeric field</comment>
+
+<comment type="line" PREFIX:line="29" PREFIX:column="1">// private method to read stream with timeout</comment>
+<function><type><name PREFIX:line="30" PREFIX:column="1">int</name></type> <name><name PREFIX:line="30" PREFIX:column="5">Stream</name>::<name PREFIX:line="30" PREFIX:column="13">timedRead</name></name><parameter_list PREFIX:line="30" PREFIX:column="22">()</parameter_list>
+<block PREFIX:line="31" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="32" PREFIX:column="3">int</name></type> <name PREFIX:line="32" PREFIX:column="7">c</name></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="33" PREFIX:column="3">_startMillis</name> = <call><name PREFIX:line="33" PREFIX:column="18">millis</name><argument_list PREFIX:line="33" PREFIX:column="24">()</argument_list></call></expr>;</expr_stmt>
+  <do PREFIX:line="34" PREFIX:column="3">do <block PREFIX:line="34" PREFIX:column="6">{
+    <expr_stmt><expr><name PREFIX:line="35" PREFIX:column="5">c</name> = <call><name PREFIX:line="35" PREFIX:column="9">read</name><argument_list PREFIX:line="35" PREFIX:column="13">()</argument_list></call></expr>;</expr_stmt>
+    <if PREFIX:line="36" PREFIX:column="5">if <condition PREFIX:line="36" PREFIX:column="8">(<expr><name PREFIX:line="36" PREFIX:column="9">c</name> &gt;= 0</expr>)</condition><then PREFIX:line="36" PREFIX:column="16"> <return PREFIX:line="36" PREFIX:column="17">return <expr><name PREFIX:line="36" PREFIX:column="24">c</name></expr>;</return></then></if>
+  }</block> while<condition PREFIX:line="37" PREFIX:column="10">(<expr><call><name PREFIX:line="37" PREFIX:column="11">millis</name><argument_list PREFIX:line="37" PREFIX:column="17">()</argument_list></call> - <name PREFIX:line="37" PREFIX:column="22">_startMillis</name> &lt; <name PREFIX:line="37" PREFIX:column="37">_timeout</name></expr>)</condition>;</do>
+  <return PREFIX:line="38" PREFIX:column="3">return <expr PREFIX:line="38" PREFIX:column="10">-1</expr>;</return>     <comment type="line" PREFIX:line="38" PREFIX:column="18">// -1 indicates timeout</comment>
+}</block></function>
+
+<comment type="line" PREFIX:line="41" PREFIX:column="1">// private method to peek stream with timeout</comment>
+<function><type><name PREFIX:line="42" PREFIX:column="1">int</name></type> <name><name PREFIX:line="42" PREFIX:column="5">Stream</name>::<name PREFIX:line="42" PREFIX:column="13">timedPeek</name></name><parameter_list PREFIX:line="42" PREFIX:column="22">()</parameter_list>
+<block PREFIX:line="43" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="44" PREFIX:column="3">int</name></type> <name PREFIX:line="44" PREFIX:column="7">c</name></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="45" PREFIX:column="3">_startMillis</name> = <call><name PREFIX:line="45" PREFIX:column="18">millis</name><argument_list PREFIX:line="45" PREFIX:column="24">()</argument_list></call></expr>;</expr_stmt>
+  <do PREFIX:line="46" PREFIX:column="3">do <block PREFIX:line="46" PREFIX:column="6">{
+    <expr_stmt><expr><name PREFIX:line="47" PREFIX:column="5">c</name> = <call><name PREFIX:line="47" PREFIX:column="9">peek</name><argument_list PREFIX:line="47" PREFIX:column="13">()</argument_list></call></expr>;</expr_stmt>
+    <if PREFIX:line="48" PREFIX:column="5">if <condition PREFIX:line="48" PREFIX:column="8">(<expr><name PREFIX:line="48" PREFIX:column="9">c</name> &gt;= 0</expr>)</condition><then PREFIX:line="48" PREFIX:column="16"> <return PREFIX:line="48" PREFIX:column="17">return <expr><name PREFIX:line="48" PREFIX:column="24">c</name></expr>;</return></then></if>
+  }</block> while<condition PREFIX:line="49" PREFIX:column="10">(<expr><call><name PREFIX:line="49" PREFIX:column="11">millis</name><argument_list PREFIX:line="49" PREFIX:column="17">()</argument_list></call> - <name PREFIX:line="49" PREFIX:column="22">_startMillis</name> &lt; <name PREFIX:line="49" PREFIX:column="37">_timeout</name></expr>)</condition>;</do>
+  <return PREFIX:line="50" PREFIX:column="3">return <expr PREFIX:line="50" PREFIX:column="10">-1</expr>;</return>     <comment type="line" PREFIX:line="50" PREFIX:column="18">// -1 indicates timeout</comment>
+}</block></function>
+
+<comment type="line" PREFIX:line="53" PREFIX:column="1">// returns peek of the next digit in the stream or -1 if timeout</comment>
+<comment type="line" PREFIX:line="54" PREFIX:column="1">// discards non-numeric characters</comment>
+<function><type><name PREFIX:line="55" PREFIX:column="1">int</name></type> <name><name PREFIX:line="55" PREFIX:column="5">Stream</name>::<name PREFIX:line="55" PREFIX:column="13">peekNextDigit</name></name><parameter_list PREFIX:line="55" PREFIX:column="26">()</parameter_list>
+<block PREFIX:line="56" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="57" PREFIX:column="3">int</name></type> <name PREFIX:line="57" PREFIX:column="7">c</name></decl>;</decl_stmt>
+  <while PREFIX:line="58" PREFIX:column="3">while <condition PREFIX:line="58" PREFIX:column="9">(<expr PREFIX:line="58" PREFIX:column="10">1</expr>)</condition> <block PREFIX:line="58" PREFIX:column="13">{
+    <expr_stmt><expr><name PREFIX:line="59" PREFIX:column="5">c</name> = <call><name PREFIX:line="59" PREFIX:column="9">timedPeek</name><argument_list PREFIX:line="59" PREFIX:column="18">()</argument_list></call></expr>;</expr_stmt>
+    <if PREFIX:line="60" PREFIX:column="5">if <condition PREFIX:line="60" PREFIX:column="8">(<expr><name PREFIX:line="60" PREFIX:column="9">c</name> &lt; 0</expr>)</condition><then PREFIX:line="60" PREFIX:column="15"> <return PREFIX:line="60" PREFIX:column="16">return <expr><name PREFIX:line="60" PREFIX:column="23">c</name></expr>;</return></then></if>  <comment type="line" PREFIX:line="60" PREFIX:column="27">// timeout</comment>
+    <if PREFIX:line="61" PREFIX:column="5">if <condition PREFIX:line="61" PREFIX:column="8">(<expr><name PREFIX:line="61" PREFIX:column="9">c</name> == '-'</expr>)</condition><then PREFIX:line="61" PREFIX:column="18"> <return PREFIX:line="61" PREFIX:column="19">return <expr><name PREFIX:line="61" PREFIX:column="26">c</name></expr>;</return></then></if>
+    <if PREFIX:line="62" PREFIX:column="5">if <condition PREFIX:line="62" PREFIX:column="8">(<expr><name PREFIX:line="62" PREFIX:column="9">c</name> &gt;= '0' &amp;&amp; <name PREFIX:line="62" PREFIX:column="21">c</name> &lt;= '9'</expr>)</condition><then PREFIX:line="62" PREFIX:column="30"> <return PREFIX:line="62" PREFIX:column="31">return <expr><name PREFIX:line="62" PREFIX:column="38">c</name></expr>;</return></then></if>
+    <expr_stmt><expr><call><name PREFIX:line="63" PREFIX:column="5">read</name><argument_list PREFIX:line="63" PREFIX:column="9">()</argument_list></call></expr>;</expr_stmt>  <comment type="line" PREFIX:line="63" PREFIX:column="14">// discard non-numeric</comment>
+  }</block></while>
+}</block></function>
+
+<comment type="line" PREFIX:line="67" PREFIX:column="1">// Public Methods</comment>
+<comment type="line" format="doxygen" PREFIX:line="68" PREFIX:column="1">//////////////////////////////////////////////////////////////</comment>
+
+<function><type><name PREFIX:line="70" PREFIX:column="1">void</name></type> <name><name PREFIX:line="70" PREFIX:column="6">Stream</name>::<name PREFIX:line="70" PREFIX:column="14">setTimeout</name></name><parameter_list PREFIX:line="70" PREFIX:column="24">(<param><decl><type><name PREFIX:line="70" PREFIX:column="25">unknowntype</name> <name PREFIX:line="70" PREFIX:column="37">long</name></type> <name PREFIX:line="70" PREFIX:column="42">timeout</name></decl></param>)</parameter_list>  <comment type="line" PREFIX:line="70" PREFIX:column="52">// sets the maximum number of milliseconds to wait</comment>
+<block PREFIX:line="71" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="72" PREFIX:column="3">_timeout</name> = <name PREFIX:line="72" PREFIX:column="14">timeout</name></expr>;</expr_stmt>
+}</block></function>
+
+ <comment type="line" PREFIX:line="75" PREFIX:column="2">// find returns true if the target string is found</comment>
+<function><type><name PREFIX:line="76" PREFIX:column="1">bool</name></type>  <name><name PREFIX:line="76" PREFIX:column="7">Stream</name>::<name PREFIX:line="76" PREFIX:column="15">find</name></name><parameter_list PREFIX:line="76" PREFIX:column="19">(<param><decl><type><name PREFIX:line="76" PREFIX:column="20">char</name> *</type><name PREFIX:line="76" PREFIX:column="26">target</name></decl></param>)</parameter_list>
+<block PREFIX:line="77" PREFIX:column="1">{
+  <return PREFIX:line="78" PREFIX:column="3">return <expr><call><name PREFIX:line="78" PREFIX:column="10">findUntil</name><argument_list PREFIX:line="78" PREFIX:column="19">(<argument><expr><name PREFIX:line="78" PREFIX:column="20">target</name></expr></argument>, <argument><expr><name PREFIX:line="78" PREFIX:column="28">NULL</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="81" PREFIX:column="1">// reads data from the stream until the target string of given length is found</comment>
+<comment type="line" PREFIX:line="82" PREFIX:column="1">// returns true if target string is found, false if timed out</comment>
+<function><type><name PREFIX:line="83" PREFIX:column="1">bool</name></type> <name><name PREFIX:line="83" PREFIX:column="6">Stream</name>::<name PREFIX:line="83" PREFIX:column="14">find</name></name><parameter_list PREFIX:line="83" PREFIX:column="18">(<param><decl><type><name PREFIX:line="83" PREFIX:column="19">char</name> *</type><name PREFIX:line="83" PREFIX:column="25">target</name></decl></param>, <param><decl><type><name PREFIX:line="83" PREFIX:column="33">size_t</name></type> <name PREFIX:line="83" PREFIX:column="40">length</name></decl></param>)</parameter_list>
+<block PREFIX:line="84" PREFIX:column="1">{
+  <return PREFIX:line="85" PREFIX:column="3">return <expr><call><name PREFIX:line="85" PREFIX:column="10">findUntil</name><argument_list PREFIX:line="85" PREFIX:column="19">(<argument><expr><name PREFIX:line="85" PREFIX:column="20">target</name></expr></argument>, <argument><expr><name PREFIX:line="85" PREFIX:column="28">length</name></expr></argument>, <argument><expr><name PREFIX:line="85" PREFIX:column="36">NULL</name></expr></argument>, <argument><expr PREFIX:line="85" PREFIX:column="42">0</expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="88" PREFIX:column="1">// as find but search ends if the terminator string is found</comment>
+<function><type><name PREFIX:line="89" PREFIX:column="1">bool</name></type>  <name><name PREFIX:line="89" PREFIX:column="7">Stream</name>::<name PREFIX:line="89" PREFIX:column="15">findUntil</name></name><parameter_list PREFIX:line="89" PREFIX:column="24">(<param><decl><type><name PREFIX:line="89" PREFIX:column="25">char</name> *</type><name PREFIX:line="89" PREFIX:column="31">target</name></decl></param>, <param><decl><type><name PREFIX:line="89" PREFIX:column="39">char</name> *</type><name PREFIX:line="89" PREFIX:column="45">terminator</name></decl></param>)</parameter_list>
+<block PREFIX:line="90" PREFIX:column="1">{
+  <return PREFIX:line="91" PREFIX:column="3">return <expr><call><name PREFIX:line="91" PREFIX:column="10">findUntil</name><argument_list PREFIX:line="91" PREFIX:column="19">(<argument><expr><name PREFIX:line="91" PREFIX:column="20">target</name></expr></argument>, <argument><expr><call><name PREFIX:line="91" PREFIX:column="28">strlen</name><argument_list PREFIX:line="91" PREFIX:column="34">(<argument><expr><name PREFIX:line="91" PREFIX:column="35">target</name></expr></argument>)</argument_list></call></expr></argument>, <argument><expr><name PREFIX:line="91" PREFIX:column="44">terminator</name></expr></argument>, <argument><expr><call><name PREFIX:line="91" PREFIX:column="56">strlen</name><argument_list PREFIX:line="91" PREFIX:column="62">(<argument><expr><name PREFIX:line="91" PREFIX:column="63">terminator</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="94" PREFIX:column="1">// reads data from the stream until the target string of the given length is found</comment>
+<comment type="line" PREFIX:line="95" PREFIX:column="1">// search terminated if the terminator string is found</comment>
+<comment type="line" PREFIX:line="96" PREFIX:column="1">// returns true if target string is found, false if terminated or timed out</comment>
+<function><type><name PREFIX:line="97" PREFIX:column="1">bool</name></type> <name><name PREFIX:line="97" PREFIX:column="6">Stream</name>::<name PREFIX:line="97" PREFIX:column="14">findUntil</name></name><parameter_list PREFIX:line="97" PREFIX:column="23">(<param><decl><type><name PREFIX:line="97" PREFIX:column="24">char</name> *</type><name PREFIX:line="97" PREFIX:column="30">target</name></decl></param>, <param><decl><type><name PREFIX:line="97" PREFIX:column="38">size_t</name></type> <name PREFIX:line="97" PREFIX:column="45">targetLen</name></decl></param>, <param><decl><type><name PREFIX:line="97" PREFIX:column="56">char</name> *</type><name PREFIX:line="97" PREFIX:column="62">terminator</name></decl></param>, <param><decl><type><name PREFIX:line="97" PREFIX:column="74">size_t</name></type> <name PREFIX:line="97" PREFIX:column="81">termLen</name></decl></param>)</parameter_list>
+<block PREFIX:line="98" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="99" PREFIX:column="3">size_t</name></type> <name PREFIX:line="99" PREFIX:column="10">index</name> <init PREFIX:line="99" PREFIX:column="16">= <expr PREFIX:line="99" PREFIX:column="18">0</expr></init></decl>;</decl_stmt>  <comment type="line" PREFIX:line="99" PREFIX:column="22">// maximum target string length is 64k bytes!</comment>
+  <decl_stmt><decl><type><name PREFIX:line="100" PREFIX:column="3">size_t</name></type> <name PREFIX:line="100" PREFIX:column="10">termIndex</name> <init PREFIX:line="100" PREFIX:column="20">= <expr PREFIX:line="100" PREFIX:column="22">0</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="101" PREFIX:column="3">int</name></type> <name PREFIX:line="101" PREFIX:column="7">c</name></decl>;</decl_stmt>
+  
+  <if PREFIX:line="103" PREFIX:column="3">if<condition PREFIX:line="103" PREFIX:column="5">( <expr PREFIX:line="103" PREFIX:column="7">*<name PREFIX:line="103" PREFIX:column="8">target</name> == 0</expr>)</condition><then PREFIX:line="103" PREFIX:column="20">
+    <return PREFIX:line="104" PREFIX:column="5">return <expr PREFIX:line="104" PREFIX:column="12">true</expr>;</return></then></if>   <comment type="line" PREFIX:line="104" PREFIX:column="20">// return true if target is a null string</comment>
+  <while PREFIX:line="105" PREFIX:column="3">while<condition PREFIX:line="105" PREFIX:column="8">( <expr PREFIX:line="105" PREFIX:column="10">(<name PREFIX:line="105" PREFIX:column="11">c</name> = <call><name PREFIX:line="105" PREFIX:column="15">timedRead</name><argument_list PREFIX:line="105" PREFIX:column="24">()</argument_list></call>) &gt; 0</expr>)</condition><block PREFIX:line="105" PREFIX:column="32">{
+    
+    <if PREFIX:line="107" PREFIX:column="5">if<condition PREFIX:line="107" PREFIX:column="7">(<expr><name PREFIX:line="107" PREFIX:column="8">c</name> != <name><name PREFIX:line="107" PREFIX:column="13">target</name><index PREFIX:line="107" PREFIX:column="19">[<expr><name PREFIX:line="107" PREFIX:column="20">index</name></expr>]</index></name></expr>)</condition><then PREFIX:line="107" PREFIX:column="27">
+      <expr_stmt><expr><name PREFIX:line="108" PREFIX:column="7">index</name> = 0</expr>;</expr_stmt></then></if> <comment type="line" PREFIX:line="108" PREFIX:column="18">// reset index if any char does not match</comment>
+    
+    <if PREFIX:line="110" PREFIX:column="5">if<condition PREFIX:line="110" PREFIX:column="7">( <expr><name PREFIX:line="110" PREFIX:column="9">c</name> == <name><name PREFIX:line="110" PREFIX:column="14">target</name><index PREFIX:line="110" PREFIX:column="20">[<expr><name PREFIX:line="110" PREFIX:column="21">index</name></expr>]</index></name></expr>)</condition><then><block PREFIX:line="110" PREFIX:column="28">{
+      <comment type="line" format="doxygen" PREFIX:line="111" PREFIX:column="7">//////Serial.print("found "); Serial.write(c); Serial.print("index now"); Serial.println(index+1);</comment>
+      <if PREFIX:line="112" PREFIX:column="7">if<condition PREFIX:line="112" PREFIX:column="9">(<expr PREFIX:line="112" PREFIX:column="10">++<name PREFIX:line="112" PREFIX:column="12">index</name> &gt;= <name PREFIX:line="112" PREFIX:column="21">targetLen</name></expr>)</condition><then><block PREFIX:line="112" PREFIX:column="31">{ <comment type="line" PREFIX:line="112" PREFIX:column="33">// return true if all chars in the target match</comment>
+        <return PREFIX:line="113" PREFIX:column="9">return <expr PREFIX:line="113" PREFIX:column="16">true</expr>;</return>
+      }</block></then></if>
+    }</block></then></if>
+    
+    <if PREFIX:line="117" PREFIX:column="5">if<condition PREFIX:line="117" PREFIX:column="7">(<expr><name PREFIX:line="117" PREFIX:column="8">termLen</name> &gt; 0 &amp;&amp; <name PREFIX:line="117" PREFIX:column="23">c</name> == <name><name PREFIX:line="117" PREFIX:column="28">terminator</name><index PREFIX:line="117" PREFIX:column="38">[<expr><name PREFIX:line="117" PREFIX:column="39">termIndex</name></expr>]</index></name></expr>)</condition><then><block PREFIX:line="117" PREFIX:column="50">{
+      <if PREFIX:line="118" PREFIX:column="7">if<condition PREFIX:line="118" PREFIX:column="9">(<expr PREFIX:line="118" PREFIX:column="10">++<name PREFIX:line="118" PREFIX:column="12">termIndex</name> &gt;= <name PREFIX:line="118" PREFIX:column="25">termLen</name></expr>)</condition><then PREFIX:line="118" PREFIX:column="33">
+        <return PREFIX:line="119" PREFIX:column="9">return <expr PREFIX:line="119" PREFIX:column="16">false</expr>;</return></then></if>       <comment type="line" PREFIX:line="119" PREFIX:column="29">// return false if terminate string found before target string</comment>
+    }</block></then>
+    <else PREFIX:line="121" PREFIX:column="5">else
+      <expr_stmt><expr><name PREFIX:line="122" PREFIX:column="7">termIndex</name> = 0</expr>;</expr_stmt></else></if>
+  }</block></while>
+  <return PREFIX:line="124" PREFIX:column="3">return <expr PREFIX:line="124" PREFIX:column="10">false</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="128" PREFIX:column="1">// returns the first valid (long) integer value from the current position.</comment>
+<comment type="line" PREFIX:line="129" PREFIX:column="1">// initial characters that are not digits (or the minus sign) are skipped</comment>
+<comment type="line" PREFIX:line="130" PREFIX:column="1">// function is terminated by the first character that is not a digit.</comment>
+<function><type><name PREFIX:line="131" PREFIX:column="1">long</name></type> <name><name PREFIX:line="131" PREFIX:column="6">Stream</name>::<name PREFIX:line="131" PREFIX:column="14">parseInt</name></name><parameter_list PREFIX:line="131" PREFIX:column="22">()</parameter_list>
+<block PREFIX:line="132" PREFIX:column="1">{
+  <return PREFIX:line="133" PREFIX:column="3">return <expr><call><name PREFIX:line="133" PREFIX:column="10">parseInt</name><argument_list PREFIX:line="133" PREFIX:column="18">(<argument><expr><name PREFIX:line="133" PREFIX:column="19">NO_SKIP_CHAR</name></expr></argument>)</argument_list></call></expr>;</return> <comment type="line" PREFIX:line="133" PREFIX:column="34">// terminate on first non-digit character (or timeout)</comment>
+}</block></function>
+
+<comment type="line" PREFIX:line="136" PREFIX:column="1">// as above but a given skipChar is ignored</comment>
+<comment type="line" PREFIX:line="137" PREFIX:column="1">// this allows format characters (typically commas) in values to be ignored</comment>
+<function><type><name PREFIX:line="138" PREFIX:column="1">long</name></type> <name><name PREFIX:line="138" PREFIX:column="6">Stream</name>::<name PREFIX:line="138" PREFIX:column="14">parseInt</name></name><parameter_list PREFIX:line="138" PREFIX:column="22">(<param><decl><type><name PREFIX:line="138" PREFIX:column="23">char</name></type> <name PREFIX:line="138" PREFIX:column="28">skipChar</name></decl></param>)</parameter_list>
+<block PREFIX:line="139" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="140" PREFIX:column="3">boolean</name></type> <name PREFIX:line="140" PREFIX:column="11">isNegative</name> <init PREFIX:line="140" PREFIX:column="22">= <expr PREFIX:line="140" PREFIX:column="24">false</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="141" PREFIX:column="3">long</name></type> <name PREFIX:line="141" PREFIX:column="8">value</name> <init PREFIX:line="141" PREFIX:column="14">= <expr PREFIX:line="141" PREFIX:column="16">0</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="142" PREFIX:column="3">int</name></type> <name PREFIX:line="142" PREFIX:column="7">c</name></decl>;</decl_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="144" PREFIX:column="3">c</name> = <call><name PREFIX:line="144" PREFIX:column="7">peekNextDigit</name><argument_list PREFIX:line="144" PREFIX:column="20">()</argument_list></call></expr>;</expr_stmt>
+  <comment type="line" PREFIX:line="145" PREFIX:column="3">// ignore non numeric leading characters</comment>
+  <if PREFIX:line="146" PREFIX:column="3">if<condition PREFIX:line="146" PREFIX:column="5">(<expr><name PREFIX:line="146" PREFIX:column="6">c</name> &lt; 0</expr>)</condition><then PREFIX:line="146" PREFIX:column="12">
+    <return PREFIX:line="147" PREFIX:column="5">return <expr PREFIX:line="147" PREFIX:column="12">0</expr>;</return></then></if> <comment type="line" PREFIX:line="147" PREFIX:column="15">// zero returned if timeout</comment>
+
+  <do PREFIX:line="149" PREFIX:column="3">do<block PREFIX:line="149" PREFIX:column="5">{
+    <if PREFIX:line="150" PREFIX:column="5">if<condition PREFIX:line="150" PREFIX:column="7">(<expr><name PREFIX:line="150" PREFIX:column="8">c</name> == <name PREFIX:line="150" PREFIX:column="13">skipChar</name></expr>)</condition><then PREFIX:line="150" PREFIX:column="22">
+      <empty_stmt PREFIX:line="151" PREFIX:column="7">;</empty_stmt></then> <comment type="line" PREFIX:line="151" PREFIX:column="9">// ignore this charactor</comment>
+    <else PREFIX:line="152" PREFIX:column="5">else <if PREFIX:line="152" PREFIX:column="10">if<condition PREFIX:line="152" PREFIX:column="12">(<expr><name PREFIX:line="152" PREFIX:column="13">c</name> == '-'</expr>)</condition><then PREFIX:line="152" PREFIX:column="22">
+      <expr_stmt><expr><name PREFIX:line="153" PREFIX:column="7">isNegative</name> = true</expr>;</expr_stmt></then>
+    <else PREFIX:line="154" PREFIX:column="5">else <if PREFIX:line="154" PREFIX:column="10">if<condition PREFIX:line="154" PREFIX:column="12">(<expr><name PREFIX:line="154" PREFIX:column="13">c</name> &gt;= '0' &amp;&amp; <name PREFIX:line="154" PREFIX:column="25">c</name> &lt;= '9'</expr>)</condition><then PREFIX:line="154" PREFIX:column="34">        <comment type="line" PREFIX:line="154" PREFIX:column="42">// is c a digit?</comment>
+      <expr_stmt><expr><name PREFIX:line="155" PREFIX:column="7">value</name> = <name PREFIX:line="155" PREFIX:column="15">value</name> * 10 + <name PREFIX:line="155" PREFIX:column="28">c</name> - '0'</expr>;</expr_stmt></then></if></else></if></else></if>
+    <expr_stmt><expr><call><name PREFIX:line="156" PREFIX:column="5">read</name><argument_list PREFIX:line="156" PREFIX:column="9">()</argument_list></call></expr>;</expr_stmt>  <comment type="line" PREFIX:line="156" PREFIX:column="14">// consume the character we got with peek</comment>
+    <expr_stmt><expr><name PREFIX:line="157" PREFIX:column="5">c</name> = <call><name PREFIX:line="157" PREFIX:column="9">timedPeek</name><argument_list PREFIX:line="157" PREFIX:column="18">()</argument_list></call></expr>;</expr_stmt>
+  }</block>
+  while<condition PREFIX:line="159" PREFIX:column="8">( <expr PREFIX:line="159" PREFIX:column="10">(<name PREFIX:line="159" PREFIX:column="11">c</name> &gt;= '0' &amp;&amp; <name PREFIX:line="159" PREFIX:column="23">c</name> &lt;= '9') || <name PREFIX:line="159" PREFIX:column="36">c</name> == <name PREFIX:line="159" PREFIX:column="41">skipChar</name></expr> )</condition>;</do>
+
+  <if PREFIX:line="161" PREFIX:column="3">if<condition PREFIX:line="161" PREFIX:column="5">(<expr><name PREFIX:line="161" PREFIX:column="6">isNegative</name></expr>)</condition><then PREFIX:line="161" PREFIX:column="17">
+    <expr_stmt><expr><name PREFIX:line="162" PREFIX:column="5">value</name> = -<name PREFIX:line="162" PREFIX:column="14">value</name></expr>;</expr_stmt></then></if>
+  <return PREFIX:line="163" PREFIX:column="3">return <expr><name PREFIX:line="163" PREFIX:column="10">value</name></expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="167" PREFIX:column="1">// as parseInt but returns a floating point value</comment>
+<function><type><name PREFIX:line="168" PREFIX:column="1">float</name></type> <name><name PREFIX:line="168" PREFIX:column="7">Stream</name>::<name PREFIX:line="168" PREFIX:column="15">parseFloat</name></name><parameter_list PREFIX:line="168" PREFIX:column="25">()</parameter_list>
+<block PREFIX:line="169" PREFIX:column="1">{
+  <return PREFIX:line="170" PREFIX:column="3">return <expr><call><name PREFIX:line="170" PREFIX:column="10">parseFloat</name><argument_list PREFIX:line="170" PREFIX:column="20">(<argument><expr><name PREFIX:line="170" PREFIX:column="21">NO_SKIP_CHAR</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="173" PREFIX:column="1">// as above but the given skipChar is ignored</comment>
+<comment type="line" PREFIX:line="174" PREFIX:column="1">// this allows format characters (typically commas) in values to be ignored</comment>
+<function><type><name PREFIX:line="175" PREFIX:column="1">float</name></type> <name><name PREFIX:line="175" PREFIX:column="7">Stream</name>::<name PREFIX:line="175" PREFIX:column="15">parseFloat</name></name><parameter_list PREFIX:line="175" PREFIX:column="25">(<param><decl><type><name PREFIX:line="175" PREFIX:column="26">char</name></type> <name PREFIX:line="175" PREFIX:column="31">skipChar</name></decl></param>)</parameter_list><block PREFIX:line="175" PREFIX:column="40">{
+  <decl_stmt><decl><type><name PREFIX:line="176" PREFIX:column="3">boolean</name></type> <name PREFIX:line="176" PREFIX:column="11">isNegative</name> <init PREFIX:line="176" PREFIX:column="22">= <expr PREFIX:line="176" PREFIX:column="24">false</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="177" PREFIX:column="3">boolean</name></type> <name PREFIX:line="177" PREFIX:column="11">isFraction</name> <init PREFIX:line="177" PREFIX:column="22">= <expr PREFIX:line="177" PREFIX:column="24">false</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="178" PREFIX:column="3">long</name></type> <name PREFIX:line="178" PREFIX:column="8">value</name> <init PREFIX:line="178" PREFIX:column="14">= <expr PREFIX:line="178" PREFIX:column="16">0</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="179" PREFIX:column="3">char</name></type> <name PREFIX:line="179" PREFIX:column="8">c</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="180" PREFIX:column="3">float</name></type> <name PREFIX:line="180" PREFIX:column="9">fraction</name> <init PREFIX:line="180" PREFIX:column="18">= <expr PREFIX:line="180" PREFIX:column="20">1.0</expr></init></decl>;</decl_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="182" PREFIX:column="3">c</name> = <call><name PREFIX:line="182" PREFIX:column="7">peekNextDigit</name><argument_list PREFIX:line="182" PREFIX:column="20">()</argument_list></call></expr>;</expr_stmt>
+    <comment type="line" PREFIX:line="183" PREFIX:column="5">// ignore non numeric leading characters</comment>
+  <if PREFIX:line="184" PREFIX:column="3">if<condition PREFIX:line="184" PREFIX:column="5">(<expr><name PREFIX:line="184" PREFIX:column="6">c</name> &lt; 0</expr>)</condition><then PREFIX:line="184" PREFIX:column="12">
+    <return PREFIX:line="185" PREFIX:column="5">return <expr PREFIX:line="185" PREFIX:column="12">0</expr>;</return></then></if> <comment type="line" PREFIX:line="185" PREFIX:column="15">// zero returned if timeout</comment>
+
+  <do PREFIX:line="187" PREFIX:column="3">do<block PREFIX:line="187" PREFIX:column="5">{
+    <if PREFIX:line="188" PREFIX:column="5">if<condition PREFIX:line="188" PREFIX:column="7">(<expr><name PREFIX:line="188" PREFIX:column="8">c</name> == <name PREFIX:line="188" PREFIX:column="13">skipChar</name></expr>)</condition><then PREFIX:line="188" PREFIX:column="22">
+      <empty_stmt PREFIX:line="189" PREFIX:column="7">;</empty_stmt></then> <comment type="line" PREFIX:line="189" PREFIX:column="9">// ignore</comment>
+    <else PREFIX:line="190" PREFIX:column="5">else <if PREFIX:line="190" PREFIX:column="10">if<condition PREFIX:line="190" PREFIX:column="12">(<expr><name PREFIX:line="190" PREFIX:column="13">c</name> == '-'</expr>)</condition><then PREFIX:line="190" PREFIX:column="22">
+      <expr_stmt><expr><name PREFIX:line="191" PREFIX:column="7">isNegative</name> = true</expr>;</expr_stmt></then>
+    <else PREFIX:line="192" PREFIX:column="5">else <if PREFIX:line="192" PREFIX:column="10">if <condition PREFIX:line="192" PREFIX:column="13">(<expr><name PREFIX:line="192" PREFIX:column="14">c</name> == '.'</expr>)</condition><then PREFIX:line="192" PREFIX:column="23">
+      <expr_stmt><expr><name PREFIX:line="193" PREFIX:column="7">isFraction</name> = true</expr>;</expr_stmt></then>
+    <else PREFIX:line="194" PREFIX:column="5">else <if PREFIX:line="194" PREFIX:column="10">if<condition PREFIX:line="194" PREFIX:column="12">(<expr><name PREFIX:line="194" PREFIX:column="13">c</name> &gt;= '0' &amp;&amp; <name PREFIX:line="194" PREFIX:column="25">c</name> &lt;= '9'</expr>)</condition><then PREFIX:line="194" PREFIX:column="34">  <block PREFIX:line="194" PREFIX:column="36">{      <comment type="line" PREFIX:line="194" PREFIX:column="43">// is c a digit?</comment>
+      <expr_stmt><expr><name PREFIX:line="195" PREFIX:column="7">value</name> = <name PREFIX:line="195" PREFIX:column="15">value</name> * 10 + <name PREFIX:line="195" PREFIX:column="28">c</name> - '0'</expr>;</expr_stmt>
+      <if PREFIX:line="196" PREFIX:column="7">if<condition PREFIX:line="196" PREFIX:column="9">(<expr><name PREFIX:line="196" PREFIX:column="10">isFraction</name></expr>)</condition><then PREFIX:line="196" PREFIX:column="21">
+         <expr_stmt><expr><name PREFIX:line="197" PREFIX:column="10">fraction</name> *= 0.1</expr>;</expr_stmt></then></if>
+    }</block></then></if></else></if></else></if></else></if>
+    <expr_stmt><expr><call><name PREFIX:line="199" PREFIX:column="5">read</name><argument_list PREFIX:line="199" PREFIX:column="9">()</argument_list></call></expr>;</expr_stmt>  <comment type="line" PREFIX:line="199" PREFIX:column="14">// consume the character we got with peek</comment>
+    <expr_stmt><expr><name PREFIX:line="200" PREFIX:column="5">c</name> = <call><name PREFIX:line="200" PREFIX:column="9">timedPeek</name><argument_list PREFIX:line="200" PREFIX:column="18">()</argument_list></call></expr>;</expr_stmt>
+  }</block>
+  while<condition PREFIX:line="202" PREFIX:column="8">( <expr PREFIX:line="202" PREFIX:column="10">(<name PREFIX:line="202" PREFIX:column="11">c</name> &gt;= '0' &amp;&amp; <name PREFIX:line="202" PREFIX:column="23">c</name> &lt;= '9')  || <name PREFIX:line="202" PREFIX:column="37">c</name> == '.' || <name PREFIX:line="202" PREFIX:column="49">c</name> == <name PREFIX:line="202" PREFIX:column="54">skipChar</name></expr> )</condition>;</do>
+
+  <if PREFIX:line="204" PREFIX:column="3">if<condition PREFIX:line="204" PREFIX:column="5">(<expr><name PREFIX:line="204" PREFIX:column="6">isNegative</name></expr>)</condition><then PREFIX:line="204" PREFIX:column="17">
+    <expr_stmt><expr><name PREFIX:line="205" PREFIX:column="5">value</name> = -<name PREFIX:line="205" PREFIX:column="14">value</name></expr>;</expr_stmt></then></if>
+  <if PREFIX:line="206" PREFIX:column="3">if<condition PREFIX:line="206" PREFIX:column="5">(<expr><name PREFIX:line="206" PREFIX:column="6">isFraction</name></expr>)</condition><then PREFIX:line="206" PREFIX:column="17">
+    <return PREFIX:line="207" PREFIX:column="5">return <expr><name PREFIX:line="207" PREFIX:column="12">value</name> * <name PREFIX:line="207" PREFIX:column="20">fraction</name></expr>;</return></then>
+  <else PREFIX:line="208" PREFIX:column="3">else
+    <return PREFIX:line="209" PREFIX:column="5">return <expr><name PREFIX:line="209" PREFIX:column="12">value</name></expr>;</return></else></if>
+}</block></function>
+
+<comment type="line" PREFIX:line="212" PREFIX:column="1">// read characters from stream into buffer</comment>
+<comment type="line" PREFIX:line="213" PREFIX:column="1">// terminates if length characters have been read, or timeout (see setTimeout)</comment>
+<comment type="line" PREFIX:line="214" PREFIX:column="1">// returns the number of characters placed in the buffer</comment>
+<comment type="line" PREFIX:line="215" PREFIX:column="1">// the buffer is NOT null terminated.</comment>
+<comment type="line" PREFIX:line="216" PREFIX:column="1">//</comment>
+<function><type><name PREFIX:line="217" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="217" PREFIX:column="8">Stream</name>::<name PREFIX:line="217" PREFIX:column="16">readBytes</name></name><parameter_list PREFIX:line="217" PREFIX:column="25">(<param><decl><type><name PREFIX:line="217" PREFIX:column="26">char</name> *</type><name PREFIX:line="217" PREFIX:column="32">buffer</name></decl></param>, <param><decl><type><name PREFIX:line="217" PREFIX:column="40">size_t</name></type> <name PREFIX:line="217" PREFIX:column="47">length</name></decl></param>)</parameter_list>
+<block PREFIX:line="218" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="219" PREFIX:column="3">size_t</name></type> <name PREFIX:line="219" PREFIX:column="10">count</name> <init PREFIX:line="219" PREFIX:column="16">= <expr PREFIX:line="219" PREFIX:column="18">0</expr></init></decl>;</decl_stmt>
+  <while PREFIX:line="220" PREFIX:column="3">while <condition PREFIX:line="220" PREFIX:column="9">(<expr><name PREFIX:line="220" PREFIX:column="10">count</name> &lt; <name PREFIX:line="220" PREFIX:column="18">length</name></expr>)</condition> <block PREFIX:line="220" PREFIX:column="26">{
+    <decl_stmt><decl><type><name PREFIX:line="221" PREFIX:column="5">int</name></type> <name PREFIX:line="221" PREFIX:column="9">c</name> <init PREFIX:line="221" PREFIX:column="11">= <expr><call><name PREFIX:line="221" PREFIX:column="13">timedRead</name><argument_list PREFIX:line="221" PREFIX:column="22">()</argument_list></call></expr></init></decl>;</decl_stmt>
+    <if PREFIX:line="222" PREFIX:column="5">if <condition PREFIX:line="222" PREFIX:column="8">(<expr><name PREFIX:line="222" PREFIX:column="9">c</name> &lt; 0</expr>)</condition><then PREFIX:line="222" PREFIX:column="15"> <break PREFIX:line="222" PREFIX:column="16">break;</break></then></if>
+    <expr_stmt><expr PREFIX:line="223" PREFIX:column="5">*<name PREFIX:line="223" PREFIX:column="6">buffer</name>++ = (<name PREFIX:line="223" PREFIX:column="18">char</name>)<name PREFIX:line="223" PREFIX:column="23">c</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="224" PREFIX:column="5">count</name>++</expr>;</expr_stmt>
+  }</block></while>
+  <return PREFIX:line="226" PREFIX:column="3">return <expr><name PREFIX:line="226" PREFIX:column="10">count</name></expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="230" PREFIX:column="1">// as readBytes with terminator character</comment>
+<comment type="line" PREFIX:line="231" PREFIX:column="1">// terminates if length characters have been read, timeout, or if the terminator character  detected</comment>
+<comment type="line" PREFIX:line="232" PREFIX:column="1">// returns the number of characters placed in the buffer (0 means no valid data found)</comment>
+
+<function><type><name PREFIX:line="234" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="234" PREFIX:column="8">Stream</name>::<name PREFIX:line="234" PREFIX:column="16">readBytesUntil</name></name><parameter_list PREFIX:line="234" PREFIX:column="30">(<param><decl><type><name PREFIX:line="234" PREFIX:column="31">char</name></type> <name PREFIX:line="234" PREFIX:column="36">terminator</name></decl></param>, <param><decl><type><name PREFIX:line="234" PREFIX:column="48">char</name> *</type><name PREFIX:line="234" PREFIX:column="54">buffer</name></decl></param>, <param><decl><type><name PREFIX:line="234" PREFIX:column="62">size_t</name></type> <name PREFIX:line="234" PREFIX:column="69">length</name></decl></param>)</parameter_list>
+<block PREFIX:line="235" PREFIX:column="1">{
+  <if PREFIX:line="236" PREFIX:column="3">if <condition PREFIX:line="236" PREFIX:column="6">(<expr><name PREFIX:line="236" PREFIX:column="7">length</name> &lt; 1</expr>)</condition><then PREFIX:line="236" PREFIX:column="18"> <return PREFIX:line="236" PREFIX:column="19">return <expr PREFIX:line="236" PREFIX:column="26">0</expr>;</return></then></if>
+  <decl_stmt><decl><type><name PREFIX:line="237" PREFIX:column="3">size_t</name></type> <name PREFIX:line="237" PREFIX:column="10">index</name> <init PREFIX:line="237" PREFIX:column="16">= <expr PREFIX:line="237" PREFIX:column="18">0</expr></init></decl>;</decl_stmt>
+  <while PREFIX:line="238" PREFIX:column="3">while <condition PREFIX:line="238" PREFIX:column="9">(<expr><name PREFIX:line="238" PREFIX:column="10">index</name> &lt; <name PREFIX:line="238" PREFIX:column="18">length</name></expr>)</condition> <block PREFIX:line="238" PREFIX:column="26">{
+    <decl_stmt><decl><type><name PREFIX:line="239" PREFIX:column="5">int</name></type> <name PREFIX:line="239" PREFIX:column="9">c</name> <init PREFIX:line="239" PREFIX:column="11">= <expr><call><name PREFIX:line="239" PREFIX:column="13">timedRead</name><argument_list PREFIX:line="239" PREFIX:column="22">()</argument_list></call></expr></init></decl>;</decl_stmt>
+    <if PREFIX:line="240" PREFIX:column="5">if <condition PREFIX:line="240" PREFIX:column="8">(<expr><name PREFIX:line="240" PREFIX:column="9">c</name> &lt; 0 || <name PREFIX:line="240" PREFIX:column="18">c</name> == <name PREFIX:line="240" PREFIX:column="23">terminator</name></expr>)</condition><then PREFIX:line="240" PREFIX:column="34"> <break PREFIX:line="240" PREFIX:column="35">break;</break></then></if>
+    <expr_stmt><expr PREFIX:line="241" PREFIX:column="5">*<name PREFIX:line="241" PREFIX:column="6">buffer</name>++ = (<name PREFIX:line="241" PREFIX:column="18">char</name>)<name PREFIX:line="241" PREFIX:column="23">c</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="242" PREFIX:column="5">index</name>++</expr>;</expr_stmt>
+  }</block></while>
+  <return PREFIX:line="244" PREFIX:column="3">return <expr><name PREFIX:line="244" PREFIX:column="10">index</name></expr>;</return> <comment type="line" PREFIX:line="244" PREFIX:column="17">// return number of characters, not including null terminator</comment>
+}</block></function>
+
+<function><type><name PREFIX:line="247" PREFIX:column="1">String</name></type> <name><name PREFIX:line="247" PREFIX:column="8">Stream</name>::<name PREFIX:line="247" PREFIX:column="16">readString</name></name><parameter_list PREFIX:line="247" PREFIX:column="26">()</parameter_list>
+<block PREFIX:line="248" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="249" PREFIX:column="3">String</name></type> <name PREFIX:line="249" PREFIX:column="10">ret</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="250" PREFIX:column="3">int</name></type> <name PREFIX:line="250" PREFIX:column="7">c</name> <init PREFIX:line="250" PREFIX:column="9">= <expr><call><name PREFIX:line="250" PREFIX:column="11">timedRead</name><argument_list PREFIX:line="250" PREFIX:column="20">()</argument_list></call></expr></init></decl>;</decl_stmt>
+  <while PREFIX:line="251" PREFIX:column="3">while <condition PREFIX:line="251" PREFIX:column="9">(<expr><name PREFIX:line="251" PREFIX:column="10">c</name> &gt;= 0</expr>)</condition>
+  <block PREFIX:line="252" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="253" PREFIX:column="5">ret</name> += (<name PREFIX:line="253" PREFIX:column="13">char</name>)<name PREFIX:line="253" PREFIX:column="18">c</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="254" PREFIX:column="5">c</name> = <call><name PREFIX:line="254" PREFIX:column="9">timedRead</name><argument_list PREFIX:line="254" PREFIX:column="18">()</argument_list></call></expr>;</expr_stmt>
+  }</block></while>
+  <return PREFIX:line="256" PREFIX:column="3">return <expr><name PREFIX:line="256" PREFIX:column="10">ret</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="259" PREFIX:column="1">String</name></type> <name><name PREFIX:line="259" PREFIX:column="8">Stream</name>::<name PREFIX:line="259" PREFIX:column="16">readStringUntil</name></name><parameter_list PREFIX:line="259" PREFIX:column="31">(<param><decl><type><name PREFIX:line="259" PREFIX:column="32">char</name></type> <name PREFIX:line="259" PREFIX:column="37">terminator</name></decl></param>)</parameter_list>
+<block PREFIX:line="260" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="261" PREFIX:column="3">String</name></type> <name PREFIX:line="261" PREFIX:column="10">ret</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="262" PREFIX:column="3">int</name></type> <name PREFIX:line="262" PREFIX:column="7">c</name> <init PREFIX:line="262" PREFIX:column="9">= <expr><call><name PREFIX:line="262" PREFIX:column="11">timedRead</name><argument_list PREFIX:line="262" PREFIX:column="20">()</argument_list></call></expr></init></decl>;</decl_stmt>
+  <while PREFIX:line="263" PREFIX:column="3">while <condition PREFIX:line="263" PREFIX:column="9">(<expr><name PREFIX:line="263" PREFIX:column="10">c</name> &gt;= 0 &amp;&amp; <name PREFIX:line="263" PREFIX:column="20">c</name> != <name PREFIX:line="263" PREFIX:column="25">terminator</name></expr>)</condition>
+  <block PREFIX:line="264" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="265" PREFIX:column="5">ret</name> += (<name PREFIX:line="265" PREFIX:column="13">char</name>)<name PREFIX:line="265" PREFIX:column="18">c</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="266" PREFIX:column="5">c</name> = <call><name PREFIX:line="266" PREFIX:column="9">timedRead</name><argument_list PREFIX:line="266" PREFIX:column="18">()</argument_list></call></expr>;</expr_stmt>
+  }</block></while>
+  <return PREFIX:line="268" PREFIX:column="3">return <expr><name PREFIX:line="268" PREFIX:column="10">ret</name></expr>;</return>
+}</block></function>
+
+</unit>

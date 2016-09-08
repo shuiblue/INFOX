@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/hardware/Sanguino/cores/arduino/USBDesc.h.cpp" PREFIX:tabs="8" PREFIX:line="1" PREFIX:column="1">
+
+<comment type="block" PREFIX:line="3" PREFIX:column="1">/* Copyright (c) 2011, Peter Barrett  
+**  
+** Permission to use, copy, modify, and/or distribute this software for  
+** any purpose with or without fee is hereby granted, provided that the  
+** above copyright notice and this permission notice appear in all copies.  
+** 
+** THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL  
+** WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED  
+** WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR  
+** BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES  
+** OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
+** WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,  
+** ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS  
+** SOFTWARE.  
+*/</comment>
+
+<cpp:define PREFIX:line="19" PREFIX:column="1">#<cpp:directive PREFIX:line="19" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="19" PREFIX:column="9">CDC_ENABLED</name></cpp:macro></cpp:define>
+<cpp:define PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="20" PREFIX:column="9">HID_ENABLED</name></cpp:macro></cpp:define>
+
+
+<cpp:ifdef PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="23" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+<cpp:define PREFIX:line="24" PREFIX:column="1">#<cpp:directive PREFIX:line="24" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="24" PREFIX:column="9">CDC_INTERFACE_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="24" PREFIX:column="33">2</cpp:value></cpp:define>
+<cpp:define PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="25" PREFIX:column="9">CDC_ENPOINT_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="25" PREFIX:column="33">3</cpp:value></cpp:define>
+<cpp:else PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">else</cpp:directive></cpp:else>
+<cpp:define PREFIX:line="27" PREFIX:column="1">#<cpp:directive PREFIX:line="27" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="27" PREFIX:column="9">CDC_INTERFACE_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="27" PREFIX:column="33">0</cpp:value></cpp:define>
+<cpp:define PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="28" PREFIX:column="9">CDC_ENPOINT_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="28" PREFIX:column="33">0</cpp:value></cpp:define>
+<cpp:endif PREFIX:line="29" PREFIX:column="1">#<cpp:directive PREFIX:line="29" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:ifdef PREFIX:line="31" PREFIX:column="1">#<cpp:directive PREFIX:line="31" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="31" PREFIX:column="8">HID_ENABLED</name></cpp:ifdef>
+<cpp:define PREFIX:line="32" PREFIX:column="1">#<cpp:directive PREFIX:line="32" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="32" PREFIX:column="9">HID_INTERFACE_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="32" PREFIX:column="33">1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="33" PREFIX:column="1">#<cpp:directive PREFIX:line="33" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="33" PREFIX:column="9">HID_ENPOINT_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="33" PREFIX:column="33">1</cpp:value></cpp:define>
+<cpp:else PREFIX:line="34" PREFIX:column="1">#<cpp:directive PREFIX:line="34" PREFIX:column="2">else</cpp:directive></cpp:else>
+<cpp:define PREFIX:line="35" PREFIX:column="1">#<cpp:directive PREFIX:line="35" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="35" PREFIX:column="9">HID_INTERFACE_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="35" PREFIX:column="33">0</cpp:value></cpp:define>
+<cpp:define PREFIX:line="36" PREFIX:column="1">#<cpp:directive PREFIX:line="36" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="36" PREFIX:column="9">HID_ENPOINT_COUNT</name></cpp:macro>	<cpp:value PREFIX:line="36" PREFIX:column="33">0</cpp:value></cpp:define>
+<cpp:endif PREFIX:line="37" PREFIX:column="1">#<cpp:directive PREFIX:line="37" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:define PREFIX:line="39" PREFIX:column="1">#<cpp:directive PREFIX:line="39" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="39" PREFIX:column="9">CDC_ACM_INTERFACE</name></cpp:macro>	<cpp:value PREFIX:line="39" PREFIX:column="33">0</cpp:value></cpp:define>	<comment type="line" PREFIX:line="39" PREFIX:column="41">// CDC ACM</comment>
+<cpp:define PREFIX:line="40" PREFIX:column="1">#<cpp:directive PREFIX:line="40" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="40" PREFIX:column="9">CDC_DATA_INTERFACE</name></cpp:macro>	<cpp:value PREFIX:line="40" PREFIX:column="33">1</cpp:value></cpp:define>	<comment type="line" PREFIX:line="40" PREFIX:column="41">// CDC Data</comment>
+<cpp:define PREFIX:line="41" PREFIX:column="1">#<cpp:directive PREFIX:line="41" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="41" PREFIX:column="9">CDC_FIRST_ENDPOINT</name></cpp:macro>	<cpp:value PREFIX:line="41" PREFIX:column="33">1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="42" PREFIX:column="1">#<cpp:directive PREFIX:line="42" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="42" PREFIX:column="9">CDC_ENDPOINT_ACM</name></cpp:macro>	<cpp:value PREFIX:line="42" PREFIX:column="33">(CDC_FIRST_ENDPOINT)</cpp:value></cpp:define>							<comment type="line" PREFIX:line="42" PREFIX:column="105">// CDC First</comment>
+<cpp:define PREFIX:line="43" PREFIX:column="1">#<cpp:directive PREFIX:line="43" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="43" PREFIX:column="9">CDC_ENDPOINT_OUT</name></cpp:macro>	<cpp:value PREFIX:line="43" PREFIX:column="33">(CDC_FIRST_ENDPOINT+1)</cpp:value></cpp:define>
+<cpp:define PREFIX:line="44" PREFIX:column="1">#<cpp:directive PREFIX:line="44" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="44" PREFIX:column="9">CDC_ENDPOINT_IN</name></cpp:macro>		<cpp:value PREFIX:line="44" PREFIX:column="33">(CDC_FIRST_ENDPOINT+2)</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="46" PREFIX:column="1">#<cpp:directive PREFIX:line="46" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="46" PREFIX:column="9">HID_INTERFACE</name></cpp:macro>		<cpp:value PREFIX:line="46" PREFIX:column="33">(CDC_ACM_INTERFACE + CDC_INTERFACE_COUNT)</cpp:value></cpp:define>		<comment type="line" PREFIX:line="46" PREFIX:column="89">// HID Interface</comment>
+<cpp:define PREFIX:line="47" PREFIX:column="1">#<cpp:directive PREFIX:line="47" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="47" PREFIX:column="9">HID_FIRST_ENDPOINT</name></cpp:macro>	<cpp:value PREFIX:line="47" PREFIX:column="33">(CDC_FIRST_ENDPOINT + CDC_ENPOINT_COUNT)</cpp:value></cpp:define>
+<cpp:define PREFIX:line="48" PREFIX:column="1">#<cpp:directive PREFIX:line="48" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="48" PREFIX:column="9">HID_ENDPOINT_INT</name></cpp:macro>	<cpp:value PREFIX:line="48" PREFIX:column="33">(HID_FIRST_ENDPOINT)</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="50" PREFIX:column="1">#<cpp:directive PREFIX:line="50" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="50" PREFIX:column="9">INTERFACE_COUNT</name></cpp:macro>		<cpp:value PREFIX:line="50" PREFIX:column="33">(MSC_INTERFACE + MSC_INTERFACE_COUNT)</cpp:value></cpp:define>
+
+<cpp:ifdef PREFIX:line="52" PREFIX:column="1">#<cpp:directive PREFIX:line="52" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="52" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+<cpp:define PREFIX:line="53" PREFIX:column="1">#<cpp:directive PREFIX:line="53" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="53" PREFIX:column="9">CDC_RX</name></cpp:macro> <cpp:value PREFIX:line="53" PREFIX:column="16">CDC_ENDPOINT_OUT</cpp:value></cpp:define>
+<cpp:define PREFIX:line="54" PREFIX:column="1">#<cpp:directive PREFIX:line="54" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="54" PREFIX:column="9">CDC_TX</name></cpp:macro> <cpp:value PREFIX:line="54" PREFIX:column="16">CDC_ENDPOINT_IN</cpp:value></cpp:define>
+<cpp:endif PREFIX:line="55" PREFIX:column="1">#<cpp:directive PREFIX:line="55" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:ifdef PREFIX:line="57" PREFIX:column="1">#<cpp:directive PREFIX:line="57" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="57" PREFIX:column="8">HID_ENABLED</name></cpp:ifdef>
+<cpp:define PREFIX:line="58" PREFIX:column="1">#<cpp:directive PREFIX:line="58" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="58" PREFIX:column="9">HID_TX</name></cpp:macro> <cpp:value PREFIX:line="58" PREFIX:column="16">HID_ENDPOINT_INT</cpp:value></cpp:define>
+<cpp:endif PREFIX:line="59" PREFIX:column="1">#<cpp:directive PREFIX:line="59" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:define PREFIX:line="61" PREFIX:column="1">#<cpp:directive PREFIX:line="61" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="61" PREFIX:column="9">IMANUFACTURER</name></cpp:macro>	<cpp:value PREFIX:line="61" PREFIX:column="25">1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="62" PREFIX:column="1">#<cpp:directive PREFIX:line="62" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="62" PREFIX:column="9">IPRODUCT</name></cpp:macro>		<cpp:value PREFIX:line="62" PREFIX:column="33">2</cpp:value></cpp:define>
+
+</unit>

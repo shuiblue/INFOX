@@ -193,10 +193,11 @@ public class GetForkAddedCode {
         }
     }
 
-    public void identifyIfdefs(String projectPath, String repo, int dirNum, ArrayList<String> macroList) {
-        String testDir = projectPath + repo;
-        sourcecodeDir = testDir + "/" + repo;
-        analysisDir = testDir + "/DPGraph/" + dirNum + "/";
+    public void identifyIfdefs(String sourcecodeDir, String analysisDir,  ArrayList<String> macroList) {
+//    public void identifyIfdefs(String projectPath, String repo, int dirNum, ArrayList<String> macroList) {
+//        String testDir = projectPath + repo;
+//        sourcecodeDir = testDir + "/" + repo;
+//        analysisDir = testDir + "/DPGraph/" + dirNum + "/";
         File dir1 = new File(sourcecodeDir);
         File dir2 = new File(analysisDir);
         dir2.mkdirs();

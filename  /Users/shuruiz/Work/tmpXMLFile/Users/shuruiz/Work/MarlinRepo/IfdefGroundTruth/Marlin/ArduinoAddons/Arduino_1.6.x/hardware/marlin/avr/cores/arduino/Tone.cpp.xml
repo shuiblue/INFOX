@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/arduino/Tone.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/* Tone.cpp
+
+  A Tone Generator Library
+
+  Written by Brett Hagman
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+Version Modified By Date     Comments
+------- ----------- -------- --------
+0001    B Hagman    09/08/02 Initial coding
+0002    B Hagman    09/08/18 Multiple pins
+0003    B Hagman    09/08/18 Moved initialization from ructor to begin()
+0004    B Hagman    09/09/26 Fixed problems with ATmega8
+0005    B Hagman    09/11/23 Scanned prescalars for best fit on 8 bit timers
+                    09/11/25 Changed pin toggle method to XOR
+                    09/11/25 Fixed timer0 from being excluded
+0006    D Mellis    09/12/29 Replaced objects with functions
+0007    M Sproul    10/08/29 Changed #ifdefs from cpu to register
+0008    S Kanemoto  12/06/22 Fixed for Leonardo by @maris_HY
+0009    J Reucker   15/04/10 Issue #292 Fixed problems with ATmega8 (thanks to Pete62)
+0010    jipp        15/04/13 added additional define check #2923
+*************************************************/</comment>
+
+<cpp:include PREFIX:line="37" PREFIX:column="1">#<cpp:directive PREFIX:line="37" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="37" PREFIX:column="10">&lt;avr/interrupt.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="38" PREFIX:column="1">#<cpp:directive PREFIX:line="38" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="38" PREFIX:column="10">&lt;avr/pgmspace.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="39" PREFIX:column="1">#<cpp:directive PREFIX:line="39" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="39" PREFIX:column="10">"Arduino.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="40" PREFIX:column="1">#<cpp:directive PREFIX:line="40" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="40" PREFIX:column="10">"pins_arduino.h"</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="42" PREFIX:column="1">#<cpp:directive PREFIX:line="42" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="42" PREFIX:column="5">defined</name><argument_list PREFIX:line="42" PREFIX:column="12">(<argument><expr><name PREFIX:line="42" PREFIX:column="13">__AVR_ATmega8__</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="42" PREFIX:column="33">defined</name><argument_list PREFIX:line="42" PREFIX:column="40">(<argument><expr><name PREFIX:line="42" PREFIX:column="41">__AVR_ATmega128__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<cpp:define PREFIX:line="43" PREFIX:column="1">#<cpp:directive PREFIX:line="43" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="43" PREFIX:column="9">TCCR2A</name></cpp:macro> <cpp:value PREFIX:line="43" PREFIX:column="16">TCCR2</cpp:value></cpp:define>
+<cpp:define PREFIX:line="44" PREFIX:column="1">#<cpp:directive PREFIX:line="44" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="44" PREFIX:column="9">TCCR2B</name></cpp:macro> <cpp:value PREFIX:line="44" PREFIX:column="16">TCCR2</cpp:value></cpp:define>
+<cpp:define PREFIX:line="45" PREFIX:column="1">#<cpp:directive PREFIX:line="45" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="45" PREFIX:column="9">COM2A1</name></cpp:macro> <cpp:value PREFIX:line="45" PREFIX:column="16">COM21</cpp:value></cpp:define>
+<cpp:define PREFIX:line="46" PREFIX:column="1">#<cpp:directive PREFIX:line="46" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="46" PREFIX:column="9">COM2A0</name></cpp:macro> <cpp:value PREFIX:line="46" PREFIX:column="16">COM20</cpp:value></cpp:define>
+<cpp:define PREFIX:line="47" PREFIX:column="1">#<cpp:directive PREFIX:line="47" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="47" PREFIX:column="9">OCR2A</name></cpp:macro> <cpp:value PREFIX:line="47" PREFIX:column="15">OCR2</cpp:value></cpp:define>
+<cpp:define PREFIX:line="48" PREFIX:column="1">#<cpp:directive PREFIX:line="48" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="48" PREFIX:column="9">TIMSK2</name></cpp:macro> <cpp:value PREFIX:line="48" PREFIX:column="16">TIMSK</cpp:value></cpp:define>
+<cpp:define PREFIX:line="49" PREFIX:column="1">#<cpp:directive PREFIX:line="49" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="49" PREFIX:column="9">OCIE2A</name></cpp:macro> <cpp:value PREFIX:line="49" PREFIX:column="16">OCIE2</cpp:value></cpp:define>
+<cpp:define PREFIX:line="50" PREFIX:column="1">#<cpp:directive PREFIX:line="50" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="50" PREFIX:column="9">TIMER2_COMPA_vect</name></cpp:macro> <cpp:value PREFIX:line="50" PREFIX:column="27">TIMER2_COMP_vect</cpp:value></cpp:define>
+<cpp:define PREFIX:line="51" PREFIX:column="1">#<cpp:directive PREFIX:line="51" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="51" PREFIX:column="9">TIMSK1</name></cpp:macro> <cpp:value PREFIX:line="51" PREFIX:column="16">TIMSK</cpp:value></cpp:define>
+<cpp:endif PREFIX:line="52" PREFIX:column="1">#<cpp:directive PREFIX:line="52" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<comment type="line" PREFIX:line="54" PREFIX:column="1">// timerx_toggle_count:</comment>
+<comment type="line" PREFIX:line="55" PREFIX:column="1">//  &gt; 0 - duration specified</comment>
+<comment type="line" PREFIX:line="56" PREFIX:column="1">//  = 0 - stopped</comment>
+<comment type="line" PREFIX:line="57" PREFIX:column="1">//  &lt; 0 - infinitely (until stop() method called, or new play() called)</comment>
+
+<cpp:if PREFIX:line="59" PREFIX:column="1">#<cpp:directive PREFIX:line="59" PREFIX:column="2">if</cpp:directive> <expr PREFIX:line="59" PREFIX:column="5">!<call><name PREFIX:line="59" PREFIX:column="6">defined</name><argument_list PREFIX:line="59" PREFIX:column="13">(<argument><expr><name PREFIX:line="59" PREFIX:column="14">__AVR_ATmega8__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<decl_stmt><decl><type><specifier PREFIX:line="60" PREFIX:column="1">volatile</specifier> <name PREFIX:line="60" PREFIX:column="10">long</name></type> <name PREFIX:line="60" PREFIX:column="15">timer0_toggle_count</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="61" PREFIX:column="1">volatile</specifier> <name PREFIX:line="61" PREFIX:column="10">uint8_t</name> *</type><name PREFIX:line="61" PREFIX:column="19">timer0_pin_port</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="62" PREFIX:column="1">volatile</specifier> <name PREFIX:line="62" PREFIX:column="10">uint8_t</name></type> <name PREFIX:line="62" PREFIX:column="18">timer0_pin_mask</name></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="63" PREFIX:column="1">#<cpp:directive PREFIX:line="63" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<decl_stmt><decl><type><specifier PREFIX:line="65" PREFIX:column="1">volatile</specifier> <name PREFIX:line="65" PREFIX:column="10">long</name></type> <name PREFIX:line="65" PREFIX:column="15">timer1_toggle_count</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="66" PREFIX:column="1">volatile</specifier> <name PREFIX:line="66" PREFIX:column="10">uint8_t</name> *</type><name PREFIX:line="66" PREFIX:column="19">timer1_pin_port</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="67" PREFIX:column="1">volatile</specifier> <name PREFIX:line="67" PREFIX:column="10">uint8_t</name></type> <name PREFIX:line="67" PREFIX:column="18">timer1_pin_mask</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="68" PREFIX:column="1">volatile</specifier> <name PREFIX:line="68" PREFIX:column="10">long</name></type> <name PREFIX:line="68" PREFIX:column="15">timer2_toggle_count</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="69" PREFIX:column="1">volatile</specifier> <name PREFIX:line="69" PREFIX:column="10">uint8_t</name> *</type><name PREFIX:line="69" PREFIX:column="19">timer2_pin_port</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="70" PREFIX:column="1">volatile</specifier> <name PREFIX:line="70" PREFIX:column="10">uint8_t</name></type> <name PREFIX:line="70" PREFIX:column="18">timer2_pin_mask</name></decl>;</decl_stmt>
+
+<cpp:if PREFIX:line="72" PREFIX:column="1">#<cpp:directive PREFIX:line="72" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="72" PREFIX:column="5">defined</name><argument_list PREFIX:line="72" PREFIX:column="12">(<argument><expr><name PREFIX:line="72" PREFIX:column="13">TIMSK3</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<decl_stmt><decl><type><specifier PREFIX:line="73" PREFIX:column="1">volatile</specifier> <name PREFIX:line="73" PREFIX:column="10">long</name></type> <name PREFIX:line="73" PREFIX:column="15">timer3_toggle_count</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="74" PREFIX:column="1">volatile</specifier> <name PREFIX:line="74" PREFIX:column="10">uint8_t</name> *</type><name PREFIX:line="74" PREFIX:column="19">timer3_pin_port</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="75" PREFIX:column="1">volatile</specifier> <name PREFIX:line="75" PREFIX:column="10">uint8_t</name></type> <name PREFIX:line="75" PREFIX:column="18">timer3_pin_mask</name></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="76" PREFIX:column="1">#<cpp:directive PREFIX:line="76" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="78" PREFIX:column="1">#<cpp:directive PREFIX:line="78" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="78" PREFIX:column="5">defined</name><argument_list PREFIX:line="78" PREFIX:column="12">(<argument><expr><name PREFIX:line="78" PREFIX:column="13">TIMSK4</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<decl_stmt><decl><type><specifier PREFIX:line="79" PREFIX:column="1">volatile</specifier> <name PREFIX:line="79" PREFIX:column="10">long</name></type> <name PREFIX:line="79" PREFIX:column="15">timer4_toggle_count</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="80" PREFIX:column="1">volatile</specifier> <name PREFIX:line="80" PREFIX:column="10">uint8_t</name> *</type><name PREFIX:line="80" PREFIX:column="19">timer4_pin_port</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="81" PREFIX:column="1">volatile</specifier> <name PREFIX:line="81" PREFIX:column="10">uint8_t</name></type> <name PREFIX:line="81" PREFIX:column="18">timer4_pin_mask</name></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="82" PREFIX:column="1">#<cpp:directive PREFIX:line="82" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="84" PREFIX:column="1">#<cpp:directive PREFIX:line="84" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="84" PREFIX:column="5">defined</name><argument_list PREFIX:line="84" PREFIX:column="12">(<argument><expr><name PREFIX:line="84" PREFIX:column="13">TIMSK5</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<decl_stmt><decl><type><specifier PREFIX:line="85" PREFIX:column="1">volatile</specifier> <name PREFIX:line="85" PREFIX:column="10">long</name></type> <name PREFIX:line="85" PREFIX:column="15">timer5_toggle_count</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="86" PREFIX:column="1">volatile</specifier> <name PREFIX:line="86" PREFIX:column="10">uint8_t</name> *</type><name PREFIX:line="86" PREFIX:column="19">timer5_pin_port</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="87" PREFIX:column="1">volatile</specifier> <name PREFIX:line="87" PREFIX:column="10">uint8_t</name></type> <name PREFIX:line="87" PREFIX:column="18">timer5_pin_mask</name></decl>;</decl_stmt>
+<cpp:endif PREFIX:line="88" PREFIX:column="1">#<cpp:directive PREFIX:line="88" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+<cpp:if PREFIX:line="91" PREFIX:column="1">#<cpp:directive PREFIX:line="91" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="91" PREFIX:column="5">defined</name><argument_list PREFIX:line="91" PREFIX:column="12">(<argument><expr><name PREFIX:line="91" PREFIX:column="13">__AVR_ATmega1280__</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="91" PREFIX:column="36">defined</name><argument_list PREFIX:line="91" PREFIX:column="43">(<argument><expr><name PREFIX:line="91" PREFIX:column="44">__AVR_ATmega2560__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<cpp:define PREFIX:line="93" PREFIX:column="1">#<cpp:directive PREFIX:line="93" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="93" PREFIX:column="9">AVAILABLE_TONE_PINS</name></cpp:macro> <cpp:value PREFIX:line="93" PREFIX:column="29">1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="94" PREFIX:column="1">#<cpp:directive PREFIX:line="94" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="94" PREFIX:column="9">USE_TIMER2</name></cpp:macro></cpp:define>
+
+ <decl_stmt><decl><type><name PREFIX:line="96" PREFIX:column="2">uint8_t</name> <name PREFIX:line="96" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="96" PREFIX:column="18">tone_pin_to_timer_PGM</name><index PREFIX:line="96" PREFIX:column="39">[]</index></name> <init PREFIX:line="96" PREFIX:column="42">= <expr><block PREFIX:line="96" PREFIX:column="44">{ <expr PREFIX:line="96" PREFIX:column="46">2</expr> <comment type="block" PREFIX:line="96" PREFIX:column="48">/*, 3, 4, 5, 1, 0 */</comment> }</block></expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="97" PREFIX:column="1">static</specifier> <name PREFIX:line="97" PREFIX:column="8">uint8_t</name></type> <name><name PREFIX:line="97" PREFIX:column="16">tone_pins</name><index PREFIX:line="97" PREFIX:column="25">[<expr><name PREFIX:line="97" PREFIX:column="26">AVAILABLE_TONE_PINS</name></expr>]</index></name> <init PREFIX:line="97" PREFIX:column="47">= <expr><block PREFIX:line="97" PREFIX:column="49">{ <expr PREFIX:line="97" PREFIX:column="51">255</expr> <comment type="block" PREFIX:line="97" PREFIX:column="55">/*, 255, 255, 255, 255, 255 */</comment> }</block></expr></init></decl>;</decl_stmt>
+
+<cpp:elif PREFIX:line="99" PREFIX:column="1">#<cpp:directive PREFIX:line="99" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="99" PREFIX:column="7">defined</name><argument_list PREFIX:line="99" PREFIX:column="14">(<argument><expr><name PREFIX:line="99" PREFIX:column="15">__AVR_ATmega8__</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+
+<cpp:define PREFIX:line="101" PREFIX:column="1">#<cpp:directive PREFIX:line="101" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="101" PREFIX:column="9">AVAILABLE_TONE_PINS</name></cpp:macro> <cpp:value PREFIX:line="101" PREFIX:column="29">1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="102" PREFIX:column="1">#<cpp:directive PREFIX:line="102" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="102" PREFIX:column="9">USE_TIMER2</name></cpp:macro></cpp:define>
+
+ <decl_stmt><decl><type><name PREFIX:line="104" PREFIX:column="2">uint8_t</name> <name PREFIX:line="104" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="104" PREFIX:column="18">tone_pin_to_timer_PGM</name><index PREFIX:line="104" PREFIX:column="39">[]</index></name> <init PREFIX:line="104" PREFIX:column="42">= <expr><block PREFIX:line="104" PREFIX:column="44">{ <expr PREFIX:line="104" PREFIX:column="46">2</expr> <comment type="block" PREFIX:line="104" PREFIX:column="48">/*, 1 */</comment> }</block></expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="105" PREFIX:column="1">static</specifier> <name PREFIX:line="105" PREFIX:column="8">uint8_t</name></type> <name><name PREFIX:line="105" PREFIX:column="16">tone_pins</name><index PREFIX:line="105" PREFIX:column="25">[<expr><name PREFIX:line="105" PREFIX:column="26">AVAILABLE_TONE_PINS</name></expr>]</index></name> <init PREFIX:line="105" PREFIX:column="47">= <expr><block PREFIX:line="105" PREFIX:column="49">{ <expr PREFIX:line="105" PREFIX:column="51">255</expr> <comment type="block" PREFIX:line="105" PREFIX:column="55">/*, 255 */</comment> }</block></expr></init></decl>;</decl_stmt>
+
+<cpp:elif PREFIX:line="107" PREFIX:column="1">#<cpp:directive PREFIX:line="107" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="107" PREFIX:column="7">defined</name><argument_list PREFIX:line="107" PREFIX:column="14">(<argument><expr><name PREFIX:line="107" PREFIX:column="15">__AVR_ATmega32U4__</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+ 
+<cpp:define PREFIX:line="109" PREFIX:column="1">#<cpp:directive PREFIX:line="109" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="109" PREFIX:column="9">AVAILABLE_TONE_PINS</name></cpp:macro> <cpp:value PREFIX:line="109" PREFIX:column="29">1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="110" PREFIX:column="1">#<cpp:directive PREFIX:line="110" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="110" PREFIX:column="9">USE_TIMER3</name></cpp:macro></cpp:define>
+ 
+ <decl_stmt><decl><type><name PREFIX:line="112" PREFIX:column="2">uint8_t</name> <name PREFIX:line="112" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="112" PREFIX:column="18">tone_pin_to_timer_PGM</name><index PREFIX:line="112" PREFIX:column="39">[]</index></name> <init PREFIX:line="112" PREFIX:column="42">= <expr><block PREFIX:line="112" PREFIX:column="44">{ <expr PREFIX:line="112" PREFIX:column="46">3</expr> <comment type="block" PREFIX:line="112" PREFIX:column="48">/*, 1 */</comment> }</block></expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="113" PREFIX:column="1">static</specifier> <name PREFIX:line="113" PREFIX:column="8">uint8_t</name></type> <name><name PREFIX:line="113" PREFIX:column="16">tone_pins</name><index PREFIX:line="113" PREFIX:column="25">[<expr><name PREFIX:line="113" PREFIX:column="26">AVAILABLE_TONE_PINS</name></expr>]</index></name> <init PREFIX:line="113" PREFIX:column="47">= <expr><block PREFIX:line="113" PREFIX:column="49">{ <expr PREFIX:line="113" PREFIX:column="51">255</expr> <comment type="block" PREFIX:line="113" PREFIX:column="55">/*, 255 */</comment> }</block></expr></init></decl>;</decl_stmt>
+ 
+<cpp:else PREFIX:line="115" PREFIX:column="1">#<cpp:directive PREFIX:line="115" PREFIX:column="2">else</cpp:directive></cpp:else>
+
+<cpp:define PREFIX:line="117" PREFIX:column="1">#<cpp:directive PREFIX:line="117" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="117" PREFIX:column="9">AVAILABLE_TONE_PINS</name></cpp:macro> <cpp:value PREFIX:line="117" PREFIX:column="29">1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="118" PREFIX:column="1">#<cpp:directive PREFIX:line="118" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="118" PREFIX:column="9">USE_TIMER2</name></cpp:macro></cpp:define>
+
+<comment type="line" PREFIX:line="120" PREFIX:column="1">// Leave timer 0 to last.</comment>
+ <decl_stmt><decl><type><name PREFIX:line="121" PREFIX:column="2">uint8_t</name> <name PREFIX:line="121" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="121" PREFIX:column="18">tone_pin_to_timer_PGM</name><index PREFIX:line="121" PREFIX:column="39">[]</index></name> <init PREFIX:line="121" PREFIX:column="42">= <expr><block PREFIX:line="121" PREFIX:column="44">{ <expr PREFIX:line="121" PREFIX:column="46">2</expr> <comment type="block" PREFIX:line="121" PREFIX:column="48">/*, 1, 0 */</comment> }</block></expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="122" PREFIX:column="1">static</specifier> <name PREFIX:line="122" PREFIX:column="8">uint8_t</name></type> <name><name PREFIX:line="122" PREFIX:column="16">tone_pins</name><index PREFIX:line="122" PREFIX:column="25">[<expr><name PREFIX:line="122" PREFIX:column="26">AVAILABLE_TONE_PINS</name></expr>]</index></name> <init PREFIX:line="122" PREFIX:column="47">= <expr><block PREFIX:line="122" PREFIX:column="49">{ <expr PREFIX:line="122" PREFIX:column="51">255</expr> <comment type="block" PREFIX:line="122" PREFIX:column="55">/*, 255, 255 */</comment> }</block></expr></init></decl>;</decl_stmt>
+
+<cpp:endif PREFIX:line="124" PREFIX:column="1">#<cpp:directive PREFIX:line="124" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+
+<function><type><specifier PREFIX:line="128" PREFIX:column="1">static</specifier> <name PREFIX:line="128" PREFIX:column="8">int8_t</name></type> <name PREFIX:line="128" PREFIX:column="15">toneBegin</name><parameter_list PREFIX:line="128" PREFIX:column="24">(<param><decl><type><name PREFIX:line="128" PREFIX:column="25">uint8_t</name></type> <name PREFIX:line="128" PREFIX:column="33">_pin</name></decl></param>)</parameter_list>
+<block PREFIX:line="129" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="130" PREFIX:column="3">int8_t</name></type> <name PREFIX:line="130" PREFIX:column="10">_timer</name> <init PREFIX:line="130" PREFIX:column="17">= <expr PREFIX:line="130" PREFIX:column="19">-1</expr></init></decl>;</decl_stmt>
+
+  <comment type="line" PREFIX:line="132" PREFIX:column="3">// if we're already using the pin, the timer should be configured.  </comment>
+  <for PREFIX:line="133" PREFIX:column="3">for (<init><decl><type><name PREFIX:line="133" PREFIX:column="8">int</name></type> <name PREFIX:line="133" PREFIX:column="12">i</name> <init PREFIX:line="133" PREFIX:column="14">= <expr PREFIX:line="133" PREFIX:column="16">0</expr></init></decl>;</init> <condition><expr><name PREFIX:line="133" PREFIX:column="19">i</name> &lt; <name PREFIX:line="133" PREFIX:column="23">AVAILABLE_TONE_PINS</name></expr>;</condition> <incr><expr><name PREFIX:line="133" PREFIX:column="44">i</name>++</expr></incr>) <block PREFIX:line="133" PREFIX:column="49">{
+    <if PREFIX:line="134" PREFIX:column="5">if <condition PREFIX:line="134" PREFIX:column="8">(<expr><name><name PREFIX:line="134" PREFIX:column="9">tone_pins</name><index PREFIX:line="134" PREFIX:column="18">[<expr><name PREFIX:line="134" PREFIX:column="19">i</name></expr>]</index></name> == <name PREFIX:line="134" PREFIX:column="25">_pin</name></expr>)</condition><then PREFIX:line="134" PREFIX:column="30"> <block PREFIX:line="134" PREFIX:column="31">{
+      <return PREFIX:line="135" PREFIX:column="7">return <expr><call><name PREFIX:line="135" PREFIX:column="14">pgm_read_byte</name><argument_list PREFIX:line="135" PREFIX:column="27">(<argument><expr><name PREFIX:line="135" PREFIX:column="28">tone_pin_to_timer_PGM</name> + <name PREFIX:line="135" PREFIX:column="52">i</name></expr></argument>)</argument_list></call></expr>;</return>
+    }</block></then></if>
+  }</block></for>
+  
+  <comment type="line" PREFIX:line="139" PREFIX:column="3">// search for an unused timer.</comment>
+  <for PREFIX:line="140" PREFIX:column="3">for (<init><decl><type><name PREFIX:line="140" PREFIX:column="8">int</name></type> <name PREFIX:line="140" PREFIX:column="12">i</name> <init PREFIX:line="140" PREFIX:column="14">= <expr PREFIX:line="140" PREFIX:column="16">0</expr></init></decl>;</init> <condition><expr><name PREFIX:line="140" PREFIX:column="19">i</name> &lt; <name PREFIX:line="140" PREFIX:column="23">AVAILABLE_TONE_PINS</name></expr>;</condition> <incr><expr><name PREFIX:line="140" PREFIX:column="44">i</name>++</expr></incr>) <block PREFIX:line="140" PREFIX:column="49">{
+    <if PREFIX:line="141" PREFIX:column="5">if <condition PREFIX:line="141" PREFIX:column="8">(<expr><name><name PREFIX:line="141" PREFIX:column="9">tone_pins</name><index PREFIX:line="141" PREFIX:column="18">[<expr><name PREFIX:line="141" PREFIX:column="19">i</name></expr>]</index></name> == 255</expr>)</condition><then PREFIX:line="141" PREFIX:column="29"> <block PREFIX:line="141" PREFIX:column="30">{
+      <expr_stmt><expr><name><name PREFIX:line="142" PREFIX:column="7">tone_pins</name><index PREFIX:line="142" PREFIX:column="16">[<expr><name PREFIX:line="142" PREFIX:column="17">i</name></expr>]</index></name> = <name PREFIX:line="142" PREFIX:column="22">_pin</name></expr>;</expr_stmt>
+      <expr_stmt><expr><name PREFIX:line="143" PREFIX:column="7">_timer</name> = <call><name PREFIX:line="143" PREFIX:column="16">pgm_read_byte</name><argument_list PREFIX:line="143" PREFIX:column="29">(<argument><expr><name PREFIX:line="143" PREFIX:column="30">tone_pin_to_timer_PGM</name> + <name PREFIX:line="143" PREFIX:column="54">i</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="144" PREFIX:column="7">break;</break>
+    }</block></then></if>
+  }</block></for>
+  
+  <if PREFIX:line="148" PREFIX:column="3">if <condition PREFIX:line="148" PREFIX:column="6">(<expr><name PREFIX:line="148" PREFIX:column="7">_timer</name> != -1</expr>)</condition><then PREFIX:line="148" PREFIX:column="20">
+  <block PREFIX:line="149" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="150" PREFIX:column="5">// Set timer specific stuff</comment>
+    <comment type="line" PREFIX:line="151" PREFIX:column="5">// All timers in CTC mode</comment>
+    <comment type="line" PREFIX:line="152" PREFIX:column="5">// 8 bit timers will require changing prescalar values,</comment>
+    <comment type="line" PREFIX:line="153" PREFIX:column="5">// whereas 16 bit timers are set to either ck/1 or ck/64 prescalar</comment>
+    <switch PREFIX:line="154" PREFIX:column="5">switch <condition PREFIX:line="154" PREFIX:column="12">(<expr><name PREFIX:line="154" PREFIX:column="13">_timer</name></expr>)</condition>
+    <block PREFIX:line="155" PREFIX:column="5">{
+      <cpp:if PREFIX:line="156" PREFIX:column="7">#<cpp:directive PREFIX:line="156" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="156" PREFIX:column="11">defined</name><argument_list PREFIX:line="156" PREFIX:column="18">(<argument><expr><name PREFIX:line="156" PREFIX:column="19">TCCR0A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="156" PREFIX:column="30">defined</name><argument_list PREFIX:line="156" PREFIX:column="37">(<argument><expr><name PREFIX:line="156" PREFIX:column="38">TCCR0B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="156" PREFIX:column="49">defined</name><argument_list PREFIX:line="156" PREFIX:column="56">(<argument><expr><name PREFIX:line="156" PREFIX:column="57">WGM01</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      <case PREFIX:line="157" PREFIX:column="7">case <expr PREFIX:line="157" PREFIX:column="12">0</expr>:
+        <comment type="line" PREFIX:line="158" PREFIX:column="9">// 8 bit timer</comment>
+        <expr_stmt><expr><name PREFIX:line="159" PREFIX:column="9">TCCR0A</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="160" PREFIX:column="9">TCCR0B</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="161" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="161" PREFIX:column="17">(<argument><expr><name PREFIX:line="161" PREFIX:column="18">TCCR0A</name></expr></argument>, <argument><expr><name PREFIX:line="161" PREFIX:column="26">WGM01</name></expr></argument>, <argument><expr PREFIX:line="161" PREFIX:column="33">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="162" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="162" PREFIX:column="17">(<argument><expr><name PREFIX:line="162" PREFIX:column="18">TCCR0B</name></expr></argument>, <argument><expr><name PREFIX:line="162" PREFIX:column="26">CS00</name></expr></argument>, <argument><expr PREFIX:line="162" PREFIX:column="32">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="163" PREFIX:column="9">timer0_pin_port</name> = <call><name PREFIX:line="163" PREFIX:column="27">portOutputRegister</name><argument_list PREFIX:line="163" PREFIX:column="45">(<argument><expr><call><name PREFIX:line="163" PREFIX:column="46">digitalPinToPort</name><argument_list PREFIX:line="163" PREFIX:column="62">(<argument><expr><name PREFIX:line="163" PREFIX:column="63">_pin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="164" PREFIX:column="9">timer0_pin_mask</name> = <call><name PREFIX:line="164" PREFIX:column="27">digitalPinToBitMask</name><argument_list PREFIX:line="164" PREFIX:column="46">(<argument><expr><name PREFIX:line="164" PREFIX:column="47">_pin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="165" PREFIX:column="9">break;</break>
+      <cpp:endif PREFIX:line="166" PREFIX:column="7">#<cpp:directive PREFIX:line="166" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+
+      <cpp:if PREFIX:line="168" PREFIX:column="7">#<cpp:directive PREFIX:line="168" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="168" PREFIX:column="11">defined</name><argument_list PREFIX:line="168" PREFIX:column="18">(<argument><expr><name PREFIX:line="168" PREFIX:column="19">TCCR1A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="168" PREFIX:column="30">defined</name><argument_list PREFIX:line="168" PREFIX:column="37">(<argument><expr><name PREFIX:line="168" PREFIX:column="38">TCCR1B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="168" PREFIX:column="49">defined</name><argument_list PREFIX:line="168" PREFIX:column="56">(<argument><expr><name PREFIX:line="168" PREFIX:column="57">WGM12</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="169" PREFIX:column="7">case <expr PREFIX:line="169" PREFIX:column="12">1</expr>:
+        <comment type="line" PREFIX:line="170" PREFIX:column="9">// 16 bit timer</comment>
+        <expr_stmt><expr><name PREFIX:line="171" PREFIX:column="9">TCCR1A</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="172" PREFIX:column="9">TCCR1B</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="173" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="173" PREFIX:column="17">(<argument><expr><name PREFIX:line="173" PREFIX:column="18">TCCR1B</name></expr></argument>, <argument><expr><name PREFIX:line="173" PREFIX:column="26">WGM12</name></expr></argument>, <argument><expr PREFIX:line="173" PREFIX:column="33">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="174" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="174" PREFIX:column="17">(<argument><expr><name PREFIX:line="174" PREFIX:column="18">TCCR1B</name></expr></argument>, <argument><expr><name PREFIX:line="174" PREFIX:column="26">CS10</name></expr></argument>, <argument><expr PREFIX:line="174" PREFIX:column="32">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="175" PREFIX:column="9">timer1_pin_port</name> = <call><name PREFIX:line="175" PREFIX:column="27">portOutputRegister</name><argument_list PREFIX:line="175" PREFIX:column="45">(<argument><expr><call><name PREFIX:line="175" PREFIX:column="46">digitalPinToPort</name><argument_list PREFIX:line="175" PREFIX:column="62">(<argument><expr><name PREFIX:line="175" PREFIX:column="63">_pin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="176" PREFIX:column="9">timer1_pin_mask</name> = <call><name PREFIX:line="176" PREFIX:column="27">digitalPinToBitMask</name><argument_list PREFIX:line="176" PREFIX:column="46">(<argument><expr><name PREFIX:line="176" PREFIX:column="47">_pin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="177" PREFIX:column="9">break;</break>
+      <cpp:endif PREFIX:line="178" PREFIX:column="7">#<cpp:directive PREFIX:line="178" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+
+      <cpp:if PREFIX:line="180" PREFIX:column="7">#<cpp:directive PREFIX:line="180" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="180" PREFIX:column="11">defined</name><argument_list PREFIX:line="180" PREFIX:column="18">(<argument><expr><name PREFIX:line="180" PREFIX:column="19">TCCR2A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="180" PREFIX:column="30">defined</name><argument_list PREFIX:line="180" PREFIX:column="37">(<argument><expr><name PREFIX:line="180" PREFIX:column="38">TCCR2B</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="181" PREFIX:column="7">case <expr PREFIX:line="181" PREFIX:column="12">2</expr>:
+        <comment type="line" PREFIX:line="182" PREFIX:column="9">// 8 bit timer</comment>
+        <expr_stmt><expr><name PREFIX:line="183" PREFIX:column="9">TCCR2A</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="184" PREFIX:column="9">TCCR2B</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="185" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="185" PREFIX:column="17">(<argument><expr><name PREFIX:line="185" PREFIX:column="18">TCCR2A</name></expr></argument>, <argument><expr><name PREFIX:line="185" PREFIX:column="26">WGM21</name></expr></argument>, <argument><expr PREFIX:line="185" PREFIX:column="33">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="186" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="186" PREFIX:column="17">(<argument><expr><name PREFIX:line="186" PREFIX:column="18">TCCR2B</name></expr></argument>, <argument><expr><name PREFIX:line="186" PREFIX:column="26">CS20</name></expr></argument>, <argument><expr PREFIX:line="186" PREFIX:column="32">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="187" PREFIX:column="9">timer2_pin_port</name> = <call><name PREFIX:line="187" PREFIX:column="27">portOutputRegister</name><argument_list PREFIX:line="187" PREFIX:column="45">(<argument><expr><call><name PREFIX:line="187" PREFIX:column="46">digitalPinToPort</name><argument_list PREFIX:line="187" PREFIX:column="62">(<argument><expr><name PREFIX:line="187" PREFIX:column="63">_pin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="188" PREFIX:column="9">timer2_pin_mask</name> = <call><name PREFIX:line="188" PREFIX:column="27">digitalPinToBitMask</name><argument_list PREFIX:line="188" PREFIX:column="46">(<argument><expr><name PREFIX:line="188" PREFIX:column="47">_pin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="189" PREFIX:column="9">break;</break>
+      <cpp:endif PREFIX:line="190" PREFIX:column="7">#<cpp:directive PREFIX:line="190" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+
+      <cpp:if PREFIX:line="192" PREFIX:column="7">#<cpp:directive PREFIX:line="192" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="192" PREFIX:column="11">defined</name><argument_list PREFIX:line="192" PREFIX:column="18">(<argument><expr><name PREFIX:line="192" PREFIX:column="19">TCCR3A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="192" PREFIX:column="30">defined</name><argument_list PREFIX:line="192" PREFIX:column="37">(<argument><expr><name PREFIX:line="192" PREFIX:column="38">TCCR3B</name></expr></argument>)</argument_list></call> &amp;&amp;  <call><name PREFIX:line="192" PREFIX:column="50">defined</name><argument_list PREFIX:line="192" PREFIX:column="57">(<argument><expr><name PREFIX:line="192" PREFIX:column="58">TIMSK3</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="193" PREFIX:column="7">case <expr PREFIX:line="193" PREFIX:column="12">3</expr>:
+        <comment type="line" PREFIX:line="194" PREFIX:column="9">// 16 bit timer</comment>
+        <expr_stmt><expr><name PREFIX:line="195" PREFIX:column="9">TCCR3A</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="196" PREFIX:column="9">TCCR3B</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="197" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="197" PREFIX:column="17">(<argument><expr><name PREFIX:line="197" PREFIX:column="18">TCCR3B</name></expr></argument>, <argument><expr><name PREFIX:line="197" PREFIX:column="26">WGM32</name></expr></argument>, <argument><expr PREFIX:line="197" PREFIX:column="33">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="198" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="198" PREFIX:column="17">(<argument><expr><name PREFIX:line="198" PREFIX:column="18">TCCR3B</name></expr></argument>, <argument><expr><name PREFIX:line="198" PREFIX:column="26">CS30</name></expr></argument>, <argument><expr PREFIX:line="198" PREFIX:column="32">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="199" PREFIX:column="9">timer3_pin_port</name> = <call><name PREFIX:line="199" PREFIX:column="27">portOutputRegister</name><argument_list PREFIX:line="199" PREFIX:column="45">(<argument><expr><call><name PREFIX:line="199" PREFIX:column="46">digitalPinToPort</name><argument_list PREFIX:line="199" PREFIX:column="62">(<argument><expr><name PREFIX:line="199" PREFIX:column="63">_pin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="200" PREFIX:column="9">timer3_pin_mask</name> = <call><name PREFIX:line="200" PREFIX:column="27">digitalPinToBitMask</name><argument_list PREFIX:line="200" PREFIX:column="46">(<argument><expr><name PREFIX:line="200" PREFIX:column="47">_pin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="201" PREFIX:column="9">break;</break>
+      <cpp:endif PREFIX:line="202" PREFIX:column="7">#<cpp:directive PREFIX:line="202" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+
+      <cpp:if PREFIX:line="204" PREFIX:column="7">#<cpp:directive PREFIX:line="204" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="204" PREFIX:column="11">defined</name><argument_list PREFIX:line="204" PREFIX:column="18">(<argument><expr><name PREFIX:line="204" PREFIX:column="19">TCCR4A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="204" PREFIX:column="30">defined</name><argument_list PREFIX:line="204" PREFIX:column="37">(<argument><expr><name PREFIX:line="204" PREFIX:column="38">TCCR4B</name></expr></argument>)</argument_list></call> &amp;&amp;  <call><name PREFIX:line="204" PREFIX:column="50">defined</name><argument_list PREFIX:line="204" PREFIX:column="57">(<argument><expr><name PREFIX:line="204" PREFIX:column="58">TIMSK4</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="205" PREFIX:column="7">case <expr PREFIX:line="205" PREFIX:column="12">4</expr>:
+        <comment type="line" PREFIX:line="206" PREFIX:column="9">// 16 bit timer</comment>
+        <expr_stmt><expr><name PREFIX:line="207" PREFIX:column="9">TCCR4A</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="208" PREFIX:column="9">TCCR4B</name> = 0</expr>;</expr_stmt>
+        <cpp:if PREFIX:line="209" PREFIX:column="9">#<cpp:directive PREFIX:line="209" PREFIX:column="10">if</cpp:directive> <expr><call><name PREFIX:line="209" PREFIX:column="13">defined</name><argument_list PREFIX:line="209" PREFIX:column="20">(<argument><expr><name PREFIX:line="209" PREFIX:column="21">WGM42</name></expr></argument>)</argument_list></call></expr></cpp:if>
+          <expr_stmt><expr><call><name PREFIX:line="210" PREFIX:column="11">bitWrite</name><argument_list PREFIX:line="210" PREFIX:column="19">(<argument><expr><name PREFIX:line="210" PREFIX:column="20">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="210" PREFIX:column="28">WGM42</name></expr></argument>, <argument><expr PREFIX:line="210" PREFIX:column="35">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <cpp:elif PREFIX:line="211" PREFIX:column="9">#<cpp:directive PREFIX:line="211" PREFIX:column="10">elif</cpp:directive> <expr><call><name PREFIX:line="211" PREFIX:column="15">defined</name><argument_list PREFIX:line="211" PREFIX:column="22">(<argument><expr><name PREFIX:line="211" PREFIX:column="23">CS43</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+          <cpp:error PREFIX:line="212" PREFIX:column="11">#<cpp:directive PREFIX:line="212" PREFIX:column="12">warning</cpp:directive> this may not be correct</cpp:error>
+          <comment type="line" PREFIX:line="213" PREFIX:column="11">// atmega32u4</comment>
+          <expr_stmt><expr><call><name PREFIX:line="214" PREFIX:column="11">bitWrite</name><argument_list PREFIX:line="214" PREFIX:column="19">(<argument><expr><name PREFIX:line="214" PREFIX:column="20">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="214" PREFIX:column="28">CS43</name></expr></argument>, <argument><expr PREFIX:line="214" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <cpp:endif PREFIX:line="215" PREFIX:column="9">#<cpp:directive PREFIX:line="215" PREFIX:column="10">endif</cpp:directive></cpp:endif>
+        <expr_stmt><expr><call><name PREFIX:line="216" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="216" PREFIX:column="17">(<argument><expr><name PREFIX:line="216" PREFIX:column="18">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="216" PREFIX:column="26">CS40</name></expr></argument>, <argument><expr PREFIX:line="216" PREFIX:column="32">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="217" PREFIX:column="9">timer4_pin_port</name> = <call><name PREFIX:line="217" PREFIX:column="27">portOutputRegister</name><argument_list PREFIX:line="217" PREFIX:column="45">(<argument><expr><call><name PREFIX:line="217" PREFIX:column="46">digitalPinToPort</name><argument_list PREFIX:line="217" PREFIX:column="62">(<argument><expr><name PREFIX:line="217" PREFIX:column="63">_pin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="218" PREFIX:column="9">timer4_pin_mask</name> = <call><name PREFIX:line="218" PREFIX:column="27">digitalPinToBitMask</name><argument_list PREFIX:line="218" PREFIX:column="46">(<argument><expr><name PREFIX:line="218" PREFIX:column="47">_pin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="219" PREFIX:column="9">break;</break>
+      <cpp:endif PREFIX:line="220" PREFIX:column="7">#<cpp:directive PREFIX:line="220" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+
+      <cpp:if PREFIX:line="222" PREFIX:column="7">#<cpp:directive PREFIX:line="222" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="222" PREFIX:column="11">defined</name><argument_list PREFIX:line="222" PREFIX:column="18">(<argument><expr><name PREFIX:line="222" PREFIX:column="19">TCCR5A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="222" PREFIX:column="30">defined</name><argument_list PREFIX:line="222" PREFIX:column="37">(<argument><expr><name PREFIX:line="222" PREFIX:column="38">TCCR5B</name></expr></argument>)</argument_list></call> &amp;&amp;  <call><name PREFIX:line="222" PREFIX:column="50">defined</name><argument_list PREFIX:line="222" PREFIX:column="57">(<argument><expr><name PREFIX:line="222" PREFIX:column="58">TIMSK5</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="223" PREFIX:column="7">case <expr PREFIX:line="223" PREFIX:column="12">5</expr>:
+        <comment type="line" PREFIX:line="224" PREFIX:column="9">// 16 bit timer</comment>
+        <expr_stmt><expr><name PREFIX:line="225" PREFIX:column="9">TCCR5A</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="226" PREFIX:column="9">TCCR5B</name> = 0</expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="227" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="227" PREFIX:column="17">(<argument><expr><name PREFIX:line="227" PREFIX:column="18">TCCR5B</name></expr></argument>, <argument><expr><name PREFIX:line="227" PREFIX:column="26">WGM52</name></expr></argument>, <argument><expr PREFIX:line="227" PREFIX:column="33">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="228" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="228" PREFIX:column="17">(<argument><expr><name PREFIX:line="228" PREFIX:column="18">TCCR5B</name></expr></argument>, <argument><expr><name PREFIX:line="228" PREFIX:column="26">CS50</name></expr></argument>, <argument><expr PREFIX:line="228" PREFIX:column="32">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="229" PREFIX:column="9">timer5_pin_port</name> = <call><name PREFIX:line="229" PREFIX:column="27">portOutputRegister</name><argument_list PREFIX:line="229" PREFIX:column="45">(<argument><expr><call><name PREFIX:line="229" PREFIX:column="46">digitalPinToPort</name><argument_list PREFIX:line="229" PREFIX:column="62">(<argument><expr><name PREFIX:line="229" PREFIX:column="63">_pin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="230" PREFIX:column="9">timer5_pin_mask</name> = <call><name PREFIX:line="230" PREFIX:column="27">digitalPinToBitMask</name><argument_list PREFIX:line="230" PREFIX:column="46">(<argument><expr><name PREFIX:line="230" PREFIX:column="47">_pin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="231" PREFIX:column="9">break;</break>
+      <cpp:endif PREFIX:line="232" PREFIX:column="7">#<cpp:directive PREFIX:line="232" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+    </case>}</block></switch>
+  }</block></then></if>
+
+  <return PREFIX:line="236" PREFIX:column="3">return <expr><name PREFIX:line="236" PREFIX:column="10">_timer</name></expr>;</return>
+}</block></function>
+
+
+
+<comment type="line" PREFIX:line="241" PREFIX:column="1">// frequency (in hertz) and duration (in milliseconds).</comment>
+
+<function><type><name PREFIX:line="243" PREFIX:column="1">void</name></type> <name PREFIX:line="243" PREFIX:column="6">tone</name><parameter_list PREFIX:line="243" PREFIX:column="10">(<param><decl><type><name PREFIX:line="243" PREFIX:column="11">uint8_t</name></type> <name PREFIX:line="243" PREFIX:column="19">_pin</name></decl></param>, <param><decl><type><name PREFIX:line="243" PREFIX:column="25">unknowntype</name> <name PREFIX:line="243" PREFIX:column="37">int</name></type> <name PREFIX:line="243" PREFIX:column="41">frequency</name></decl></param>, <param><decl><type><name PREFIX:line="243" PREFIX:column="52">unknowntype</name> <name PREFIX:line="243" PREFIX:column="64">long</name></type> <name PREFIX:line="243" PREFIX:column="69">duration</name></decl></param>)</parameter_list>
+<block PREFIX:line="244" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="245" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="245" PREFIX:column="11">prescalarbits</name> <init PREFIX:line="245" PREFIX:column="25">= <expr PREFIX:line="245" PREFIX:column="27">0b001</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="246" PREFIX:column="3">long</name></type> <name PREFIX:line="246" PREFIX:column="8">toggle_count</name> <init PREFIX:line="246" PREFIX:column="21">= <expr PREFIX:line="246" PREFIX:column="23">0</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="247" PREFIX:column="3">uint32_t</name></type> <name PREFIX:line="247" PREFIX:column="12">ocr</name> <init PREFIX:line="247" PREFIX:column="16">= <expr PREFIX:line="247" PREFIX:column="18">0</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="248" PREFIX:column="3">int8_t</name></type> <name PREFIX:line="248" PREFIX:column="10">_timer</name></decl>;</decl_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="250" PREFIX:column="3">_timer</name> = <call><name PREFIX:line="250" PREFIX:column="12">toneBegin</name><argument_list PREFIX:line="250" PREFIX:column="21">(<argument><expr><name PREFIX:line="250" PREFIX:column="22">_pin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <if PREFIX:line="252" PREFIX:column="3">if <condition PREFIX:line="252" PREFIX:column="6">(<expr><name PREFIX:line="252" PREFIX:column="7">_timer</name> &gt;= 0</expr>)</condition><then PREFIX:line="252" PREFIX:column="19">
+  <block PREFIX:line="253" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="254" PREFIX:column="5">// Set the pinMode as OUTPUT</comment>
+    <expr_stmt><expr><call><name PREFIX:line="255" PREFIX:column="5">pinMode</name><argument_list PREFIX:line="255" PREFIX:column="12">(<argument><expr><name PREFIX:line="255" PREFIX:column="13">_pin</name></expr></argument>, <argument><expr><name PREFIX:line="255" PREFIX:column="19">OUTPUT</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    
+    <comment type="line" PREFIX:line="257" PREFIX:column="5">// if we are using an 8 bit timer, scan through prescalars to find the best fit</comment>
+    <if PREFIX:line="258" PREFIX:column="5">if <condition PREFIX:line="258" PREFIX:column="8">(<expr><name PREFIX:line="258" PREFIX:column="9">_timer</name> == 0 || <name PREFIX:line="258" PREFIX:column="24">_timer</name> == 2</expr>)</condition><then PREFIX:line="258" PREFIX:column="36">
+    <block PREFIX:line="259" PREFIX:column="5">{
+      <expr_stmt><expr><name PREFIX:line="260" PREFIX:column="7">ocr</name> = <name PREFIX:line="260" PREFIX:column="13">F_CPU</name> / <name PREFIX:line="260" PREFIX:column="21">frequency</name> / 2 - 1</expr>;</expr_stmt>
+      <expr_stmt><expr><name PREFIX:line="261" PREFIX:column="7">prescalarbits</name> = 0b001</expr>;</expr_stmt>  <comment type="line" PREFIX:line="261" PREFIX:column="31">// ck/1: same for both timers</comment>
+      <if PREFIX:line="262" PREFIX:column="7">if <condition PREFIX:line="262" PREFIX:column="10">(<expr><name PREFIX:line="262" PREFIX:column="11">ocr</name> &gt; 255</expr>)</condition><then PREFIX:line="262" PREFIX:column="21">
+      <block PREFIX:line="263" PREFIX:column="7">{
+        <expr_stmt><expr><name PREFIX:line="264" PREFIX:column="9">ocr</name> = <name PREFIX:line="264" PREFIX:column="15">F_CPU</name> / <name PREFIX:line="264" PREFIX:column="23">frequency</name> / 2 / 8 - 1</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="265" PREFIX:column="9">prescalarbits</name> = 0b010</expr>;</expr_stmt>  <comment type="line" PREFIX:line="265" PREFIX:column="33">// ck/8: same for both timers</comment>
+
+        <if PREFIX:line="267" PREFIX:column="9">if <condition PREFIX:line="267" PREFIX:column="12">(<expr><name PREFIX:line="267" PREFIX:column="13">_timer</name> == 2 &amp;&amp; <name PREFIX:line="267" PREFIX:column="28">ocr</name> &gt; 255</expr>)</condition><then PREFIX:line="267" PREFIX:column="38">
+        <block PREFIX:line="268" PREFIX:column="9">{
+          <expr_stmt><expr><name PREFIX:line="269" PREFIX:column="11">ocr</name> = <name PREFIX:line="269" PREFIX:column="17">F_CPU</name> / <name PREFIX:line="269" PREFIX:column="25">frequency</name> / 2 / 32 - 1</expr>;</expr_stmt>
+          <expr_stmt><expr><name PREFIX:line="270" PREFIX:column="11">prescalarbits</name> = 0b011</expr>;</expr_stmt>
+        }</block></then></if>
+
+        <if PREFIX:line="273" PREFIX:column="9">if <condition PREFIX:line="273" PREFIX:column="12">(<expr><name PREFIX:line="273" PREFIX:column="13">ocr</name> &gt; 255</expr>)</condition><then PREFIX:line="273" PREFIX:column="23">
+        <block PREFIX:line="274" PREFIX:column="9">{
+          <expr_stmt><expr><name PREFIX:line="275" PREFIX:column="11">ocr</name> = <name PREFIX:line="275" PREFIX:column="17">F_CPU</name> / <name PREFIX:line="275" PREFIX:column="25">frequency</name> / 2 / 64 - 1</expr>;</expr_stmt>
+          <expr_stmt><expr><name PREFIX:line="276" PREFIX:column="11">prescalarbits</name> = <name PREFIX:line="276" PREFIX:column="27">_timer</name> == 0 ? 0b011 : 0b100</expr>;</expr_stmt>
+
+          <if PREFIX:line="278" PREFIX:column="11">if <condition PREFIX:line="278" PREFIX:column="14">(<expr><name PREFIX:line="278" PREFIX:column="15">_timer</name> == 2 &amp;&amp; <name PREFIX:line="278" PREFIX:column="30">ocr</name> &gt; 255</expr>)</condition><then PREFIX:line="278" PREFIX:column="40">
+          <block PREFIX:line="279" PREFIX:column="11">{
+            <expr_stmt><expr><name PREFIX:line="280" PREFIX:column="13">ocr</name> = <name PREFIX:line="280" PREFIX:column="19">F_CPU</name> / <name PREFIX:line="280" PREFIX:column="27">frequency</name> / 2 / 128 - 1</expr>;</expr_stmt>
+            <expr_stmt><expr><name PREFIX:line="281" PREFIX:column="13">prescalarbits</name> = 0b101</expr>;</expr_stmt>
+          }</block></then></if>
+
+          <if PREFIX:line="284" PREFIX:column="11">if <condition PREFIX:line="284" PREFIX:column="14">(<expr><name PREFIX:line="284" PREFIX:column="15">ocr</name> &gt; 255</expr>)</condition><then PREFIX:line="284" PREFIX:column="25">
+          <block PREFIX:line="285" PREFIX:column="11">{
+            <expr_stmt><expr><name PREFIX:line="286" PREFIX:column="13">ocr</name> = <name PREFIX:line="286" PREFIX:column="19">F_CPU</name> / <name PREFIX:line="286" PREFIX:column="27">frequency</name> / 2 / 256 - 1</expr>;</expr_stmt>
+            <expr_stmt><expr><name PREFIX:line="287" PREFIX:column="13">prescalarbits</name> = <name PREFIX:line="287" PREFIX:column="29">_timer</name> == 0 ? 0b100 : 0b110</expr>;</expr_stmt>
+            <if PREFIX:line="288" PREFIX:column="13">if <condition PREFIX:line="288" PREFIX:column="16">(<expr><name PREFIX:line="288" PREFIX:column="17">ocr</name> &gt; 255</expr>)</condition><then PREFIX:line="288" PREFIX:column="27">
+            <block PREFIX:line="289" PREFIX:column="13">{
+              <comment type="line" PREFIX:line="290" PREFIX:column="15">// can't do any better than /1024</comment>
+              <expr_stmt><expr><name PREFIX:line="291" PREFIX:column="15">ocr</name> = <name PREFIX:line="291" PREFIX:column="21">F_CPU</name> / <name PREFIX:line="291" PREFIX:column="29">frequency</name> / 2 / 1024 - 1</expr>;</expr_stmt>
+              <expr_stmt><expr><name PREFIX:line="292" PREFIX:column="15">prescalarbits</name> = <name PREFIX:line="292" PREFIX:column="31">_timer</name> == 0 ? 0b101 : 0b111</expr>;</expr_stmt>
+            }</block></then></if>
+          }</block></then></if>
+        }</block></then></if>
+      }</block></then></if>
+
+<cpp:if PREFIX:line="298" PREFIX:column="1">#<cpp:directive PREFIX:line="298" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="298" PREFIX:column="5">defined</name><argument_list PREFIX:line="298" PREFIX:column="12">(<argument><expr><name PREFIX:line="298" PREFIX:column="13">TCCR0B</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      <if PREFIX:line="299" PREFIX:column="7">if <condition PREFIX:line="299" PREFIX:column="10">(<expr><name PREFIX:line="299" PREFIX:column="11">_timer</name> == 0</expr>)</condition><then PREFIX:line="299" PREFIX:column="23">
+      <block PREFIX:line="300" PREFIX:column="7">{
+        <expr_stmt><expr><name PREFIX:line="301" PREFIX:column="9">TCCR0B</name> = (<name PREFIX:line="301" PREFIX:column="19">TCCR0B</name> &amp; 0b11111000) | <name PREFIX:line="301" PREFIX:column="42">prescalarbits</name></expr>;</expr_stmt>
+      }</block></then>
+      <else PREFIX:line="303" PREFIX:column="7">else
+<cpp:endif PREFIX:line="304" PREFIX:column="1">#<cpp:directive PREFIX:line="304" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="305" PREFIX:column="1">#<cpp:directive PREFIX:line="305" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="305" PREFIX:column="5">defined</name><argument_list PREFIX:line="305" PREFIX:column="12">(<argument><expr><name PREFIX:line="305" PREFIX:column="13">TCCR2B</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      <block PREFIX:line="306" PREFIX:column="7">{
+        <expr_stmt><expr><name PREFIX:line="307" PREFIX:column="9">TCCR2B</name> = (<name PREFIX:line="307" PREFIX:column="19">TCCR2B</name> &amp; 0b11111000) | <name PREFIX:line="307" PREFIX:column="42">prescalarbits</name></expr>;</expr_stmt>
+      }</block></else></if>
+<cpp:else PREFIX:line="309" PREFIX:column="1">#<cpp:directive PREFIX:line="309" PREFIX:column="2">else</cpp:directive></cpp:else>
+      <block PREFIX:line="310" PREFIX:column="7">{
+        <comment type="line" PREFIX:line="311" PREFIX:column="9">// dummy place holder to make the above ifdefs work</comment>
+      }</block>
+<cpp:endif PREFIX:line="313" PREFIX:column="1">#<cpp:directive PREFIX:line="313" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+    }</block></then>
+    <else PREFIX:line="315" PREFIX:column="5">else
+    <block PREFIX:line="316" PREFIX:column="5">{
+      <comment type="line" PREFIX:line="317" PREFIX:column="7">// two choices for the 16 bit timers: ck/1 or ck/64</comment>
+      <expr_stmt><expr><name PREFIX:line="318" PREFIX:column="7">ocr</name> = <name PREFIX:line="318" PREFIX:column="13">F_CPU</name> / <name PREFIX:line="318" PREFIX:column="21">frequency</name> / 2 - 1</expr>;</expr_stmt>
+
+      <expr_stmt><expr><name PREFIX:line="320" PREFIX:column="7">prescalarbits</name> = 0b001</expr>;</expr_stmt>
+      <if PREFIX:line="321" PREFIX:column="7">if <condition PREFIX:line="321" PREFIX:column="10">(<expr><name PREFIX:line="321" PREFIX:column="11">ocr</name> &gt; 0xffff</expr>)</condition><then PREFIX:line="321" PREFIX:column="24">
+      <block PREFIX:line="322" PREFIX:column="7">{
+        <expr_stmt><expr><name PREFIX:line="323" PREFIX:column="9">ocr</name> = <name PREFIX:line="323" PREFIX:column="15">F_CPU</name> / <name PREFIX:line="323" PREFIX:column="23">frequency</name> / 2 / 64 - 1</expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="324" PREFIX:column="9">prescalarbits</name> = 0b011</expr>;</expr_stmt>
+      }</block></then></if>
+
+      <if PREFIX:line="327" PREFIX:column="7">if <condition PREFIX:line="327" PREFIX:column="10">(<expr><name PREFIX:line="327" PREFIX:column="11">_timer</name> == 1</expr>)</condition><then PREFIX:line="327" PREFIX:column="23">
+      <block PREFIX:line="328" PREFIX:column="7">{
+<cpp:if PREFIX:line="329" PREFIX:column="1">#<cpp:directive PREFIX:line="329" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="329" PREFIX:column="5">defined</name><argument_list PREFIX:line="329" PREFIX:column="12">(<argument><expr><name PREFIX:line="329" PREFIX:column="13">TCCR1B</name></expr></argument>)</argument_list></call></expr></cpp:if>
+        <expr_stmt><expr><name PREFIX:line="330" PREFIX:column="9">TCCR1B</name> = (<name PREFIX:line="330" PREFIX:column="19">TCCR1B</name> &amp; 0b11111000) | <name PREFIX:line="330" PREFIX:column="42">prescalarbits</name></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="331" PREFIX:column="1">#<cpp:directive PREFIX:line="331" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+      }</block></then>
+<cpp:if PREFIX:line="333" PREFIX:column="1">#<cpp:directive PREFIX:line="333" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="333" PREFIX:column="5">defined</name><argument_list PREFIX:line="333" PREFIX:column="12">(<argument><expr><name PREFIX:line="333" PREFIX:column="13">TCCR3B</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      <else PREFIX:line="334" PREFIX:column="7">else <if PREFIX:line="334" PREFIX:column="12">if <condition PREFIX:line="334" PREFIX:column="15">(<expr><name PREFIX:line="334" PREFIX:column="16">_timer</name> == 3</expr>)</condition><then PREFIX:line="334" PREFIX:column="28">
+        <expr_stmt><expr><name PREFIX:line="335" PREFIX:column="9">TCCR3B</name> = (<name PREFIX:line="335" PREFIX:column="19">TCCR3B</name> &amp; 0b11111000) | <name PREFIX:line="335" PREFIX:column="42">prescalarbits</name></expr>;</expr_stmt></then>
+<cpp:endif PREFIX:line="336" PREFIX:column="1">#<cpp:directive PREFIX:line="336" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="337" PREFIX:column="1">#<cpp:directive PREFIX:line="337" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="337" PREFIX:column="5">defined</name><argument_list PREFIX:line="337" PREFIX:column="12">(<argument><expr><name PREFIX:line="337" PREFIX:column="13">TCCR4B</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      <else PREFIX:line="338" PREFIX:column="7">else <if PREFIX:line="338" PREFIX:column="12">if <condition PREFIX:line="338" PREFIX:column="15">(<expr><name PREFIX:line="338" PREFIX:column="16">_timer</name> == 4</expr>)</condition><then PREFIX:line="338" PREFIX:column="28">
+        <expr_stmt><expr><name PREFIX:line="339" PREFIX:column="9">TCCR4B</name> = (<name PREFIX:line="339" PREFIX:column="19">TCCR4B</name> &amp; 0b11111000) | <name PREFIX:line="339" PREFIX:column="42">prescalarbits</name></expr>;</expr_stmt></then>
+<cpp:endif PREFIX:line="340" PREFIX:column="1">#<cpp:directive PREFIX:line="340" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="341" PREFIX:column="1">#<cpp:directive PREFIX:line="341" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="341" PREFIX:column="5">defined</name><argument_list PREFIX:line="341" PREFIX:column="12">(<argument><expr><name PREFIX:line="341" PREFIX:column="13">TCCR5B</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      <else PREFIX:line="342" PREFIX:column="7">else <if PREFIX:line="342" PREFIX:column="12">if <condition PREFIX:line="342" PREFIX:column="15">(<expr><name PREFIX:line="342" PREFIX:column="16">_timer</name> == 5</expr>)</condition><then PREFIX:line="342" PREFIX:column="28">
+        <expr_stmt><expr><name PREFIX:line="343" PREFIX:column="9">TCCR5B</name> = (<name PREFIX:line="343" PREFIX:column="19">TCCR5B</name> &amp; 0b11111000) | <name PREFIX:line="343" PREFIX:column="42">prescalarbits</name></expr>;</expr_stmt></then></if></else></if></else></if></else></if>
+<cpp:endif PREFIX:line="344" PREFIX:column="1">#<cpp:directive PREFIX:line="344" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+    }</block></else></if>
+    
+
+    <comment type="line" PREFIX:line="349" PREFIX:column="5">// Calculate the toggle count</comment>
+    <if PREFIX:line="350" PREFIX:column="5">if <condition PREFIX:line="350" PREFIX:column="8">(<expr><name PREFIX:line="350" PREFIX:column="9">duration</name> &gt; 0</expr>)</condition><then PREFIX:line="350" PREFIX:column="22">
+    <block PREFIX:line="351" PREFIX:column="5">{
+      <expr_stmt><expr><name PREFIX:line="352" PREFIX:column="7">toggle_count</name> = 2 * <name PREFIX:line="352" PREFIX:column="26">frequency</name> * <name PREFIX:line="352" PREFIX:column="38">duration</name> / 1000</expr>;</expr_stmt>
+    }</block></then>
+    <else PREFIX:line="354" PREFIX:column="5">else
+    <block PREFIX:line="355" PREFIX:column="5">{
+      <expr_stmt><expr><name PREFIX:line="356" PREFIX:column="7">toggle_count</name> = -1</expr>;</expr_stmt>
+    }</block></else></if>
+
+    <comment type="line" PREFIX:line="359" PREFIX:column="5">// Set the OCR for the given timer,</comment>
+    <comment type="line" PREFIX:line="360" PREFIX:column="5">// set the toggle count,</comment>
+    <comment type="line" PREFIX:line="361" PREFIX:column="5">// then turn on the interrupts</comment>
+    <switch PREFIX:line="362" PREFIX:column="5">switch <condition PREFIX:line="362" PREFIX:column="12">(<expr><name PREFIX:line="362" PREFIX:column="13">_timer</name></expr>)</condition>
+    <block PREFIX:line="363" PREFIX:column="5">{
+
+<cpp:if PREFIX:line="365" PREFIX:column="1">#<cpp:directive PREFIX:line="365" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="365" PREFIX:column="5">defined</name><argument_list PREFIX:line="365" PREFIX:column="12">(<argument><expr><name PREFIX:line="365" PREFIX:column="13">OCR0A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="365" PREFIX:column="23">defined</name><argument_list PREFIX:line="365" PREFIX:column="30">(<argument><expr><name PREFIX:line="365" PREFIX:column="31">TIMSK0</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="365" PREFIX:column="42">defined</name><argument_list PREFIX:line="365" PREFIX:column="49">(<argument><expr><name PREFIX:line="365" PREFIX:column="50">OCIE0A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      <case PREFIX:line="366" PREFIX:column="7">case <expr PREFIX:line="366" PREFIX:column="12">0</expr>:
+        <expr_stmt><expr><name PREFIX:line="367" PREFIX:column="9">OCR0A</name> = <name PREFIX:line="367" PREFIX:column="17">ocr</name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="368" PREFIX:column="9">timer0_toggle_count</name> = <name PREFIX:line="368" PREFIX:column="31">toggle_count</name></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="369" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="369" PREFIX:column="17">(<argument><expr><name PREFIX:line="369" PREFIX:column="18">TIMSK0</name></expr></argument>, <argument><expr><name PREFIX:line="369" PREFIX:column="26">OCIE0A</name></expr></argument>, <argument><expr PREFIX:line="369" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="370" PREFIX:column="9">break;</break>
+<cpp:endif PREFIX:line="371" PREFIX:column="1">#<cpp:directive PREFIX:line="371" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+      </case><case PREFIX:line="373" PREFIX:column="7">case <expr PREFIX:line="373" PREFIX:column="12">1</expr>:
+<cpp:if PREFIX:line="374" PREFIX:column="1">#<cpp:directive PREFIX:line="374" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="374" PREFIX:column="5">defined</name><argument_list PREFIX:line="374" PREFIX:column="12">(<argument><expr><name PREFIX:line="374" PREFIX:column="13">OCR1A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="374" PREFIX:column="23">defined</name><argument_list PREFIX:line="374" PREFIX:column="30">(<argument><expr><name PREFIX:line="374" PREFIX:column="31">TIMSK1</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="374" PREFIX:column="42">defined</name><argument_list PREFIX:line="374" PREFIX:column="49">(<argument><expr><name PREFIX:line="374" PREFIX:column="50">OCIE1A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+        <expr_stmt><expr><name PREFIX:line="375" PREFIX:column="9">OCR1A</name> = <name PREFIX:line="375" PREFIX:column="17">ocr</name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="376" PREFIX:column="9">timer1_toggle_count</name> = <name PREFIX:line="376" PREFIX:column="31">toggle_count</name></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="377" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="377" PREFIX:column="17">(<argument><expr><name PREFIX:line="377" PREFIX:column="18">TIMSK1</name></expr></argument>, <argument><expr><name PREFIX:line="377" PREFIX:column="26">OCIE1A</name></expr></argument>, <argument><expr PREFIX:line="377" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="378" PREFIX:column="1">#<cpp:directive PREFIX:line="378" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="378" PREFIX:column="7">defined</name><argument_list PREFIX:line="378" PREFIX:column="14">(<argument><expr><name PREFIX:line="378" PREFIX:column="15">OCR1A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="378" PREFIX:column="25">defined</name><argument_list PREFIX:line="378" PREFIX:column="32">(<argument><expr><name PREFIX:line="378" PREFIX:column="33">TIMSK</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="378" PREFIX:column="43">defined</name><argument_list PREFIX:line="378" PREFIX:column="50">(<argument><expr><name PREFIX:line="378" PREFIX:column="51">OCIE1A</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+        <comment type="line" PREFIX:line="379" PREFIX:column="9">// this combination is for at least the ATmega32</comment>
+        <expr_stmt><expr><name PREFIX:line="380" PREFIX:column="9">OCR1A</name> = <name PREFIX:line="380" PREFIX:column="17">ocr</name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="381" PREFIX:column="9">timer1_toggle_count</name> = <name PREFIX:line="381" PREFIX:column="31">toggle_count</name></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="382" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="382" PREFIX:column="17">(<argument><expr><name PREFIX:line="382" PREFIX:column="18">TIMSK</name></expr></argument>, <argument><expr><name PREFIX:line="382" PREFIX:column="25">OCIE1A</name></expr></argument>, <argument><expr PREFIX:line="382" PREFIX:column="33">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="383" PREFIX:column="1">#<cpp:directive PREFIX:line="383" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+        <break PREFIX:line="384" PREFIX:column="9">break;</break>
+
+<cpp:if PREFIX:line="386" PREFIX:column="1">#<cpp:directive PREFIX:line="386" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="386" PREFIX:column="5">defined</name><argument_list PREFIX:line="386" PREFIX:column="12">(<argument><expr><name PREFIX:line="386" PREFIX:column="13">OCR2A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="386" PREFIX:column="23">defined</name><argument_list PREFIX:line="386" PREFIX:column="30">(<argument><expr><name PREFIX:line="386" PREFIX:column="31">TIMSK2</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="386" PREFIX:column="42">defined</name><argument_list PREFIX:line="386" PREFIX:column="49">(<argument><expr><name PREFIX:line="386" PREFIX:column="50">OCIE2A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="387" PREFIX:column="7">case <expr PREFIX:line="387" PREFIX:column="12">2</expr>:
+        <expr_stmt><expr><name PREFIX:line="388" PREFIX:column="9">OCR2A</name> = <name PREFIX:line="388" PREFIX:column="17">ocr</name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="389" PREFIX:column="9">timer2_toggle_count</name> = <name PREFIX:line="389" PREFIX:column="31">toggle_count</name></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="390" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="390" PREFIX:column="17">(<argument><expr><name PREFIX:line="390" PREFIX:column="18">TIMSK2</name></expr></argument>, <argument><expr><name PREFIX:line="390" PREFIX:column="26">OCIE2A</name></expr></argument>, <argument><expr PREFIX:line="390" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="391" PREFIX:column="9">break;</break>
+<cpp:endif PREFIX:line="392" PREFIX:column="1">#<cpp:directive PREFIX:line="392" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="394" PREFIX:column="1">#<cpp:directive PREFIX:line="394" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="394" PREFIX:column="5">defined</name><argument_list PREFIX:line="394" PREFIX:column="12">(<argument><expr><name PREFIX:line="394" PREFIX:column="13">OCR3A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="394" PREFIX:column="23">defined</name><argument_list PREFIX:line="394" PREFIX:column="30">(<argument><expr><name PREFIX:line="394" PREFIX:column="31">TIMSK3</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="394" PREFIX:column="42">defined</name><argument_list PREFIX:line="394" PREFIX:column="49">(<argument><expr><name PREFIX:line="394" PREFIX:column="50">OCIE3A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="395" PREFIX:column="7">case <expr PREFIX:line="395" PREFIX:column="12">3</expr>:
+        <expr_stmt><expr><name PREFIX:line="396" PREFIX:column="9">OCR3A</name> = <name PREFIX:line="396" PREFIX:column="17">ocr</name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="397" PREFIX:column="9">timer3_toggle_count</name> = <name PREFIX:line="397" PREFIX:column="31">toggle_count</name></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="398" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="398" PREFIX:column="17">(<argument><expr><name PREFIX:line="398" PREFIX:column="18">TIMSK3</name></expr></argument>, <argument><expr><name PREFIX:line="398" PREFIX:column="26">OCIE3A</name></expr></argument>, <argument><expr PREFIX:line="398" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="399" PREFIX:column="9">break;</break>
+<cpp:endif PREFIX:line="400" PREFIX:column="1">#<cpp:directive PREFIX:line="400" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="402" PREFIX:column="1">#<cpp:directive PREFIX:line="402" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="402" PREFIX:column="5">defined</name><argument_list PREFIX:line="402" PREFIX:column="12">(<argument><expr><name PREFIX:line="402" PREFIX:column="13">OCR4A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="402" PREFIX:column="23">defined</name><argument_list PREFIX:line="402" PREFIX:column="30">(<argument><expr><name PREFIX:line="402" PREFIX:column="31">TIMSK4</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="402" PREFIX:column="42">defined</name><argument_list PREFIX:line="402" PREFIX:column="49">(<argument><expr><name PREFIX:line="402" PREFIX:column="50">OCIE4A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="403" PREFIX:column="7">case <expr PREFIX:line="403" PREFIX:column="12">4</expr>:
+        <expr_stmt><expr><name PREFIX:line="404" PREFIX:column="9">OCR4A</name> = <name PREFIX:line="404" PREFIX:column="17">ocr</name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="405" PREFIX:column="9">timer4_toggle_count</name> = <name PREFIX:line="405" PREFIX:column="31">toggle_count</name></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="406" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="406" PREFIX:column="17">(<argument><expr><name PREFIX:line="406" PREFIX:column="18">TIMSK4</name></expr></argument>, <argument><expr><name PREFIX:line="406" PREFIX:column="26">OCIE4A</name></expr></argument>, <argument><expr PREFIX:line="406" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="407" PREFIX:column="9">break;</break>
+<cpp:endif PREFIX:line="408" PREFIX:column="1">#<cpp:directive PREFIX:line="408" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="410" PREFIX:column="1">#<cpp:directive PREFIX:line="410" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="410" PREFIX:column="5">defined</name><argument_list PREFIX:line="410" PREFIX:column="12">(<argument><expr><name PREFIX:line="410" PREFIX:column="13">OCR5A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="410" PREFIX:column="23">defined</name><argument_list PREFIX:line="410" PREFIX:column="30">(<argument><expr><name PREFIX:line="410" PREFIX:column="31">TIMSK5</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="410" PREFIX:column="42">defined</name><argument_list PREFIX:line="410" PREFIX:column="49">(<argument><expr><name PREFIX:line="410" PREFIX:column="50">OCIE5A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+      </case><case PREFIX:line="411" PREFIX:column="7">case <expr PREFIX:line="411" PREFIX:column="12">5</expr>:
+        <expr_stmt><expr><name PREFIX:line="412" PREFIX:column="9">OCR5A</name> = <name PREFIX:line="412" PREFIX:column="17">ocr</name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="413" PREFIX:column="9">timer5_toggle_count</name> = <name PREFIX:line="413" PREFIX:column="31">toggle_count</name></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name PREFIX:line="414" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="414" PREFIX:column="17">(<argument><expr><name PREFIX:line="414" PREFIX:column="18">TIMSK5</name></expr></argument>, <argument><expr><name PREFIX:line="414" PREFIX:column="26">OCIE5A</name></expr></argument>, <argument><expr PREFIX:line="414" PREFIX:column="34">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <break PREFIX:line="415" PREFIX:column="9">break;</break>
+<cpp:endif PREFIX:line="416" PREFIX:column="1">#<cpp:directive PREFIX:line="416" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+    </case>}</block></switch>
+  }</block></then></if>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="423" PREFIX:column="1">// XXX: this function only works properly for timer 2 (the only one we use</comment>
+<comment type="line" PREFIX:line="424" PREFIX:column="1">// currently).  for the others, it should end the tone, but won't restore</comment>
+<comment type="line" PREFIX:line="425" PREFIX:column="1">// proper PWM functionality for the timer.</comment>
+<function><type><name PREFIX:line="426" PREFIX:column="1">void</name></type> <name PREFIX:line="426" PREFIX:column="6">disableTimer</name><parameter_list PREFIX:line="426" PREFIX:column="18">(<param><decl><type><name PREFIX:line="426" PREFIX:column="19">uint8_t</name></type> <name PREFIX:line="426" PREFIX:column="27">_timer</name></decl></param>)</parameter_list>
+<block PREFIX:line="427" PREFIX:column="1">{
+  <switch PREFIX:line="428" PREFIX:column="3">switch <condition PREFIX:line="428" PREFIX:column="10">(<expr><name PREFIX:line="428" PREFIX:column="11">_timer</name></expr>)</condition>
+  <block PREFIX:line="429" PREFIX:column="3">{
+    <case PREFIX:line="430" PREFIX:column="5">case <expr PREFIX:line="430" PREFIX:column="10">0</expr>:
+      <cpp:if PREFIX:line="431" PREFIX:column="7">#<cpp:directive PREFIX:line="431" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="431" PREFIX:column="11">defined</name><argument_list PREFIX:line="431" PREFIX:column="18">(<argument><expr><name PREFIX:line="431" PREFIX:column="19">TIMSK0</name></expr></argument>)</argument_list></call></expr></cpp:if>
+        <expr_stmt><expr><name PREFIX:line="432" PREFIX:column="9">TIMSK0</name> = 0</expr>;</expr_stmt>
+      <cpp:elif PREFIX:line="433" PREFIX:column="7">#<cpp:directive PREFIX:line="433" PREFIX:column="8">elif</cpp:directive> <expr><call><name PREFIX:line="433" PREFIX:column="13">defined</name><argument_list PREFIX:line="433" PREFIX:column="20">(<argument><expr><name PREFIX:line="433" PREFIX:column="21">TIMSK</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+        <expr_stmt><expr><name PREFIX:line="434" PREFIX:column="9">TIMSK</name> = 0</expr>;</expr_stmt> <comment type="line" PREFIX:line="434" PREFIX:column="20">// atmega32</comment>
+      <cpp:endif PREFIX:line="435" PREFIX:column="7">#<cpp:directive PREFIX:line="435" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+      <break PREFIX:line="436" PREFIX:column="7">break;</break>
+
+<cpp:if PREFIX:line="438" PREFIX:column="1">#<cpp:directive PREFIX:line="438" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="438" PREFIX:column="5">defined</name><argument_list PREFIX:line="438" PREFIX:column="12">(<argument><expr><name PREFIX:line="438" PREFIX:column="13">TIMSK1</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="438" PREFIX:column="24">defined</name><argument_list PREFIX:line="438" PREFIX:column="31">(<argument><expr><name PREFIX:line="438" PREFIX:column="32">OCIE1A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+    </case><case PREFIX:line="439" PREFIX:column="5">case <expr PREFIX:line="439" PREFIX:column="10">1</expr>:
+      <expr_stmt><expr><call><name PREFIX:line="440" PREFIX:column="7">bitWrite</name><argument_list PREFIX:line="440" PREFIX:column="15">(<argument><expr><name PREFIX:line="440" PREFIX:column="16">TIMSK1</name></expr></argument>, <argument><expr><name PREFIX:line="440" PREFIX:column="24">OCIE1A</name></expr></argument>, <argument><expr PREFIX:line="440" PREFIX:column="32">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="441" PREFIX:column="7">break;</break>
+<cpp:endif PREFIX:line="442" PREFIX:column="1">#<cpp:directive PREFIX:line="442" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+    </case><case PREFIX:line="444" PREFIX:column="5">case <expr PREFIX:line="444" PREFIX:column="10">2</expr>:
+      <cpp:if PREFIX:line="445" PREFIX:column="7">#<cpp:directive PREFIX:line="445" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="445" PREFIX:column="11">defined</name><argument_list PREFIX:line="445" PREFIX:column="18">(<argument><expr><name PREFIX:line="445" PREFIX:column="19">TIMSK2</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="445" PREFIX:column="30">defined</name><argument_list PREFIX:line="445" PREFIX:column="37">(<argument><expr><name PREFIX:line="445" PREFIX:column="38">OCIE2A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+        <expr_stmt><expr><call><name PREFIX:line="446" PREFIX:column="9">bitWrite</name><argument_list PREFIX:line="446" PREFIX:column="17">(<argument><expr><name PREFIX:line="446" PREFIX:column="18">TIMSK2</name></expr></argument>, <argument><expr><name PREFIX:line="446" PREFIX:column="26">OCIE2A</name></expr></argument>, <argument><expr PREFIX:line="446" PREFIX:column="34">0</expr></argument>)</argument_list></call></expr>;</expr_stmt> <comment type="line" PREFIX:line="446" PREFIX:column="38">// disable interrupt</comment>
+      <cpp:endif PREFIX:line="447" PREFIX:column="7">#<cpp:directive PREFIX:line="447" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+      <cpp:if PREFIX:line="448" PREFIX:column="7">#<cpp:directive PREFIX:line="448" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="448" PREFIX:column="11">defined</name><argument_list PREFIX:line="448" PREFIX:column="18">(<argument><expr><name PREFIX:line="448" PREFIX:column="19">TCCR2A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="448" PREFIX:column="30">defined</name><argument_list PREFIX:line="448" PREFIX:column="37">(<argument><expr><name PREFIX:line="448" PREFIX:column="38">WGM20</name></expr></argument>)</argument_list></call></expr></cpp:if>
+        <expr_stmt><expr><name PREFIX:line="449" PREFIX:column="9">TCCR2A</name> = (1 &lt;&lt; <name PREFIX:line="449" PREFIX:column="24">WGM20</name>)</expr>;</expr_stmt>
+      <cpp:endif PREFIX:line="450" PREFIX:column="7">#<cpp:directive PREFIX:line="450" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+      <cpp:if PREFIX:line="451" PREFIX:column="7">#<cpp:directive PREFIX:line="451" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="451" PREFIX:column="11">defined</name><argument_list PREFIX:line="451" PREFIX:column="18">(<argument><expr><name PREFIX:line="451" PREFIX:column="19">TCCR2B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="451" PREFIX:column="30">defined</name><argument_list PREFIX:line="451" PREFIX:column="37">(<argument><expr><name PREFIX:line="451" PREFIX:column="38">CS22</name></expr></argument>)</argument_list></call></expr></cpp:if>
+        <expr_stmt><expr><name PREFIX:line="452" PREFIX:column="9">TCCR2B</name> = (<name PREFIX:line="452" PREFIX:column="19">TCCR2B</name> &amp; 0b11111000) | (1 &lt;&lt; <name PREFIX:line="452" PREFIX:column="48">CS22</name>)</expr>;</expr_stmt>
+      <cpp:endif PREFIX:line="453" PREFIX:column="7">#<cpp:directive PREFIX:line="453" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+      <cpp:if PREFIX:line="454" PREFIX:column="7">#<cpp:directive PREFIX:line="454" PREFIX:column="8">if</cpp:directive> <expr><call><name PREFIX:line="454" PREFIX:column="11">defined</name><argument_list PREFIX:line="454" PREFIX:column="18">(<argument><expr><name PREFIX:line="454" PREFIX:column="19">OCR2A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+        <expr_stmt><expr><name PREFIX:line="455" PREFIX:column="9">OCR2A</name> = 0</expr>;</expr_stmt>
+      <cpp:endif PREFIX:line="456" PREFIX:column="7">#<cpp:directive PREFIX:line="456" PREFIX:column="8">endif</cpp:directive></cpp:endif>
+      <break PREFIX:line="457" PREFIX:column="7">break;</break>
+
+<cpp:if PREFIX:line="459" PREFIX:column="1">#<cpp:directive PREFIX:line="459" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="459" PREFIX:column="5">defined</name><argument_list PREFIX:line="459" PREFIX:column="12">(<argument><expr><name PREFIX:line="459" PREFIX:column="13">TIMSK3</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="459" PREFIX:column="24">defined</name><argument_list PREFIX:line="459" PREFIX:column="31">(<argument><expr><name PREFIX:line="459" PREFIX:column="32">OCIE3A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+    </case><case PREFIX:line="460" PREFIX:column="5">case <expr PREFIX:line="460" PREFIX:column="10">3</expr>:
+      <expr_stmt><expr><call><name PREFIX:line="461" PREFIX:column="7">bitWrite</name><argument_list PREFIX:line="461" PREFIX:column="15">(<argument><expr><name PREFIX:line="461" PREFIX:column="16">TIMSK3</name></expr></argument>, <argument><expr><name PREFIX:line="461" PREFIX:column="24">OCIE3A</name></expr></argument>, <argument><expr PREFIX:line="461" PREFIX:column="32">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="462" PREFIX:column="7">break;</break>
+<cpp:endif PREFIX:line="463" PREFIX:column="1">#<cpp:directive PREFIX:line="463" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="465" PREFIX:column="1">#<cpp:directive PREFIX:line="465" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="465" PREFIX:column="5">defined</name><argument_list PREFIX:line="465" PREFIX:column="12">(<argument><expr><name PREFIX:line="465" PREFIX:column="13">TIMSK4</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="465" PREFIX:column="24">defined</name><argument_list PREFIX:line="465" PREFIX:column="31">(<argument><expr><name PREFIX:line="465" PREFIX:column="32">OCIE4A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+    </case><case PREFIX:line="466" PREFIX:column="5">case <expr PREFIX:line="466" PREFIX:column="10">4</expr>:
+      <expr_stmt><expr><call><name PREFIX:line="467" PREFIX:column="7">bitWrite</name><argument_list PREFIX:line="467" PREFIX:column="15">(<argument><expr><name PREFIX:line="467" PREFIX:column="16">TIMSK4</name></expr></argument>, <argument><expr><name PREFIX:line="467" PREFIX:column="24">OCIE4A</name></expr></argument>, <argument><expr PREFIX:line="467" PREFIX:column="32">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="468" PREFIX:column="7">break;</break>
+<cpp:endif PREFIX:line="469" PREFIX:column="1">#<cpp:directive PREFIX:line="469" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="471" PREFIX:column="1">#<cpp:directive PREFIX:line="471" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="471" PREFIX:column="5">defined</name><argument_list PREFIX:line="471" PREFIX:column="12">(<argument><expr><name PREFIX:line="471" PREFIX:column="13">TIMSK5</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="471" PREFIX:column="24">defined</name><argument_list PREFIX:line="471" PREFIX:column="31">(<argument><expr><name PREFIX:line="471" PREFIX:column="32">OCIE5A</name></expr></argument>)</argument_list></call></expr></cpp:if>
+    </case><case PREFIX:line="472" PREFIX:column="5">case <expr PREFIX:line="472" PREFIX:column="10">5</expr>:
+      <expr_stmt><expr><call><name PREFIX:line="473" PREFIX:column="7">bitWrite</name><argument_list PREFIX:line="473" PREFIX:column="15">(<argument><expr><name PREFIX:line="473" PREFIX:column="16">TIMSK5</name></expr></argument>, <argument><expr><name PREFIX:line="473" PREFIX:column="24">OCIE5A</name></expr></argument>, <argument><expr PREFIX:line="473" PREFIX:column="32">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="474" PREFIX:column="7">break;</break>
+<cpp:endif PREFIX:line="475" PREFIX:column="1">#<cpp:directive PREFIX:line="475" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+  </case>}</block></switch>
+}</block></function>
+
+
+<function><type><name PREFIX:line="480" PREFIX:column="1">void</name></type> <name PREFIX:line="480" PREFIX:column="6">noTone</name><parameter_list PREFIX:line="480" PREFIX:column="12">(<param><decl><type><name PREFIX:line="480" PREFIX:column="13">uint8_t</name></type> <name PREFIX:line="480" PREFIX:column="21">_pin</name></decl></param>)</parameter_list>
+<block PREFIX:line="481" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="482" PREFIX:column="3">int8_t</name></type> <name PREFIX:line="482" PREFIX:column="10">_timer</name> <init PREFIX:line="482" PREFIX:column="17">= <expr PREFIX:line="482" PREFIX:column="19">-1</expr></init></decl>;</decl_stmt>
+  
+  <for PREFIX:line="484" PREFIX:column="3">for (<init><decl><type><name PREFIX:line="484" PREFIX:column="8">int</name></type> <name PREFIX:line="484" PREFIX:column="12">i</name> <init PREFIX:line="484" PREFIX:column="14">= <expr PREFIX:line="484" PREFIX:column="16">0</expr></init></decl>;</init> <condition><expr><name PREFIX:line="484" PREFIX:column="19">i</name> &lt; <name PREFIX:line="484" PREFIX:column="23">AVAILABLE_TONE_PINS</name></expr>;</condition> <incr><expr><name PREFIX:line="484" PREFIX:column="44">i</name>++</expr></incr>) <block PREFIX:line="484" PREFIX:column="49">{
+    <if PREFIX:line="485" PREFIX:column="5">if <condition PREFIX:line="485" PREFIX:column="8">(<expr><name><name PREFIX:line="485" PREFIX:column="9">tone_pins</name><index PREFIX:line="485" PREFIX:column="18">[<expr><name PREFIX:line="485" PREFIX:column="19">i</name></expr>]</index></name> == <name PREFIX:line="485" PREFIX:column="25">_pin</name></expr>)</condition><then PREFIX:line="485" PREFIX:column="30"> <block PREFIX:line="485" PREFIX:column="31">{
+      <expr_stmt><expr><name PREFIX:line="486" PREFIX:column="7">_timer</name> = <call><name PREFIX:line="486" PREFIX:column="16">pgm_read_byte</name><argument_list PREFIX:line="486" PREFIX:column="29">(<argument><expr><name PREFIX:line="486" PREFIX:column="30">tone_pin_to_timer_PGM</name> + <name PREFIX:line="486" PREFIX:column="54">i</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><name><name PREFIX:line="487" PREFIX:column="7">tone_pins</name><index PREFIX:line="487" PREFIX:column="16">[<expr><name PREFIX:line="487" PREFIX:column="17">i</name></expr>]</index></name> = 255</expr>;</expr_stmt>
+    }</block></then></if>
+  }</block></for>
+  
+  <expr_stmt><expr><call><name PREFIX:line="491" PREFIX:column="3">disableTimer</name><argument_list PREFIX:line="491" PREFIX:column="15">(<argument><expr><name PREFIX:line="491" PREFIX:column="16">_timer</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <expr_stmt><expr><call><name PREFIX:line="493" PREFIX:column="3">digitalWrite</name><argument_list PREFIX:line="493" PREFIX:column="15">(<argument><expr><name PREFIX:line="493" PREFIX:column="16">_pin</name></expr></argument>, <argument><expr PREFIX:line="493" PREFIX:column="22">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<cpp:ifdef PREFIX:line="496" PREFIX:column="1">#<cpp:directive PREFIX:line="496" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="496" PREFIX:column="8">USE_TIMER0</name></cpp:ifdef>
+<macro><name PREFIX:line="497" PREFIX:column="1">ISR</name><argument_list PREFIX:line="497" PREFIX:column="4">(<argument PREFIX:line="497" PREFIX:column="5">TIMER0_COMPA_vect</argument>)</argument_list></macro>
+<block PREFIX:line="498" PREFIX:column="1">{
+  <if PREFIX:line="499" PREFIX:column="3">if <condition PREFIX:line="499" PREFIX:column="6">(<expr><name PREFIX:line="499" PREFIX:column="7">timer0_toggle_count</name> != 0</expr>)</condition><then PREFIX:line="499" PREFIX:column="32">
+  <block PREFIX:line="500" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="501" PREFIX:column="5">// toggle the pin</comment>
+    <expr_stmt><expr PREFIX:line="502" PREFIX:column="5">*<name PREFIX:line="502" PREFIX:column="6">timer0_pin_port</name> ^= <name PREFIX:line="502" PREFIX:column="25">timer0_pin_mask</name></expr>;</expr_stmt>
+
+    <if PREFIX:line="504" PREFIX:column="5">if <condition PREFIX:line="504" PREFIX:column="8">(<expr><name PREFIX:line="504" PREFIX:column="9">timer0_toggle_count</name> &gt; 0</expr>)</condition><then PREFIX:line="504" PREFIX:column="33">
+      <expr_stmt><expr><name PREFIX:line="505" PREFIX:column="7">timer0_toggle_count</name>--</expr>;</expr_stmt></then></if>
+  }</block></then>
+  <else PREFIX:line="507" PREFIX:column="3">else
+  <block PREFIX:line="508" PREFIX:column="3">{
+    <expr_stmt><expr><call><name PREFIX:line="509" PREFIX:column="5">disableTimer</name><argument_list PREFIX:line="509" PREFIX:column="17">(<argument><expr PREFIX:line="509" PREFIX:column="18">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="510" PREFIX:column="5">*<name PREFIX:line="510" PREFIX:column="6">timer0_pin_port</name> &amp;= ~(<name PREFIX:line="510" PREFIX:column="27">timer0_pin_mask</name>)</expr>;</expr_stmt>  <comment type="line" PREFIX:line="510" PREFIX:column="46">// keep pin low after stop</comment>
+  }</block></else></if>
+}</block>
+<cpp:endif PREFIX:line="513" PREFIX:column="1">#<cpp:directive PREFIX:line="513" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+<cpp:ifdef PREFIX:line="516" PREFIX:column="1">#<cpp:directive PREFIX:line="516" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="516" PREFIX:column="8">USE_TIMER1</name></cpp:ifdef>
+<macro><name PREFIX:line="517" PREFIX:column="1">ISR</name><argument_list PREFIX:line="517" PREFIX:column="4">(<argument PREFIX:line="517" PREFIX:column="5">TIMER1_COMPA_vect</argument>)</argument_list></macro>
+<block PREFIX:line="518" PREFIX:column="1">{
+  <if PREFIX:line="519" PREFIX:column="3">if <condition PREFIX:line="519" PREFIX:column="6">(<expr><name PREFIX:line="519" PREFIX:column="7">timer1_toggle_count</name> != 0</expr>)</condition><then PREFIX:line="519" PREFIX:column="32">
+  <block PREFIX:line="520" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="521" PREFIX:column="5">// toggle the pin</comment>
+    <expr_stmt><expr PREFIX:line="522" PREFIX:column="5">*<name PREFIX:line="522" PREFIX:column="6">timer1_pin_port</name> ^= <name PREFIX:line="522" PREFIX:column="25">timer1_pin_mask</name></expr>;</expr_stmt>
+
+    <if PREFIX:line="524" PREFIX:column="5">if <condition PREFIX:line="524" PREFIX:column="8">(<expr><name PREFIX:line="524" PREFIX:column="9">timer1_toggle_count</name> &gt; 0</expr>)</condition><then PREFIX:line="524" PREFIX:column="33">
+      <expr_stmt><expr><name PREFIX:line="525" PREFIX:column="7">timer1_toggle_count</name>--</expr>;</expr_stmt></then></if>
+  }</block></then>
+  <else PREFIX:line="527" PREFIX:column="3">else
+  <block PREFIX:line="528" PREFIX:column="3">{
+    <expr_stmt><expr><call><name PREFIX:line="529" PREFIX:column="5">disableTimer</name><argument_list PREFIX:line="529" PREFIX:column="17">(<argument><expr PREFIX:line="529" PREFIX:column="18">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="530" PREFIX:column="5">*<name PREFIX:line="530" PREFIX:column="6">timer1_pin_port</name> &amp;= ~(<name PREFIX:line="530" PREFIX:column="27">timer1_pin_mask</name>)</expr>;</expr_stmt>  <comment type="line" PREFIX:line="530" PREFIX:column="46">// keep pin low after stop</comment>
+  }</block></else></if>
+}</block>
+<cpp:endif PREFIX:line="533" PREFIX:column="1">#<cpp:directive PREFIX:line="533" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+<cpp:ifdef PREFIX:line="536" PREFIX:column="1">#<cpp:directive PREFIX:line="536" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="536" PREFIX:column="8">USE_TIMER2</name></cpp:ifdef>
+<macro><name PREFIX:line="537" PREFIX:column="1">ISR</name><argument_list PREFIX:line="537" PREFIX:column="4">(<argument PREFIX:line="537" PREFIX:column="5">TIMER2_COMPA_vect</argument>)</argument_list></macro>
+<block PREFIX:line="538" PREFIX:column="1">{
+
+  <if PREFIX:line="540" PREFIX:column="3">if <condition PREFIX:line="540" PREFIX:column="6">(<expr><name PREFIX:line="540" PREFIX:column="7">timer2_toggle_count</name> != 0</expr>)</condition><then PREFIX:line="540" PREFIX:column="32">
+  <block PREFIX:line="541" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="542" PREFIX:column="5">// toggle the pin</comment>
+    <expr_stmt><expr PREFIX:line="543" PREFIX:column="5">*<name PREFIX:line="543" PREFIX:column="6">timer2_pin_port</name> ^= <name PREFIX:line="543" PREFIX:column="25">timer2_pin_mask</name></expr>;</expr_stmt>
+
+    <if PREFIX:line="545" PREFIX:column="5">if <condition PREFIX:line="545" PREFIX:column="8">(<expr><name PREFIX:line="545" PREFIX:column="9">timer2_toggle_count</name> &gt; 0</expr>)</condition><then PREFIX:line="545" PREFIX:column="33">
+      <expr_stmt><expr><name PREFIX:line="546" PREFIX:column="7">timer2_toggle_count</name>--</expr>;</expr_stmt></then></if>
+  }</block></then>
+  <else PREFIX:line="548" PREFIX:column="3">else
+  <block PREFIX:line="549" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="550" PREFIX:column="5">// need to call noTone() so that the tone_pins[] entry is reset, so the</comment>
+    <comment type="line" PREFIX:line="551" PREFIX:column="5">// timer gets initialized next time we call tone().</comment>
+    <comment type="line" PREFIX:line="552" PREFIX:column="5">// XXX: this assumes timer 2 is always the first one used.</comment>
+    <expr_stmt><expr><call><name PREFIX:line="553" PREFIX:column="5">noTone</name><argument_list PREFIX:line="553" PREFIX:column="11">(<argument><expr><name><name PREFIX:line="553" PREFIX:column="12">tone_pins</name><index PREFIX:line="553" PREFIX:column="21">[<expr PREFIX:line="553" PREFIX:column="22">0</expr>]</index></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<comment type="line" PREFIX:line="554" PREFIX:column="1">//    disableTimer(2);</comment>
+<comment type="line" PREFIX:line="555" PREFIX:column="1">//    *timer2_pin_port &amp;= ~(timer2_pin_mask);  // keep pin low after stop</comment>
+  }</block></else></if>
+}</block>
+<cpp:endif PREFIX:line="558" PREFIX:column="1">#<cpp:directive PREFIX:line="558" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+<cpp:ifdef PREFIX:line="561" PREFIX:column="1">#<cpp:directive PREFIX:line="561" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="561" PREFIX:column="8">USE_TIMER3</name></cpp:ifdef>
+<macro><name PREFIX:line="562" PREFIX:column="1">ISR</name><argument_list PREFIX:line="562" PREFIX:column="4">(<argument PREFIX:line="562" PREFIX:column="5">TIMER3_COMPA_vect</argument>)</argument_list></macro>
+<block PREFIX:line="563" PREFIX:column="1">{
+  <if PREFIX:line="564" PREFIX:column="3">if <condition PREFIX:line="564" PREFIX:column="6">(<expr><name PREFIX:line="564" PREFIX:column="7">timer3_toggle_count</name> != 0</expr>)</condition><then PREFIX:line="564" PREFIX:column="32">
+  <block PREFIX:line="565" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="566" PREFIX:column="5">// toggle the pin</comment>
+    <expr_stmt><expr PREFIX:line="567" PREFIX:column="5">*<name PREFIX:line="567" PREFIX:column="6">timer3_pin_port</name> ^= <name PREFIX:line="567" PREFIX:column="25">timer3_pin_mask</name></expr>;</expr_stmt>
+
+    <if PREFIX:line="569" PREFIX:column="5">if <condition PREFIX:line="569" PREFIX:column="8">(<expr><name PREFIX:line="569" PREFIX:column="9">timer3_toggle_count</name> &gt; 0</expr>)</condition><then PREFIX:line="569" PREFIX:column="33">
+      <expr_stmt><expr><name PREFIX:line="570" PREFIX:column="7">timer3_toggle_count</name>--</expr>;</expr_stmt></then></if>
+  }</block></then>
+  <else PREFIX:line="572" PREFIX:column="3">else
+  <block PREFIX:line="573" PREFIX:column="3">{
+    <expr_stmt><expr><call><name PREFIX:line="574" PREFIX:column="5">disableTimer</name><argument_list PREFIX:line="574" PREFIX:column="17">(<argument><expr PREFIX:line="574" PREFIX:column="18">3</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="575" PREFIX:column="5">*<name PREFIX:line="575" PREFIX:column="6">timer3_pin_port</name> &amp;= ~(<name PREFIX:line="575" PREFIX:column="27">timer3_pin_mask</name>)</expr>;</expr_stmt>  <comment type="line" PREFIX:line="575" PREFIX:column="46">// keep pin low after stop</comment>
+  }</block></else></if>
+}</block>
+<cpp:endif PREFIX:line="578" PREFIX:column="1">#<cpp:directive PREFIX:line="578" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+<cpp:ifdef PREFIX:line="581" PREFIX:column="1">#<cpp:directive PREFIX:line="581" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="581" PREFIX:column="8">USE_TIMER4</name></cpp:ifdef>
+<macro><name PREFIX:line="582" PREFIX:column="1">ISR</name><argument_list PREFIX:line="582" PREFIX:column="4">(<argument PREFIX:line="582" PREFIX:column="5">TIMER4_COMPA_vect</argument>)</argument_list></macro>
+<block PREFIX:line="583" PREFIX:column="1">{
+  <if PREFIX:line="584" PREFIX:column="3">if <condition PREFIX:line="584" PREFIX:column="6">(<expr><name PREFIX:line="584" PREFIX:column="7">timer4_toggle_count</name> != 0</expr>)</condition><then PREFIX:line="584" PREFIX:column="32">
+  <block PREFIX:line="585" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="586" PREFIX:column="5">// toggle the pin</comment>
+    <expr_stmt><expr PREFIX:line="587" PREFIX:column="5">*<name PREFIX:line="587" PREFIX:column="6">timer4_pin_port</name> ^= <name PREFIX:line="587" PREFIX:column="25">timer4_pin_mask</name></expr>;</expr_stmt>
+
+    <if PREFIX:line="589" PREFIX:column="5">if <condition PREFIX:line="589" PREFIX:column="8">(<expr><name PREFIX:line="589" PREFIX:column="9">timer4_toggle_count</name> &gt; 0</expr>)</condition><then PREFIX:line="589" PREFIX:column="33">
+      <expr_stmt><expr><name PREFIX:line="590" PREFIX:column="7">timer4_toggle_count</name>--</expr>;</expr_stmt></then></if>
+  }</block></then>
+  <else PREFIX:line="592" PREFIX:column="3">else
+  <block PREFIX:line="593" PREFIX:column="3">{
+    <expr_stmt><expr><call><name PREFIX:line="594" PREFIX:column="5">disableTimer</name><argument_list PREFIX:line="594" PREFIX:column="17">(<argument><expr PREFIX:line="594" PREFIX:column="18">4</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="595" PREFIX:column="5">*<name PREFIX:line="595" PREFIX:column="6">timer4_pin_port</name> &amp;= ~(<name PREFIX:line="595" PREFIX:column="27">timer4_pin_mask</name>)</expr>;</expr_stmt>  <comment type="line" PREFIX:line="595" PREFIX:column="46">// keep pin low after stop</comment>
+  }</block></else></if>
+}</block>
+<cpp:endif PREFIX:line="598" PREFIX:column="1">#<cpp:directive PREFIX:line="598" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+<cpp:ifdef PREFIX:line="601" PREFIX:column="1">#<cpp:directive PREFIX:line="601" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="601" PREFIX:column="8">USE_TIMER5</name></cpp:ifdef>
+<macro><name PREFIX:line="602" PREFIX:column="1">ISR</name><argument_list PREFIX:line="602" PREFIX:column="4">(<argument PREFIX:line="602" PREFIX:column="5">TIMER5_COMPA_vect</argument>)</argument_list></macro>
+<block PREFIX:line="603" PREFIX:column="1">{
+  <if PREFIX:line="604" PREFIX:column="3">if <condition PREFIX:line="604" PREFIX:column="6">(<expr><name PREFIX:line="604" PREFIX:column="7">timer5_toggle_count</name> != 0</expr>)</condition><then PREFIX:line="604" PREFIX:column="32">
+  <block PREFIX:line="605" PREFIX:column="3">{
+    <comment type="line" PREFIX:line="606" PREFIX:column="5">// toggle the pin</comment>
+    <expr_stmt><expr PREFIX:line="607" PREFIX:column="5">*<name PREFIX:line="607" PREFIX:column="6">timer5_pin_port</name> ^= <name PREFIX:line="607" PREFIX:column="25">timer5_pin_mask</name></expr>;</expr_stmt>
+
+    <if PREFIX:line="609" PREFIX:column="5">if <condition PREFIX:line="609" PREFIX:column="8">(<expr><name PREFIX:line="609" PREFIX:column="9">timer5_toggle_count</name> &gt; 0</expr>)</condition><then PREFIX:line="609" PREFIX:column="33">
+      <expr_stmt><expr><name PREFIX:line="610" PREFIX:column="7">timer5_toggle_count</name>--</expr>;</expr_stmt></then></if>
+  }</block></then>
+  <else PREFIX:line="612" PREFIX:column="3">else
+  <block PREFIX:line="613" PREFIX:column="3">{
+    <expr_stmt><expr><call><name PREFIX:line="614" PREFIX:column="5">disableTimer</name><argument_list PREFIX:line="614" PREFIX:column="17">(<argument><expr PREFIX:line="614" PREFIX:column="18">5</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="615" PREFIX:column="5">*<name PREFIX:line="615" PREFIX:column="6">timer5_pin_port</name> &amp;= ~(<name PREFIX:line="615" PREFIX:column="27">timer5_pin_mask</name>)</expr>;</expr_stmt>  <comment type="line" PREFIX:line="615" PREFIX:column="46">// keep pin low after stop</comment>
+  }</block></else></if>
+}</block>
+<cpp:endif PREFIX:line="618" PREFIX:column="1">#<cpp:directive PREFIX:line="618" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+</unit>

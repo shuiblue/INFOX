@@ -20,39 +20,48 @@ import org.apache.commons.io.FileUtils;
  * The DependencyGraph object corresponds to a source code file.
  * There are 3 kinds of dependency graph:
  * todo: rename dependencyGraph to forkAddedDependencyGraph
- *     1) dependencyGraph only contains fork added node
- *     2) completGraph: contains all the nodes from the file
- *     3) compactGraph: if the file has not been changed, then the whole file is one node
+ * 1) dependencyGraph only contains fork added node
+ * 2) completGraph: contains all the nodes from the file
+ * 3) compactGraph: if the file has not been changed, then the whole file is one node
  */
 public class DependencyGraph {
 
-    /** There are four kinds of edges in current Dependency Graph
+    /**
+     * There are four kinds of edges in current Dependency Graph
      * 1) Def-use of types, fields, methods, variables
      * 2) Hierarchical relation
      * 3) Control flow information
      * 4) Consecutive lines
-    **/
+     **/
     static public boolean HIERACHICAL = true;
     static final public boolean CONTROL_FLOW = true;
     static public boolean CONSECUTIVE = true;
 
-     public String current_OS = "MAC"; // "WINDOWS"
+    public String current_OS = "MAC"; // "WINDOWS"
 
     static final public String CONTROLFLOW_LABEL = "<Control-Flow>";
 
     ProcessingText ProcessingText = new ProcessingText();
 
-    /** symbol Table stores all the declaration nodes.* */
+    /**
+     * symbol Table stores all the declaration nodes.*
+     */
     HashSet<Symbol> symbolTable = new HashSet<>();
 
-    /** lonelySymbolSet stores all the nodes that haven't find any node that could be point to.   **/
+    /**
+     * lonelySymbolSet stores all the nodes that haven't find any node that could be point to.
+     **/
     HashSet<Symbol> lonelySymbolSet = new HashSet<>();
 
-    /** This map stores nodes that have same name, used for search, in order to find dependencies effectively. **/
+    /**
+     * This map stores nodes that have same name, used for search, in order to find dependencies effectively.
+     **/
     HashMap<String, HashSet<Symbol>> sameNameMap = new HashMap<>();
 
 
-    /**---------------------- dependency Graph ---------------------------------**/
+    /**
+     * ---------------------- dependency Graph ---------------------------------
+     **/
     // key: node label
     HashMap<String, HashSet<String[]>> dependencyGraph = new HashMap<>();
     HashMap<String, HashSet<String[]>> completeGraph = new HashMap<>();
@@ -66,9 +75,10 @@ public class DependencyGraph {
     HashSet<String> edgeList = new HashSet<>();
 
 
-    /**----------------------compact Graph ------------------------------
-    *    if the file is not changed, then the whole file is a node
-    */
+    /**
+     * ----------------------compact Graph ------------------------------
+     * if the file is not changed, then the whole file is a node
+     */
     static HashSet<String> changedFiles;
     static int compact_graph_node_id = 0;
     HashMap<String, HashSet<String[]>> compactGraph = new HashMap<>();
@@ -80,25 +90,37 @@ public class DependencyGraph {
     HashSet<String> compact_edgeList = new HashSet<>();
 
 
-    /**   used for Similarity Calculation, LD algorithm   **/
+    /**
+     * used for Similarity Calculation, LD algorithm
+     **/
     ArrayList<String> candidateStrings = new ArrayList<>();
     //map nodeID in graph -> stringID in candidateString list
     HashMap<Integer, Integer> idMap = new HashMap<>();
 
-    /**  This flag is used for checking whether the macro is a header guard or not **/
+    /**
+     * This flag is used for checking whether the macro is a header guard or not
+     **/
     boolean foundHeaderGuard = false;
 
     static final String FS = File.separator;
 
-    /** These two var are used for srcML  **/
+    /**
+     * These two var are used for srcML
+     **/
     static final public String NAMESPACEURI = "http://www.sdml.info/srcML/src";
     static final public String NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
 
-    /**----------------  Specifying paths  -----------------------**/
+    /**
+     * ----------------  Specifying paths  -----------------------
+     **/
     static String Root_Dir = "";
-    /**   analysis Dir stores the output of INFOX   **/
+    /**
+     * analysis Dir stores the output of INFOX
+     **/
     String analysisDir = "";
-    /**   sourceCode Dir stores the source code to be analyzed   **/
+    /**
+     * sourceCode Dir stores the source code to be analyzed
+     **/
     String sourcecodeDir = "";
     static String tmpXmlPath = "tmpXMLFile" + FS;
     static String analysisDirName = "DPGraph";
@@ -111,13 +133,13 @@ public class DependencyGraph {
      *
      * @return dependency graph, no edge label stored.
      */
-    public HashSet<String> getDependencyGraphForProject(String sourcecodeDir) {
-        this.analysisDir = sourcecodeDir + analysisDirName + FS;
+    public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String analysisDir) {
+        this.analysisDir = analysisDir;
         this.sourcecodeDir = sourcecodeDir;
 
-        if(current_OS.equals("MAC")){
-            Root_Dir = " /Users/shuruiz/Work/";
-        }else if(current_OS=="WINDOWS"){
+        if (current_OS.equals("MAC")) {
+            Root_Dir = "/Users/shuruiz/Work/";
+        } else if (current_OS == "WINDOWS") {
             Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
         }
 
@@ -176,6 +198,7 @@ public class DependencyGraph {
 
     /**
      * This function will collect all the fork added node from  "forkAddedNode.txt", and generate a list of forkAddedNode
+     *
      * @return Arraylist of fork Added Nodes
      * @throws IOException
      */
@@ -196,7 +219,6 @@ public class DependencyGraph {
     }
 
 
-
     /**
      * This function parses one source code file
      *
@@ -211,7 +233,8 @@ public class DependencyGraph {
 
         /**   re-write source code file in case the misinterpretation of srcml   **/
         String tmpFilePath = Root_Dir + tmpXmlPath + filePath.toString().replace(Root_Dir, "");
-        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
+//        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
+        if (fileName.endsWith(".h")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
             tmpFilePath += ".cpp";
         }
         try {
@@ -226,6 +249,8 @@ public class DependencyGraph {
         /** generating xml file by src2srcml **/
         String xmlFilePath = ProcessingText.getXmlFile(tmpFilePath);
 
+
+        System.out.println("!!!   "+xmlFilePath);
         /** generating DOM tree by xmlParser (xom) **/
         Element root = ProcessingText.getXmlDom(xmlFilePath).getRootElement();
 
@@ -248,11 +273,12 @@ public class DependencyGraph {
 
     /**
      * This method is calling the generatingDependencyGraphForSubTree function by setting isinit = false
-     * @param subTreeRoot dom tree
-     * @param fileName name of the file
-     * @param scope  is the scope of the variable declaration, used for finding the correct def-use relation
-     *              scope = 1: global variable, defined in a class
-     *              scope = currentScope +1 , local variable , defined in a function declaration, if statement, etc.
+     *
+     * @param subTreeRoot    dom tree
+     * @param fileName       name of the file
+     * @param scope          is the scope of the variable declaration, used for finding the correct def-use relation
+     *                       scope = 1: global variable, defined in a class
+     *                       scope = currentScope +1 , local variable , defined in a function declaration, if statement, etc.
      * @param parentLocation
      * @return
      */
@@ -360,10 +386,11 @@ public class DependencyGraph {
 
     /**
      * This method parses declaration statement <decl_stmt> node
+     *
      * @param fileName
      * @param scope
      * @param parentLocation
-     * @param ele decl_stmt node
+     * @param ele            decl_stmt node
      * @return
      */
     private String parseDeclStmt(String fileName, int scope, String parentLocation, Element ele) {
@@ -1801,6 +1828,7 @@ public class DependencyGraph {
 
     /**
      * This method get file name by check the difference of (filePath - dirPath)
+     *
      * @param filePath
      * @param dirPath
      * @return
@@ -1812,12 +1840,15 @@ public class DependencyGraph {
         }
         return filePath;
     }
+
     /**
      * This function checks whether the file is a C files when parsing the source code directory
+     *
      * @param filePath
      * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
      */
     private boolean isCFile(String filePath) {
-        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
+        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c");
+//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
 }

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/U8glib/utility/u8g_ellipse.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_ellipse.c
+
+  Utility to draw empty and filled ellipses.
+  
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, bjthom@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  Addition to the U8G Library as of 02/29/12
+  Adapted from Bresenham's Algorithm and the following websites:
+	http://free.pages.at/easyfilter/bresenham.html
+	http://homepage.smc.edu/kennedy_john/belipse.pdf
+  
+*/</comment>
+
+<cpp:include PREFIX:line="43" PREFIX:column="1">#<cpp:directive PREFIX:line="43" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="43" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+
+<cpp:ifdef PREFIX:line="46" PREFIX:column="1">#<cpp:directive PREFIX:line="46" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="46" PREFIX:column="8">WORK_IN_PROGRESS</name></cpp:ifdef>
+
+<function><type><name PREFIX:line="48" PREFIX:column="1">void</name></type> <name PREFIX:line="48" PREFIX:column="6">u8g_DrawEllipseRect</name><parameter_list PREFIX:line="48" PREFIX:column="25">(<param><decl><type><name PREFIX:line="48" PREFIX:column="26">u8g_t</name> *</type><name PREFIX:line="48" PREFIX:column="33">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="48" PREFIX:column="38">u8g_uint_t</name></type> <name PREFIX:line="48" PREFIX:column="49">x0</name></decl></param>, <param><decl><type><name PREFIX:line="48" PREFIX:column="53">u8g_uint_t</name></type> <name PREFIX:line="48" PREFIX:column="64">y0</name></decl></param>, <param><decl><type><name PREFIX:line="48" PREFIX:column="68">u8g_uint_t</name></type> <name PREFIX:line="48" PREFIX:column="79">x1</name></decl></param>, <param><decl><type><name PREFIX:line="48" PREFIX:column="83">u8g_uint_t</name></type> <name PREFIX:line="48" PREFIX:column="94">y1</name></decl></param>)</parameter_list>
+<block PREFIX:line="49" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="50" PREFIX:column="9">int</name></type> <name PREFIX:line="50" PREFIX:column="13">a</name> <init PREFIX:line="50" PREFIX:column="15">= <expr><call><name PREFIX:line="50" PREFIX:column="17">abs</name><argument_list PREFIX:line="50" PREFIX:column="20">(<argument><expr><name PREFIX:line="50" PREFIX:column="21">x1</name> - <name PREFIX:line="50" PREFIX:column="26">x0</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="51" PREFIX:column="9">int</name></type> <name PREFIX:line="51" PREFIX:column="13">b</name> <init PREFIX:line="51" PREFIX:column="15">= <expr><call><name PREFIX:line="51" PREFIX:column="17">abs</name><argument_list PREFIX:line="51" PREFIX:column="20">(<argument><expr><name PREFIX:line="51" PREFIX:column="21">y1</name> - <name PREFIX:line="51" PREFIX:column="26">y0</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>	<comment type="line" PREFIX:line="51" PREFIX:column="33">//get diameters</comment>
+	<decl_stmt><decl><type><name PREFIX:line="52" PREFIX:column="9">int</name></type> <name PREFIX:line="52" PREFIX:column="13">b1</name> <init PREFIX:line="52" PREFIX:column="16">= <expr><name PREFIX:line="52" PREFIX:column="18">b</name>&amp;1</expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="53" PREFIX:column="9">long</name></type> <name PREFIX:line="53" PREFIX:column="14">dx</name> <init PREFIX:line="53" PREFIX:column="17">= <expr PREFIX:line="53" PREFIX:column="19">4*(1-<name PREFIX:line="53" PREFIX:column="24">a</name>)*<name PREFIX:line="53" PREFIX:column="27">b</name>*<name PREFIX:line="53" PREFIX:column="29">b</name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="54" PREFIX:column="9">long</name></type> <name PREFIX:line="54" PREFIX:column="14">dy</name> <init PREFIX:line="54" PREFIX:column="17">= <expr PREFIX:line="54" PREFIX:column="19">4*(<name PREFIX:line="54" PREFIX:column="22">b1</name>+1)*<name PREFIX:line="54" PREFIX:column="28">a</name>*<name PREFIX:line="54" PREFIX:column="30">a</name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="55" PREFIX:column="9">long</name></type> <name PREFIX:line="55" PREFIX:column="14">err</name> <init PREFIX:line="55" PREFIX:column="18">= <expr><name PREFIX:line="55" PREFIX:column="20">dx</name>+<name PREFIX:line="55" PREFIX:column="23">dy</name>+<name PREFIX:line="55" PREFIX:column="26">b1</name>*<name PREFIX:line="55" PREFIX:column="29">a</name>*<name PREFIX:line="55" PREFIX:column="31">a</name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="56" PREFIX:column="9">long</name></type> <name PREFIX:line="56" PREFIX:column="14">e2</name></decl>;</decl_stmt>
+	
+	<if PREFIX:line="58" PREFIX:column="9">if <condition PREFIX:line="58" PREFIX:column="12">(<expr><name PREFIX:line="58" PREFIX:column="13">x0</name> &gt; <name PREFIX:line="58" PREFIX:column="18">x1</name></expr>)</condition><then PREFIX:line="58" PREFIX:column="21"> <block PREFIX:line="58" PREFIX:column="22">{ <expr_stmt><expr><name PREFIX:line="58" PREFIX:column="24">x0</name> = <name PREFIX:line="58" PREFIX:column="29">x1</name></expr>;</expr_stmt> <expr_stmt><expr><name PREFIX:line="58" PREFIX:column="33">x1</name> += <name PREFIX:line="58" PREFIX:column="39">a</name></expr>;</expr_stmt> }</block></then></if>
+	<if PREFIX:line="59" PREFIX:column="9">if <condition PREFIX:line="59" PREFIX:column="12">(<expr><name PREFIX:line="59" PREFIX:column="13">y0</name> &gt; <name PREFIX:line="59" PREFIX:column="18">y1</name></expr>)</condition><then PREFIX:line="59" PREFIX:column="21"> <block PREFIX:line="59" PREFIX:column="22">{ <expr_stmt><expr><name PREFIX:line="59" PREFIX:column="24">y0</name> = <name PREFIX:line="59" PREFIX:column="29">y1</name></expr>;</expr_stmt> }</block></then></if> 
+	<expr_stmt><expr><name PREFIX:line="60" PREFIX:column="9">y0</name> += (<name PREFIX:line="60" PREFIX:column="16">b</name>+1)/2</expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="61" PREFIX:column="9">y1</name> = <name PREFIX:line="61" PREFIX:column="14">y0</name>-<name PREFIX:line="61" PREFIX:column="17">b1</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="62" PREFIX:column="9">a</name> *= 8*<name PREFIX:line="62" PREFIX:column="16">a</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="63" PREFIX:column="9">b1</name> = 8*<name PREFIX:line="63" PREFIX:column="16">b</name>*<name PREFIX:line="63" PREFIX:column="18">b</name></expr>;</expr_stmt>
+	
+	<do PREFIX:line="65" PREFIX:column="9">do <block PREFIX:line="65" PREFIX:column="12">{
+		<expr_stmt><expr><call><name PREFIX:line="66" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="66" PREFIX:column="30">(<argument><expr><name PREFIX:line="66" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="66" PREFIX:column="36">x1</name></expr></argument>, <argument><expr><name PREFIX:line="66" PREFIX:column="40">y0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="67" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="67" PREFIX:column="30">(<argument><expr><name PREFIX:line="67" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="67" PREFIX:column="36">x0</name></expr></argument>, <argument><expr><name PREFIX:line="67" PREFIX:column="40">y0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="68" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="68" PREFIX:column="30">(<argument><expr><name PREFIX:line="68" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="68" PREFIX:column="36">x0</name></expr></argument>, <argument><expr><name PREFIX:line="68" PREFIX:column="40">y1</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="69" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="69" PREFIX:column="30">(<argument><expr><name PREFIX:line="69" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="69" PREFIX:column="36">x1</name></expr></argument>, <argument><expr><name PREFIX:line="69" PREFIX:column="40">y1</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><name PREFIX:line="70" PREFIX:column="17">e2</name> = 2*<name PREFIX:line="70" PREFIX:column="24">err</name></expr>;</expr_stmt>
+		<if PREFIX:line="71" PREFIX:column="17">if <condition PREFIX:line="71" PREFIX:column="20">(<expr><name PREFIX:line="71" PREFIX:column="21">e2</name> &gt;= <name PREFIX:line="71" PREFIX:column="27">dx</name></expr>)</condition><then PREFIX:line="71" PREFIX:column="30"> <block PREFIX:line="71" PREFIX:column="31">{
+			<expr_stmt><expr><name PREFIX:line="72" PREFIX:column="25">x0</name>++</expr>;</expr_stmt>
+			<expr_stmt><expr><name PREFIX:line="73" PREFIX:column="25">x1</name>--</expr>;</expr_stmt>
+			<expr_stmt><expr><name PREFIX:line="74" PREFIX:column="25">err</name> += <name PREFIX:line="74" PREFIX:column="32">dx</name> += <name PREFIX:line="74" PREFIX:column="38">b1</name></expr>;</expr_stmt>
+		}</block></then></if>
+		<if PREFIX:line="76" PREFIX:column="17">if <condition PREFIX:line="76" PREFIX:column="20">(<expr><name PREFIX:line="76" PREFIX:column="21">e2</name> &lt;= <name PREFIX:line="76" PREFIX:column="27">dy</name></expr>)</condition><then PREFIX:line="76" PREFIX:column="30"> <block PREFIX:line="76" PREFIX:column="31">{
+			<expr_stmt><expr><name PREFIX:line="77" PREFIX:column="25">y0</name>++</expr>;</expr_stmt>
+			<expr_stmt><expr><name PREFIX:line="78" PREFIX:column="25">y1</name>--</expr>;</expr_stmt>
+			<expr_stmt><expr><name PREFIX:line="79" PREFIX:column="25">err</name> += <name PREFIX:line="79" PREFIX:column="32">dy</name> += <name PREFIX:line="79" PREFIX:column="38">a</name></expr>;</expr_stmt>
+		}</block></then></if>
+	}</block> while <condition PREFIX:line="81" PREFIX:column="17">(<expr><name PREFIX:line="81" PREFIX:column="18">x0</name> &lt;= <name PREFIX:line="81" PREFIX:column="24">x1</name></expr>)</condition>;</do>
+	
+	<while PREFIX:line="83" PREFIX:column="9">while <condition PREFIX:line="83" PREFIX:column="15">(<expr><name PREFIX:line="83" PREFIX:column="16">y0</name>-<name PREFIX:line="83" PREFIX:column="19">y1</name> &lt; <name PREFIX:line="83" PREFIX:column="24">b</name></expr>)</condition> <block PREFIX:line="83" PREFIX:column="27">{
+		<expr_stmt><expr><call><name PREFIX:line="84" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="84" PREFIX:column="30">(<argument><expr><name PREFIX:line="84" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="84" PREFIX:column="36">x0</name>-1</expr></argument>, <argument><expr><name PREFIX:line="84" PREFIX:column="42">y0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="85" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="85" PREFIX:column="30">(<argument><expr><name PREFIX:line="85" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="85" PREFIX:column="36">x1</name>+1</expr></argument>, <argument><expr><name PREFIX:line="85" PREFIX:column="42">y0</name>++</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="86" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="86" PREFIX:column="30">(<argument><expr><name PREFIX:line="86" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="86" PREFIX:column="36">x0</name>-1</expr></argument>, <argument><expr><name PREFIX:line="86" PREFIX:column="42">y1</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="87" PREFIX:column="17">u8g_DrawPixel</name><argument_list PREFIX:line="87" PREFIX:column="30">(<argument><expr><name PREFIX:line="87" PREFIX:column="31">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="87" PREFIX:column="36">x1</name>+1</expr></argument>, <argument><expr><name PREFIX:line="87" PREFIX:column="42">y1</name>--</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	}</block></while>
+}</block></function>
+
+<function><type><name PREFIX:line="91" PREFIX:column="1">void</name></type> <name PREFIX:line="91" PREFIX:column="6">u8g_DrawEllipse</name><parameter_list PREFIX:line="91" PREFIX:column="21">(<param><decl><type><name PREFIX:line="91" PREFIX:column="22">u8g_t</name> *</type><name PREFIX:line="91" PREFIX:column="29">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="91" PREFIX:column="34">u8g_uint_t</name></type> <name PREFIX:line="91" PREFIX:column="45">x0</name></decl></param>, <param><decl><type><name PREFIX:line="91" PREFIX:column="49">u8g_uint_t</name></type> <name PREFIX:line="91" PREFIX:column="60">y0</name></decl></param>, <param><decl><type><name PREFIX:line="91" PREFIX:column="64">u8g_uint_t</name></type> <name PREFIX:line="91" PREFIX:column="75">xr</name></decl></param>, <param><decl><type><name PREFIX:line="91" PREFIX:column="79">u8g_uint_t</name></type> <name PREFIX:line="91" PREFIX:column="90">yr</name></decl></param>)</parameter_list>
+<block PREFIX:line="92" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="93" PREFIX:column="9">u8g_DrawPixel</name><argument_list PREFIX:line="93" PREFIX:column="22">(<argument><expr><name PREFIX:line="93" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="93" PREFIX:column="28">x0</name></expr></argument>, <argument><expr><name PREFIX:line="93" PREFIX:column="32">y0</name>+<name PREFIX:line="93" PREFIX:column="35">yr</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="94" PREFIX:column="9">u8g_DrawPixel</name><argument_list PREFIX:line="94" PREFIX:column="22">(<argument><expr><name PREFIX:line="94" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="94" PREFIX:column="28">x0</name></expr></argument>, <argument><expr><name PREFIX:line="94" PREFIX:column="32">y0</name>-<name PREFIX:line="94" PREFIX:column="35">yr</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="95" PREFIX:column="9">u8g_DrawPixel</name><argument_list PREFIX:line="95" PREFIX:column="22">(<argument><expr><name PREFIX:line="95" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="95" PREFIX:column="28">x0</name>+<name PREFIX:line="95" PREFIX:column="31">xr</name></expr></argument>, <argument><expr><name PREFIX:line="95" PREFIX:column="35">y0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="96" PREFIX:column="9">u8g_DrawPixel</name><argument_list PREFIX:line="96" PREFIX:column="22">(<argument><expr><name PREFIX:line="96" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="96" PREFIX:column="28">x0</name>-<name PREFIX:line="96" PREFIX:column="31">xr</name></expr></argument>, <argument><expr><name PREFIX:line="96" PREFIX:column="35">y0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<cpp:endif PREFIX:line="99" PREFIX:column="1">#<cpp:directive PREFIX:line="99" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+</unit>

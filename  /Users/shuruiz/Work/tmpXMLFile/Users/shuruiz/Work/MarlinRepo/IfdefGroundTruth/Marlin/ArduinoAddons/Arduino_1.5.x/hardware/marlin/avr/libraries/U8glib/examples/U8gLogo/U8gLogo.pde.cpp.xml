@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/U8glib/examples/U8gLogo/U8gLogo.pde.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  U8gLogo.pde
+  
+  Put the U8GLIB logo on the display.
+  
+  &gt;&gt;&gt; Before compiling: Please remove comment from the ructor of the 
+  &gt;&gt;&gt; connected graphics display (see below).
+  
+  Universal 8bit Graphics Library, http://code.google.com/p/u8glib/
+  
+  Copyright (c) 2012, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+*/</comment>
+
+
+<cpp:include PREFIX:line="42" PREFIX:column="1">#<cpp:directive PREFIX:line="42" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="42" PREFIX:column="10">"U8glib.h"</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="44" PREFIX:column="1">// setup u8g object, please remove comment from one of the following ructor calls</comment>
+<comment type="line" PREFIX:line="45" PREFIX:column="1">// IMPORTANT NOTE: The complete list of supported devices is here: http://code.google.com/p/u8glib/wiki/device</comment>
+
+<comment type="line" PREFIX:line="47" PREFIX:column="1">//U8GLIB_NHD27OLED_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="48" PREFIX:column="1">//U8GLIB_NHD27OLED_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="49" PREFIX:column="1">//U8GLIB_NHD27OLED_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="50" PREFIX:column="1">//U8GLIB_NHD27OLED_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="51" PREFIX:column="1">//U8GLIB_NHD31OLED_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="52" PREFIX:column="1">//U8GLIB_NHD31OLED_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="53" PREFIX:column="1">//U8GLIB_NHD31OLED_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="54" PREFIX:column="1">//U8GLIB_NHD31OLED_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="55" PREFIX:column="1">//U8GLIB_DOGS102 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="56" PREFIX:column="1">//U8GLIB_DOGM132 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="57" PREFIX:column="1">//U8GLIB_DOGM128 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="58" PREFIX:column="1">//U8GLIB_ST7920_128X64_1X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="59" PREFIX:column="1">//U8GLIB_ST7920_128X64_4X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="60" PREFIX:column="1">//U8GLIB_ST7920_128X64_1X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="61" PREFIX:column="1">//U8GLIB_ST7920_128X64_4X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="62" PREFIX:column="1">//U8GLIB_ST7920_192X32_1X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="63" PREFIX:column="1">//U8GLIB_ST7920_192X32_4X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="64" PREFIX:column="1">//U8GLIB_ST7920_192X32_1X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="65" PREFIX:column="1">//U8GLIB_ST7920_192X32_4X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="66" PREFIX:column="1">//U8GLIB_ST7920_192X32_1X u8g(13, 11, 10);	// SPI Com: SCK = en = 13, MOSI = rw = 11, CS = di = 10</comment>
+<comment type="line" PREFIX:line="67" PREFIX:column="1">//U8GLIB_ST7920_192X32_4X u8g(10);		// SPI Com: SCK = en = 13, MOSI = rw = 11, CS = di = 10, HW SPI</comment>
+<comment type="line" PREFIX:line="68" PREFIX:column="1">//U8GLIB_ST7920_202X32_1X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="69" PREFIX:column="1">//U8GLIB_ST7920_202X32_4X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="70" PREFIX:column="1">//U8GLIB_ST7920_202X32_1X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="71" PREFIX:column="1">//U8GLIB_ST7920_202X32_4X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="72" PREFIX:column="1">//U8GLIB_LM6059 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="73" PREFIX:column="1">//U8GLIB_LM6063 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="74" PREFIX:column="1">//U8GLIB_DOGXL160_BW u8g(10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="75" PREFIX:column="1">//U8GLIB_DOGXL160_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="76" PREFIX:column="1">//U8GLIB_DOGXL160_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="77" PREFIX:column="1">//U8GLIB_DOGXL160_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="78" PREFIX:column="1">//U8GLIB_PCD8544 u8g(13, 11, 10, 9, 8);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, Reset = 8</comment>
+<comment type="line" PREFIX:line="79" PREFIX:column="1">//U8GLIB_PCF8812 u8g(13, 11, 10, 9, 8);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, Reset = 8</comment>
+<comment type="line" PREFIX:line="80" PREFIX:column="1">//U8GLIB_KS0108_128 u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 14, 15, 17, 16); 		// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs1=14, cs2=15,di=17,rw=16</comment>
+<comment type="line" PREFIX:line="81" PREFIX:column="1">//U8GLIB_LC7981_160X80 u8g(8, 9, 10, 11, 4, 5, 6, 7,  18, 14, 15, 17, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs=14 ,di=15,rw=17, reset = 16</comment>
+<comment type="line" PREFIX:line="82" PREFIX:column="1">//U8GLIB_LC7981_240X64 u8g(8, 9, 10, 11, 4, 5, 6, 7,  18, 14, 15, 17, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs=14 ,di=15,rw=17, reset = 16</comment>
+<comment type="line" PREFIX:line="83" PREFIX:column="1">//U8GLIB_LC7981_240X128 u8g(8, 9, 10, 11, 4, 5, 6, 7,  18, 14, 15, 17, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs=14 ,di=15,rw=17, reset = 16</comment>
+<comment type="line" PREFIX:line="84" PREFIX:column="1">//U8GLIB_ILI9325D_320x240 u8g(18,17,19,U8G_PIN_NONE,16 );  			// 8Bit Com: D0..D7: 0,1,2,3,4,5,6,7 en=wr=18, cs=17, rs=19, rd=U8G_PIN_NONE, reset = 16</comment>
+<comment type="line" PREFIX:line="85" PREFIX:column="1">//U8GLIB_SBN1661_122X32 u8g(8,9,10,11,4,5,6,7,14,15, 17, U8G_PIN_NONE, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 cs1=14, cs2=15,di=17,rw=16,reset = 16</comment>
+<comment type="line" PREFIX:line="86" PREFIX:column="1">//U8GLIB_SSD1306_128X64 u8g(13, 11, 10, 9);	// SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="87" PREFIX:column="1">//U8GLIB_SSD1306_128X64 u8g(10, 9);		// HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="88" PREFIX:column="1">//U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);	// HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="89" PREFIX:column="1">//U8GLIB_SSD1306_128X32 u8g(13, 11, 10, 9);	// SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="90" PREFIX:column="1">//U8GLIB_SSD1306_128X32 u8g(10, 9);             // HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="91" PREFIX:column="1">//U8GLIB_SSD1306_128X32 u8g(U8G_I2C_OPT_NONE);	// HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="92" PREFIX:column="1">//U8GLIB_SSD1309_128X64 u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="93" PREFIX:column="1">//U8GLIB_SSD1327_96X96_GR u8g(U8G_I2C_OPT_NONE);	// I2C</comment>
+<comment type="line" PREFIX:line="94" PREFIX:column="1">//U8GLIB_SSD1327_96X96_2X_GR u8g(U8G_I2C_OPT_NONE);	// I2C</comment>
+<comment type="line" PREFIX:line="95" PREFIX:column="1">//U8GLIB_NHD_C12864 u8g(13, 11, 10, 9, 8);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, RST = 8</comment>
+<comment type="line" PREFIX:line="96" PREFIX:column="1">//U8GLIB_NHD_C12832 u8g(13, 11, 10, 9, 8);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, RST = 8</comment>
+<comment type="line" PREFIX:line="97" PREFIX:column="1">//U8GLIB_T6963_240X128 u8g(8, 9, 10, 11, 4, 5, 6, 7, 14, 15, 17, 18, 16); // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7, cs=14, a0=15, wr=17, rd=18, reset=16</comment>
+<comment type="line" PREFIX:line="98" PREFIX:column="1">//U8GLIB_T6963_240X64 u8g(8, 9, 10, 11, 4, 5, 6, 7, 14, 15, 17, 18, 16); // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7, cs=14, a0=15, wr=17, rd=18, reset=16</comment>
+<comment type="line" PREFIX:line="99" PREFIX:column="1">//U8GLIB_T6963_128X64 u8g(8, 9, 10, 11, 4, 5, 6, 7, 14, 15, 17, 18, 16); // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7, cs=14, a0=15, wr=17, rd=18, reset=16</comment>
+
+
+<function><type><name PREFIX:line="102" PREFIX:column="1">void</name></type> <name PREFIX:line="102" PREFIX:column="6">drawColorBox</name><parameter_list PREFIX:line="102" PREFIX:column="18">(<param><decl><type><name PREFIX:line="102" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="103" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="104" PREFIX:column="3">u8g_uint_t</name></type> <name PREFIX:line="104" PREFIX:column="14">w</name></decl>,<decl><type ref="prev"/><name PREFIX:line="104" PREFIX:column="16">h</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="105" PREFIX:column="3">u8g_uint_t</name></type> <name PREFIX:line="105" PREFIX:column="14">r</name></decl>, <decl><type ref="prev"/><name PREFIX:line="105" PREFIX:column="17">g</name></decl>, <decl><type ref="prev"/><name PREFIX:line="105" PREFIX:column="20">b</name></decl>;</decl_stmt>
+  
+  <expr_stmt><expr><name PREFIX:line="107" PREFIX:column="3">w</name> = <call><name><name PREFIX:line="107" PREFIX:column="7">u8g</name>.<name PREFIX:line="107" PREFIX:column="11">getWidth</name></name><argument_list PREFIX:line="107" PREFIX:column="19">()</argument_list></call>/32</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="108" PREFIX:column="3">h</name> = <call><name><name PREFIX:line="108" PREFIX:column="7">u8g</name>.<name PREFIX:line="108" PREFIX:column="11">getHeight</name></name><argument_list PREFIX:line="108" PREFIX:column="20">()</argument_list></call>/8</expr>;</expr_stmt>
+  <for PREFIX:line="109" PREFIX:column="3">for( <init><expr><name PREFIX:line="109" PREFIX:column="8">b</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="109" PREFIX:column="15">b</name> &lt; 4</expr>;</condition> <incr><expr><name PREFIX:line="109" PREFIX:column="22">b</name>++</expr></incr> )
+    <for PREFIX:line="110" PREFIX:column="5">for( <init><expr><name PREFIX:line="110" PREFIX:column="10">g</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="110" PREFIX:column="17">g</name> &lt; 8</expr>;</condition> <incr><expr><name PREFIX:line="110" PREFIX:column="24">g</name>++</expr></incr> )
+      <for PREFIX:line="111" PREFIX:column="7">for( <init><expr><name PREFIX:line="111" PREFIX:column="12">r</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="111" PREFIX:column="19">r</name> &lt; 8</expr>;</condition> <incr><expr><name PREFIX:line="111" PREFIX:column="26">r</name>++</expr></incr> )
+      <block PREFIX:line="112" PREFIX:column="7">{
+        <expr_stmt><expr><call><name><name PREFIX:line="113" PREFIX:column="9">u8g</name>.<name PREFIX:line="113" PREFIX:column="13">setColorIndex</name></name><argument_list PREFIX:line="113" PREFIX:column="26">(<argument><expr PREFIX:line="113" PREFIX:column="27">(<name PREFIX:line="113" PREFIX:column="28">r</name>&lt;&lt;5) |  (<name PREFIX:line="113" PREFIX:column="38">g</name>&lt;&lt;2) | <name PREFIX:line="113" PREFIX:column="46">b</name></expr></argument> )</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><call><name><name PREFIX:line="114" PREFIX:column="9">u8g</name>.<name PREFIX:line="114" PREFIX:column="13">drawBox</name></name><argument_list PREFIX:line="114" PREFIX:column="20">(<argument><expr><name PREFIX:line="114" PREFIX:column="21">g</name>*<name PREFIX:line="114" PREFIX:column="23">w</name> + <name PREFIX:line="114" PREFIX:column="27">b</name>*<name PREFIX:line="114" PREFIX:column="29">w</name>*8</expr></argument>, <argument><expr><name PREFIX:line="114" PREFIX:column="34">r</name>*<name PREFIX:line="114" PREFIX:column="36">h</name></expr></argument>, <argument><expr><name PREFIX:line="114" PREFIX:column="39">w</name></expr></argument>, <argument><expr><name PREFIX:line="114" PREFIX:column="42">h</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      }</block></for></for></for>
+}</block></function>
+
+<function><type><name PREFIX:line="118" PREFIX:column="1">void</name></type> <name PREFIX:line="118" PREFIX:column="6">drawLogo</name><parameter_list PREFIX:line="118" PREFIX:column="14">(<param><decl><type><name PREFIX:line="118" PREFIX:column="15">uint8_t</name></type> <name PREFIX:line="118" PREFIX:column="23">d</name></decl></param>)</parameter_list>
+<block PREFIX:line="119" PREFIX:column="1">{
+  <expr_stmt><expr><call><name><name PREFIX:line="120" PREFIX:column="3">u8g</name>.<name PREFIX:line="120" PREFIX:column="7">setFont</name></name><argument_list PREFIX:line="120" PREFIX:column="14">(<argument><expr><name PREFIX:line="120" PREFIX:column="15">u8g_font_gdr25r</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="121" PREFIX:column="3">u8g</name>.<name PREFIX:line="121" PREFIX:column="7">drawStr</name></name><argument_list PREFIX:line="121" PREFIX:column="14">(<argument><expr PREFIX:line="121" PREFIX:column="15">0+<name PREFIX:line="121" PREFIX:column="17">d</name></expr></argument>, <argument><expr PREFIX:line="121" PREFIX:column="20">30+<name PREFIX:line="121" PREFIX:column="23">d</name></expr></argument>, <argument><expr PREFIX:line="121" PREFIX:column="26">"U"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="122" PREFIX:column="3">u8g</name>.<name PREFIX:line="122" PREFIX:column="7">setFont</name></name><argument_list PREFIX:line="122" PREFIX:column="14">(<argument><expr><name PREFIX:line="122" PREFIX:column="15">u8g_font_gdr30n</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="123" PREFIX:column="3">u8g</name>.<name PREFIX:line="123" PREFIX:column="7">drawStr90</name></name><argument_list PREFIX:line="123" PREFIX:column="16">(<argument><expr PREFIX:line="123" PREFIX:column="17">23+<name PREFIX:line="123" PREFIX:column="20">d</name></expr></argument>,<argument><expr PREFIX:line="123" PREFIX:column="22">10+<name PREFIX:line="123" PREFIX:column="25">d</name></expr></argument>,<argument><expr PREFIX:line="123" PREFIX:column="27">"8"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="124" PREFIX:column="3">u8g</name>.<name PREFIX:line="124" PREFIX:column="7">setFont</name></name><argument_list PREFIX:line="124" PREFIX:column="14">(<argument><expr><name PREFIX:line="124" PREFIX:column="15">u8g_font_gdr25r</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="125" PREFIX:column="3">u8g</name>.<name PREFIX:line="125" PREFIX:column="7">drawStr</name></name><argument_list PREFIX:line="125" PREFIX:column="14">(<argument><expr PREFIX:line="125" PREFIX:column="15">53+<name PREFIX:line="125" PREFIX:column="18">d</name></expr></argument>,<argument><expr PREFIX:line="125" PREFIX:column="20">30+<name PREFIX:line="125" PREFIX:column="23">d</name></expr></argument>,<argument><expr PREFIX:line="125" PREFIX:column="25">"g"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  
+  <expr_stmt><expr><call><name><name PREFIX:line="127" PREFIX:column="3">u8g</name>.<name PREFIX:line="127" PREFIX:column="7">drawHLine</name></name><argument_list PREFIX:line="127" PREFIX:column="16">(<argument><expr PREFIX:line="127" PREFIX:column="17">2+<name PREFIX:line="127" PREFIX:column="19">d</name></expr></argument>, <argument><expr PREFIX:line="127" PREFIX:column="22">35+<name PREFIX:line="127" PREFIX:column="25">d</name></expr></argument>, <argument><expr PREFIX:line="127" PREFIX:column="28">47</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="128" PREFIX:column="3">u8g</name>.<name PREFIX:line="128" PREFIX:column="7">drawVLine</name></name><argument_list PREFIX:line="128" PREFIX:column="16">(<argument><expr PREFIX:line="128" PREFIX:column="17">45+<name PREFIX:line="128" PREFIX:column="20">d</name></expr></argument>, <argument><expr PREFIX:line="128" PREFIX:column="23">32+<name PREFIX:line="128" PREFIX:column="26">d</name></expr></argument>, <argument><expr PREFIX:line="128" PREFIX:column="29">12</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="131" PREFIX:column="1">void</name></type> <name PREFIX:line="131" PREFIX:column="6">drawURL</name><parameter_list PREFIX:line="131" PREFIX:column="13">(<param><decl><type><name PREFIX:line="131" PREFIX:column="14">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="132" PREFIX:column="1">{
+  <expr_stmt><expr><call><name><name PREFIX:line="133" PREFIX:column="3">u8g</name>.<name PREFIX:line="133" PREFIX:column="7">setFont</name></name><argument_list PREFIX:line="133" PREFIX:column="14">(<argument><expr><name PREFIX:line="133" PREFIX:column="15">u8g_font_4x6</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <if PREFIX:line="134" PREFIX:column="3">if <condition PREFIX:line="134" PREFIX:column="6">( <expr><call><name><name PREFIX:line="134" PREFIX:column="8">u8g</name>.<name PREFIX:line="134" PREFIX:column="12">getHeight</name></name><argument_list PREFIX:line="134" PREFIX:column="21">()</argument_list></call> &lt; 59</expr> )</condition><then PREFIX:line="134" PREFIX:column="30">
+  <block PREFIX:line="135" PREFIX:column="3">{
+    <expr_stmt><expr><call><name><name PREFIX:line="136" PREFIX:column="5">u8g</name>.<name PREFIX:line="136" PREFIX:column="9">drawStr</name></name><argument_list PREFIX:line="136" PREFIX:column="16">(<argument><expr PREFIX:line="136" PREFIX:column="17">53</expr></argument>,<argument><expr PREFIX:line="136" PREFIX:column="20">9</expr></argument>,<argument><expr PREFIX:line="136" PREFIX:column="22">"code.google.com"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name><name PREFIX:line="137" PREFIX:column="5">u8g</name>.<name PREFIX:line="137" PREFIX:column="9">drawStr</name></name><argument_list PREFIX:line="137" PREFIX:column="16">(<argument><expr PREFIX:line="137" PREFIX:column="17">77</expr></argument>,<argument><expr PREFIX:line="137" PREFIX:column="20">18</expr></argument>,<argument><expr PREFIX:line="137" PREFIX:column="23">"/p/u8glib"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then>
+  <else PREFIX:line="139" PREFIX:column="3">else
+  <block PREFIX:line="140" PREFIX:column="3">{
+    <expr_stmt><expr><call><name><name PREFIX:line="141" PREFIX:column="5">u8g</name>.<name PREFIX:line="141" PREFIX:column="9">drawStr</name></name><argument_list PREFIX:line="141" PREFIX:column="16">(<argument><expr PREFIX:line="141" PREFIX:column="17">1</expr></argument>,<argument><expr PREFIX:line="141" PREFIX:column="19">54</expr></argument>,<argument><expr PREFIX:line="141" PREFIX:column="22">"code.google.com/p/u8glib"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></else></if>
+}</block></function>
+
+
+<function><type><name PREFIX:line="146" PREFIX:column="1">void</name></type> <name PREFIX:line="146" PREFIX:column="6">draw</name><parameter_list PREFIX:line="146" PREFIX:column="10">(<param><decl><type><name PREFIX:line="146" PREFIX:column="11">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="146" PREFIX:column="17">{
+  <if PREFIX:line="147" PREFIX:column="3">if <condition PREFIX:line="147" PREFIX:column="6">( <expr><call><name><name PREFIX:line="147" PREFIX:column="8">u8g</name>.<name PREFIX:line="147" PREFIX:column="12">getMode</name></name><argument_list PREFIX:line="147" PREFIX:column="19">()</argument_list></call> == <name PREFIX:line="147" PREFIX:column="25">U8G_MODE_R3G3B2</name></expr> )</condition><then PREFIX:line="147" PREFIX:column="42"> <block PREFIX:line="147" PREFIX:column="43">{
+    <expr_stmt><expr><call><name PREFIX:line="148" PREFIX:column="5">drawColorBox</name><argument_list PREFIX:line="148" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+  }</block></then></if>
+  <expr_stmt><expr><call><name><name PREFIX:line="150" PREFIX:column="3">u8g</name>.<name PREFIX:line="150" PREFIX:column="7">setColorIndex</name></name><argument_list PREFIX:line="150" PREFIX:column="20">(<argument><expr PREFIX:line="150" PREFIX:column="21">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <if PREFIX:line="151" PREFIX:column="3">if <condition PREFIX:line="151" PREFIX:column="6">( <expr><call><name PREFIX:line="151" PREFIX:column="8">U8G_MODE_GET_BITS_PER_PIXEL</name><argument_list PREFIX:line="151" PREFIX:column="35">(<argument><expr><call><name><name PREFIX:line="151" PREFIX:column="36">u8g</name>.<name PREFIX:line="151" PREFIX:column="40">getMode</name></name><argument_list PREFIX:line="151" PREFIX:column="47">()</argument_list></call></expr></argument>)</argument_list></call> &gt; 1</expr> )</condition><then PREFIX:line="151" PREFIX:column="56"> <block PREFIX:line="151" PREFIX:column="57">{
+    <expr_stmt><expr><call><name PREFIX:line="152" PREFIX:column="5">drawLogo</name><argument_list PREFIX:line="152" PREFIX:column="13">(<argument><expr PREFIX:line="152" PREFIX:column="14">2</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name><name PREFIX:line="153" PREFIX:column="5">u8g</name>.<name PREFIX:line="153" PREFIX:column="9">setColorIndex</name></name><argument_list PREFIX:line="153" PREFIX:column="22">(<argument><expr PREFIX:line="153" PREFIX:column="23">2</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="154" PREFIX:column="5">drawLogo</name><argument_list PREFIX:line="154" PREFIX:column="13">(<argument><expr PREFIX:line="154" PREFIX:column="14">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name><name PREFIX:line="155" PREFIX:column="5">u8g</name>.<name PREFIX:line="155" PREFIX:column="9">setColorIndex</name></name><argument_list PREFIX:line="155" PREFIX:column="22">(<argument><expr PREFIX:line="155" PREFIX:column="23">3</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then></if>
+  <expr_stmt><expr><call><name PREFIX:line="157" PREFIX:column="3">drawLogo</name><argument_list PREFIX:line="157" PREFIX:column="11">(<argument><expr PREFIX:line="157" PREFIX:column="12">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="158" PREFIX:column="3">drawURL</name><argument_list PREFIX:line="158" PREFIX:column="10">()</argument_list></call></expr>;</expr_stmt>
+  
+}</block></function>
+
+<function><type><name PREFIX:line="162" PREFIX:column="1">void</name></type> <name PREFIX:line="162" PREFIX:column="6">setup</name><parameter_list PREFIX:line="162" PREFIX:column="11">(<param><decl><type><name PREFIX:line="162" PREFIX:column="12">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="162" PREFIX:column="18">{
+  <comment type="line" PREFIX:line="163" PREFIX:column="3">// flip screen, if required</comment>
+  <comment type="line" PREFIX:line="164" PREFIX:column="3">//u8g.setRot180();</comment>
+}</block></function>
+
+<function><type><name PREFIX:line="167" PREFIX:column="1">void</name></type> <name PREFIX:line="167" PREFIX:column="6">loop</name><parameter_list PREFIX:line="167" PREFIX:column="10">(<param><decl><type><name PREFIX:line="167" PREFIX:column="11">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="167" PREFIX:column="17">{
+  
+  <comment type="line" PREFIX:line="169" PREFIX:column="3">// picture loop</comment>
+  <expr_stmt><expr><call><name><name PREFIX:line="170" PREFIX:column="3">u8g</name>.<name PREFIX:line="170" PREFIX:column="7">firstPage</name></name><argument_list PREFIX:line="170" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>  
+  <do PREFIX:line="171" PREFIX:column="3">do <block PREFIX:line="171" PREFIX:column="6">{
+    <expr_stmt><expr><call><name PREFIX:line="172" PREFIX:column="5">draw</name><argument_list PREFIX:line="172" PREFIX:column="9">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="173" PREFIX:column="3">u8g</name>.<name PREFIX:line="173" PREFIX:column="7">setColorIndex</name></name><argument_list PREFIX:line="173" PREFIX:column="20">(<argument><expr PREFIX:line="173" PREFIX:column="21">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="174" PREFIX:column="10">( <expr><call><name><name PREFIX:line="174" PREFIX:column="12">u8g</name>.<name PREFIX:line="174" PREFIX:column="16">nextPage</name></name><argument_list PREFIX:line="174" PREFIX:column="24">()</argument_list></call></expr> )</condition>;</do>
+  
+  <comment type="line" PREFIX:line="176" PREFIX:column="3">// rebuild the picture after some delay</comment>
+  <expr_stmt><expr><call><name PREFIX:line="177" PREFIX:column="3">delay</name><argument_list PREFIX:line="177" PREFIX:column="8">(<argument><expr PREFIX:line="177" PREFIX:column="9">200</expr></argument>)</argument_list></call></expr>;</expr_stmt>  
+}</block></function>
+
+</unit>

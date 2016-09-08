@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/TEMP/SPI/SPI.h.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+ * Copyright (c) 2010 by Cristian Maglie &lt;c.maglie@bug.st&gt;
+ * SPI Master library for arduino.
+ *
+ * This file is free software; you can redistribute it and/or modify
+ * it under the terms of either the GNU General Public License version 2
+ * or the GNU Lesser General Public License version 2.1, both as
+ * published by the Free Software Foundation.
+ */</comment>
+
+<cpp:ifndef PREFIX:line="11" PREFIX:column="1">#<cpp:directive PREFIX:line="11" PREFIX:column="2">ifndef</cpp:directive> <name PREFIX:line="11" PREFIX:column="9">_SPI_H_INCLUDED</name></cpp:ifndef>
+<cpp:define PREFIX:line="12" PREFIX:column="1">#<cpp:directive PREFIX:line="12" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="12" PREFIX:column="9">_SPI_H_INCLUDED</name></cpp:macro></cpp:define>
+
+<cpp:include PREFIX:line="14" PREFIX:column="1">#<cpp:directive PREFIX:line="14" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="14" PREFIX:column="10">&lt;stdio.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="15" PREFIX:column="1">#<cpp:directive PREFIX:line="15" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="15" PREFIX:column="10">&lt;Arduino.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="16" PREFIX:column="1">#<cpp:directive PREFIX:line="16" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="16" PREFIX:column="10">&lt;avr/pgmspace.h&gt;</cpp:file></cpp:include>
+
+<cpp:define PREFIX:line="18" PREFIX:column="1">#<cpp:directive PREFIX:line="18" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="18" PREFIX:column="9">SPI_CLOCK_DIV4</name></cpp:macro> <cpp:value PREFIX:line="18" PREFIX:column="24">0x00</cpp:value></cpp:define>
+<cpp:define PREFIX:line="19" PREFIX:column="1">#<cpp:directive PREFIX:line="19" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="19" PREFIX:column="9">SPI_CLOCK_DIV16</name></cpp:macro> <cpp:value PREFIX:line="19" PREFIX:column="25">0x01</cpp:value></cpp:define>
+<cpp:define PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="20" PREFIX:column="9">SPI_CLOCK_DIV64</name></cpp:macro> <cpp:value PREFIX:line="20" PREFIX:column="25">0x02</cpp:value></cpp:define>
+<cpp:define PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="21" PREFIX:column="9">SPI_CLOCK_DIV128</name></cpp:macro> <cpp:value PREFIX:line="21" PREFIX:column="26">0x03</cpp:value></cpp:define>
+<cpp:define PREFIX:line="22" PREFIX:column="1">#<cpp:directive PREFIX:line="22" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="22" PREFIX:column="9">SPI_CLOCK_DIV2</name></cpp:macro> <cpp:value PREFIX:line="22" PREFIX:column="24">0x04</cpp:value></cpp:define>
+<cpp:define PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="23" PREFIX:column="9">SPI_CLOCK_DIV8</name></cpp:macro> <cpp:value PREFIX:line="23" PREFIX:column="24">0x05</cpp:value></cpp:define>
+<cpp:define PREFIX:line="24" PREFIX:column="1">#<cpp:directive PREFIX:line="24" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="24" PREFIX:column="9">SPI_CLOCK_DIV32</name></cpp:macro> <cpp:value PREFIX:line="24" PREFIX:column="25">0x06</cpp:value></cpp:define>
+<comment type="line" PREFIX:line="25" PREFIX:column="1">//#define SPI_CLOCK_DIV64 0x07</comment>
+
+<cpp:define PREFIX:line="27" PREFIX:column="1">#<cpp:directive PREFIX:line="27" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="27" PREFIX:column="9">SPI_MODE0</name></cpp:macro> <cpp:value PREFIX:line="27" PREFIX:column="19">0x00</cpp:value></cpp:define>
+<cpp:define PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="28" PREFIX:column="9">SPI_MODE1</name></cpp:macro> <cpp:value PREFIX:line="28" PREFIX:column="19">0x04</cpp:value></cpp:define>
+<cpp:define PREFIX:line="29" PREFIX:column="1">#<cpp:directive PREFIX:line="29" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="29" PREFIX:column="9">SPI_MODE2</name></cpp:macro> <cpp:value PREFIX:line="29" PREFIX:column="19">0x08</cpp:value></cpp:define>
+<cpp:define PREFIX:line="30" PREFIX:column="1">#<cpp:directive PREFIX:line="30" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="30" PREFIX:column="9">SPI_MODE3</name></cpp:macro> <cpp:value PREFIX:line="30" PREFIX:column="19">0x0C</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="32" PREFIX:column="1">#<cpp:directive PREFIX:line="32" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="32" PREFIX:column="9">SPI_MODE_MASK</name></cpp:macro> <cpp:value PREFIX:line="32" PREFIX:column="23">0x0C</cpp:value></cpp:define>  <comment type="line" PREFIX:line="32" PREFIX:column="29">// CPOL = bit 3, CPHA = bit 2 on SPCR</comment>
+<cpp:define PREFIX:line="33" PREFIX:column="1">#<cpp:directive PREFIX:line="33" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="33" PREFIX:column="9">SPI_CLOCK_MASK</name></cpp:macro> <cpp:value PREFIX:line="33" PREFIX:column="24">0x03</cpp:value></cpp:define>  <comment type="line" PREFIX:line="33" PREFIX:column="30">// SPR1 = bit 1, SPR0 = bit 0 on SPCR</comment>
+<cpp:define PREFIX:line="34" PREFIX:column="1">#<cpp:directive PREFIX:line="34" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="34" PREFIX:column="9">SPI_2XCLOCK_MASK</name></cpp:macro> <cpp:value PREFIX:line="34" PREFIX:column="26">0x01</cpp:value></cpp:define>  <comment type="line" PREFIX:line="34" PREFIX:column="32">// SPI2X = bit 0 on SPSR</comment>
+
+<class PREFIX:line="36" PREFIX:column="1">class <name PREFIX:line="36" PREFIX:column="7">SPIClass</name> <block PREFIX:line="36" PREFIX:column="16">{<private type="default" PREFIX:line="36" PREFIX:column="17">
+</private><public PREFIX:line="37" PREFIX:column="1">public:
+  <function_decl><type><specifier PREFIX:line="38" PREFIX:column="3">inline</specifier> <specifier PREFIX:line="38" PREFIX:column="10">static</specifier> <name PREFIX:line="38" PREFIX:column="17">byte</name></type> <name PREFIX:line="38" PREFIX:column="22">transfer</name><parameter_list PREFIX:line="38" PREFIX:column="30">(<param><decl><type><name PREFIX:line="38" PREFIX:column="31">byte</name></type> <name PREFIX:line="38" PREFIX:column="36">_data</name></decl></param>)</parameter_list>;</function_decl>
+
+  <comment type="line" PREFIX:line="40" PREFIX:column="3">// SPI Configuration methods</comment>
+
+  <function_decl><type><specifier PREFIX:line="42" PREFIX:column="3">inline</specifier> <specifier PREFIX:line="42" PREFIX:column="10">static</specifier> <name PREFIX:line="42" PREFIX:column="17">void</name></type> <name PREFIX:line="42" PREFIX:column="22">attachInterrupt</name><parameter_list PREFIX:line="42" PREFIX:column="37">()</parameter_list>;</function_decl>
+  <function_decl><type><specifier PREFIX:line="43" PREFIX:column="3">inline</specifier> <specifier PREFIX:line="43" PREFIX:column="10">static</specifier> <name PREFIX:line="43" PREFIX:column="17">void</name></type> <name PREFIX:line="43" PREFIX:column="22">detachInterrupt</name><parameter_list PREFIX:line="43" PREFIX:column="37">()</parameter_list>;</function_decl> <comment type="line" PREFIX:line="43" PREFIX:column="41">// Default</comment>
+
+  <function_decl><type><specifier PREFIX:line="45" PREFIX:column="3">static</specifier> <name PREFIX:line="45" PREFIX:column="10">void</name></type> <name PREFIX:line="45" PREFIX:column="15">begin</name><parameter_list PREFIX:line="45" PREFIX:column="20">()</parameter_list>;</function_decl> <comment type="line" PREFIX:line="45" PREFIX:column="24">// Default</comment>
+  <function_decl><type><specifier PREFIX:line="46" PREFIX:column="3">static</specifier> <name PREFIX:line="46" PREFIX:column="10">void</name></type> <name PREFIX:line="46" PREFIX:column="15">end</name><parameter_list PREFIX:line="46" PREFIX:column="18">()</parameter_list>;</function_decl>
+
+  <function_decl><type><specifier PREFIX:line="48" PREFIX:column="3">static</specifier> <name PREFIX:line="48" PREFIX:column="10">void</name></type> <name PREFIX:line="48" PREFIX:column="15">setBitOrder</name><parameter_list PREFIX:line="48" PREFIX:column="26">(<param><decl><type><name PREFIX:line="48" PREFIX:column="27">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><specifier PREFIX:line="49" PREFIX:column="3">static</specifier> <name PREFIX:line="49" PREFIX:column="10">void</name></type> <name PREFIX:line="49" PREFIX:column="15">setDataMode</name><parameter_list PREFIX:line="49" PREFIX:column="26">(<param><decl><type><name PREFIX:line="49" PREFIX:column="27">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><specifier PREFIX:line="50" PREFIX:column="3">static</specifier> <name PREFIX:line="50" PREFIX:column="10">void</name></type> <name PREFIX:line="50" PREFIX:column="15">setClockDivider</name><parameter_list PREFIX:line="50" PREFIX:column="30">(<param><decl><type><name PREFIX:line="50" PREFIX:column="31">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+</public>}</block>;</class>
+
+ <decl_stmt><decl><type><name PREFIX:line="53" PREFIX:column="2">SPIClass</name></type> <name PREFIX:line="53" PREFIX:column="11">SPI</name></decl>;</decl_stmt>
+
+<function><type><name PREFIX:line="55" PREFIX:column="1">byte</name></type> <name><name PREFIX:line="55" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="55" PREFIX:column="16">transfer</name></name><parameter_list PREFIX:line="55" PREFIX:column="24">(<param><decl><type><name PREFIX:line="55" PREFIX:column="25">byte</name></type> <name PREFIX:line="55" PREFIX:column="30">_data</name></decl></param>)</parameter_list> <block PREFIX:line="55" PREFIX:column="37">{
+  <expr_stmt><expr><name PREFIX:line="56" PREFIX:column="3">SPDR</name> = <name PREFIX:line="56" PREFIX:column="10">_data</name></expr>;</expr_stmt>
+  <while PREFIX:line="57" PREFIX:column="3">while <condition PREFIX:line="57" PREFIX:column="9">(<expr PREFIX:line="57" PREFIX:column="10">!(<name PREFIX:line="57" PREFIX:column="12">SPSR</name> &amp; <call><name PREFIX:line="57" PREFIX:column="19">_BV</name><argument_list PREFIX:line="57" PREFIX:column="22">(<argument><expr><name PREFIX:line="57" PREFIX:column="23">SPIF</name></expr></argument>)</argument_list></call>)</expr>)</condition>
+    <empty_stmt PREFIX:line="58" PREFIX:column="5">;</empty_stmt></while>
+  <return PREFIX:line="59" PREFIX:column="3">return <expr><name PREFIX:line="59" PREFIX:column="10">SPDR</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="62" PREFIX:column="1">void</name></type> <name><name PREFIX:line="62" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="62" PREFIX:column="16">attachInterrupt</name></name><parameter_list PREFIX:line="62" PREFIX:column="31">()</parameter_list> <block PREFIX:line="62" PREFIX:column="34">{
+  <expr_stmt><expr><name PREFIX:line="63" PREFIX:column="3">SPCR</name> |= <call><name PREFIX:line="63" PREFIX:column="11">_BV</name><argument_list PREFIX:line="63" PREFIX:column="14">(<argument><expr><name PREFIX:line="63" PREFIX:column="15">SPIE</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="66" PREFIX:column="1">void</name></type> <name><name PREFIX:line="66" PREFIX:column="6">SPIClass</name>::<name PREFIX:line="66" PREFIX:column="16">detachInterrupt</name></name><parameter_list PREFIX:line="66" PREFIX:column="31">()</parameter_list> <block PREFIX:line="66" PREFIX:column="34">{
+  <expr_stmt><expr><name PREFIX:line="67" PREFIX:column="3">SPCR</name> &amp;= ~<call><name PREFIX:line="67" PREFIX:column="12">_BV</name><argument_list PREFIX:line="67" PREFIX:column="15">(<argument><expr><name PREFIX:line="67" PREFIX:column="16">SPIE</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<cpp:endif PREFIX:line="70" PREFIX:column="1">#<cpp:directive PREFIX:line="70" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+</unit>

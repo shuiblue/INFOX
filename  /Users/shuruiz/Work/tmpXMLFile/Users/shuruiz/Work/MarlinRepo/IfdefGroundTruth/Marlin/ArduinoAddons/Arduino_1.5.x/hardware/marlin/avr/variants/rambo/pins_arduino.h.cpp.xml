@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/variants/rambo/pins_arduino.h.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  pins_arduino.h - Pin definition functions for Arduino
+  Part of Arduino - http://www.arduino.cc/
+
+  Copyright (c) 2007 David A. Mellis
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General
+  Public License along with this library; if not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  Boston, MA  02111-1307  USA
+
+  $Id: wiring.h 249 2007-02-03 16:52:51Z mellis $
+*/</comment>
+
+<cpp:ifndef PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">ifndef</cpp:directive> <name PREFIX:line="25" PREFIX:column="9">Pins_Arduino_h</name></cpp:ifndef>
+<cpp:define PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="26" PREFIX:column="9">Pins_Arduino_h</name></cpp:macro></cpp:define>
+
+<cpp:include PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="28" PREFIX:column="10">&lt;avr/pgmspace.h&gt;</cpp:file></cpp:include>
+
+<cpp:define PREFIX:line="30" PREFIX:column="1">#<cpp:directive PREFIX:line="30" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="30" PREFIX:column="9">NUM_DIGITAL_PINS</name></cpp:macro>            <cpp:value PREFIX:line="30" PREFIX:column="37">82</cpp:value></cpp:define>
+<cpp:define PREFIX:line="31" PREFIX:column="1">#<cpp:directive PREFIX:line="31" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="31" PREFIX:column="9">NUM_ANALOG_INPUTS</name></cpp:macro>           <cpp:value PREFIX:line="31" PREFIX:column="37">16</cpp:value></cpp:define>
+<cpp:define PREFIX:line="32" PREFIX:column="1">#<cpp:directive PREFIX:line="32" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="32" PREFIX:column="9">analogInputToDigitalPin</name><parameter_list PREFIX:line="32" PREFIX:column="32">(<param><type><name PREFIX:line="32" PREFIX:column="33">p</name></type></param>)</parameter_list></cpp:macro>  <cpp:value PREFIX:line="32" PREFIX:column="37">((p &lt; 16) ? (p) + 54 : -1)</cpp:value></cpp:define>
+<cpp:define PREFIX:line="33" PREFIX:column="1">#<cpp:directive PREFIX:line="33" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="33" PREFIX:column="9">digitalPinHasPWM</name><parameter_list PREFIX:line="33" PREFIX:column="25">(<param><type><name PREFIX:line="33" PREFIX:column="26">p</name></type></param>)</parameter_list></cpp:macro>         <cpp:value PREFIX:line="33" PREFIX:column="37">(((p) &gt;= 2 &amp;&amp; (p) &lt;= 13) || ((p) &gt;= 44 &amp;&amp; (p)&lt;= 46))</cpp:value></cpp:define>
+
+<decl_stmt><decl><type><specifier PREFIX:line="35" PREFIX:column="1">static</specifier>  <name PREFIX:line="35" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="35" PREFIX:column="17">SS</name>   <init PREFIX:line="35" PREFIX:column="22">= <expr PREFIX:line="35" PREFIX:column="24">53</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="36" PREFIX:column="1">static</specifier>  <name PREFIX:line="36" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="36" PREFIX:column="17">MOSI</name> <init PREFIX:line="36" PREFIX:column="22">= <expr PREFIX:line="36" PREFIX:column="24">51</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="37" PREFIX:column="1">static</specifier>  <name PREFIX:line="37" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="37" PREFIX:column="17">MISO</name> <init PREFIX:line="37" PREFIX:column="22">= <expr PREFIX:line="37" PREFIX:column="24">50</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="38" PREFIX:column="1">static</specifier>  <name PREFIX:line="38" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="38" PREFIX:column="17">SCK</name>  <init PREFIX:line="38" PREFIX:column="22">= <expr PREFIX:line="38" PREFIX:column="24">52</expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><specifier PREFIX:line="40" PREFIX:column="1">static</specifier>  <name PREFIX:line="40" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="40" PREFIX:column="17">SDA</name> <init PREFIX:line="40" PREFIX:column="21">= <expr PREFIX:line="40" PREFIX:column="23">20</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="41" PREFIX:column="1">static</specifier>  <name PREFIX:line="41" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="41" PREFIX:column="17">SCL</name> <init PREFIX:line="41" PREFIX:column="21">= <expr PREFIX:line="41" PREFIX:column="23">21</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="42" PREFIX:column="1">static</specifier>  <name PREFIX:line="42" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="42" PREFIX:column="17">LED_BUILTIN</name> <init PREFIX:line="42" PREFIX:column="29">= <expr PREFIX:line="42" PREFIX:column="31">13</expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><specifier PREFIX:line="44" PREFIX:column="1">static</specifier>  <name PREFIX:line="44" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="44" PREFIX:column="17">A0</name> <init PREFIX:line="44" PREFIX:column="20">= <expr PREFIX:line="44" PREFIX:column="22">54</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="45" PREFIX:column="1">static</specifier>  <name PREFIX:line="45" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="45" PREFIX:column="17">A1</name> <init PREFIX:line="45" PREFIX:column="20">= <expr PREFIX:line="45" PREFIX:column="22">55</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="46" PREFIX:column="1">static</specifier>  <name PREFIX:line="46" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="46" PREFIX:column="17">A2</name> <init PREFIX:line="46" PREFIX:column="20">= <expr PREFIX:line="46" PREFIX:column="22">56</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="47" PREFIX:column="1">static</specifier>  <name PREFIX:line="47" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="47" PREFIX:column="17">A3</name> <init PREFIX:line="47" PREFIX:column="20">= <expr PREFIX:line="47" PREFIX:column="22">57</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="48" PREFIX:column="1">static</specifier>  <name PREFIX:line="48" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="48" PREFIX:column="17">A4</name> <init PREFIX:line="48" PREFIX:column="20">= <expr PREFIX:line="48" PREFIX:column="22">58</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="49" PREFIX:column="1">static</specifier>  <name PREFIX:line="49" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="49" PREFIX:column="17">A5</name> <init PREFIX:line="49" PREFIX:column="20">= <expr PREFIX:line="49" PREFIX:column="22">59</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="50" PREFIX:column="1">static</specifier>  <name PREFIX:line="50" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="50" PREFIX:column="17">A6</name> <init PREFIX:line="50" PREFIX:column="20">= <expr PREFIX:line="50" PREFIX:column="22">60</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="51" PREFIX:column="1">static</specifier>  <name PREFIX:line="51" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="51" PREFIX:column="17">A7</name> <init PREFIX:line="51" PREFIX:column="20">= <expr PREFIX:line="51" PREFIX:column="22">61</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="52" PREFIX:column="1">static</specifier>  <name PREFIX:line="52" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="52" PREFIX:column="17">A8</name> <init PREFIX:line="52" PREFIX:column="20">= <expr PREFIX:line="52" PREFIX:column="22">62</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="53" PREFIX:column="1">static</specifier>  <name PREFIX:line="53" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="53" PREFIX:column="17">A9</name> <init PREFIX:line="53" PREFIX:column="20">= <expr PREFIX:line="53" PREFIX:column="22">63</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="54" PREFIX:column="1">static</specifier>  <name PREFIX:line="54" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="54" PREFIX:column="17">A10</name> <init PREFIX:line="54" PREFIX:column="21">= <expr PREFIX:line="54" PREFIX:column="23">64</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="55" PREFIX:column="1">static</specifier>  <name PREFIX:line="55" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="55" PREFIX:column="17">A11</name> <init PREFIX:line="55" PREFIX:column="21">= <expr PREFIX:line="55" PREFIX:column="23">65</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="56" PREFIX:column="1">static</specifier>  <name PREFIX:line="56" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="56" PREFIX:column="17">A12</name> <init PREFIX:line="56" PREFIX:column="21">= <expr PREFIX:line="56" PREFIX:column="23">66</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="57" PREFIX:column="1">static</specifier>  <name PREFIX:line="57" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="57" PREFIX:column="17">A13</name> <init PREFIX:line="57" PREFIX:column="21">= <expr PREFIX:line="57" PREFIX:column="23">67</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="58" PREFIX:column="1">static</specifier>  <name PREFIX:line="58" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="58" PREFIX:column="17">A14</name> <init PREFIX:line="58" PREFIX:column="21">= <expr PREFIX:line="58" PREFIX:column="23">68</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="59" PREFIX:column="1">static</specifier>  <name PREFIX:line="59" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="59" PREFIX:column="17">A15</name> <init PREFIX:line="59" PREFIX:column="21">= <expr PREFIX:line="59" PREFIX:column="23">69</expr></init></decl>;</decl_stmt>
+
+<comment type="line" PREFIX:line="61" PREFIX:column="1">// A majority of the pins are NOT PCINTs, SO BE WARNED (i.e. you cannot use them as receive pins)</comment>
+<comment type="line" PREFIX:line="62" PREFIX:column="1">// Only pins available for RECEIVE (TRANSMIT can be on any pin):</comment>
+<comment type="line" PREFIX:line="63" PREFIX:column="1">// (I've deliberately left out pin mapping to the Hardware USARTs - seems senseless to me)</comment>
+<comment type="line" PREFIX:line="64" PREFIX:column="1">// Pins: 10, 11, 12, 13,  50, 51, 52, 53,  62, 63, 64, 65, 66, 67, 68, 69</comment>
+
+<cpp:define PREFIX:line="66" PREFIX:column="1">#<cpp:directive PREFIX:line="66" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="66" PREFIX:column="9">digitalPinToPCICR</name><parameter_list PREFIX:line="66" PREFIX:column="26">(<param><type><name PREFIX:line="66" PREFIX:column="27">p</name></type></param>)</parameter_list></cpp:macro>    <cpp:value PREFIX:line="66" PREFIX:column="33">( (((p) &gt;= 10) &amp;&amp; ((p) &lt;= 13)) || \
+                                  (((p) &gt;= 50) &amp;&amp; ((p) &lt;= 53)) || \
+                                  (((p) &gt;= 62) &amp;&amp; ((p) &lt;= 69)) ? (&amp;PCICR) : ((uint8_t *)0) )</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="70" PREFIX:column="1">#<cpp:directive PREFIX:line="70" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="70" PREFIX:column="9">digitalPinToPCICRbit</name><parameter_list PREFIX:line="70" PREFIX:column="29">(<param><type><name PREFIX:line="70" PREFIX:column="30">p</name></type></param>)</parameter_list></cpp:macro> <cpp:value PREFIX:line="70" PREFIX:column="33">( (((p) &gt;= 10) &amp;&amp; ((p) &lt;= 13)) || (((p) &gt;= 50) &amp;&amp; ((p) &lt;= 53)) ? 0 : \
+                                ( (((p) &gt;= 62) &amp;&amp; ((p) &lt;= 69)) ? 2 : \
+                                0 ) )</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="74" PREFIX:column="1">#<cpp:directive PREFIX:line="74" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="74" PREFIX:column="9">digitalPinToPCMSK</name><parameter_list PREFIX:line="74" PREFIX:column="26">(<param><type><name PREFIX:line="74" PREFIX:column="27">p</name></type></param>)</parameter_list></cpp:macro>    <cpp:value PREFIX:line="74" PREFIX:column="33">( (((p) &gt;= 10) &amp;&amp; ((p) &lt;= 13)) || (((p) &gt;= 50) &amp;&amp; ((p) &lt;= 53)) ? (&amp;PCMSK0) : \
+                                ( (((p) &gt;= 62) &amp;&amp; ((p) &lt;= 69)) ? (&amp;PCMSK2) : \
+                                ((uint8_t *)0) ) )</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="78" PREFIX:column="1">#<cpp:directive PREFIX:line="78" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="78" PREFIX:column="9">digitalPinToPCMSKbit</name><parameter_list PREFIX:line="78" PREFIX:column="29">(<param><type><name PREFIX:line="78" PREFIX:column="30">p</name></type></param>)</parameter_list></cpp:macro> <cpp:value PREFIX:line="78" PREFIX:column="33">( (((p) &gt;= 10) &amp;&amp; ((p) &lt;= 13)) ? ((p) - 6) : \
+                                ( ((p) == 50) ? 3 : \
+                                ( ((p) == 51) ? 2 : \
+                                ( ((p) == 52) ? 1 : \
+                                ( ((p) == 53) ? 0 : \
+                                ( (((p) &gt;= 62) &amp;&amp; ((p) &lt;= 69)) ? ((p) - 62) : \
+                                0 ) ) ) ) ) )</cpp:value></cpp:define>
+
+<cpp:ifdef PREFIX:line="86" PREFIX:column="1">#<cpp:directive PREFIX:line="86" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="86" PREFIX:column="8">ARDUINO_MAIN</name></cpp:ifdef>
+
+ <decl_stmt><decl><type><name PREFIX:line="88" PREFIX:column="2">uint16_t</name> <name PREFIX:line="88" PREFIX:column="11">PROGMEM</name></type> <name><name PREFIX:line="88" PREFIX:column="19">port_to_mode_PGM</name><index PREFIX:line="88" PREFIX:column="35">[]</index></name> <init PREFIX:line="88" PREFIX:column="38">= <expr><block PREFIX:line="88" PREFIX:column="40">{
+	<expr><name PREFIX:line="89" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr PREFIX:line="90" PREFIX:column="9">(<name PREFIX:line="90" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="90" PREFIX:column="21">DDRA</name></expr>,
+	<expr PREFIX:line="91" PREFIX:column="9">(<name PREFIX:line="91" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="91" PREFIX:column="21">DDRB</name></expr>,
+	<expr PREFIX:line="92" PREFIX:column="9">(<name PREFIX:line="92" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="92" PREFIX:column="21">DDRC</name></expr>,
+	<expr PREFIX:line="93" PREFIX:column="9">(<name PREFIX:line="93" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="93" PREFIX:column="21">DDRD</name></expr>,
+	<expr PREFIX:line="94" PREFIX:column="9">(<name PREFIX:line="94" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="94" PREFIX:column="21">DDRE</name></expr>,
+	<expr PREFIX:line="95" PREFIX:column="9">(<name PREFIX:line="95" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="95" PREFIX:column="21">DDRF</name></expr>,
+	<expr PREFIX:line="96" PREFIX:column="9">(<name PREFIX:line="96" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="96" PREFIX:column="21">DDRG</name></expr>,
+	<expr PREFIX:line="97" PREFIX:column="9">(<name PREFIX:line="97" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="97" PREFIX:column="21">DDRH</name></expr>,
+	<expr><name PREFIX:line="98" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr PREFIX:line="99" PREFIX:column="9">(<name PREFIX:line="99" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="99" PREFIX:column="21">DDRJ</name></expr>,
+	<expr PREFIX:line="100" PREFIX:column="9">(<name PREFIX:line="100" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="100" PREFIX:column="21">DDRK</name></expr>,
+	<expr PREFIX:line="101" PREFIX:column="9">(<name PREFIX:line="101" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="101" PREFIX:column="21">DDRL</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="104" PREFIX:column="2">uint16_t</name> <name PREFIX:line="104" PREFIX:column="11">PROGMEM</name></type> <name><name PREFIX:line="104" PREFIX:column="19">port_to_output_PGM</name><index PREFIX:line="104" PREFIX:column="37">[]</index></name> <init PREFIX:line="104" PREFIX:column="40">= <expr><block PREFIX:line="104" PREFIX:column="42">{
+	<expr><name PREFIX:line="105" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr PREFIX:line="106" PREFIX:column="9">(<name PREFIX:line="106" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="106" PREFIX:column="21">PORTA</name></expr>,
+	<expr PREFIX:line="107" PREFIX:column="9">(<name PREFIX:line="107" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="107" PREFIX:column="21">PORTB</name></expr>,
+	<expr PREFIX:line="108" PREFIX:column="9">(<name PREFIX:line="108" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="108" PREFIX:column="21">PORTC</name></expr>,
+	<expr PREFIX:line="109" PREFIX:column="9">(<name PREFIX:line="109" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="109" PREFIX:column="21">PORTD</name></expr>,
+	<expr PREFIX:line="110" PREFIX:column="9">(<name PREFIX:line="110" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="110" PREFIX:column="21">PORTE</name></expr>,
+	<expr PREFIX:line="111" PREFIX:column="9">(<name PREFIX:line="111" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="111" PREFIX:column="21">PORTF</name></expr>,
+	<expr PREFIX:line="112" PREFIX:column="9">(<name PREFIX:line="112" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="112" PREFIX:column="21">PORTG</name></expr>,
+	<expr PREFIX:line="113" PREFIX:column="9">(<name PREFIX:line="113" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="113" PREFIX:column="21">PORTH</name></expr>,
+	<expr><name PREFIX:line="114" PREFIX:column="9">NOT_A_PORT</name></expr>,
+	<expr PREFIX:line="115" PREFIX:column="9">(<name PREFIX:line="115" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="115" PREFIX:column="21">PORTJ</name></expr>,
+	<expr PREFIX:line="116" PREFIX:column="9">(<name PREFIX:line="116" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="116" PREFIX:column="21">PORTK</name></expr>,
+	<expr PREFIX:line="117" PREFIX:column="9">(<name PREFIX:line="117" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="117" PREFIX:column="21">PORTL</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="120" PREFIX:column="2">uint16_t</name> <name PREFIX:line="120" PREFIX:column="11">PROGMEM</name></type> <name><name PREFIX:line="120" PREFIX:column="19">port_to_input_PGM</name><index PREFIX:line="120" PREFIX:column="36">[]</index></name> <init PREFIX:line="120" PREFIX:column="39">= <expr><block PREFIX:line="120" PREFIX:column="41">{
+	<expr><name PREFIX:line="121" PREFIX:column="9">NOT_A_PIN</name></expr>,
+	<expr PREFIX:line="122" PREFIX:column="9">(<name PREFIX:line="122" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="122" PREFIX:column="21">PINA</name></expr>,
+	<expr PREFIX:line="123" PREFIX:column="9">(<name PREFIX:line="123" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="123" PREFIX:column="21">PINB</name></expr>,
+	<expr PREFIX:line="124" PREFIX:column="9">(<name PREFIX:line="124" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="124" PREFIX:column="21">PINC</name></expr>,
+	<expr PREFIX:line="125" PREFIX:column="9">(<name PREFIX:line="125" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="125" PREFIX:column="21">PIND</name></expr>,
+	<expr PREFIX:line="126" PREFIX:column="9">(<name PREFIX:line="126" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="126" PREFIX:column="21">PINE</name></expr>,
+	<expr PREFIX:line="127" PREFIX:column="9">(<name PREFIX:line="127" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="127" PREFIX:column="21">PINF</name></expr>,
+	<expr PREFIX:line="128" PREFIX:column="9">(<name PREFIX:line="128" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="128" PREFIX:column="21">PING</name></expr>,
+	<expr PREFIX:line="129" PREFIX:column="9">(<name PREFIX:line="129" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="129" PREFIX:column="21">PINH</name></expr>,
+	<expr><name PREFIX:line="130" PREFIX:column="9">NOT_A_PIN</name></expr>,
+	<expr PREFIX:line="131" PREFIX:column="9">(<name PREFIX:line="131" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="131" PREFIX:column="21">PINJ</name></expr>,
+	<expr PREFIX:line="132" PREFIX:column="9">(<name PREFIX:line="132" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="132" PREFIX:column="21">PINK</name></expr>,
+	<expr PREFIX:line="133" PREFIX:column="9">(<name PREFIX:line="133" PREFIX:column="10">uint16_t</name>) &amp;<name PREFIX:line="133" PREFIX:column="21">PINL</name></expr>,
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="136" PREFIX:column="2">uint8_t</name> <name PREFIX:line="136" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="136" PREFIX:column="18">digital_pin_to_port_PGM</name><index PREFIX:line="136" PREFIX:column="41">[]</index></name> <init PREFIX:line="136" PREFIX:column="44">= <expr><block PREFIX:line="136" PREFIX:column="46">{
+	<comment type="line" PREFIX:line="137" PREFIX:column="9">// PORTLIST</comment>
+	<comment type="line" PREFIX:line="138" PREFIX:column="9">// -------------------------------------------</comment>
+	<expr><name PREFIX:line="139" PREFIX:column="9">PE</name></expr>	, <comment type="line" PREFIX:line="139" PREFIX:column="19">// PE 0 ** 0 ** USART0_RX</comment>
+	<expr><name PREFIX:line="140" PREFIX:column="9">PE</name></expr>	, <comment type="line" PREFIX:line="140" PREFIX:column="19">// PE 1 ** 1 ** USART0_TX</comment>
+	<expr><name PREFIX:line="141" PREFIX:column="9">PE</name></expr>	, <comment type="line" PREFIX:line="141" PREFIX:column="19">// PE 4 ** 2 ** PWM2</comment>
+	<expr><name PREFIX:line="142" PREFIX:column="9">PE</name></expr>	, <comment type="line" PREFIX:line="142" PREFIX:column="19">// PE 5 ** 3 ** PWM3</comment>
+	<expr><name PREFIX:line="143" PREFIX:column="9">PG</name></expr>	, <comment type="line" PREFIX:line="143" PREFIX:column="19">// PG 5 ** 4 ** PWM4</comment>
+	<expr><name PREFIX:line="144" PREFIX:column="9">PE</name></expr>	, <comment type="line" PREFIX:line="144" PREFIX:column="19">// PE 3 ** 5 ** PWM5</comment>
+	<expr><name PREFIX:line="145" PREFIX:column="9">PH</name></expr>	, <comment type="line" PREFIX:line="145" PREFIX:column="19">// PH 3 ** 6 ** PWM6</comment>
+	<expr><name PREFIX:line="146" PREFIX:column="9">PH</name></expr>	, <comment type="line" PREFIX:line="146" PREFIX:column="19">// PH 4 ** 7 ** PWM7</comment>
+	<expr><name PREFIX:line="147" PREFIX:column="9">PH</name></expr>	, <comment type="line" PREFIX:line="147" PREFIX:column="19">// PH 5 ** 8 ** PWM8</comment>
+	<expr><name PREFIX:line="148" PREFIX:column="9">PH</name></expr>	, <comment type="line" PREFIX:line="148" PREFIX:column="19">// PH 6 ** 9 ** PWM9</comment>
+	<expr><name PREFIX:line="149" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="149" PREFIX:column="19">// PB 4 ** 10 ** PWM10</comment>
+	<expr><name PREFIX:line="150" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="150" PREFIX:column="19">// PB 5 ** 11 ** PWM11</comment>
+	<expr><name PREFIX:line="151" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="151" PREFIX:column="19">// PB 6 ** 12 ** PWM12</comment>
+	<expr><name PREFIX:line="152" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="152" PREFIX:column="19">// PB 7 ** 13 ** PWM13</comment>
+	<expr><name PREFIX:line="153" PREFIX:column="9">PJ</name></expr>	, <comment type="line" PREFIX:line="153" PREFIX:column="19">// PJ 1 ** 14 ** USART3_TX</comment>
+	<expr><name PREFIX:line="154" PREFIX:column="9">PJ</name></expr>	, <comment type="line" PREFIX:line="154" PREFIX:column="19">// PJ 0 ** 15 ** USART3_RX</comment>
+	<expr><name PREFIX:line="155" PREFIX:column="9">PH</name></expr>	, <comment type="line" PREFIX:line="155" PREFIX:column="19">// PH 1 ** 16 ** USART2_TX</comment>
+	<expr><name PREFIX:line="156" PREFIX:column="9">PH</name></expr>	, <comment type="line" PREFIX:line="156" PREFIX:column="19">// PH 0 ** 17 ** USART2_RX</comment>
+	<expr><name PREFIX:line="157" PREFIX:column="9">PD</name></expr>	, <comment type="line" PREFIX:line="157" PREFIX:column="19">// PD 3 ** 18 ** USART1_TX</comment>
+	<expr><name PREFIX:line="158" PREFIX:column="9">PD</name></expr>	, <comment type="line" PREFIX:line="158" PREFIX:column="19">// PD 2 ** 19 ** USART1_RX</comment>
+	<expr><name PREFIX:line="159" PREFIX:column="9">PD</name></expr>	, <comment type="line" PREFIX:line="159" PREFIX:column="19">// PD 1 ** 20 ** I2C_SDA</comment>
+	<expr><name PREFIX:line="160" PREFIX:column="9">PD</name></expr>	, <comment type="line" PREFIX:line="160" PREFIX:column="19">// PD 0 ** 21 ** I2C_SCL</comment>
+	<expr><name PREFIX:line="161" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="161" PREFIX:column="19">// PA 0 ** 22 ** D22</comment>
+	<expr><name PREFIX:line="162" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="162" PREFIX:column="19">// PA 1 ** 23 ** D23</comment>
+	<expr><name PREFIX:line="163" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="163" PREFIX:column="19">// PA 2 ** 24 ** D24</comment>
+	<expr><name PREFIX:line="164" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="164" PREFIX:column="19">// PA 3 ** 25 ** D25</comment>
+	<expr><name PREFIX:line="165" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="165" PREFIX:column="19">// PA 4 ** 26 ** D26</comment>
+	<expr><name PREFIX:line="166" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="166" PREFIX:column="19">// PA 5 ** 27 ** D27</comment>
+	<expr><name PREFIX:line="167" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="167" PREFIX:column="19">// PA 6 ** 28 ** D28</comment>
+	<expr><name PREFIX:line="168" PREFIX:column="9">PA</name></expr>	, <comment type="line" PREFIX:line="168" PREFIX:column="19">// PA 7 ** 29 ** D29</comment>
+	<expr><name PREFIX:line="169" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="169" PREFIX:column="19">// PC 7 ** 30 ** D30</comment>
+	<expr><name PREFIX:line="170" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="170" PREFIX:column="19">// PC 6 ** 31 ** D31</comment>
+	<expr><name PREFIX:line="171" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="171" PREFIX:column="19">// PC 5 ** 32 ** D32</comment>
+	<expr><name PREFIX:line="172" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="172" PREFIX:column="19">// PC 4 ** 33 ** D33</comment>
+	<expr><name PREFIX:line="173" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="173" PREFIX:column="19">// PC 3 ** 34 ** D34</comment>
+	<expr><name PREFIX:line="174" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="174" PREFIX:column="19">// PC 2 ** 35 ** D35</comment>
+	<expr><name PREFIX:line="175" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="175" PREFIX:column="19">// PC 1 ** 36 ** D36</comment>
+	<expr><name PREFIX:line="176" PREFIX:column="9">PC</name></expr>	, <comment type="line" PREFIX:line="176" PREFIX:column="19">// PC 0 ** 37 ** D37</comment>
+	<expr><name PREFIX:line="177" PREFIX:column="9">PD</name></expr>	, <comment type="line" PREFIX:line="177" PREFIX:column="19">// PD 7 ** 38 ** D38</comment>
+	<expr><name PREFIX:line="178" PREFIX:column="9">PG</name></expr>	, <comment type="line" PREFIX:line="178" PREFIX:column="19">// PG 2 ** 39 ** D39</comment>
+	<expr><name PREFIX:line="179" PREFIX:column="9">PG</name></expr>	, <comment type="line" PREFIX:line="179" PREFIX:column="19">// PG 1 ** 40 ** D40</comment>
+	<expr><name PREFIX:line="180" PREFIX:column="9">PG</name></expr>	, <comment type="line" PREFIX:line="180" PREFIX:column="19">// PG 0 ** 41 ** D41</comment>
+	<expr><name PREFIX:line="181" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="181" PREFIX:column="19">// PL 7 ** 42 ** D42</comment>
+	<expr><name PREFIX:line="182" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="182" PREFIX:column="19">// PL 6 ** 43 ** D43</comment>
+	<expr><name PREFIX:line="183" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="183" PREFIX:column="19">// PL 5 ** 44 ** D44</comment>
+	<expr><name PREFIX:line="184" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="184" PREFIX:column="19">// PL 4 ** 45 ** D45</comment>
+	<expr><name PREFIX:line="185" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="185" PREFIX:column="19">// PL 3 ** 46 ** D46</comment>
+	<expr><name PREFIX:line="186" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="186" PREFIX:column="19">// PL 2 ** 47 ** D47</comment>
+	<expr><name PREFIX:line="187" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="187" PREFIX:column="19">// PL 1 ** 48 ** D48</comment>
+	<expr><name PREFIX:line="188" PREFIX:column="9">PL</name></expr>	, <comment type="line" PREFIX:line="188" PREFIX:column="19">// PL 0 ** 49 ** D49</comment>
+	<expr><name PREFIX:line="189" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="189" PREFIX:column="19">// PB 3 ** 50 ** SPI_MISO</comment>
+	<expr><name PREFIX:line="190" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="190" PREFIX:column="19">// PB 2 ** 51 ** SPI_MOSI</comment>
+	<expr><name PREFIX:line="191" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="191" PREFIX:column="19">// PB 1 ** 52 ** SPI_SCK</comment>
+	<expr><name PREFIX:line="192" PREFIX:column="9">PB</name></expr>	, <comment type="line" PREFIX:line="192" PREFIX:column="19">// PB 0 ** 53 ** SPI_SS</comment>
+	<expr><name PREFIX:line="193" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="193" PREFIX:column="19">// PF 0 ** 54 ** A0</comment>
+	<expr><name PREFIX:line="194" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="194" PREFIX:column="19">// PF 1 ** 55 ** A1</comment>
+	<expr><name PREFIX:line="195" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="195" PREFIX:column="19">// PF 2 ** 56 ** A2</comment>
+	<expr><name PREFIX:line="196" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="196" PREFIX:column="19">// PF 3 ** 57 ** A3</comment>
+	<expr><name PREFIX:line="197" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="197" PREFIX:column="19">// PF 4 ** 58 ** A4</comment>
+	<expr><name PREFIX:line="198" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="198" PREFIX:column="19">// PF 5 ** 59 ** A5</comment>
+	<expr><name PREFIX:line="199" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="199" PREFIX:column="19">// PF 6 ** 60 ** A6</comment>
+	<expr><name PREFIX:line="200" PREFIX:column="9">PF</name></expr>	, <comment type="line" PREFIX:line="200" PREFIX:column="19">// PF 7 ** 61 ** A7</comment>
+	<expr><name PREFIX:line="201" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="201" PREFIX:column="19">// PK 0 ** 62 ** A8</comment>
+	<expr><name PREFIX:line="202" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="202" PREFIX:column="19">// PK 1 ** 63 ** A9</comment>
+	<expr><name PREFIX:line="203" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="203" PREFIX:column="19">// PK 2 ** 64 ** A10</comment>
+	<expr><name PREFIX:line="204" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="204" PREFIX:column="19">// PK 3 ** 65 ** A11</comment>
+	<expr><name PREFIX:line="205" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="205" PREFIX:column="19">// PK 4 ** 66 ** A12</comment>
+	<expr><name PREFIX:line="206" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="206" PREFIX:column="19">// PK 5 ** 67 ** A13</comment>
+	<expr><name PREFIX:line="207" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="207" PREFIX:column="19">// PK 6 ** 68 ** A14</comment>
+	<expr><name PREFIX:line="208" PREFIX:column="9">PK</name></expr>	, <comment type="line" PREFIX:line="208" PREFIX:column="19">// PK 7 ** 69 ** A15</comment>
+	<expr><name PREFIX:line="209" PREFIX:column="9">PG</name></expr> 	, <comment type="line" PREFIX:line="209" PREFIX:column="19">// PG 4 ** 70 ** D70</comment>
+	<expr><name PREFIX:line="210" PREFIX:column="9">PG</name></expr> 	, <comment type="line" PREFIX:line="210" PREFIX:column="19">// PG 3 ** 71 ** D71</comment>
+	<expr><name PREFIX:line="211" PREFIX:column="9">PJ</name></expr> 	, <comment type="line" PREFIX:line="211" PREFIX:column="19">// PJ 2 ** 72 ** D72</comment>
+	<expr><name PREFIX:line="212" PREFIX:column="9">PJ</name></expr> 	, <comment type="line" PREFIX:line="212" PREFIX:column="19">// PJ 3 ** 73 ** D73</comment>
+	<expr><name PREFIX:line="213" PREFIX:column="9">PJ</name></expr> 	, <comment type="line" PREFIX:line="213" PREFIX:column="19">// PJ 7 ** 74 ** D74</comment>
+	<expr><name PREFIX:line="214" PREFIX:column="9">PJ</name></expr> 	, <comment type="line" PREFIX:line="214" PREFIX:column="19">// PJ 4 ** 75 ** D75</comment>
+	<expr><name PREFIX:line="215" PREFIX:column="9">PJ</name></expr> 	, <comment type="line" PREFIX:line="215" PREFIX:column="19">// PJ 5 ** 76 ** D76</comment>
+	<expr><name PREFIX:line="216" PREFIX:column="9">PJ</name></expr> 	, <comment type="line" PREFIX:line="216" PREFIX:column="19">// PJ 6 ** 77 ** D77</comment>
+	<expr><name PREFIX:line="217" PREFIX:column="9">PE</name></expr> 	, <comment type="line" PREFIX:line="217" PREFIX:column="19">// PE 2 ** 78 ** D78</comment>
+	<expr><name PREFIX:line="218" PREFIX:column="9">PE</name></expr> 	, <comment type="line" PREFIX:line="218" PREFIX:column="19">// PE 6 ** 79 ** D79</comment>
+	<expr><name PREFIX:line="219" PREFIX:column="9">PE</name></expr> 	, <comment type="line" PREFIX:line="219" PREFIX:column="19">// PE 7 ** 80 ** D80</comment>
+	<expr><name PREFIX:line="220" PREFIX:column="9">PD</name></expr> 	, <comment type="line" PREFIX:line="220" PREFIX:column="19">// PD 4 ** 81 ** D81</comment>
+	<expr><name PREFIX:line="221" PREFIX:column="9">PD</name></expr> 	, <comment type="line" PREFIX:line="221" PREFIX:column="19">// PD 5 ** 82 ** D82</comment>
+	<expr><name PREFIX:line="222" PREFIX:column="9">PD</name></expr> 	, <comment type="line" PREFIX:line="222" PREFIX:column="19">// PD 6 ** 83 ** D83</comment>
+	<expr><name PREFIX:line="223" PREFIX:column="9">PH</name></expr> 	, <comment type="line" PREFIX:line="223" PREFIX:column="19">// PH 2 ** 84 ** D84</comment>
+	<expr><name PREFIX:line="224" PREFIX:column="9">PH</name></expr> 	, <comment type="line" PREFIX:line="224" PREFIX:column="19">// PH 7 ** 85 ** D85</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="227" PREFIX:column="2">uint8_t</name> <name PREFIX:line="227" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="227" PREFIX:column="18">digital_pin_to_bit_mask_PGM</name><index PREFIX:line="227" PREFIX:column="45">[]</index></name> <init PREFIX:line="227" PREFIX:column="48">= <expr><block PREFIX:line="227" PREFIX:column="50">{
+	<comment type="line" PREFIX:line="228" PREFIX:column="9">// PIN IN PORT</comment>
+	<comment type="line" PREFIX:line="229" PREFIX:column="9">// -------------------------------------------</comment>
+	<expr><call><name PREFIX:line="230" PREFIX:column="9">_BV</name><argument_list PREFIX:line="230" PREFIX:column="12">( <argument><expr PREFIX:line="230" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="230" PREFIX:column="27">// PE 0 ** 0 ** USART0_RX</comment>
+	<expr><call><name PREFIX:line="231" PREFIX:column="9">_BV</name><argument_list PREFIX:line="231" PREFIX:column="12">( <argument><expr PREFIX:line="231" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="231" PREFIX:column="27">// PE 1 ** 1 ** USART0_TX</comment>
+	<expr><call><name PREFIX:line="232" PREFIX:column="9">_BV</name><argument_list PREFIX:line="232" PREFIX:column="12">( <argument><expr PREFIX:line="232" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="232" PREFIX:column="27">// PE 4 ** 2 ** PWM2</comment>
+	<expr><call><name PREFIX:line="233" PREFIX:column="9">_BV</name><argument_list PREFIX:line="233" PREFIX:column="12">( <argument><expr PREFIX:line="233" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="233" PREFIX:column="27">// PE 5 ** 3 ** PWM3</comment>
+	<expr><call><name PREFIX:line="234" PREFIX:column="9">_BV</name><argument_list PREFIX:line="234" PREFIX:column="12">( <argument><expr PREFIX:line="234" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="234" PREFIX:column="27">// PG 5 ** 4 ** PWM4</comment>
+	<expr><call><name PREFIX:line="235" PREFIX:column="9">_BV</name><argument_list PREFIX:line="235" PREFIX:column="12">( <argument><expr PREFIX:line="235" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="235" PREFIX:column="27">// PE 3 ** 5 ** PWM5</comment>
+	<expr><call><name PREFIX:line="236" PREFIX:column="9">_BV</name><argument_list PREFIX:line="236" PREFIX:column="12">( <argument><expr PREFIX:line="236" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="236" PREFIX:column="27">// PH 3 ** 6 ** PWM6</comment>
+	<expr><call><name PREFIX:line="237" PREFIX:column="9">_BV</name><argument_list PREFIX:line="237" PREFIX:column="12">( <argument><expr PREFIX:line="237" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="237" PREFIX:column="27">// PH 4 ** 7 ** PWM7</comment>
+	<expr><call><name PREFIX:line="238" PREFIX:column="9">_BV</name><argument_list PREFIX:line="238" PREFIX:column="12">( <argument><expr PREFIX:line="238" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="238" PREFIX:column="27">// PH 5 ** 8 ** PWM8</comment>
+	<expr><call><name PREFIX:line="239" PREFIX:column="9">_BV</name><argument_list PREFIX:line="239" PREFIX:column="12">( <argument><expr PREFIX:line="239" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="239" PREFIX:column="27">// PH 6 ** 9 ** PWM9</comment>
+	<expr><call><name PREFIX:line="240" PREFIX:column="9">_BV</name><argument_list PREFIX:line="240" PREFIX:column="12">( <argument><expr PREFIX:line="240" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="240" PREFIX:column="27">// PB 4 ** 10 ** PWM10</comment>
+	<expr><call><name PREFIX:line="241" PREFIX:column="9">_BV</name><argument_list PREFIX:line="241" PREFIX:column="12">( <argument><expr PREFIX:line="241" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="241" PREFIX:column="27">// PB 5 ** 11 ** PWM11</comment>
+	<expr><call><name PREFIX:line="242" PREFIX:column="9">_BV</name><argument_list PREFIX:line="242" PREFIX:column="12">( <argument><expr PREFIX:line="242" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="242" PREFIX:column="27">// PB 6 ** 12 ** PWM12</comment>
+	<expr><call><name PREFIX:line="243" PREFIX:column="9">_BV</name><argument_list PREFIX:line="243" PREFIX:column="12">( <argument><expr PREFIX:line="243" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="243" PREFIX:column="27">// PB 7 ** 13 ** PWM13</comment>
+	<expr><call><name PREFIX:line="244" PREFIX:column="9">_BV</name><argument_list PREFIX:line="244" PREFIX:column="12">( <argument><expr PREFIX:line="244" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="244" PREFIX:column="27">// PJ 1 ** 14 ** USART3_TX</comment>
+	<expr><call><name PREFIX:line="245" PREFIX:column="9">_BV</name><argument_list PREFIX:line="245" PREFIX:column="12">( <argument><expr PREFIX:line="245" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="245" PREFIX:column="27">// PJ 0 ** 15 ** USART3_RX</comment>
+	<expr><call><name PREFIX:line="246" PREFIX:column="9">_BV</name><argument_list PREFIX:line="246" PREFIX:column="12">( <argument><expr PREFIX:line="246" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="246" PREFIX:column="27">// PH 1 ** 16 ** USART2_TX</comment>
+	<expr><call><name PREFIX:line="247" PREFIX:column="9">_BV</name><argument_list PREFIX:line="247" PREFIX:column="12">( <argument><expr PREFIX:line="247" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="247" PREFIX:column="27">// PH 0 ** 17 ** USART2_RX</comment>
+	<expr><call><name PREFIX:line="248" PREFIX:column="9">_BV</name><argument_list PREFIX:line="248" PREFIX:column="12">( <argument><expr PREFIX:line="248" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="248" PREFIX:column="27">// PD 3 ** 18 ** USART1_TX</comment>
+	<expr><call><name PREFIX:line="249" PREFIX:column="9">_BV</name><argument_list PREFIX:line="249" PREFIX:column="12">( <argument><expr PREFIX:line="249" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="249" PREFIX:column="27">// PD 2 ** 19 ** USART1_RX</comment>
+	<expr><call><name PREFIX:line="250" PREFIX:column="9">_BV</name><argument_list PREFIX:line="250" PREFIX:column="12">( <argument><expr PREFIX:line="250" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="250" PREFIX:column="27">// PD 1 ** 20 ** I2C_SDA</comment>
+	<expr><call><name PREFIX:line="251" PREFIX:column="9">_BV</name><argument_list PREFIX:line="251" PREFIX:column="12">( <argument><expr PREFIX:line="251" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="251" PREFIX:column="27">// PD 0 ** 21 ** I2C_SCL</comment>
+	<expr><call><name PREFIX:line="252" PREFIX:column="9">_BV</name><argument_list PREFIX:line="252" PREFIX:column="12">( <argument><expr PREFIX:line="252" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="252" PREFIX:column="27">// PA 0 ** 22 ** D22</comment>
+	<expr><call><name PREFIX:line="253" PREFIX:column="9">_BV</name><argument_list PREFIX:line="253" PREFIX:column="12">( <argument><expr PREFIX:line="253" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="253" PREFIX:column="27">// PA 1 ** 23 ** D23</comment>
+	<expr><call><name PREFIX:line="254" PREFIX:column="9">_BV</name><argument_list PREFIX:line="254" PREFIX:column="12">( <argument><expr PREFIX:line="254" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="254" PREFIX:column="27">// PA 2 ** 24 ** D24</comment>
+	<expr><call><name PREFIX:line="255" PREFIX:column="9">_BV</name><argument_list PREFIX:line="255" PREFIX:column="12">( <argument><expr PREFIX:line="255" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="255" PREFIX:column="27">// PA 3 ** 25 ** D25</comment>
+	<expr><call><name PREFIX:line="256" PREFIX:column="9">_BV</name><argument_list PREFIX:line="256" PREFIX:column="12">( <argument><expr PREFIX:line="256" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="256" PREFIX:column="27">// PA 4 ** 26 ** D26</comment>
+	<expr><call><name PREFIX:line="257" PREFIX:column="9">_BV</name><argument_list PREFIX:line="257" PREFIX:column="12">( <argument><expr PREFIX:line="257" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="257" PREFIX:column="27">// PA 5 ** 27 ** D27</comment>
+	<expr><call><name PREFIX:line="258" PREFIX:column="9">_BV</name><argument_list PREFIX:line="258" PREFIX:column="12">( <argument><expr PREFIX:line="258" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="258" PREFIX:column="27">// PA 6 ** 28 ** D28</comment>
+	<expr><call><name PREFIX:line="259" PREFIX:column="9">_BV</name><argument_list PREFIX:line="259" PREFIX:column="12">( <argument><expr PREFIX:line="259" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="259" PREFIX:column="27">// PA 7 ** 29 ** D29</comment>
+	<expr><call><name PREFIX:line="260" PREFIX:column="9">_BV</name><argument_list PREFIX:line="260" PREFIX:column="12">( <argument><expr PREFIX:line="260" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="260" PREFIX:column="27">// PC 7 ** 30 ** D30</comment>
+	<expr><call><name PREFIX:line="261" PREFIX:column="9">_BV</name><argument_list PREFIX:line="261" PREFIX:column="12">( <argument><expr PREFIX:line="261" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="261" PREFIX:column="27">// PC 6 ** 31 ** D31</comment>
+	<expr><call><name PREFIX:line="262" PREFIX:column="9">_BV</name><argument_list PREFIX:line="262" PREFIX:column="12">( <argument><expr PREFIX:line="262" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="262" PREFIX:column="27">// PC 5 ** 32 ** D32</comment>
+	<expr><call><name PREFIX:line="263" PREFIX:column="9">_BV</name><argument_list PREFIX:line="263" PREFIX:column="12">( <argument><expr PREFIX:line="263" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="263" PREFIX:column="27">// PC 4 ** 33 ** D33</comment>
+	<expr><call><name PREFIX:line="264" PREFIX:column="9">_BV</name><argument_list PREFIX:line="264" PREFIX:column="12">( <argument><expr PREFIX:line="264" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="264" PREFIX:column="27">// PC 3 ** 34 ** D34</comment>
+	<expr><call><name PREFIX:line="265" PREFIX:column="9">_BV</name><argument_list PREFIX:line="265" PREFIX:column="12">( <argument><expr PREFIX:line="265" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="265" PREFIX:column="27">// PC 2 ** 35 ** D35</comment>
+	<expr><call><name PREFIX:line="266" PREFIX:column="9">_BV</name><argument_list PREFIX:line="266" PREFIX:column="12">( <argument><expr PREFIX:line="266" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="266" PREFIX:column="27">// PC 1 ** 36 ** D36</comment>
+	<expr><call><name PREFIX:line="267" PREFIX:column="9">_BV</name><argument_list PREFIX:line="267" PREFIX:column="12">( <argument><expr PREFIX:line="267" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="267" PREFIX:column="27">// PC 0 ** 37 ** D37</comment>
+	<expr><call><name PREFIX:line="268" PREFIX:column="9">_BV</name><argument_list PREFIX:line="268" PREFIX:column="12">( <argument><expr PREFIX:line="268" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="268" PREFIX:column="27">// PD 7 ** 38 ** D38</comment>
+	<expr><call><name PREFIX:line="269" PREFIX:column="9">_BV</name><argument_list PREFIX:line="269" PREFIX:column="12">( <argument><expr PREFIX:line="269" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="269" PREFIX:column="27">// PG 2 ** 39 ** D39</comment>
+	<expr><call><name PREFIX:line="270" PREFIX:column="9">_BV</name><argument_list PREFIX:line="270" PREFIX:column="12">( <argument><expr PREFIX:line="270" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="270" PREFIX:column="27">// PG 1 ** 40 ** D40</comment>
+	<expr><call><name PREFIX:line="271" PREFIX:column="9">_BV</name><argument_list PREFIX:line="271" PREFIX:column="12">( <argument><expr PREFIX:line="271" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="271" PREFIX:column="27">// PG 0 ** 41 ** D41</comment>
+	<expr><call><name PREFIX:line="272" PREFIX:column="9">_BV</name><argument_list PREFIX:line="272" PREFIX:column="12">( <argument><expr PREFIX:line="272" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="272" PREFIX:column="27">// PL 7 ** 42 ** D42</comment>
+	<expr><call><name PREFIX:line="273" PREFIX:column="9">_BV</name><argument_list PREFIX:line="273" PREFIX:column="12">( <argument><expr PREFIX:line="273" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="273" PREFIX:column="27">// PL 6 ** 43 ** D43</comment>
+	<expr><call><name PREFIX:line="274" PREFIX:column="9">_BV</name><argument_list PREFIX:line="274" PREFIX:column="12">( <argument><expr PREFIX:line="274" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="274" PREFIX:column="27">// PL 5 ** 44 ** D44</comment>
+	<expr><call><name PREFIX:line="275" PREFIX:column="9">_BV</name><argument_list PREFIX:line="275" PREFIX:column="12">( <argument><expr PREFIX:line="275" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="275" PREFIX:column="27">// PL 4 ** 45 ** D45</comment>
+	<expr><call><name PREFIX:line="276" PREFIX:column="9">_BV</name><argument_list PREFIX:line="276" PREFIX:column="12">( <argument><expr PREFIX:line="276" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="276" PREFIX:column="27">// PL 3 ** 46 ** D46</comment>
+	<expr><call><name PREFIX:line="277" PREFIX:column="9">_BV</name><argument_list PREFIX:line="277" PREFIX:column="12">( <argument><expr PREFIX:line="277" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="277" PREFIX:column="27">// PL 2 ** 47 ** D47</comment>
+	<expr><call><name PREFIX:line="278" PREFIX:column="9">_BV</name><argument_list PREFIX:line="278" PREFIX:column="12">( <argument><expr PREFIX:line="278" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="278" PREFIX:column="27">// PL 1 ** 48 ** D48</comment>
+	<expr><call><name PREFIX:line="279" PREFIX:column="9">_BV</name><argument_list PREFIX:line="279" PREFIX:column="12">( <argument><expr PREFIX:line="279" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="279" PREFIX:column="27">// PL 0 ** 49 ** D49</comment>
+	<expr><call><name PREFIX:line="280" PREFIX:column="9">_BV</name><argument_list PREFIX:line="280" PREFIX:column="12">( <argument><expr PREFIX:line="280" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="280" PREFIX:column="27">// PB 3 ** 50 ** SPI_MISO</comment>
+	<expr><call><name PREFIX:line="281" PREFIX:column="9">_BV</name><argument_list PREFIX:line="281" PREFIX:column="12">( <argument><expr PREFIX:line="281" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="281" PREFIX:column="27">// PB 2 ** 51 ** SPI_MOSI</comment>
+	<expr><call><name PREFIX:line="282" PREFIX:column="9">_BV</name><argument_list PREFIX:line="282" PREFIX:column="12">( <argument><expr PREFIX:line="282" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="282" PREFIX:column="27">// PB 1 ** 52 ** SPI_SCK</comment>
+	<expr><call><name PREFIX:line="283" PREFIX:column="9">_BV</name><argument_list PREFIX:line="283" PREFIX:column="12">( <argument><expr PREFIX:line="283" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="283" PREFIX:column="27">// PB 0 ** 53 ** SPI_SS</comment>
+	<expr><call><name PREFIX:line="284" PREFIX:column="9">_BV</name><argument_list PREFIX:line="284" PREFIX:column="12">( <argument><expr PREFIX:line="284" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="284" PREFIX:column="27">// PF 0 ** 54 ** A0</comment>
+	<expr><call><name PREFIX:line="285" PREFIX:column="9">_BV</name><argument_list PREFIX:line="285" PREFIX:column="12">( <argument><expr PREFIX:line="285" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="285" PREFIX:column="27">// PF 1 ** 55 ** A1</comment>
+	<expr><call><name PREFIX:line="286" PREFIX:column="9">_BV</name><argument_list PREFIX:line="286" PREFIX:column="12">( <argument><expr PREFIX:line="286" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="286" PREFIX:column="27">// PF 2 ** 56 ** A2</comment>
+	<expr><call><name PREFIX:line="287" PREFIX:column="9">_BV</name><argument_list PREFIX:line="287" PREFIX:column="12">( <argument><expr PREFIX:line="287" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="287" PREFIX:column="27">// PF 3 ** 57 ** A3</comment>
+	<expr><call><name PREFIX:line="288" PREFIX:column="9">_BV</name><argument_list PREFIX:line="288" PREFIX:column="12">( <argument><expr PREFIX:line="288" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="288" PREFIX:column="27">// PF 4 ** 58 ** A4</comment>
+	<expr><call><name PREFIX:line="289" PREFIX:column="9">_BV</name><argument_list PREFIX:line="289" PREFIX:column="12">( <argument><expr PREFIX:line="289" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="289" PREFIX:column="27">// PF 5 ** 59 ** A5</comment>
+	<expr><call><name PREFIX:line="290" PREFIX:column="9">_BV</name><argument_list PREFIX:line="290" PREFIX:column="12">( <argument><expr PREFIX:line="290" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="290" PREFIX:column="27">// PF 6 ** 60 ** A6</comment>
+	<expr><call><name PREFIX:line="291" PREFIX:column="9">_BV</name><argument_list PREFIX:line="291" PREFIX:column="12">( <argument><expr PREFIX:line="291" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="291" PREFIX:column="27">// PF 7 ** 61 ** A7</comment>
+	<expr><call><name PREFIX:line="292" PREFIX:column="9">_BV</name><argument_list PREFIX:line="292" PREFIX:column="12">( <argument><expr PREFIX:line="292" PREFIX:column="14">0</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="292" PREFIX:column="27">// PK 0 ** 62 ** A8</comment>
+	<expr><call><name PREFIX:line="293" PREFIX:column="9">_BV</name><argument_list PREFIX:line="293" PREFIX:column="12">( <argument><expr PREFIX:line="293" PREFIX:column="14">1</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="293" PREFIX:column="27">// PK 1 ** 63 ** A9</comment>
+	<expr><call><name PREFIX:line="294" PREFIX:column="9">_BV</name><argument_list PREFIX:line="294" PREFIX:column="12">( <argument><expr PREFIX:line="294" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="294" PREFIX:column="27">// PK 2 ** 64 ** A10</comment>
+	<expr><call><name PREFIX:line="295" PREFIX:column="9">_BV</name><argument_list PREFIX:line="295" PREFIX:column="12">( <argument><expr PREFIX:line="295" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="295" PREFIX:column="27">// PK 3 ** 65 ** A11</comment>
+	<expr><call><name PREFIX:line="296" PREFIX:column="9">_BV</name><argument_list PREFIX:line="296" PREFIX:column="12">( <argument><expr PREFIX:line="296" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="296" PREFIX:column="27">// PK 4 ** 66 ** A12</comment>
+	<expr><call><name PREFIX:line="297" PREFIX:column="9">_BV</name><argument_list PREFIX:line="297" PREFIX:column="12">( <argument><expr PREFIX:line="297" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="297" PREFIX:column="27">// PK 5 ** 67 ** A13</comment>
+	<expr><call><name PREFIX:line="298" PREFIX:column="9">_BV</name><argument_list PREFIX:line="298" PREFIX:column="12">( <argument><expr PREFIX:line="298" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="298" PREFIX:column="27">// PK 6 ** 68 ** A14</comment>
+	<expr><call><name PREFIX:line="299" PREFIX:column="9">_BV</name><argument_list PREFIX:line="299" PREFIX:column="12">( <argument><expr PREFIX:line="299" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="299" PREFIX:column="27">// PK 7 ** 69 ** A15</comment>
+	<expr><call><name PREFIX:line="300" PREFIX:column="9">_BV</name><argument_list PREFIX:line="300" PREFIX:column="12">( <argument><expr PREFIX:line="300" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="300" PREFIX:column="27">// PG 4 ** 70 ** D70</comment>
+	<expr><call><name PREFIX:line="301" PREFIX:column="9">_BV</name><argument_list PREFIX:line="301" PREFIX:column="12">( <argument><expr PREFIX:line="301" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="301" PREFIX:column="27">// PG 3 ** 71 ** D71</comment>
+	<expr><call><name PREFIX:line="302" PREFIX:column="9">_BV</name><argument_list PREFIX:line="302" PREFIX:column="12">( <argument><expr PREFIX:line="302" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="302" PREFIX:column="27">// PJ 2 ** 72 ** D72</comment>
+	<expr><call><name PREFIX:line="303" PREFIX:column="9">_BV</name><argument_list PREFIX:line="303" PREFIX:column="12">( <argument><expr PREFIX:line="303" PREFIX:column="14">3</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="303" PREFIX:column="27">// PJ 3 ** 73 ** D73</comment>
+	<expr><call><name PREFIX:line="304" PREFIX:column="9">_BV</name><argument_list PREFIX:line="304" PREFIX:column="12">( <argument><expr PREFIX:line="304" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="304" PREFIX:column="27">// PJ 7 ** 74 ** D74</comment>
+	<expr><call><name PREFIX:line="305" PREFIX:column="9">_BV</name><argument_list PREFIX:line="305" PREFIX:column="12">( <argument><expr PREFIX:line="305" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="305" PREFIX:column="27">// PJ 4 ** 75 ** D75</comment>
+	<expr><call><name PREFIX:line="306" PREFIX:column="9">_BV</name><argument_list PREFIX:line="306" PREFIX:column="12">( <argument><expr PREFIX:line="306" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="306" PREFIX:column="27">// PJ 5 ** 76 ** D76</comment>
+	<expr><call><name PREFIX:line="307" PREFIX:column="9">_BV</name><argument_list PREFIX:line="307" PREFIX:column="12">( <argument><expr PREFIX:line="307" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="307" PREFIX:column="27">// PJ 6 ** 77 ** D77</comment>
+	<expr><call><name PREFIX:line="308" PREFIX:column="9">_BV</name><argument_list PREFIX:line="308" PREFIX:column="12">( <argument><expr PREFIX:line="308" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="308" PREFIX:column="27">// PE 2 ** 78 ** D78</comment>
+	<expr><call><name PREFIX:line="309" PREFIX:column="9">_BV</name><argument_list PREFIX:line="309" PREFIX:column="12">( <argument><expr PREFIX:line="309" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="309" PREFIX:column="27">// PE 6 ** 79 ** D79</comment>
+	<expr><call><name PREFIX:line="310" PREFIX:column="9">_BV</name><argument_list PREFIX:line="310" PREFIX:column="12">( <argument><expr PREFIX:line="310" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="310" PREFIX:column="27">// PE 7 ** 80 ** D80</comment>
+	<expr><call><name PREFIX:line="311" PREFIX:column="9">_BV</name><argument_list PREFIX:line="311" PREFIX:column="12">( <argument><expr PREFIX:line="311" PREFIX:column="14">4</expr></argument> )</argument_list></call></expr>	, <comment type="line" PREFIX:line="311" PREFIX:column="27">// PD 4 ** 81 ** D81</comment>
+	<expr><call><name PREFIX:line="312" PREFIX:column="9">_BV</name><argument_list PREFIX:line="312" PREFIX:column="12">( <argument><expr PREFIX:line="312" PREFIX:column="14">5</expr></argument> )</argument_list></call></expr> 	, <comment type="line" PREFIX:line="312" PREFIX:column="27">// PD 5 ** 82 ** D82</comment>
+	<expr><call><name PREFIX:line="313" PREFIX:column="9">_BV</name><argument_list PREFIX:line="313" PREFIX:column="12">( <argument><expr PREFIX:line="313" PREFIX:column="14">6</expr></argument> )</argument_list></call></expr> 	, <comment type="line" PREFIX:line="313" PREFIX:column="27">// PD 6 ** 83 ** D83</comment>
+	<expr><call><name PREFIX:line="314" PREFIX:column="9">_BV</name><argument_list PREFIX:line="314" PREFIX:column="12">( <argument><expr PREFIX:line="314" PREFIX:column="14">2</expr></argument> )</argument_list></call></expr> 	, <comment type="line" PREFIX:line="314" PREFIX:column="27">// PH 2 ** 84 ** D84</comment>
+	<expr><call><name PREFIX:line="315" PREFIX:column="9">_BV</name><argument_list PREFIX:line="315" PREFIX:column="12">( <argument><expr PREFIX:line="315" PREFIX:column="14">7</expr></argument> )</argument_list></call></expr> 	, <comment type="line" PREFIX:line="315" PREFIX:column="27">// PH 7 ** 85 ** D85</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="318" PREFIX:column="2">uint8_t</name> <name PREFIX:line="318" PREFIX:column="10">PROGMEM</name></type> <name><name PREFIX:line="318" PREFIX:column="18">digital_pin_to_timer_PGM</name><index PREFIX:line="318" PREFIX:column="42">[]</index></name> <init PREFIX:line="318" PREFIX:column="45">= <expr><block PREFIX:line="318" PREFIX:column="47">{
+	<comment type="line" PREFIX:line="319" PREFIX:column="9">// TIMERS</comment>
+	<comment type="line" PREFIX:line="320" PREFIX:column="9">// -------------------------------------------</comment>
+	<expr><name PREFIX:line="321" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="321" PREFIX:column="27">// PE 0 ** 0 ** USART0_RX</comment>
+	<expr><name PREFIX:line="322" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="322" PREFIX:column="27">// PE 1 ** 1 ** USART0_TX</comment>
+	<expr><name PREFIX:line="323" PREFIX:column="9">TIMER3B</name></expr>		, <comment type="line" PREFIX:line="323" PREFIX:column="27">// PE 4 ** 2 ** PWM2</comment>
+	<expr><name PREFIX:line="324" PREFIX:column="9">TIMER3C</name></expr>		, <comment type="line" PREFIX:line="324" PREFIX:column="27">// PE 5 ** 3 ** PWM3</comment>
+	<expr><name PREFIX:line="325" PREFIX:column="9">TIMER0B</name></expr>		, <comment type="line" PREFIX:line="325" PREFIX:column="27">// PG 5 ** 4 ** PWM4</comment>
+	<expr><name PREFIX:line="326" PREFIX:column="9">TIMER3A</name></expr>		, <comment type="line" PREFIX:line="326" PREFIX:column="27">// PE 3 ** 5 ** PWM5</comment>
+	<expr><name PREFIX:line="327" PREFIX:column="9">TIMER4A</name></expr>		, <comment type="line" PREFIX:line="327" PREFIX:column="27">// PH 3 ** 6 ** PWM6</comment>
+	<expr><name PREFIX:line="328" PREFIX:column="9">TIMER4B</name></expr>		, <comment type="line" PREFIX:line="328" PREFIX:column="27">// PH 4 ** 7 ** PWM7</comment>
+	<expr><name PREFIX:line="329" PREFIX:column="9">TIMER4C</name></expr>		, <comment type="line" PREFIX:line="329" PREFIX:column="27">// PH 5 ** 8 ** PWM8</comment>
+	<expr><name PREFIX:line="330" PREFIX:column="9">TIMER2B</name></expr>		, <comment type="line" PREFIX:line="330" PREFIX:column="27">// PH 6 ** 9 ** PWM9</comment>
+	<expr><name PREFIX:line="331" PREFIX:column="9">TIMER2A</name></expr>		, <comment type="line" PREFIX:line="331" PREFIX:column="27">// PB 4 ** 10 ** PWM10</comment>
+	<expr><name PREFIX:line="332" PREFIX:column="9">TIMER1A</name></expr>		, <comment type="line" PREFIX:line="332" PREFIX:column="27">// PB 5 ** 11 ** PWM11</comment>
+	<expr><name PREFIX:line="333" PREFIX:column="9">TIMER1B</name></expr>		, <comment type="line" PREFIX:line="333" PREFIX:column="27">// PB 6 ** 12 ** PWM12</comment>
+	<expr><name PREFIX:line="334" PREFIX:column="9">TIMER0A</name></expr>		, <comment type="line" PREFIX:line="334" PREFIX:column="27">// PB 7 ** 13 ** PWM13</comment>
+	<expr><name PREFIX:line="335" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="335" PREFIX:column="27">// PJ 1 ** 14 ** USART3_TX</comment>
+	<expr><name PREFIX:line="336" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="336" PREFIX:column="27">// PJ 0 ** 15 ** USART3_RX</comment>
+	<expr><name PREFIX:line="337" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="337" PREFIX:column="27">// PH 1 ** 16 ** USART2_TX</comment>
+	<expr><name PREFIX:line="338" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="338" PREFIX:column="27">// PH 0 ** 17 ** USART2_RX</comment>
+	<expr><name PREFIX:line="339" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="339" PREFIX:column="27">// PD 3 ** 18 ** USART1_TX</comment>
+	<expr><name PREFIX:line="340" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="340" PREFIX:column="27">// PD 2 ** 19 ** USART1_RX</comment>
+	<expr><name PREFIX:line="341" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="341" PREFIX:column="27">// PD 1 ** 20 ** I2C_SDA</comment>
+	<expr><name PREFIX:line="342" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="342" PREFIX:column="27">// PD 0 ** 21 ** I2C_SCL</comment>
+	<expr><name PREFIX:line="343" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="343" PREFIX:column="27">// PA 0 ** 22 ** D22</comment>
+	<expr><name PREFIX:line="344" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="344" PREFIX:column="27">// PA 1 ** 23 ** D23</comment>
+	<expr><name PREFIX:line="345" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="345" PREFIX:column="27">// PA 2 ** 24 ** D24</comment>
+	<expr><name PREFIX:line="346" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="346" PREFIX:column="27">// PA 3 ** 25 ** D25</comment>
+	<expr><name PREFIX:line="347" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="347" PREFIX:column="27">// PA 4 ** 26 ** D26</comment>
+	<expr><name PREFIX:line="348" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="348" PREFIX:column="27">// PA 5 ** 27 ** D27</comment>
+	<expr><name PREFIX:line="349" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="349" PREFIX:column="27">// PA 6 ** 28 ** D28</comment>
+	<expr><name PREFIX:line="350" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="350" PREFIX:column="27">// PA 7 ** 29 ** D29</comment>
+	<expr><name PREFIX:line="351" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="351" PREFIX:column="27">// PC 7 ** 30 ** D30</comment>
+	<expr><name PREFIX:line="352" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="352" PREFIX:column="27">// PC 6 ** 31 ** D31</comment>
+	<expr><name PREFIX:line="353" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="353" PREFIX:column="27">// PC 5 ** 32 ** D32</comment>
+	<expr><name PREFIX:line="354" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="354" PREFIX:column="27">// PC 4 ** 33 ** D33</comment>
+	<expr><name PREFIX:line="355" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="355" PREFIX:column="27">// PC 3 ** 34 ** D34</comment>
+	<expr><name PREFIX:line="356" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="356" PREFIX:column="27">// PC 2 ** 35 ** D35</comment>
+	<expr><name PREFIX:line="357" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="357" PREFIX:column="27">// PC 1 ** 36 ** D36</comment>
+	<expr><name PREFIX:line="358" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="358" PREFIX:column="27">// PC 0 ** 37 ** D37</comment>
+	<expr><name PREFIX:line="359" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="359" PREFIX:column="27">// PD 7 ** 38 ** D38</comment>
+	<expr><name PREFIX:line="360" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="360" PREFIX:column="27">// PG 2 ** 39 ** D39</comment>
+	<expr><name PREFIX:line="361" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="361" PREFIX:column="27">// PG 1 ** 40 ** D40</comment>
+	<expr><name PREFIX:line="362" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="362" PREFIX:column="27">// PG 0 ** 41 ** D41</comment>
+	<expr><name PREFIX:line="363" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="363" PREFIX:column="27">// PL 7 ** 42 ** D42</comment>
+	<expr><name PREFIX:line="364" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="364" PREFIX:column="27">// PL 6 ** 43 ** D43</comment>
+	<expr><name PREFIX:line="365" PREFIX:column="9">TIMER5C</name></expr>		, <comment type="line" PREFIX:line="365" PREFIX:column="27">// PL 5 ** 44 ** D44</comment>
+	<expr><name PREFIX:line="366" PREFIX:column="9">TIMER5B</name></expr>		, <comment type="line" PREFIX:line="366" PREFIX:column="27">// PL 4 ** 45 ** D45</comment>
+	<expr><name PREFIX:line="367" PREFIX:column="9">TIMER5A</name></expr>		, <comment type="line" PREFIX:line="367" PREFIX:column="27">// PL 3 ** 46 ** D46</comment>
+	<expr><name PREFIX:line="368" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="368" PREFIX:column="27">// PL 2 ** 47 ** D47</comment>
+	<expr><name PREFIX:line="369" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="369" PREFIX:column="27">// PL 1 ** 48 ** D48</comment>
+	<expr><name PREFIX:line="370" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="370" PREFIX:column="27">// PL 0 ** 49 ** D49</comment>
+	<expr><name PREFIX:line="371" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="371" PREFIX:column="27">// PB 3 ** 50 ** SPI_MISO</comment>
+	<expr><name PREFIX:line="372" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="372" PREFIX:column="27">// PB 2 ** 51 ** SPI_MOSI</comment>
+	<expr><name PREFIX:line="373" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="373" PREFIX:column="27">// PB 1 ** 52 ** SPI_SCK</comment>
+	<expr><name PREFIX:line="374" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="374" PREFIX:column="27">// PB 0 ** 53 ** SPI_SS</comment>
+	<expr><name PREFIX:line="375" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="375" PREFIX:column="27">// PF 0 ** 54 ** A0	</comment>
+	<expr><name PREFIX:line="376" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="376" PREFIX:column="27">// PF 1 ** 55 ** A1	</comment>
+	<expr><name PREFIX:line="377" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="377" PREFIX:column="27">// PF 2 ** 56 ** A2	</comment>
+	<expr><name PREFIX:line="378" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="378" PREFIX:column="27">// PF 3 ** 57 ** A3	</comment>
+	<expr><name PREFIX:line="379" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="379" PREFIX:column="27">// PF 4 ** 58 ** A4	</comment>
+	<expr><name PREFIX:line="380" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="380" PREFIX:column="27">// PF 5 ** 59 ** A5	</comment>
+	<expr><name PREFIX:line="381" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="381" PREFIX:column="27">// PF 6 ** 60 ** A6	</comment>
+	<expr><name PREFIX:line="382" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="382" PREFIX:column="27">// PF 7 ** 61 ** A7	</comment>
+	<expr><name PREFIX:line="383" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="383" PREFIX:column="27">// PK 0 ** 62 ** A8	</comment>
+	<expr><name PREFIX:line="384" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="384" PREFIX:column="27">// PK 1 ** 63 ** A9	</comment>
+	<expr><name PREFIX:line="385" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="385" PREFIX:column="27">// PK 2 ** 64 ** A10	</comment>
+	<expr><name PREFIX:line="386" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="386" PREFIX:column="27">// PK 3 ** 65 ** A11	</comment>
+	<expr><name PREFIX:line="387" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="387" PREFIX:column="27">// PK 4 ** 66 ** A12	</comment>
+	<expr><name PREFIX:line="388" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="388" PREFIX:column="27">// PK 5 ** 67 ** A13	</comment>
+	<expr><name PREFIX:line="389" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="389" PREFIX:column="27">// PK 6 ** 68 ** A14	</comment>
+	<expr><name PREFIX:line="390" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="390" PREFIX:column="27">// PK 7 ** 69 ** A15</comment>
+	<expr><name PREFIX:line="391" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="391" PREFIX:column="27">// PG 4 ** 70 ** D70</comment>
+	<expr><name PREFIX:line="392" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="392" PREFIX:column="27">// PG 3 ** 71 ** D71</comment>
+	<expr><name PREFIX:line="393" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="393" PREFIX:column="27">// PJ 2 ** 72 ** D72</comment>
+	<expr><name PREFIX:line="394" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="394" PREFIX:column="27">// PJ 3 ** 73 ** D73</comment>
+	<expr><name PREFIX:line="395" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="395" PREFIX:column="27">// PJ 7 ** 74 ** D74</comment>
+	<expr><name PREFIX:line="396" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="396" PREFIX:column="27">// PJ 4 ** 75 ** D75</comment>
+	<expr><name PREFIX:line="397" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="397" PREFIX:column="27">// PJ 5 ** 76 ** D76</comment>
+	<expr><name PREFIX:line="398" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="398" PREFIX:column="27">// PJ 6 ** 77 ** D77</comment>
+	<expr><name PREFIX:line="399" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="399" PREFIX:column="27">// PE 2 ** 78 ** D78</comment>
+	<expr><name PREFIX:line="400" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="400" PREFIX:column="27">// PE 6 ** 79 ** D79</comment>
+	<expr><name PREFIX:line="401" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="401" PREFIX:column="27">// PE 7 ** 80 ** D80</comment>
+	<expr><name PREFIX:line="402" PREFIX:column="9">NOT_ON_TIMER</name></expr>	, <comment type="line" PREFIX:line="402" PREFIX:column="27">// PD 4 ** 81 ** D81</comment>
+	<expr><name PREFIX:line="403" PREFIX:column="9">NOT_ON_TIMER</name></expr> 	, <comment type="line" PREFIX:line="403" PREFIX:column="27">// PD 5 ** 82 ** D82</comment>
+	<expr><name PREFIX:line="404" PREFIX:column="9">NOT_ON_TIMER</name></expr> 	, <comment type="line" PREFIX:line="404" PREFIX:column="27">// PD 6 ** 83 ** D83</comment>
+	<expr><name PREFIX:line="405" PREFIX:column="9">NOT_ON_TIMER</name></expr> 	, <comment type="line" PREFIX:line="405" PREFIX:column="27">// PH 2 ** 84 ** D84</comment>
+	<expr><name PREFIX:line="406" PREFIX:column="9">NOT_ON_TIMER</name></expr> 	, <comment type="line" PREFIX:line="406" PREFIX:column="27">// PH 7 ** 85 ** D85</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+<cpp:endif PREFIX:line="409" PREFIX:column="1">#<cpp:directive PREFIX:line="409" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:endif PREFIX:line="411" PREFIX:column="1">#<cpp:directive PREFIX:line="411" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+</unit>

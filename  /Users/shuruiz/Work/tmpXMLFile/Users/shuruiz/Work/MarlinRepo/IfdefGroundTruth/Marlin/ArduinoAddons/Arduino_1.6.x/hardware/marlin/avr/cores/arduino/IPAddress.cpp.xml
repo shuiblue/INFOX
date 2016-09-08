@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/arduino/IPAddress.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  IPAddress.cpp - Base class that provides IPAddress
+  Copyright (c) 2011 Adrian McEwen.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/</comment>
+
+<cpp:include PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="20" PREFIX:column="10">&lt;Arduino.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="21" PREFIX:column="10">&lt;IPAddress.h&gt;</cpp:file></cpp:include>
+
+<constructor><name><name PREFIX:line="23" PREFIX:column="1">IPAddress</name>::<name PREFIX:line="23" PREFIX:column="12">IPAddress</name></name><parameter_list PREFIX:line="23" PREFIX:column="21">()</parameter_list>
+<block PREFIX:line="24" PREFIX:column="1">{
+    <expr_stmt><expr><name><name PREFIX:line="25" PREFIX:column="5">_address</name>.<name PREFIX:line="25" PREFIX:column="14">dword</name></name> = 0</expr>;</expr_stmt>
+}</block></constructor>
+
+<constructor><name><name PREFIX:line="28" PREFIX:column="1">IPAddress</name>::<name PREFIX:line="28" PREFIX:column="12">IPAddress</name></name><parameter_list PREFIX:line="28" PREFIX:column="21">(<param><decl><type><name PREFIX:line="28" PREFIX:column="22">uint8_t</name></type> <name PREFIX:line="28" PREFIX:column="30">first_octet</name></decl></param>, <param><decl><type><name PREFIX:line="28" PREFIX:column="43">uint8_t</name></type> <name PREFIX:line="28" PREFIX:column="51">second_octet</name></decl></param>, <param><decl><type><name PREFIX:line="28" PREFIX:column="65">uint8_t</name></type> <name PREFIX:line="28" PREFIX:column="73">third_octet</name></decl></param>, <param><decl><type><name PREFIX:line="28" PREFIX:column="86">uint8_t</name></type> <name PREFIX:line="28" PREFIX:column="94">fourth_octet</name></decl></param>)</parameter_list>
+<block PREFIX:line="29" PREFIX:column="1">{
+    <expr_stmt><expr><name><name PREFIX:line="30" PREFIX:column="5">_address</name>.<name PREFIX:line="30" PREFIX:column="14">bytes</name><index PREFIX:line="30" PREFIX:column="19">[<expr PREFIX:line="30" PREFIX:column="20">0</expr>]</index></name> = <name PREFIX:line="30" PREFIX:column="25">first_octet</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name><name PREFIX:line="31" PREFIX:column="5">_address</name>.<name PREFIX:line="31" PREFIX:column="14">bytes</name><index PREFIX:line="31" PREFIX:column="19">[<expr PREFIX:line="31" PREFIX:column="20">1</expr>]</index></name> = <name PREFIX:line="31" PREFIX:column="25">second_octet</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name><name PREFIX:line="32" PREFIX:column="5">_address</name>.<name PREFIX:line="32" PREFIX:column="14">bytes</name><index PREFIX:line="32" PREFIX:column="19">[<expr PREFIX:line="32" PREFIX:column="20">2</expr>]</index></name> = <name PREFIX:line="32" PREFIX:column="25">third_octet</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name><name PREFIX:line="33" PREFIX:column="5">_address</name>.<name PREFIX:line="33" PREFIX:column="14">bytes</name><index PREFIX:line="33" PREFIX:column="19">[<expr PREFIX:line="33" PREFIX:column="20">3</expr>]</index></name> = <name PREFIX:line="33" PREFIX:column="25">fourth_octet</name></expr>;</expr_stmt>
+}</block></constructor>
+
+<constructor><name><name PREFIX:line="36" PREFIX:column="1">IPAddress</name>::<name PREFIX:line="36" PREFIX:column="12">IPAddress</name></name><parameter_list PREFIX:line="36" PREFIX:column="21">(<param><decl><type><name PREFIX:line="36" PREFIX:column="22">uint32_t</name></type> <name PREFIX:line="36" PREFIX:column="31">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="37" PREFIX:column="1">{
+    <expr_stmt><expr><name><name PREFIX:line="38" PREFIX:column="5">_address</name>.<name PREFIX:line="38" PREFIX:column="14">dword</name></name> = <name PREFIX:line="38" PREFIX:column="22">address</name></expr>;</expr_stmt>
+}</block></constructor>
+
+<constructor><name><name PREFIX:line="41" PREFIX:column="1">IPAddress</name>::<name PREFIX:line="41" PREFIX:column="12">IPAddress</name></name><parameter_list PREFIX:line="41" PREFIX:column="21">( <param><decl><type><name PREFIX:line="41" PREFIX:column="23">uint8_t</name> *</type><name PREFIX:line="41" PREFIX:column="32">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="42" PREFIX:column="1">{
+    <expr_stmt><expr><call><name PREFIX:line="43" PREFIX:column="5">memcpy</name><argument_list PREFIX:line="43" PREFIX:column="11">(<argument><expr><name><name PREFIX:line="43" PREFIX:column="12">_address</name>.<name PREFIX:line="43" PREFIX:column="21">bytes</name></name></expr></argument>, <argument><expr><name PREFIX:line="43" PREFIX:column="28">address</name></expr></argument>, <argument><expr><sizeof PREFIX:line="43" PREFIX:column="37">sizeof<argument_list PREFIX:line="43" PREFIX:column="43">(<argument><expr><name><name PREFIX:line="43" PREFIX:column="44">_address</name>.<name PREFIX:line="43" PREFIX:column="53">bytes</name></name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></constructor>
+
+<function><type><name PREFIX:line="46" PREFIX:column="1">IPAddress</name>&amp;</type> <name><name PREFIX:line="46" PREFIX:column="12">IPAddress</name>::<name PREFIX:line="46" PREFIX:column="23">operator=</name></name><parameter_list PREFIX:line="46" PREFIX:column="32">( <param><decl><type><name PREFIX:line="46" PREFIX:column="34">uint8_t</name> *</type><name PREFIX:line="46" PREFIX:column="43">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="47" PREFIX:column="1">{
+    <expr_stmt><expr><call><name PREFIX:line="48" PREFIX:column="5">memcpy</name><argument_list PREFIX:line="48" PREFIX:column="11">(<argument><expr><name><name PREFIX:line="48" PREFIX:column="12">_address</name>.<name PREFIX:line="48" PREFIX:column="21">bytes</name></name></expr></argument>, <argument><expr><name PREFIX:line="48" PREFIX:column="28">address</name></expr></argument>, <argument><expr><sizeof PREFIX:line="48" PREFIX:column="37">sizeof<argument_list PREFIX:line="48" PREFIX:column="43">(<argument><expr><name><name PREFIX:line="48" PREFIX:column="44">_address</name>.<name PREFIX:line="48" PREFIX:column="53">bytes</name></name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <return PREFIX:line="49" PREFIX:column="5">return <expr PREFIX:line="49" PREFIX:column="12">*<name PREFIX:line="49" PREFIX:column="13">this</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="52" PREFIX:column="1">IPAddress</name>&amp;</type> <name><name PREFIX:line="52" PREFIX:column="12">IPAddress</name>::<name PREFIX:line="52" PREFIX:column="23">operator=</name></name><parameter_list PREFIX:line="52" PREFIX:column="32">(<param><decl><type><name PREFIX:line="52" PREFIX:column="33">uint32_t</name></type> <name PREFIX:line="52" PREFIX:column="42">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="53" PREFIX:column="1">{
+    <expr_stmt><expr><name><name PREFIX:line="54" PREFIX:column="5">_address</name>.<name PREFIX:line="54" PREFIX:column="14">dword</name></name> = <name PREFIX:line="54" PREFIX:column="22">address</name></expr>;</expr_stmt>
+    <return PREFIX:line="55" PREFIX:column="5">return <expr PREFIX:line="55" PREFIX:column="12">*<name PREFIX:line="55" PREFIX:column="13">this</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="58" PREFIX:column="1">bool</name></type> <name><name PREFIX:line="58" PREFIX:column="6">IPAddress</name>::<name PREFIX:line="58" PREFIX:column="17">operator==</name></name><parameter_list PREFIX:line="58" PREFIX:column="27">( <param><decl><type><name PREFIX:line="58" PREFIX:column="29">uint8_t</name>*</type> <name PREFIX:line="58" PREFIX:column="38">addr</name></decl></param>)</parameter_list> 
+<block PREFIX:line="59" PREFIX:column="1">{
+    <return PREFIX:line="60" PREFIX:column="5">return <expr><call><name PREFIX:line="60" PREFIX:column="12">memcmp</name><argument_list PREFIX:line="60" PREFIX:column="18">(<argument><expr><name PREFIX:line="60" PREFIX:column="19">addr</name></expr></argument>, <argument><expr><name><name PREFIX:line="60" PREFIX:column="25">_address</name>.<name PREFIX:line="60" PREFIX:column="34">bytes</name></name></expr></argument>, <argument><expr><sizeof PREFIX:line="60" PREFIX:column="41">sizeof<argument_list PREFIX:line="60" PREFIX:column="47">(<argument><expr><name><name PREFIX:line="60" PREFIX:column="48">_address</name>.<name PREFIX:line="60" PREFIX:column="57">bytes</name></name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call> == 0</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="63" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="63" PREFIX:column="8">IPAddress</name>::<name PREFIX:line="63" PREFIX:column="19">printTo</name></name><parameter_list PREFIX:line="63" PREFIX:column="26">(<param><decl><type><name PREFIX:line="63" PREFIX:column="27">Print</name>&amp;</type> <name PREFIX:line="63" PREFIX:column="34">p</name></decl></param>)</parameter_list> 
+<block PREFIX:line="64" PREFIX:column="1">{
+    <decl_stmt><decl><type><name PREFIX:line="65" PREFIX:column="5">size_t</name></type> <name PREFIX:line="65" PREFIX:column="12">n</name> <init PREFIX:line="65" PREFIX:column="14">= <expr PREFIX:line="65" PREFIX:column="16">0</expr></init></decl>;</decl_stmt>
+    <for PREFIX:line="66" PREFIX:column="5">for (<init><decl><type><name PREFIX:line="66" PREFIX:column="10">int</name></type> <name PREFIX:line="66" PREFIX:column="14">i</name> <init PREFIX:line="66" PREFIX:column="16">=<expr PREFIX:line="66" PREFIX:column="17">0</expr></init></decl>;</init> <condition><expr><name PREFIX:line="66" PREFIX:column="20">i</name> &lt; 3</expr>;</condition> <incr><expr><name PREFIX:line="66" PREFIX:column="27">i</name>++</expr></incr>)
+    <block PREFIX:line="67" PREFIX:column="5">{
+        <expr_stmt><expr><name PREFIX:line="68" PREFIX:column="9">n</name> += <call><name><name PREFIX:line="68" PREFIX:column="14">p</name>.<name PREFIX:line="68" PREFIX:column="16">print</name></name><argument_list PREFIX:line="68" PREFIX:column="21">(<argument><expr><name><name PREFIX:line="68" PREFIX:column="22">_address</name>.<name PREFIX:line="68" PREFIX:column="31">bytes</name><index PREFIX:line="68" PREFIX:column="36">[<expr><name PREFIX:line="68" PREFIX:column="37">i</name></expr>]</index></name></expr></argument>, <argument><expr><name PREFIX:line="68" PREFIX:column="41">DEC</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="69" PREFIX:column="9">n</name> += <call><name><name PREFIX:line="69" PREFIX:column="14">p</name>.<name PREFIX:line="69" PREFIX:column="16">print</name></name><argument_list PREFIX:line="69" PREFIX:column="21">(<argument><expr PREFIX:line="69" PREFIX:column="22">'.'</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    }</block></for>
+    <expr_stmt><expr><name PREFIX:line="71" PREFIX:column="5">n</name> += <call><name><name PREFIX:line="71" PREFIX:column="10">p</name>.<name PREFIX:line="71" PREFIX:column="12">print</name></name><argument_list PREFIX:line="71" PREFIX:column="17">(<argument><expr><name><name PREFIX:line="71" PREFIX:column="18">_address</name>.<name PREFIX:line="71" PREFIX:column="27">bytes</name><index PREFIX:line="71" PREFIX:column="32">[<expr PREFIX:line="71" PREFIX:column="33">3</expr>]</index></name></expr></argument>, <argument><expr><name PREFIX:line="71" PREFIX:column="37">DEC</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <return PREFIX:line="72" PREFIX:column="5">return <expr><name PREFIX:line="72" PREFIX:column="12">n</name></expr>;</return>
+}</block></function>
+
+</unit>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/arduino/CDC.cpp" PREFIX:tabs="8" PREFIX:line="1" PREFIX:column="1">
+
+<comment type="block" PREFIX:line="3" PREFIX:column="1">/* Copyright (c) 2011, Peter Barrett  
+**  
+** Permission to use, copy, modify, and/or distribute this software for  
+** any purpose with or without fee is hereby granted, provided that the  
+** above copyright notice and this permission notice appear in all copies.  
+** 
+** THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL  
+** WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED  
+** WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR  
+** BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES  
+** OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
+** WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,  
+** ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS  
+** SOFTWARE.  
+*/</comment>
+
+<cpp:include PREFIX:line="19" PREFIX:column="1">#<cpp:directive PREFIX:line="19" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="19" PREFIX:column="10">"USBAPI.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="20" PREFIX:column="10">&lt;avr/wdt.h&gt;</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="22" PREFIX:column="1">#<cpp:directive PREFIX:line="22" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="22" PREFIX:column="5">defined</name><argument_list PREFIX:line="22" PREFIX:column="12">(<argument><expr><name PREFIX:line="22" PREFIX:column="13">USBCON</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<cpp:ifdef PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="23" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+
+<typedef PREFIX:line="25" PREFIX:column="1">typedef <type><struct PREFIX:line="25" PREFIX:column="9">struct
+<block PREFIX:line="26" PREFIX:column="1">{<public type="default" PREFIX:line="26" PREFIX:column="2">
+	<decl_stmt><decl><type><name PREFIX:line="27" PREFIX:column="9">u32</name></type>	<name PREFIX:line="27" PREFIX:column="17">dwDTERate</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="28" PREFIX:column="9">u8</name></type>	<name PREFIX:line="28" PREFIX:column="17">bCharFormat</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="29" PREFIX:column="9">u8</name></type> 	<name PREFIX:line="29" PREFIX:column="17">bParityType</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="30" PREFIX:column="9">u8</name></type> 	<name PREFIX:line="30" PREFIX:column="17">bDataBits</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="31" PREFIX:column="9">u8</name></type>	<name PREFIX:line="31" PREFIX:column="17">lineState</name></decl>;</decl_stmt>
+</public>}</block></struct></type> <name PREFIX:line="32" PREFIX:column="3">LineInfo</name>;</typedef>
+
+<decl_stmt><decl><type><specifier PREFIX:line="34" PREFIX:column="1">static</specifier> <specifier PREFIX:line="34" PREFIX:column="8">volatile</specifier> <name PREFIX:line="34" PREFIX:column="17">LineInfo</name></type> <name PREFIX:line="34" PREFIX:column="26">_usbLineInfo</name> <init PREFIX:line="34" PREFIX:column="39">= <expr><block PREFIX:line="34" PREFIX:column="41">{ <expr PREFIX:line="34" PREFIX:column="43">57600</expr>, <expr PREFIX:line="34" PREFIX:column="50">0x00</expr>, <expr PREFIX:line="34" PREFIX:column="56">0x00</expr>, <expr PREFIX:line="34" PREFIX:column="62">0x00</expr>, <expr PREFIX:line="34" PREFIX:column="68">0x00</expr> }</block></expr></init></decl>;</decl_stmt>
+
+<cpp:define PREFIX:line="36" PREFIX:column="1">#<cpp:directive PREFIX:line="36" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="36" PREFIX:column="9">WEAK</name></cpp:macro> <cpp:value PREFIX:line="36" PREFIX:column="14">__attribute__ ((weak))</cpp:value></cpp:define>
+
+  <decl_stmt><decl><type><name PREFIX:line="38" PREFIX:column="3">CDCDescriptor</name> <name PREFIX:line="38" PREFIX:column="17">_cdcInterface</name></type> <name PREFIX:line="38" PREFIX:column="31">PROGMEM</name></decl>;</decl_stmt>
+ <decl_stmt><decl><type><name PREFIX:line="39" PREFIX:column="2">CDCDescriptor</name></type> <name PREFIX:line="39" PREFIX:column="16">_cdcInterface</name> <init PREFIX:line="39" PREFIX:column="30">=
+<expr><block PREFIX:line="40" PREFIX:column="1">{
+	<expr><call><name PREFIX:line="41" PREFIX:column="9">D_IAD</name><argument_list PREFIX:line="41" PREFIX:column="14">(<argument><expr PREFIX:line="41" PREFIX:column="15">0</expr></argument>,<argument><expr PREFIX:line="41" PREFIX:column="17">2</expr></argument>,<argument><expr><name PREFIX:line="41" PREFIX:column="19">CDC_COMMUNICATION_INTERFACE_CLASS</name></expr></argument>,<argument><expr><name PREFIX:line="41" PREFIX:column="53">CDC_ABSTRACT_CONTROL_MODEL</name></expr></argument>,<argument><expr PREFIX:line="41" PREFIX:column="80">1</expr></argument>)</argument_list></call></expr>,
+
+	<comment type="line" PREFIX:line="43" PREFIX:column="9">//	CDC communication interface</comment>
+	<expr><call><name PREFIX:line="44" PREFIX:column="9">D_INTERFACE</name><argument_list PREFIX:line="44" PREFIX:column="20">(<argument><expr><name PREFIX:line="44" PREFIX:column="21">CDC_ACM_INTERFACE</name></expr></argument>,<argument><expr PREFIX:line="44" PREFIX:column="39">1</expr></argument>,<argument><expr><name PREFIX:line="44" PREFIX:column="41">CDC_COMMUNICATION_INTERFACE_CLASS</name></expr></argument>,<argument><expr><name PREFIX:line="44" PREFIX:column="75">CDC_ABSTRACT_CONTROL_MODEL</name></expr></argument>,<argument><expr PREFIX:line="44" PREFIX:column="102">0</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="45" PREFIX:column="9">D_CDCCS</name><argument_list PREFIX:line="45" PREFIX:column="16">(<argument><expr><name PREFIX:line="45" PREFIX:column="17">CDC_HEADER</name></expr></argument>,<argument><expr PREFIX:line="45" PREFIX:column="28">0x10</expr></argument>,<argument><expr PREFIX:line="45" PREFIX:column="33">0x01</expr></argument>)</argument_list></call></expr>,								<comment type="line" PREFIX:line="45" PREFIX:column="97">// Header (1.10 bcd)</comment>
+	<expr><call><name PREFIX:line="46" PREFIX:column="9">D_CDCCS</name><argument_list PREFIX:line="46" PREFIX:column="16">(<argument><expr><name PREFIX:line="46" PREFIX:column="17">CDC_CALL_MANAGEMENT</name></expr></argument>,<argument><expr PREFIX:line="46" PREFIX:column="37">1</expr></argument>,<argument><expr PREFIX:line="46" PREFIX:column="39">1</expr></argument>)</argument_list></call></expr>,							<comment type="line" PREFIX:line="46" PREFIX:column="97">// Device handles call management (not)</comment>
+	<expr><call><name PREFIX:line="47" PREFIX:column="9">D_CDCCS4</name><argument_list PREFIX:line="47" PREFIX:column="17">(<argument><expr><name PREFIX:line="47" PREFIX:column="18">CDC_ABSTRACT_CONTROL_MANAGEMENT</name></expr></argument>,<argument><expr PREFIX:line="47" PREFIX:column="50">6</expr></argument>)</argument_list></call></expr>,				<comment type="line" PREFIX:line="47" PREFIX:column="81">// SET_LINE_CODING, GET_LINE_CODING, SET_CONTROL_LINE_STATE supported</comment>
+	<expr><call><name PREFIX:line="48" PREFIX:column="9">D_CDCCS</name><argument_list PREFIX:line="48" PREFIX:column="16">(<argument><expr><name PREFIX:line="48" PREFIX:column="17">CDC_UNION</name></expr></argument>,<argument><expr><name PREFIX:line="48" PREFIX:column="27">CDC_ACM_INTERFACE</name></expr></argument>,<argument><expr><name PREFIX:line="48" PREFIX:column="45">CDC_DATA_INTERFACE</name></expr></argument>)</argument_list></call></expr>,	<comment type="line" PREFIX:line="48" PREFIX:column="73">// Communication interface is master, data interface is slave 0</comment>
+	<expr><call><name PREFIX:line="49" PREFIX:column="9">D_ENDPOINT</name><argument_list PREFIX:line="49" PREFIX:column="19">(<argument><expr><call><name PREFIX:line="49" PREFIX:column="20">USB_ENDPOINT_IN</name> <argument_list PREFIX:line="49" PREFIX:column="36">(<argument><expr><name PREFIX:line="49" PREFIX:column="37">CDC_ENDPOINT_ACM</name></expr></argument>)</argument_list></call></expr></argument>,<argument><expr><name PREFIX:line="49" PREFIX:column="55">USB_ENDPOINT_TYPE_INTERRUPT</name></expr></argument>,<argument><expr PREFIX:line="49" PREFIX:column="83">0x10</expr></argument>,<argument><expr PREFIX:line="49" PREFIX:column="88">0x40</expr></argument>)</argument_list></call></expr>,
+
+	<comment type="line" PREFIX:line="51" PREFIX:column="9">//	CDC data interface</comment>
+	<expr><call><name PREFIX:line="52" PREFIX:column="9">D_INTERFACE</name><argument_list PREFIX:line="52" PREFIX:column="20">(<argument><expr><name PREFIX:line="52" PREFIX:column="21">CDC_DATA_INTERFACE</name></expr></argument>,<argument><expr PREFIX:line="52" PREFIX:column="40">2</expr></argument>,<argument><expr><name PREFIX:line="52" PREFIX:column="42">CDC_DATA_INTERFACE_CLASS</name></expr></argument>,<argument><expr PREFIX:line="52" PREFIX:column="67">0</expr></argument>,<argument><expr PREFIX:line="52" PREFIX:column="69">0</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="53" PREFIX:column="9">D_ENDPOINT</name><argument_list PREFIX:line="53" PREFIX:column="19">(<argument><expr><call><name PREFIX:line="53" PREFIX:column="20">USB_ENDPOINT_OUT</name><argument_list PREFIX:line="53" PREFIX:column="36">(<argument><expr><name PREFIX:line="53" PREFIX:column="37">CDC_ENDPOINT_OUT</name></expr></argument>)</argument_list></call></expr></argument>,<argument><expr><name PREFIX:line="53" PREFIX:column="55">USB_ENDPOINT_TYPE_BULK</name></expr></argument>,<argument><expr PREFIX:line="53" PREFIX:column="78">0x40</expr></argument>,<argument><expr PREFIX:line="53" PREFIX:column="83">0</expr></argument>)</argument_list></call></expr>,
+	<macro><name PREFIX:line="54" PREFIX:column="9">D_ENDPOINT</name><argument_list PREFIX:line="54" PREFIX:column="19">(<argument PREFIX:line="54" PREFIX:column="20">USB_ENDPOINT_IN (CDC_ENDPOINT_IN )</argument>,<argument PREFIX:line="54" PREFIX:column="55">USB_ENDPOINT_TYPE_BULK</argument>,<argument PREFIX:line="54" PREFIX:column="78">0x40</argument>,<argument PREFIX:line="54" PREFIX:column="83">0</argument>)</argument_list></macro>
+}</block></expr></init></decl>;</decl_stmt>
+
+<function><type><name PREFIX:line="57" PREFIX:column="1">int</name> <name PREFIX:line="57" PREFIX:column="5">WEAK</name></type> <name PREFIX:line="57" PREFIX:column="10">CDC_GetInterface</name><parameter_list PREFIX:line="57" PREFIX:column="26">(<param><decl><type><name PREFIX:line="57" PREFIX:column="27">u8</name>*</type> <name PREFIX:line="57" PREFIX:column="31">interfaceNum</name></decl></param>)</parameter_list>
+<block PREFIX:line="58" PREFIX:column="1">{
+	<expr_stmt><expr><name><name PREFIX:line="59" PREFIX:column="9">interfaceNum</name><index PREFIX:line="59" PREFIX:column="21">[<expr PREFIX:line="59" PREFIX:column="22">0</expr>]</index></name> += 2</expr>;</expr_stmt>	<comment type="line" PREFIX:line="59" PREFIX:column="33">// uses 2</comment>
+	<return PREFIX:line="60" PREFIX:column="9">return <expr><call><name PREFIX:line="60" PREFIX:column="16">USB_SendControl</name><argument_list PREFIX:line="60" PREFIX:column="31">(<argument><expr><name PREFIX:line="60" PREFIX:column="32">TRANSFER_PGM</name></expr></argument>,<argument><expr PREFIX:line="60" PREFIX:column="45">&amp;<name PREFIX:line="60" PREFIX:column="46">_cdcInterface</name></expr></argument>,<argument><expr><sizeof PREFIX:line="60" PREFIX:column="60">sizeof<argument_list PREFIX:line="60" PREFIX:column="66">(<argument><expr><name PREFIX:line="60" PREFIX:column="67">_cdcInterface</name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="63" PREFIX:column="1">bool</name> <name PREFIX:line="63" PREFIX:column="6">WEAK</name></type> <name PREFIX:line="63" PREFIX:column="11">CDC_Setup</name><parameter_list PREFIX:line="63" PREFIX:column="20">(<param><decl><type><name PREFIX:line="63" PREFIX:column="21">Setup</name>&amp;</type> <name PREFIX:line="63" PREFIX:column="28">setup</name></decl></param>)</parameter_list>
+<block PREFIX:line="64" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="65" PREFIX:column="9">u8</name></type> <name PREFIX:line="65" PREFIX:column="12">r</name> <init PREFIX:line="65" PREFIX:column="14">= <expr><name><name PREFIX:line="65" PREFIX:column="16">setup</name>.<name PREFIX:line="65" PREFIX:column="22">bRequest</name></name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="66" PREFIX:column="9">u8</name></type> <name PREFIX:line="66" PREFIX:column="12">requestType</name> <init PREFIX:line="66" PREFIX:column="24">= <expr><name><name PREFIX:line="66" PREFIX:column="26">setup</name>.<name PREFIX:line="66" PREFIX:column="32">bmRequestType</name></name></expr></init></decl>;</decl_stmt>
+
+	<if PREFIX:line="68" PREFIX:column="9">if <condition PREFIX:line="68" PREFIX:column="12">(<expr><name PREFIX:line="68" PREFIX:column="13">REQUEST_DEVICETOHOST_CLASS_INTERFACE</name> == <name PREFIX:line="68" PREFIX:column="53">requestType</name></expr>)</condition><then PREFIX:line="68" PREFIX:column="65">
+	<block PREFIX:line="69" PREFIX:column="9">{
+		<if PREFIX:line="70" PREFIX:column="17">if <condition PREFIX:line="70" PREFIX:column="20">(<expr><name PREFIX:line="70" PREFIX:column="21">CDC_GET_LINE_CODING</name> == <name PREFIX:line="70" PREFIX:column="44">r</name></expr>)</condition><then PREFIX:line="70" PREFIX:column="46">
+		<block PREFIX:line="71" PREFIX:column="17">{
+			<expr_stmt><expr><call><name PREFIX:line="72" PREFIX:column="25">USB_SendControl</name><argument_list PREFIX:line="72" PREFIX:column="40">(<argument><expr PREFIX:line="72" PREFIX:column="41">0</expr></argument>,<argument><expr PREFIX:line="72" PREFIX:column="43">&amp;<name PREFIX:line="72" PREFIX:column="44">_usbLineInfo</name></expr></argument>,<argument><expr PREFIX:line="72" PREFIX:column="57">7</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+			<return PREFIX:line="73" PREFIX:column="25">return <expr PREFIX:line="73" PREFIX:column="32">true</expr>;</return>
+		}</block></then></if>
+	}</block></then></if>
+
+	<if PREFIX:line="77" PREFIX:column="9">if <condition PREFIX:line="77" PREFIX:column="12">(<expr><name PREFIX:line="77" PREFIX:column="13">REQUEST_HOSTTODEVICE_CLASS_INTERFACE</name> == <name PREFIX:line="77" PREFIX:column="53">requestType</name></expr>)</condition><then PREFIX:line="77" PREFIX:column="65">
+	<block PREFIX:line="78" PREFIX:column="9">{
+		<if PREFIX:line="79" PREFIX:column="17">if <condition PREFIX:line="79" PREFIX:column="20">(<expr><name PREFIX:line="79" PREFIX:column="21">CDC_SET_LINE_CODING</name> == <name PREFIX:line="79" PREFIX:column="44">r</name></expr>)</condition><then PREFIX:line="79" PREFIX:column="46">
+		<block PREFIX:line="80" PREFIX:column="17">{
+			<expr_stmt><expr><call><name PREFIX:line="81" PREFIX:column="25">USB_RecvControl</name><argument_list PREFIX:line="81" PREFIX:column="40">(<argument><expr PREFIX:line="81" PREFIX:column="41">&amp;<name PREFIX:line="81" PREFIX:column="42">_usbLineInfo</name></expr></argument>,<argument><expr PREFIX:line="81" PREFIX:column="55">7</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		}</block></then></if>
+
+		<if PREFIX:line="84" PREFIX:column="17">if <condition PREFIX:line="84" PREFIX:column="20">(<expr><name PREFIX:line="84" PREFIX:column="21">CDC_SET_CONTROL_LINE_STATE</name> == <name PREFIX:line="84" PREFIX:column="51">r</name></expr>)</condition><then PREFIX:line="84" PREFIX:column="53">
+		<block PREFIX:line="85" PREFIX:column="17">{
+			<expr_stmt><expr><name><name PREFIX:line="86" PREFIX:column="25">_usbLineInfo</name>.<name PREFIX:line="86" PREFIX:column="38">lineState</name></name> = <name><name PREFIX:line="86" PREFIX:column="50">setup</name>.<name PREFIX:line="86" PREFIX:column="56">wValueL</name></name></expr>;</expr_stmt>
+		}</block></then></if>
+
+		<if PREFIX:line="89" PREFIX:column="17">if <condition PREFIX:line="89" PREFIX:column="20">(<expr><name PREFIX:line="89" PREFIX:column="21">CDC_SET_LINE_CODING</name> == <name PREFIX:line="89" PREFIX:column="44">r</name> || <name PREFIX:line="89" PREFIX:column="49">CDC_SET_CONTROL_LINE_STATE</name> == <name PREFIX:line="89" PREFIX:column="79">r</name></expr>)</condition><then PREFIX:line="89" PREFIX:column="81">
+		<block PREFIX:line="90" PREFIX:column="17">{
+			<comment type="line" PREFIX:line="91" PREFIX:column="25">// auto-reset into the bootloader is triggered when the port, already </comment>
+			<comment type="line" PREFIX:line="92" PREFIX:column="25">// open at 1200 bps, is closed.  this is the signal to start the watchdog</comment>
+			<comment type="line" PREFIX:line="93" PREFIX:column="25">// with a relatively long period so it can finish housekeeping tasks</comment>
+			<comment type="line" PREFIX:line="94" PREFIX:column="25">// like servicing endpoints before the sketch ends</comment>
+
+			<comment type="line" PREFIX:line="96" PREFIX:column="25">// We check DTR state to determine if host port is open (bit 0 of lineState).</comment>
+			<if PREFIX:line="97" PREFIX:column="25">if <condition PREFIX:line="97" PREFIX:column="28">(<expr PREFIX:line="97" PREFIX:column="29">1200 == <name><name PREFIX:line="97" PREFIX:column="37">_usbLineInfo</name>.<name PREFIX:line="97" PREFIX:column="50">dwDTERate</name></name> &amp;&amp; (<name><name PREFIX:line="97" PREFIX:column="64">_usbLineInfo</name>.<name PREFIX:line="97" PREFIX:column="77">lineState</name></name> &amp; 0x01) == 0</expr>)</condition><then PREFIX:line="97" PREFIX:column="100">
+			<block PREFIX:line="98" PREFIX:column="25">{
+				<expr_stmt><expr PREFIX:line="99" PREFIX:column="33">*(<name PREFIX:line="99" PREFIX:column="35">uint16_t</name> *)0x0800 = 0x7777</expr>;</expr_stmt>
+				<expr_stmt><expr><call><name PREFIX:line="100" PREFIX:column="33">wdt_enable</name><argument_list PREFIX:line="100" PREFIX:column="43">(<argument><expr><name PREFIX:line="100" PREFIX:column="44">WDTO_120MS</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+			}</block></then>
+			<else PREFIX:line="102" PREFIX:column="25">else
+			<block PREFIX:line="103" PREFIX:column="25">{
+				<comment type="line" PREFIX:line="104" PREFIX:column="33">// Most OSs do some intermediate steps when configuring ports and DTR can</comment>
+				<comment type="line" PREFIX:line="105" PREFIX:column="33">// twiggle more than once before stabilizing.</comment>
+				<comment type="line" PREFIX:line="106" PREFIX:column="33">// To avoid spurious resets we set the watchdog to 250ms and eventually</comment>
+				<comment type="line" PREFIX:line="107" PREFIX:column="33">// cancel if DTR goes back high.</comment>
+
+				<expr_stmt><expr><call><name PREFIX:line="109" PREFIX:column="33">wdt_disable</name><argument_list PREFIX:line="109" PREFIX:column="44">()</argument_list></call></expr>;</expr_stmt>
+				<expr_stmt><expr><call><name PREFIX:line="110" PREFIX:column="33">wdt_reset</name><argument_list PREFIX:line="110" PREFIX:column="42">()</argument_list></call></expr>;</expr_stmt>
+				<expr_stmt><expr PREFIX:line="111" PREFIX:column="33">*(<name PREFIX:line="111" PREFIX:column="35">uint16_t</name> *)0x0800 = 0x0</expr>;</expr_stmt>
+			}</block></else></if>
+		}</block></then></if>
+		<return PREFIX:line="114" PREFIX:column="17">return <expr PREFIX:line="114" PREFIX:column="24">true</expr>;</return>
+	}</block></then></if>
+	<return PREFIX:line="116" PREFIX:column="9">return <expr PREFIX:line="116" PREFIX:column="16">false</expr>;</return>
+}</block></function>
+
+
+<function><type><name PREFIX:line="120" PREFIX:column="1">void</name></type> <name><name PREFIX:line="120" PREFIX:column="6">Serial_</name>::<name PREFIX:line="120" PREFIX:column="15">begin</name></name><parameter_list PREFIX:line="120" PREFIX:column="20">(<param><decl><type><name PREFIX:line="120" PREFIX:column="21">unknowntype</name></type> <name PREFIX:line="120" PREFIX:column="33">long</name></decl></param> <comment type="block" PREFIX:line="120" PREFIX:column="38">/* baud_count */</comment>)</parameter_list>
+<block PREFIX:line="121" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="122" PREFIX:column="9">peek_buffer</name> = -1</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="125" PREFIX:column="1">void</name></type> <name><name PREFIX:line="125" PREFIX:column="6">Serial_</name>::<name PREFIX:line="125" PREFIX:column="15">begin</name></name><parameter_list PREFIX:line="125" PREFIX:column="20">(<param><decl><type><name PREFIX:line="125" PREFIX:column="21">unknowntype</name></type> <name PREFIX:line="125" PREFIX:column="33">long</name></decl></param> <comment type="block" PREFIX:line="125" PREFIX:column="38">/* baud_count */</comment>, <param><decl><type><name PREFIX:line="125" PREFIX:column="56">byte</name></type></decl></param> <comment type="block" PREFIX:line="125" PREFIX:column="61">/* config */</comment>)</parameter_list>
+<block PREFIX:line="126" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="127" PREFIX:column="9">peek_buffer</name> = -1</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="130" PREFIX:column="1">void</name></type> <name><name PREFIX:line="130" PREFIX:column="6">Serial_</name>::<name PREFIX:line="130" PREFIX:column="15">end</name></name><parameter_list PREFIX:line="130" PREFIX:column="18">(<param><decl><type><name PREFIX:line="130" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="131" PREFIX:column="1">{
+}</block></function>
+
+<function><type><name PREFIX:line="134" PREFIX:column="1">int</name></type> <name><name PREFIX:line="134" PREFIX:column="5">Serial_</name>::<name PREFIX:line="134" PREFIX:column="14">available</name></name><parameter_list PREFIX:line="134" PREFIX:column="23">(<param><decl><type><name PREFIX:line="134" PREFIX:column="24">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="135" PREFIX:column="1">{
+	<if PREFIX:line="136" PREFIX:column="9">if <condition PREFIX:line="136" PREFIX:column="12">(<expr><name PREFIX:line="136" PREFIX:column="13">peek_buffer</name> &gt;= 0</expr>)</condition><then PREFIX:line="136" PREFIX:column="30"> <block PREFIX:line="136" PREFIX:column="31">{
+		<return PREFIX:line="137" PREFIX:column="17">return <expr PREFIX:line="137" PREFIX:column="24">1 + <call><name PREFIX:line="137" PREFIX:column="28">USB_Available</name><argument_list PREFIX:line="137" PREFIX:column="41">(<argument><expr><name PREFIX:line="137" PREFIX:column="42">CDC_RX</name></expr></argument>)</argument_list></call></expr>;</return>
+	}</block></then></if>
+	<return PREFIX:line="139" PREFIX:column="9">return <expr><call><name PREFIX:line="139" PREFIX:column="16">USB_Available</name><argument_list PREFIX:line="139" PREFIX:column="29">(<argument><expr><name PREFIX:line="139" PREFIX:column="30">CDC_RX</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="142" PREFIX:column="1">int</name></type> <name><name PREFIX:line="142" PREFIX:column="5">Serial_</name>::<name PREFIX:line="142" PREFIX:column="14">peek</name></name><parameter_list PREFIX:line="142" PREFIX:column="18">(<param><decl><type><name PREFIX:line="142" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="143" PREFIX:column="1">{
+	<if PREFIX:line="144" PREFIX:column="9">if <condition PREFIX:line="144" PREFIX:column="12">(<expr><name PREFIX:line="144" PREFIX:column="13">peek_buffer</name> &lt; 0</expr>)</condition><then PREFIX:line="144" PREFIX:column="29">
+		<expr_stmt><expr><name PREFIX:line="145" PREFIX:column="17">peek_buffer</name> = <call><name PREFIX:line="145" PREFIX:column="31">USB_Recv</name><argument_list PREFIX:line="145" PREFIX:column="39">(<argument><expr><name PREFIX:line="145" PREFIX:column="40">CDC_RX</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></then></if>
+	<return PREFIX:line="146" PREFIX:column="9">return <expr><name PREFIX:line="146" PREFIX:column="16">peek_buffer</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="149" PREFIX:column="1">int</name></type> <name><name PREFIX:line="149" PREFIX:column="5">Serial_</name>::<name PREFIX:line="149" PREFIX:column="14">read</name></name><parameter_list PREFIX:line="149" PREFIX:column="18">(<param><decl><type><name PREFIX:line="149" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="150" PREFIX:column="1">{
+	<if PREFIX:line="151" PREFIX:column="9">if <condition PREFIX:line="151" PREFIX:column="12">(<expr><name PREFIX:line="151" PREFIX:column="13">peek_buffer</name> &gt;= 0</expr>)</condition><then PREFIX:line="151" PREFIX:column="30"> <block PREFIX:line="151" PREFIX:column="31">{
+		<decl_stmt><decl><type><name PREFIX:line="152" PREFIX:column="17">int</name></type> <name PREFIX:line="152" PREFIX:column="21">c</name> <init PREFIX:line="152" PREFIX:column="23">= <expr><name PREFIX:line="152" PREFIX:column="25">peek_buffer</name></expr></init></decl>;</decl_stmt>
+		<expr_stmt><expr><name PREFIX:line="153" PREFIX:column="17">peek_buffer</name> = -1</expr>;</expr_stmt>
+		<return PREFIX:line="154" PREFIX:column="17">return <expr><name PREFIX:line="154" PREFIX:column="24">c</name></expr>;</return>
+	}</block></then></if>
+	<return PREFIX:line="156" PREFIX:column="9">return <expr><call><name PREFIX:line="156" PREFIX:column="16">USB_Recv</name><argument_list PREFIX:line="156" PREFIX:column="24">(<argument><expr><name PREFIX:line="156" PREFIX:column="25">CDC_RX</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="159" PREFIX:column="1">void</name></type> <name><name PREFIX:line="159" PREFIX:column="6">Serial_</name>::<name PREFIX:line="159" PREFIX:column="15">flush</name></name><parameter_list PREFIX:line="159" PREFIX:column="20">(<param><decl><type><name PREFIX:line="159" PREFIX:column="21">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="160" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="161" PREFIX:column="9">USB_Flush</name><argument_list PREFIX:line="161" PREFIX:column="18">(<argument><expr><name PREFIX:line="161" PREFIX:column="19">CDC_TX</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="164" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="164" PREFIX:column="8">Serial_</name>::<name PREFIX:line="164" PREFIX:column="17">write</name></name><parameter_list PREFIX:line="164" PREFIX:column="22">(<param><decl><type><name PREFIX:line="164" PREFIX:column="23">uint8_t</name></type> <name PREFIX:line="164" PREFIX:column="31">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="165" PREFIX:column="1">{
+	<return PREFIX:line="166" PREFIX:column="9">return <expr><call><name PREFIX:line="166" PREFIX:column="16">write</name><argument_list PREFIX:line="166" PREFIX:column="21">(<argument><expr PREFIX:line="166" PREFIX:column="22">&amp;<name PREFIX:line="166" PREFIX:column="23">c</name></expr></argument>, <argument><expr PREFIX:line="166" PREFIX:column="26">1</expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="169" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="169" PREFIX:column="8">Serial_</name>::<name PREFIX:line="169" PREFIX:column="17">write</name></name><parameter_list PREFIX:line="169" PREFIX:column="22">( <param><decl><type><name PREFIX:line="169" PREFIX:column="24">uint8_t</name> *</type><name PREFIX:line="169" PREFIX:column="33">buffer</name></decl></param>, <param><decl><type><name PREFIX:line="169" PREFIX:column="41">size_t</name></type> <name PREFIX:line="169" PREFIX:column="48">size</name></decl></param>)</parameter_list>
+<block PREFIX:line="170" PREFIX:column="1">{
+	<comment type="block" PREFIX:line="171" PREFIX:column="9">/* only try to send bytes if the high-level CDC connection itself 
+	 is open (not just the pipe) - the OS should set lineState when the port
+	 is opened and clear lineState when the port is closed.
+	 bytes sent before the user opens the connection or after
+	 the connection is closed are lost - just like with a UART. */</comment>
+	
+	<comment type="line" PREFIX:line="177" PREFIX:column="9">// TODO - ZE - check behavior on different OSes and test what happens if an</comment>
+	<comment type="line" PREFIX:line="178" PREFIX:column="9">// open connection isn't broken cleanly (cable is yanked out, host dies</comment>
+	<comment type="line" PREFIX:line="179" PREFIX:column="9">// or locks up, or host virtual serial port hangs)</comment>
+	<if PREFIX:line="180" PREFIX:column="9">if <condition PREFIX:line="180" PREFIX:column="12">(<expr><name><name PREFIX:line="180" PREFIX:column="13">_usbLineInfo</name>.<name PREFIX:line="180" PREFIX:column="26">lineState</name></name> &gt; 0</expr>)</condition><then PREFIX:line="180" PREFIX:column="40">	<block PREFIX:line="180" PREFIX:column="41">{
+		<decl_stmt><decl><type><name PREFIX:line="181" PREFIX:column="17">int</name></type> <name PREFIX:line="181" PREFIX:column="21">r</name> <init PREFIX:line="181" PREFIX:column="23">= <expr><call><name PREFIX:line="181" PREFIX:column="25">USB_Send</name><argument_list PREFIX:line="181" PREFIX:column="33">(<argument><expr><name PREFIX:line="181" PREFIX:column="34">CDC_TX</name></expr></argument>,<argument><expr><name PREFIX:line="181" PREFIX:column="41">buffer</name></expr></argument>,<argument><expr><name PREFIX:line="181" PREFIX:column="48">size</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+		<if PREFIX:line="182" PREFIX:column="17">if <condition PREFIX:line="182" PREFIX:column="20">(<expr><name PREFIX:line="182" PREFIX:column="21">r</name> &gt; 0</expr>)</condition><then PREFIX:line="182" PREFIX:column="27"> <block PREFIX:line="182" PREFIX:column="28">{
+			<return PREFIX:line="183" PREFIX:column="25">return <expr><name PREFIX:line="183" PREFIX:column="32">r</name></expr>;</return>
+		}</block></then> <else PREFIX:line="184" PREFIX:column="19">else <block PREFIX:line="184" PREFIX:column="24">{
+			<expr_stmt><expr><call><name PREFIX:line="185" PREFIX:column="25">setWriteError</name><argument_list PREFIX:line="185" PREFIX:column="38">()</argument_list></call></expr>;</expr_stmt>
+			<return PREFIX:line="186" PREFIX:column="25">return <expr PREFIX:line="186" PREFIX:column="32">0</expr>;</return>
+		}</block></else></if>
+	}</block></then></if>
+	<expr_stmt><expr><call><name PREFIX:line="189" PREFIX:column="9">setWriteError</name><argument_list PREFIX:line="189" PREFIX:column="22">()</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="190" PREFIX:column="9">return <expr PREFIX:line="190" PREFIX:column="16">0</expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="193" PREFIX:column="1">// This operator is a convenient way for a sketch to check whether the</comment>
+<comment type="line" PREFIX:line="194" PREFIX:column="1">// port has actually been configured and opened by the host (as opposed</comment>
+<comment type="line" PREFIX:line="195" PREFIX:column="1">// to just being connected to the host).  It can be used, for example, in </comment>
+<comment type="line" PREFIX:line="196" PREFIX:column="1">// setup() before printing to ensure that an application on the host is</comment>
+<comment type="line" PREFIX:line="197" PREFIX:column="1">// actually ready to receive and display the data.</comment>
+<comment type="line" PREFIX:line="198" PREFIX:column="1">// We add a short delay before returning to fix a bug observed by Federico</comment>
+<comment type="line" PREFIX:line="199" PREFIX:column="1">// where the port is configured (lineState != 0) but not quite opened.</comment>
+<function><name><name PREFIX:line="200" PREFIX:column="1">Serial_</name>::<name PREFIX:line="200" PREFIX:column="10">operator bool</name></name><parameter_list PREFIX:line="200" PREFIX:column="23">()</parameter_list> <block PREFIX:line="200" PREFIX:column="26">{
+	<decl_stmt><decl><type><name PREFIX:line="201" PREFIX:column="9">bool</name></type> <name PREFIX:line="201" PREFIX:column="14">result</name> <init PREFIX:line="201" PREFIX:column="21">= <expr PREFIX:line="201" PREFIX:column="23">false</expr></init></decl>;</decl_stmt>
+	<if PREFIX:line="202" PREFIX:column="9">if <condition PREFIX:line="202" PREFIX:column="12">(<expr><name><name PREFIX:line="202" PREFIX:column="13">_usbLineInfo</name>.<name PREFIX:line="202" PREFIX:column="26">lineState</name></name> &gt; 0</expr>)</condition><then PREFIX:line="202" PREFIX:column="40"> 
+		<expr_stmt><expr><name PREFIX:line="203" PREFIX:column="17">result</name> = true</expr>;</expr_stmt></then></if>
+	<expr_stmt><expr><call><name PREFIX:line="204" PREFIX:column="9">delay</name><argument_list PREFIX:line="204" PREFIX:column="14">(<argument><expr PREFIX:line="204" PREFIX:column="15">10</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="205" PREFIX:column="9">return <expr><name PREFIX:line="205" PREFIX:column="16">result</name></expr>;</return>
+}</block></function>
+
+<decl_stmt><decl><type><name PREFIX:line="208" PREFIX:column="1">Serial_</name></type> <name PREFIX:line="208" PREFIX:column="9">Serial</name></decl>;</decl_stmt>
+
+<cpp:endif PREFIX:line="210" PREFIX:column="1">#<cpp:directive PREFIX:line="210" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:endif PREFIX:line="211" PREFIX:column="1">#<cpp:directive PREFIX:line="211" PREFIX:column="2">endif</cpp:directive></cpp:endif> <comment type="block" PREFIX:line="211" PREFIX:column="8">/* if defined(USBCON) */</comment>
+</unit>

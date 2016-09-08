@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/U8glib/examples/Console/Console.pde.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  Console.pde
+  
+  Read from serial monitor, output to display
+  
+  &gt;&gt;&gt; Before compiling: Please remove comment from the ructor of the 
+  &gt;&gt;&gt; connected graphics display (see below).
+  
+  Universal 8bit Graphics Library, http://code.google.com/p/u8glib/
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+*/</comment>
+
+
+<cpp:include PREFIX:line="42" PREFIX:column="1">#<cpp:directive PREFIX:line="42" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="42" PREFIX:column="10">"U8glib.h"</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="44" PREFIX:column="1">// setup u8g object, please remove comment from one of the following ructor calls</comment>
+<comment type="line" PREFIX:line="45" PREFIX:column="1">// IMPORTANT NOTE: The complete list of supported devices is here: http://code.google.com/p/u8glib/wiki/device</comment>
+
+<comment type="line" PREFIX:line="47" PREFIX:column="1">//U8GLIB_NHD27OLED_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="48" PREFIX:column="1">//U8GLIB_NHD27OLED_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="49" PREFIX:column="1">//U8GLIB_NHD27OLED_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="50" PREFIX:column="1">//U8GLIB_NHD27OLED_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="51" PREFIX:column="1">//U8GLIB_NHD31OLED_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="52" PREFIX:column="1">//U8GLIB_NHD31OLED_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="53" PREFIX:column="1">//U8GLIB_NHD31OLED_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="54" PREFIX:column="1">//U8GLIB_NHD31OLED_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="55" PREFIX:column="1">//U8GLIB_DOGS102 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="56" PREFIX:column="1">//U8GLIB_DOGM132 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="57" PREFIX:column="1">//U8GLIB_DOGM128 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="58" PREFIX:column="1">//U8GLIB_ST7920_128X64_1X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="59" PREFIX:column="1">//U8GLIB_ST7920_128X64_4X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="60" PREFIX:column="1">//U8GLIB_ST7920_128X64_1X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="61" PREFIX:column="1">//U8GLIB_ST7920_128X64_4X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="62" PREFIX:column="1">//U8GLIB_ST7920_192X32_1X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="63" PREFIX:column="1">//U8GLIB_ST7920_192X32_4X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="64" PREFIX:column="1">//U8GLIB_ST7920_192X32_1X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="65" PREFIX:column="1">//U8GLIB_ST7920_192X32_4X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="66" PREFIX:column="1">//U8GLIB_ST7920_192X32_1X u8g(13, 11, 10);	// SPI Com: SCK = en = 13, MOSI = rw = 11, CS = di = 10</comment>
+<comment type="line" PREFIX:line="67" PREFIX:column="1">//U8GLIB_ST7920_192X32_4X u8g(10);		// SPI Com: SCK = en = 13, MOSI = rw = 11, CS = di = 10, HW SPI</comment>
+<comment type="line" PREFIX:line="68" PREFIX:column="1">//U8GLIB_ST7920_202X32_1X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="69" PREFIX:column="1">//U8GLIB_ST7920_202X32_4X u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 17, 16);   // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, di=17,rw=16</comment>
+<comment type="line" PREFIX:line="70" PREFIX:column="1">//U8GLIB_ST7920_202X32_1X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="71" PREFIX:column="1">//U8GLIB_ST7920_202X32_4X u8g(18, 16, 17);	// SPI Com: SCK = en = 18, MOSI = rw = 16, CS = di = 17</comment>
+<comment type="line" PREFIX:line="72" PREFIX:column="1">//U8GLIB_LM6059 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="73" PREFIX:column="1">//U8GLIB_LM6063 u8g(13, 11, 10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="74" PREFIX:column="1">//U8GLIB_DOGXL160_BW u8g(10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="75" PREFIX:column="1">//U8GLIB_DOGXL160_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="76" PREFIX:column="1">//U8GLIB_DOGXL160_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="77" PREFIX:column="1">//U8GLIB_DOGXL160_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="78" PREFIX:column="1">//U8GLIB_PCD8544 u8g(13, 11, 10, 9, 8);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, Reset = 8</comment>
+<comment type="line" PREFIX:line="79" PREFIX:column="1">//U8GLIB_PCF8812 u8g(13, 11, 10, 9, 8);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, Reset = 8</comment>
+<comment type="line" PREFIX:line="80" PREFIX:column="1">//U8GLIB_KS0108_128 u8g(8, 9, 10, 11, 4, 5, 6, 7, 18, 14, 15, 17, 16); 		// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs1=14, cs2=15,di=17,rw=16</comment>
+<comment type="line" PREFIX:line="81" PREFIX:column="1">//U8GLIB_LC7981_160X80 u8g(8, 9, 10, 11, 4, 5, 6, 7,  18, 14, 15, 17, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs=14 ,di=15,rw=17, reset = 16</comment>
+<comment type="line" PREFIX:line="82" PREFIX:column="1">//U8GLIB_LC7981_240X64 u8g(8, 9, 10, 11, 4, 5, 6, 7,  18, 14, 15, 17, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs=14 ,di=15,rw=17, reset = 16</comment>
+<comment type="line" PREFIX:line="83" PREFIX:column="1">//U8GLIB_LC7981_240X128 u8g(8, 9, 10, 11, 4, 5, 6, 7,  18, 14, 15, 17, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 en=18, cs=14 ,di=15,rw=17, reset = 16</comment>
+<comment type="line" PREFIX:line="84" PREFIX:column="1">//U8GLIB_ILI9325D_320x240 u8g(18,17,19,U8G_PIN_NONE,16 );  			// 8Bit Com: D0..D7: 0,1,2,3,4,5,6,7 en=wr=18, cs=17, rs=19, rd=U8G_PIN_NONE, reset = 16</comment>
+<comment type="line" PREFIX:line="85" PREFIX:column="1">//U8GLIB_SBN1661_122X32 u8g(8,9,10,11,4,5,6,7,14,15, 17, U8G_PIN_NONE, 16); 	// 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7 cs1=14, cs2=15,di=17,rw=16,reset = 16</comment>
+<comment type="line" PREFIX:line="86" PREFIX:column="1">//U8GLIB_SSD1306_128X64 u8g(13, 11, 10, 9);	// SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="87" PREFIX:column="1">//U8GLIB_SSD1306_128X64 u8g(10, 9);		// HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="88" PREFIX:column="1">//U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);	// HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="89" PREFIX:column="1">//U8GLIB_SSD1306_128X32 u8g(13, 11, 10, 9);	// SW SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="90" PREFIX:column="1">//U8GLIB_SSD1306_128X32 u8g(10, 9);             // HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="91" PREFIX:column="1">//U8GLIB_SSD1306_128X32 u8g(U8G_I2C_OPT_NONE);	// HW SPI Com: CS = 10, A0 = 9 (Hardware Pins are  SCK = 13 and MOSI = 11)</comment>
+<comment type="line" PREFIX:line="92" PREFIX:column="1">//U8GLIB_SSD1309_128X64 u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9</comment>
+<comment type="line" PREFIX:line="93" PREFIX:column="1">//U8GLIB_SSD1327_96X96_GR u8g(U8G_I2C_OPT_NONE);	// I2C</comment>
+<comment type="line" PREFIX:line="94" PREFIX:column="1">//U8GLIB_SSD1327_96X96_2X_GR u8g(U8G_I2C_OPT_NONE);	// I2C</comment>
+<comment type="line" PREFIX:line="95" PREFIX:column="1">//U8GLIB_NHD_C12864 u8g(13, 11, 10, 9, 8);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, RST = 8</comment>
+<comment type="line" PREFIX:line="96" PREFIX:column="1">//U8GLIB_NHD_C12832 u8g(13, 11, 10, 9, 8);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9, RST = 8</comment>
+<comment type="line" PREFIX:line="97" PREFIX:column="1">//U8GLIB_T6963_240X128 u8g(8, 9, 10, 11, 4, 5, 6, 7, 14, 15, 17, 18, 16); // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7, cs=14, a0=15, wr=17, rd=18, reset=16</comment>
+<comment type="line" PREFIX:line="98" PREFIX:column="1">//U8GLIB_T6963_240X64 u8g(8, 9, 10, 11, 4, 5, 6, 7, 14, 15, 17, 18, 16); // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7, cs=14, a0=15, wr=17, rd=18, reset=16</comment>
+<comment type="line" PREFIX:line="99" PREFIX:column="1">//U8GLIB_T6963_128X64 u8g(8, 9, 10, 11, 4, 5, 6, 7, 14, 15, 17, 18, 16); // 8Bit Com: D0..D7: 8,9,10,11,4,5,6,7, cs=14, a0=15, wr=17, rd=18, reset=16</comment>
+
+
+<comment type="line" PREFIX:line="102" PREFIX:column="1">// setup input buffer</comment>
+<cpp:define PREFIX:line="103" PREFIX:column="1">#<cpp:directive PREFIX:line="103" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="103" PREFIX:column="9">LINE_MAX</name></cpp:macro> <cpp:value PREFIX:line="103" PREFIX:column="18">30</cpp:value></cpp:define> 
+<decl_stmt><decl><type><name PREFIX:line="104" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="104" PREFIX:column="9">line_buf</name><index PREFIX:line="104" PREFIX:column="17">[<expr><name PREFIX:line="104" PREFIX:column="18">LINE_MAX</name></expr>]</index></name> <init PREFIX:line="104" PREFIX:column="28">= <expr PREFIX:line="104" PREFIX:column="30">"U8GLIB Console"</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="105" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="105" PREFIX:column="9">line_pos</name> <init PREFIX:line="105" PREFIX:column="18">= <expr PREFIX:line="105" PREFIX:column="20">0</expr></init></decl>;</decl_stmt>
+
+<comment type="line" PREFIX:line="107" PREFIX:column="1">// setup a text screen to support scrolling</comment>
+<cpp:define PREFIX:line="108" PREFIX:column="1">#<cpp:directive PREFIX:line="108" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="108" PREFIX:column="9">ROW_MAX</name></cpp:macro> <cpp:value PREFIX:line="108" PREFIX:column="17">12</cpp:value></cpp:define>
+
+
+<decl_stmt><decl><type><name PREFIX:line="111" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="111" PREFIX:column="9">screen</name><index PREFIX:line="111" PREFIX:column="15">[<expr><name PREFIX:line="111" PREFIX:column="16">ROW_MAX</name></expr>]</index><index PREFIX:line="111" PREFIX:column="24">[<expr><name PREFIX:line="111" PREFIX:column="25">LINE_MAX</name></expr>]</index></name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="112" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="112" PREFIX:column="9">rows</name></decl>, <decl><type ref="prev"/><name PREFIX:line="112" PREFIX:column="15">cols</name></decl>;</decl_stmt>
+
+<comment type="line" PREFIX:line="114" PREFIX:column="1">// line height, which matches the selected font (5x7)</comment>
+<cpp:define PREFIX:line="115" PREFIX:column="1">#<cpp:directive PREFIX:line="115" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="115" PREFIX:column="9">LINE_PIXEL_HEIGHT</name></cpp:macro> <cpp:value PREFIX:line="115" PREFIX:column="27">7</cpp:value></cpp:define>
+
+<comment type="line" PREFIX:line="117" PREFIX:column="1">// clear entire screen, called during setup</comment>
+<function><type><name PREFIX:line="118" PREFIX:column="1">void</name></type> <name PREFIX:line="118" PREFIX:column="6">clear_screen</name><parameter_list PREFIX:line="118" PREFIX:column="18">(<param><decl><type><name PREFIX:line="118" PREFIX:column="19">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="118" PREFIX:column="25">{
+  <decl_stmt><decl><type><name PREFIX:line="119" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="119" PREFIX:column="11">i</name></decl>, <decl><type ref="prev"/><name PREFIX:line="119" PREFIX:column="14">j</name></decl>;</decl_stmt>
+  <for PREFIX:line="120" PREFIX:column="3">for( <init><expr><name PREFIX:line="120" PREFIX:column="8">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="120" PREFIX:column="15">i</name> &lt; <name PREFIX:line="120" PREFIX:column="19">ROW_MAX</name></expr>;</condition> <incr><expr><name PREFIX:line="120" PREFIX:column="28">i</name>++</expr></incr> )
+    <for PREFIX:line="121" PREFIX:column="5">for( <init><expr><name PREFIX:line="121" PREFIX:column="10">j</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="121" PREFIX:column="17">j</name> &lt; <name PREFIX:line="121" PREFIX:column="21">LINE_MAX</name></expr>;</condition> <incr><expr><name PREFIX:line="121" PREFIX:column="31">j</name>++</expr></incr> )
+      <expr_stmt><expr><name><name PREFIX:line="122" PREFIX:column="7">screen</name><index PREFIX:line="122" PREFIX:column="13">[<expr><name PREFIX:line="122" PREFIX:column="14">i</name></expr>]</index><index PREFIX:line="122" PREFIX:column="16">[<expr><name PREFIX:line="122" PREFIX:column="17">j</name></expr>]</index></name> = 0</expr>;</expr_stmt></for></for>  
+}</block></function>
+
+<comment type="line" PREFIX:line="125" PREFIX:column="1">// append a line to the screen, scroll up</comment>
+<function><type><name PREFIX:line="126" PREFIX:column="1">void</name></type> <name PREFIX:line="126" PREFIX:column="6">add_line_to_screen</name><parameter_list PREFIX:line="126" PREFIX:column="24">(<param><decl><type><name PREFIX:line="126" PREFIX:column="25">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="126" PREFIX:column="31">{
+  <decl_stmt><decl><type><name PREFIX:line="127" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="127" PREFIX:column="11">i</name></decl>, <decl><type ref="prev"/><name PREFIX:line="127" PREFIX:column="14">j</name></decl>;</decl_stmt>
+  <for PREFIX:line="128" PREFIX:column="3">for( <init><expr><name PREFIX:line="128" PREFIX:column="8">j</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="128" PREFIX:column="15">j</name> &lt; <name PREFIX:line="128" PREFIX:column="19">LINE_MAX</name></expr>;</condition> <incr><expr><name PREFIX:line="128" PREFIX:column="29">j</name>++</expr></incr> )
+    <for PREFIX:line="129" PREFIX:column="5">for( <init><expr><name PREFIX:line="129" PREFIX:column="10">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="129" PREFIX:column="17">i</name> &lt; <name PREFIX:line="129" PREFIX:column="21">rows</name>-1</expr>;</condition> <incr><expr><name PREFIX:line="129" PREFIX:column="29">i</name>++</expr></incr> )
+      <expr_stmt><expr><name><name PREFIX:line="130" PREFIX:column="7">screen</name><index PREFIX:line="130" PREFIX:column="13">[<expr><name PREFIX:line="130" PREFIX:column="14">i</name></expr>]</index><index PREFIX:line="130" PREFIX:column="16">[<expr><name PREFIX:line="130" PREFIX:column="17">j</name></expr>]</index></name> = <name><name PREFIX:line="130" PREFIX:column="22">screen</name><index PREFIX:line="130" PREFIX:column="28">[<expr><name PREFIX:line="130" PREFIX:column="29">i</name>+1</expr>]</index><index PREFIX:line="130" PREFIX:column="33">[<expr><name PREFIX:line="130" PREFIX:column="34">j</name></expr>]</index></name></expr>;</expr_stmt></for></for>
+  
+  <for PREFIX:line="132" PREFIX:column="3">for( <init><expr><name PREFIX:line="132" PREFIX:column="8">j</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="132" PREFIX:column="15">j</name> &lt; <name PREFIX:line="132" PREFIX:column="19">LINE_MAX</name></expr>;</condition> <incr><expr><name PREFIX:line="132" PREFIX:column="29">j</name>++</expr></incr> )
+    <expr_stmt><expr><name><name PREFIX:line="133" PREFIX:column="5">screen</name><index PREFIX:line="133" PREFIX:column="11">[<expr><name PREFIX:line="133" PREFIX:column="12">rows</name>-1</expr>]</index><index PREFIX:line="133" PREFIX:column="19">[<expr><name PREFIX:line="133" PREFIX:column="20">j</name></expr>]</index></name> = <name><name PREFIX:line="133" PREFIX:column="25">line_buf</name><index PREFIX:line="133" PREFIX:column="33">[<expr><name PREFIX:line="133" PREFIX:column="34">j</name></expr>]</index></name></expr>;</expr_stmt></for>
+}</block></function>
+
+<comment type="line" PREFIX:line="136" PREFIX:column="1">// U8GLIB draw procedure: output the screen</comment>
+<function><type><name PREFIX:line="137" PREFIX:column="1">void</name></type> <name PREFIX:line="137" PREFIX:column="6">draw</name><parameter_list PREFIX:line="137" PREFIX:column="10">(<param><decl><type><name PREFIX:line="137" PREFIX:column="11">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="137" PREFIX:column="17">{
+  <decl_stmt><decl><type><name PREFIX:line="138" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="138" PREFIX:column="11">i</name></decl>, <decl><type ref="prev"/><name PREFIX:line="138" PREFIX:column="14">y</name></decl>;</decl_stmt>
+  <comment type="line" PREFIX:line="139" PREFIX:column="3">// graphic commands to redraw the complete screen are placed here    </comment>
+  <expr_stmt><expr><name PREFIX:line="140" PREFIX:column="3">y</name> = 0</expr>;</expr_stmt>       <comment type="line" PREFIX:line="140" PREFIX:column="16">// reference is the top left -1 position of the string</comment>
+  <expr_stmt><expr><name PREFIX:line="141" PREFIX:column="3">y</name>--</expr>;</expr_stmt>           <comment type="line" PREFIX:line="141" PREFIX:column="18">// correct the -1 position of the drawStr </comment>
+  <for PREFIX:line="142" PREFIX:column="3">for( <init><expr><name PREFIX:line="142" PREFIX:column="8">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="142" PREFIX:column="15">i</name> &lt; <name PREFIX:line="142" PREFIX:column="19">rows</name></expr>;</condition> <incr><expr><name PREFIX:line="142" PREFIX:column="25">i</name>++</expr></incr> )
+  <block PREFIX:line="143" PREFIX:column="3">{
+    <expr_stmt><expr><call><name><name PREFIX:line="144" PREFIX:column="5">u8g</name>.<name PREFIX:line="144" PREFIX:column="9">drawStr</name></name><argument_list PREFIX:line="144" PREFIX:column="16">( <argument><expr PREFIX:line="144" PREFIX:column="18">0</expr></argument>, <argument><expr><name PREFIX:line="144" PREFIX:column="21">y</name></expr></argument>, <argument><expr PREFIX:line="144" PREFIX:column="24">(<name PREFIX:line="144" PREFIX:column="25">char</name> *)(<name><name PREFIX:line="144" PREFIX:column="33">screen</name><index PREFIX:line="144" PREFIX:column="39">[<expr><name PREFIX:line="144" PREFIX:column="40">i</name></expr>]</index></name>)</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="145" PREFIX:column="5">y</name> += <call><name><name PREFIX:line="145" PREFIX:column="10">u8g</name>.<name PREFIX:line="145" PREFIX:column="14">getFontLineSpacing</name></name><argument_list PREFIX:line="145" PREFIX:column="32">()</argument_list></call></expr>;</expr_stmt>
+  }</block></for>
+}</block></function>
+
+<function><type><name PREFIX:line="149" PREFIX:column="1">void</name></type> <name PREFIX:line="149" PREFIX:column="6">exec_line</name><parameter_list PREFIX:line="149" PREFIX:column="15">(<param><decl><type><name PREFIX:line="149" PREFIX:column="16">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="149" PREFIX:column="22">{
+  <comment type="line" PREFIX:line="150" PREFIX:column="3">// echo line to the serial monitor</comment>
+  <expr_stmt><expr><call><name><name PREFIX:line="151" PREFIX:column="3">Serial</name>.<name PREFIX:line="151" PREFIX:column="10">println</name></name><argument_list PREFIX:line="151" PREFIX:column="17">(<argument><expr PREFIX:line="151" PREFIX:column="18">( <name PREFIX:line="151" PREFIX:column="20">char</name> *)<name PREFIX:line="151" PREFIX:column="27">line_buf</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  
+  <comment type="line" PREFIX:line="153" PREFIX:column="3">// add the line to the screen</comment>
+  <expr_stmt><expr><call><name PREFIX:line="154" PREFIX:column="3">add_line_to_screen</name><argument_list PREFIX:line="154" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt>
+  
+  <comment type="line" PREFIX:line="156" PREFIX:column="3">// U8GLIB picture loop</comment>
+  <expr_stmt><expr><call><name><name PREFIX:line="157" PREFIX:column="3">u8g</name>.<name PREFIX:line="157" PREFIX:column="7">firstPage</name></name><argument_list PREFIX:line="157" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>  
+  <do PREFIX:line="158" PREFIX:column="3">do <block PREFIX:line="158" PREFIX:column="6">{
+    <expr_stmt><expr><call><name PREFIX:line="159" PREFIX:column="5">draw</name><argument_list PREFIX:line="159" PREFIX:column="9">()</argument_list></call></expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="160" PREFIX:column="10">( <expr><call><name><name PREFIX:line="160" PREFIX:column="12">u8g</name>.<name PREFIX:line="160" PREFIX:column="16">nextPage</name></name><argument_list PREFIX:line="160" PREFIX:column="24">()</argument_list></call></expr> )</condition>;</do>
+}</block></function>
+
+<comment type="line" PREFIX:line="163" PREFIX:column="1">// clear current input buffer</comment>
+<function><type><name PREFIX:line="164" PREFIX:column="1">void</name></type> <name PREFIX:line="164" PREFIX:column="6">reset_line</name><parameter_list PREFIX:line="164" PREFIX:column="16">(<param><decl><type><name PREFIX:line="164" PREFIX:column="17">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="164" PREFIX:column="23">{ 
+      <expr_stmt><expr><name PREFIX:line="165" PREFIX:column="7">line_pos</name> = 0</expr>;</expr_stmt>
+      <expr_stmt><expr><name><name PREFIX:line="166" PREFIX:column="7">line_buf</name><index PREFIX:line="166" PREFIX:column="15">[<expr><name PREFIX:line="166" PREFIX:column="16">line_pos</name></expr>]</index></name> = '\0'</expr>;</expr_stmt>  
+}</block></function>
+
+<comment type="line" PREFIX:line="169" PREFIX:column="1">// add a single character to the input buffer </comment>
+<function><type><name PREFIX:line="170" PREFIX:column="1">void</name></type> <name PREFIX:line="170" PREFIX:column="6">char_to_line</name><parameter_list PREFIX:line="170" PREFIX:column="18">(<param><decl><type><name PREFIX:line="170" PREFIX:column="19">uint8_t</name></type> <name PREFIX:line="170" PREFIX:column="27">c</name></decl></param>)</parameter_list> <block PREFIX:line="170" PREFIX:column="30">{
+      <expr_stmt><expr><name><name PREFIX:line="171" PREFIX:column="7">line_buf</name><index PREFIX:line="171" PREFIX:column="15">[<expr><name PREFIX:line="171" PREFIX:column="16">line_pos</name></expr>]</index></name> = <name PREFIX:line="171" PREFIX:column="28">c</name></expr>;</expr_stmt>
+      <expr_stmt><expr><name PREFIX:line="172" PREFIX:column="7">line_pos</name>++</expr>;</expr_stmt>
+      <expr_stmt><expr><name><name PREFIX:line="173" PREFIX:column="7">line_buf</name><index PREFIX:line="173" PREFIX:column="15">[<expr><name PREFIX:line="173" PREFIX:column="16">line_pos</name></expr>]</index></name> = '\0'</expr>;</expr_stmt>  
+}</block></function>
+
+<comment type="line" PREFIX:line="176" PREFIX:column="1">// check serial in and handle the character</comment>
+<function><type><name PREFIX:line="177" PREFIX:column="1">void</name></type> <name PREFIX:line="177" PREFIX:column="6">read_line</name><parameter_list PREFIX:line="177" PREFIX:column="15">(<param><decl><type><name PREFIX:line="177" PREFIX:column="16">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="177" PREFIX:column="22">{
+  <if PREFIX:line="178" PREFIX:column="3">if <condition PREFIX:line="178" PREFIX:column="6">( <expr><call><name><name PREFIX:line="178" PREFIX:column="8">Serial</name>.<name PREFIX:line="178" PREFIX:column="15">available</name></name><argument_list PREFIX:line="178" PREFIX:column="24">()</argument_list></call></expr> )</condition><then PREFIX:line="178" PREFIX:column="28">
+  <block PREFIX:line="179" PREFIX:column="3">{
+    <decl_stmt><decl><type><name PREFIX:line="180" PREFIX:column="5">uint8_t</name></type> <name PREFIX:line="180" PREFIX:column="13">c</name></decl>;</decl_stmt>
+    <expr_stmt><expr><name PREFIX:line="181" PREFIX:column="5">c</name> = <call><name><name PREFIX:line="181" PREFIX:column="9">Serial</name>.<name PREFIX:line="181" PREFIX:column="16">read</name></name><argument_list PREFIX:line="181" PREFIX:column="20">()</argument_list></call></expr>;</expr_stmt>
+    <if PREFIX:line="182" PREFIX:column="5">if <condition PREFIX:line="182" PREFIX:column="8">( <expr><name PREFIX:line="182" PREFIX:column="10">line_pos</name> &gt;= <name PREFIX:line="182" PREFIX:column="22">cols</name>-1</expr> )</condition><then PREFIX:line="182" PREFIX:column="30"> <block PREFIX:line="182" PREFIX:column="31">{
+      <expr_stmt><expr><call><name PREFIX:line="183" PREFIX:column="7">exec_line</name><argument_list PREFIX:line="183" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="184" PREFIX:column="7">reset_line</name><argument_list PREFIX:line="184" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="185" PREFIX:column="7">char_to_line</name><argument_list PREFIX:line="185" PREFIX:column="19">(<argument><expr><name PREFIX:line="185" PREFIX:column="20">c</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    }</block></then> 
+    <else PREFIX:line="187" PREFIX:column="5">else <if PREFIX:line="187" PREFIX:column="10">if <condition PREFIX:line="187" PREFIX:column="13">( <expr><name PREFIX:line="187" PREFIX:column="15">c</name> == '\n'</expr> )</condition><then PREFIX:line="187" PREFIX:column="26"> <block PREFIX:line="187" PREFIX:column="27">{
+      <comment type="line" PREFIX:line="188" PREFIX:column="7">// ignore '\n' </comment>
+    }</block></then>
+    <else PREFIX:line="190" PREFIX:column="5">else <if PREFIX:line="190" PREFIX:column="10">if <condition PREFIX:line="190" PREFIX:column="13">( <expr><name PREFIX:line="190" PREFIX:column="15">c</name> == '\r'</expr> )</condition><then PREFIX:line="190" PREFIX:column="26"> <block PREFIX:line="190" PREFIX:column="27">{
+      <expr_stmt><expr><call><name PREFIX:line="191" PREFIX:column="7">exec_line</name><argument_list PREFIX:line="191" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="192" PREFIX:column="7">reset_line</name><argument_list PREFIX:line="192" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+    }</block></then>
+    <else PREFIX:line="194" PREFIX:column="5">else <block PREFIX:line="194" PREFIX:column="10">{
+      <expr_stmt><expr><call><name PREFIX:line="195" PREFIX:column="7">char_to_line</name><argument_list PREFIX:line="195" PREFIX:column="19">(<argument><expr><name PREFIX:line="195" PREFIX:column="20">c</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    }</block></else></if></else></if></else></if>
+  }</block></then></if>
+}</block></function>
+
+<comment type="line" PREFIX:line="200" PREFIX:column="1">// Arduino master setup</comment>
+<function><type><name PREFIX:line="201" PREFIX:column="1">void</name></type> <name PREFIX:line="201" PREFIX:column="6">setup</name><parameter_list PREFIX:line="201" PREFIX:column="11">(<param><decl><type><name PREFIX:line="201" PREFIX:column="12">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="201" PREFIX:column="18">{
+  <comment type="line" PREFIX:line="202" PREFIX:column="3">// set font for the console window</comment>
+  <expr_stmt><expr><call><name><name PREFIX:line="203" PREFIX:column="3">u8g</name>.<name PREFIX:line="203" PREFIX:column="7">setFont</name></name><argument_list PREFIX:line="203" PREFIX:column="14">(<argument><expr><name PREFIX:line="203" PREFIX:column="15">u8g_font_5x7</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <comment type="line" PREFIX:line="204" PREFIX:column="3">//u8g.setFont(u8g_font_9x15);</comment>
+  
+  <comment type="line" PREFIX:line="206" PREFIX:column="3">// set upper left position for the string draw procedure</comment>
+  <expr_stmt><expr><call><name><name PREFIX:line="207" PREFIX:column="3">u8g</name>.<name PREFIX:line="207" PREFIX:column="7">setFontPosTop</name></name><argument_list PREFIX:line="207" PREFIX:column="20">()</argument_list></call></expr>;</expr_stmt>
+  
+  <comment type="line" PREFIX:line="209" PREFIX:column="3">// calculate the number of rows for the display</comment>
+  <expr_stmt><expr><name PREFIX:line="210" PREFIX:column="3">rows</name> = <call><name><name PREFIX:line="210" PREFIX:column="10">u8g</name>.<name PREFIX:line="210" PREFIX:column="14">getHeight</name></name><argument_list PREFIX:line="210" PREFIX:column="23">()</argument_list></call> / <call><name><name PREFIX:line="210" PREFIX:column="28">u8g</name>.<name PREFIX:line="210" PREFIX:column="32">getFontLineSpacing</name></name><argument_list PREFIX:line="210" PREFIX:column="50">()</argument_list></call></expr>;</expr_stmt>
+  <if PREFIX:line="211" PREFIX:column="3">if <condition PREFIX:line="211" PREFIX:column="6">( <expr><name PREFIX:line="211" PREFIX:column="8">rows</name> &gt; <name PREFIX:line="211" PREFIX:column="15">ROW_MAX</name></expr> )</condition><then PREFIX:line="211" PREFIX:column="24">
+    <expr_stmt><expr><name PREFIX:line="212" PREFIX:column="5">rows</name> = <name PREFIX:line="212" PREFIX:column="12">ROW_MAX</name></expr>;</expr_stmt></then></if> 
+  
+  <comment type="line" PREFIX:line="214" PREFIX:column="3">// estimate the number of columns for the display</comment>
+  <expr_stmt><expr><name PREFIX:line="215" PREFIX:column="3">cols</name> = <call><name><name PREFIX:line="215" PREFIX:column="10">u8g</name>.<name PREFIX:line="215" PREFIX:column="14">getWidth</name></name><argument_list PREFIX:line="215" PREFIX:column="22">()</argument_list></call> / <call><name><name PREFIX:line="215" PREFIX:column="27">u8g</name>.<name PREFIX:line="215" PREFIX:column="31">getStrWidth</name></name><argument_list PREFIX:line="215" PREFIX:column="42">(<argument><expr PREFIX:line="215" PREFIX:column="43">"m"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <if PREFIX:line="216" PREFIX:column="3">if <condition PREFIX:line="216" PREFIX:column="6">( <expr><name PREFIX:line="216" PREFIX:column="8">cols</name> &gt; <name PREFIX:line="216" PREFIX:column="15">LINE_MAX</name>-1</expr> )</condition><then PREFIX:line="216" PREFIX:column="27">
+    <expr_stmt><expr><name PREFIX:line="217" PREFIX:column="5">cols</name> = <name PREFIX:line="217" PREFIX:column="12">LINE_MAX</name>-1</expr>;</expr_stmt></then></if> 
+  
+  <expr_stmt><expr><call><name PREFIX:line="219" PREFIX:column="3">clear_screen</name><argument_list PREFIX:line="219" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>               <comment type="line" PREFIX:line="219" PREFIX:column="33">// clear screen</comment>
+  <expr_stmt><expr><call><name PREFIX:line="220" PREFIX:column="3">delay</name><argument_list PREFIX:line="220" PREFIX:column="8">(<argument><expr PREFIX:line="220" PREFIX:column="9">1000</expr></argument>)</argument_list></call></expr>;</expr_stmt>                  <comment type="line" PREFIX:line="220" PREFIX:column="33">// do some delay</comment>
+  <expr_stmt><expr><call><name><name PREFIX:line="221" PREFIX:column="3">Serial</name>.<name PREFIX:line="221" PREFIX:column="10">begin</name></name><argument_list PREFIX:line="221" PREFIX:column="15">(<argument><expr PREFIX:line="221" PREFIX:column="16">9600</expr></argument>)</argument_list></call></expr>;</expr_stmt>        <comment type="line" PREFIX:line="221" PREFIX:column="30">// init serial</comment>
+  <expr_stmt><expr><call><name PREFIX:line="222" PREFIX:column="3">exec_line</name><argument_list PREFIX:line="222" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>                    <comment type="line" PREFIX:line="222" PREFIX:column="35">// place the input buffer into the screen</comment>
+  <expr_stmt><expr><call><name PREFIX:line="223" PREFIX:column="3">reset_line</name><argument_list PREFIX:line="223" PREFIX:column="13">()</argument_list></call></expr>;</expr_stmt>                   <comment type="line" PREFIX:line="223" PREFIX:column="35">// clear input buffer</comment>
+}</block></function>
+
+<comment type="line" PREFIX:line="226" PREFIX:column="1">// Arduino main loop</comment>
+<function><type><name PREFIX:line="227" PREFIX:column="1">void</name></type> <name PREFIX:line="227" PREFIX:column="6">loop</name><parameter_list PREFIX:line="227" PREFIX:column="10">(<param><decl><type><name PREFIX:line="227" PREFIX:column="11">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="227" PREFIX:column="17">{
+  <expr_stmt><expr><call><name PREFIX:line="228" PREFIX:column="3">read_line</name><argument_list PREFIX:line="228" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+</unit>

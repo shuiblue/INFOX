@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/libraries/U8glib/utility/u8g_dev_gprof.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_dev_gprof.c
+
+  Device for performance measurement with gprof.
+  Does not write any data, but uses a buffer.
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  
+
+*/</comment>
+
+<cpp:include PREFIX:line="41" PREFIX:column="1">#<cpp:directive PREFIX:line="41" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="41" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+
+<cpp:define PREFIX:line="44" PREFIX:column="1">#<cpp:directive PREFIX:line="44" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="44" PREFIX:column="9">WIDTH</name></cpp:macro> <cpp:value PREFIX:line="44" PREFIX:column="15">128</cpp:value></cpp:define>
+<cpp:define PREFIX:line="45" PREFIX:column="1">#<cpp:directive PREFIX:line="45" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="45" PREFIX:column="9">HEIGHT</name></cpp:macro> <cpp:value PREFIX:line="45" PREFIX:column="16">64</cpp:value></cpp:define>
+<cpp:define PREFIX:line="46" PREFIX:column="1">#<cpp:directive PREFIX:line="46" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="46" PREFIX:column="9">PAGE_HEIGHT</name></cpp:macro> <cpp:value PREFIX:line="46" PREFIX:column="21">8</cpp:value></cpp:define>
+
+<function_decl><type><name PREFIX:line="48" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="48" PREFIX:column="9">u8g_dev_gprof_fn</name><parameter_list PREFIX:line="48" PREFIX:column="25">(<param><decl><type><name PREFIX:line="48" PREFIX:column="26">u8g_t</name> *</type><name PREFIX:line="48" PREFIX:column="33">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="48" PREFIX:column="38">u8g_dev_t</name> *</type><name PREFIX:line="48" PREFIX:column="49">dev</name></decl></param>, <param><decl><type><name PREFIX:line="48" PREFIX:column="54">uint8_t</name></type> <name PREFIX:line="48" PREFIX:column="62">msg</name></decl></param>, <param><decl><type><name PREFIX:line="48" PREFIX:column="67">void</name> *</type><name PREFIX:line="48" PREFIX:column="73">arg</name></decl></param>)</parameter_list>;</function_decl>
+
+<decl_stmt><decl><type><name PREFIX:line="50" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="50" PREFIX:column="9">u8g_pb_dev_gprof_buf</name><index PREFIX:line="50" PREFIX:column="29">[<expr><name PREFIX:line="50" PREFIX:column="30">WIDTH</name></expr>]</index></name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="51" PREFIX:column="1">u8g_pb_t</name></type> <name PREFIX:line="51" PREFIX:column="10">u8g_pb_dev_gprof</name> <init PREFIX:line="51" PREFIX:column="27">= <expr><block PREFIX:line="51" PREFIX:column="29">{ <expr><block PREFIX:line="51" PREFIX:column="31">{<expr><name PREFIX:line="51" PREFIX:column="32">PAGE_HEIGHT</name></expr>, <expr><name PREFIX:line="51" PREFIX:column="45">HEIGHT</name></expr>, <expr PREFIX:line="51" PREFIX:column="53">0</expr>, <expr PREFIX:line="51" PREFIX:column="56">0</expr>, <expr PREFIX:line="51" PREFIX:column="59">0</expr>}</block></expr>,  <expr><name PREFIX:line="51" PREFIX:column="64">WIDTH</name></expr>, <expr><name PREFIX:line="51" PREFIX:column="71">u8g_pb_dev_gprof_buf</name></expr> }</block></expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><name PREFIX:line="53" PREFIX:column="1">u8g_dev_t</name></type> <name PREFIX:line="53" PREFIX:column="11">u8g_dev_gprof</name> <init PREFIX:line="53" PREFIX:column="25">= <expr><block PREFIX:line="53" PREFIX:column="27">{ <expr><name PREFIX:line="53" PREFIX:column="29">u8g_dev_gprof_fn</name></expr>, <expr PREFIX:line="53" PREFIX:column="47">&amp;<name PREFIX:line="53" PREFIX:column="48">u8g_pb_dev_gprof</name></expr>, <expr><name PREFIX:line="53" PREFIX:column="66">NULL</name></expr> }</block></expr></init></decl>;</decl_stmt>
+
+<function><type><name PREFIX:line="55" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="55" PREFIX:column="9">u8g_dev_gprof_fn</name><parameter_list PREFIX:line="55" PREFIX:column="25">(<param><decl><type><name PREFIX:line="55" PREFIX:column="26">u8g_t</name> *</type><name PREFIX:line="55" PREFIX:column="33">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="55" PREFIX:column="38">u8g_dev_t</name> *</type><name PREFIX:line="55" PREFIX:column="49">dev</name></decl></param>, <param><decl><type><name PREFIX:line="55" PREFIX:column="54">uint8_t</name></type> <name PREFIX:line="55" PREFIX:column="62">msg</name></decl></param>, <param><decl><type><name PREFIX:line="55" PREFIX:column="67">void</name> *</type><name PREFIX:line="55" PREFIX:column="73">arg</name></decl></param>)</parameter_list>
+<block PREFIX:line="56" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="57" PREFIX:column="3">u8g_pb_t</name> *</type><name PREFIX:line="57" PREFIX:column="13">pb</name> <init PREFIX:line="57" PREFIX:column="16">= <expr><call PREFIX:line="57" PREFIX:column="18">(<name PREFIX:line="57" PREFIX:column="19">u8g_pb_t</name> *)<argument_list PREFIX:line="57" PREFIX:column="30">(<argument><expr><name><name PREFIX:line="57" PREFIX:column="31">dev</name>-&gt;<name PREFIX:line="57" PREFIX:column="36">dev_mem</name></name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  
+  <switch PREFIX:line="59" PREFIX:column="3">switch<condition PREFIX:line="59" PREFIX:column="9">(<expr><name PREFIX:line="59" PREFIX:column="10">msg</name></expr>)</condition>
+  <block PREFIX:line="60" PREFIX:column="3">{
+    <case PREFIX:line="61" PREFIX:column="5">case <expr><name PREFIX:line="61" PREFIX:column="10">U8G_DEV_MSG_INIT</name></expr>:
+      <break PREFIX:line="62" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="63" PREFIX:column="5">case <expr><name PREFIX:line="63" PREFIX:column="10">U8G_DEV_MSG_STOP</name></expr>:
+      <break PREFIX:line="64" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="65" PREFIX:column="5">case <expr><name PREFIX:line="65" PREFIX:column="10">U8G_DEV_MSG_PAGE_FIRST</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="66" PREFIX:column="7">u8g_pb_Clear</name><argument_list PREFIX:line="66" PREFIX:column="19">(<argument><expr><name PREFIX:line="66" PREFIX:column="20">pb</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="67" PREFIX:column="7">u8g_page_First</name><argument_list PREFIX:line="67" PREFIX:column="21">(<argument><expr PREFIX:line="67" PREFIX:column="22">&amp;(<name><name PREFIX:line="67" PREFIX:column="24">pb</name>-&gt;<name PREFIX:line="67" PREFIX:column="28">p</name></name>)</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="68" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="69" PREFIX:column="5">case <expr><name PREFIX:line="69" PREFIX:column="10">U8G_DEV_MSG_PAGE_NEXT</name></expr>:
+      <comment type="block" PREFIX:line="70" PREFIX:column="7">/*
+      {
+        uint8_t i, j;
+        uint8_t page_height;
+        page_height = pb-&gt;p.page_y1;
+        page_height -= pb-&gt;p.page_y0;
+        page_height++;
+        for( j = 0; j &lt; page_height; j++ )
+        {
+          printf("%02d ", j);
+          for( i = 0; i &lt; WIDTH; i++ )
+          {
+            if ( (u8g_pb_dev_stdout_buf[i] &amp; (1&lt;&lt;j)) != 0 )
+              printf("#");
+            else
+              printf(".");
+          }
+          printf("\n");
+        }
+      }
+      */</comment>
+      <if PREFIX:line="91" PREFIX:column="7">if <condition PREFIX:line="91" PREFIX:column="10">( <expr><call><name PREFIX:line="91" PREFIX:column="12">u8g_page_Next</name><argument_list PREFIX:line="91" PREFIX:column="25">(<argument><expr PREFIX:line="91" PREFIX:column="26">&amp;(<name><name PREFIX:line="91" PREFIX:column="28">pb</name>-&gt;<name PREFIX:line="91" PREFIX:column="32">p</name></name>)</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="91" PREFIX:column="42">
+      <block PREFIX:line="92" PREFIX:column="7">{
+        <comment type="line" PREFIX:line="93" PREFIX:column="9">//printf("\n");</comment>
+        <return PREFIX:line="94" PREFIX:column="9">return <expr PREFIX:line="94" PREFIX:column="16">0</expr>;</return>
+      }</block></then></if>
+      <expr_stmt><expr><call><name PREFIX:line="96" PREFIX:column="7">u8g_pb_Clear</name><argument_list PREFIX:line="96" PREFIX:column="19">(<argument><expr><name PREFIX:line="96" PREFIX:column="20">pb</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="97" PREFIX:column="7">break;</break>
+<cpp:ifdef PREFIX:line="98" PREFIX:column="1">#<cpp:directive PREFIX:line="98" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="98" PREFIX:column="8">U8G_DEV_MSG_IS_BBX_INTERSECTION</name></cpp:ifdef>
+    </case><case PREFIX:line="99" PREFIX:column="5">case <expr><name PREFIX:line="99" PREFIX:column="10">U8G_DEV_MSG_IS_BBX_INTERSECTION</name></expr>:
+       <block PREFIX:line="100" PREFIX:column="8">{
+        <decl_stmt><decl><type><name PREFIX:line="101" PREFIX:column="9">u8g_dev_arg_bbx_t</name> *</type><name PREFIX:line="101" PREFIX:column="28">bbx</name> <init PREFIX:line="101" PREFIX:column="32">= <expr PREFIX:line="101" PREFIX:column="34">(<name PREFIX:line="101" PREFIX:column="35">u8g_dev_arg_bbx_t</name> *)<name PREFIX:line="101" PREFIX:column="55">arg</name></expr></init></decl>;</decl_stmt>
+        <decl_stmt><decl><type><name PREFIX:line="102" PREFIX:column="9">u8g_uint_t</name></type> <name PREFIX:line="102" PREFIX:column="20">x2</name></decl>, <decl><type ref="prev"/><name PREFIX:line="102" PREFIX:column="24">y2</name></decl>;</decl_stmt>
+
+        <expr_stmt><expr><name PREFIX:line="104" PREFIX:column="9">y2</name> = <name><name PREFIX:line="104" PREFIX:column="14">bbx</name>-&gt;<name PREFIX:line="104" PREFIX:column="19">y</name></name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="105" PREFIX:column="9">y2</name> += <name><name PREFIX:line="105" PREFIX:column="15">bbx</name>-&gt;<name PREFIX:line="105" PREFIX:column="20">h</name></name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="106" PREFIX:column="9">y2</name>--</expr>;</expr_stmt>
+        
+        <if PREFIX:line="108" PREFIX:column="9">if <condition PREFIX:line="108" PREFIX:column="12">( <expr><call><name PREFIX:line="108" PREFIX:column="14">u8g_pb_IsYIntersection</name><argument_list PREFIX:line="108" PREFIX:column="36">(<argument><expr><name PREFIX:line="108" PREFIX:column="37">pb</name></expr></argument>, <argument><expr><name><name PREFIX:line="108" PREFIX:column="41">bbx</name>-&gt;<name PREFIX:line="108" PREFIX:column="46">y</name></name></expr></argument>, <argument><expr><name PREFIX:line="108" PREFIX:column="49">y2</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="108" PREFIX:column="59">
+          <return PREFIX:line="109" PREFIX:column="11">return <expr PREFIX:line="109" PREFIX:column="18">0</expr>;</return></then></if>
+        
+        <comment type="block" PREFIX:line="111" PREFIX:column="9">/* maybe this one can be skiped... probability is very high to have an intersection, so it would be ok to always return 1 */</comment>
+        <expr_stmt><expr><name PREFIX:line="112" PREFIX:column="9">x2</name> = <name><name PREFIX:line="112" PREFIX:column="14">bbx</name>-&gt;<name PREFIX:line="112" PREFIX:column="19">x</name></name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="113" PREFIX:column="9">x2</name> += <name><name PREFIX:line="113" PREFIX:column="15">bbx</name>-&gt;<name PREFIX:line="113" PREFIX:column="20">w</name></name></expr>;</expr_stmt>
+        <expr_stmt><expr><name PREFIX:line="114" PREFIX:column="9">x2</name>--</expr>;</expr_stmt>
+        
+        <if PREFIX:line="116" PREFIX:column="9">if <condition PREFIX:line="116" PREFIX:column="12">( <expr><call><name PREFIX:line="116" PREFIX:column="14">u8g_pb_IsXIntersection</name><argument_list PREFIX:line="116" PREFIX:column="36">(<argument><expr><name PREFIX:line="116" PREFIX:column="37">pb</name></expr></argument>, <argument><expr><name><name PREFIX:line="116" PREFIX:column="41">bbx</name>-&gt;<name PREFIX:line="116" PREFIX:column="46">x</name></name></expr></argument>, <argument><expr><name PREFIX:line="116" PREFIX:column="49">x2</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="116" PREFIX:column="59">
+          <return PREFIX:line="117" PREFIX:column="11">return <expr PREFIX:line="117" PREFIX:column="18">0</expr>;</return></then></if>
+      }</block>
+      <return PREFIX:line="119" PREFIX:column="7">return <expr PREFIX:line="119" PREFIX:column="14">1</expr>;</return>
+<cpp:endif PREFIX:line="120" PREFIX:column="1">#<cpp:directive PREFIX:line="120" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+    </case><case PREFIX:line="121" PREFIX:column="5">case <expr><name PREFIX:line="121" PREFIX:column="10">U8G_DEV_MSG_GET_PAGE_BOX</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="122" PREFIX:column="7">u8g_pb_GetPageBox</name><argument_list PREFIX:line="122" PREFIX:column="24">(<argument><expr><name PREFIX:line="122" PREFIX:column="25">pb</name></expr></argument>, <argument><expr PREFIX:line="122" PREFIX:column="29">(<name PREFIX:line="122" PREFIX:column="30">u8g_box_t</name> *)<name PREFIX:line="122" PREFIX:column="42">arg</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="123" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="124" PREFIX:column="5">case <expr><name PREFIX:line="124" PREFIX:column="10">U8G_DEV_MSG_SET_COLOR_ENTRY</name></expr>:
+      <break PREFIX:line="125" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="126" PREFIX:column="5">case <expr><name PREFIX:line="126" PREFIX:column="10">U8G_DEV_MSG_SET_XY_CB</name></expr>:
+      <break PREFIX:line="127" PREFIX:column="7">break;</break>
+  </case>}</block></switch>
+  <return PREFIX:line="129" PREFIX:column="3">return <expr><call><name PREFIX:line="129" PREFIX:column="10">u8g_dev_pb8v1_base_fn</name><argument_list PREFIX:line="129" PREFIX:column="31">(<argument><expr><name PREFIX:line="129" PREFIX:column="32">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="129" PREFIX:column="37">dev</name></expr></argument>, <argument><expr><name PREFIX:line="129" PREFIX:column="42">msg</name></expr></argument>, <argument><expr><name PREFIX:line="129" PREFIX:column="47">arg</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+</unit>
