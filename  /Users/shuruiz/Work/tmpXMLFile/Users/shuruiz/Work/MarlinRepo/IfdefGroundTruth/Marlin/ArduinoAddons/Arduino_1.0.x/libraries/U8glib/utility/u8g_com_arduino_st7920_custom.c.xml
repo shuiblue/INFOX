@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  
+  u8g_com_arduino_st7920_custom.c
+  
+  Additional COM device, initially introduced for 3D Printer community
+  Implements a fast SW SPI com subsystem
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+  A special SPI interface for ST7920 controller
+
+  Update for ATOMIC operation done (01 Jun 2013)
+    U8G_ATOMIC_OR(ptr, val)
+    U8G_ATOMIC_AND(ptr, val)
+    U8G_ATOMIC_START();
+    U8G_ATOMIC_END();
+
+
+*/</comment>
+
+<cpp:include PREFIX:line="48" PREFIX:column="1">#<cpp:directive PREFIX:line="48" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="48" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="50" PREFIX:column="1">#<cpp:directive PREFIX:line="50" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="50" PREFIX:column="5">defined</name><argument_list PREFIX:line="50" PREFIX:column="12">(<argument><expr><name PREFIX:line="50" PREFIX:column="13">ARDUINO</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<cpp:if PREFIX:line="52" PREFIX:column="1">#<cpp:directive PREFIX:line="52" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="52" PREFIX:column="5">ARDUINO</name> &lt; 100</expr></cpp:if> 
+<cpp:include PREFIX:line="53" PREFIX:column="1">#<cpp:directive PREFIX:line="53" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="53" PREFIX:column="10">&lt;WProgram.h&gt;</cpp:file></cpp:include>    
+<cpp:include PREFIX:line="54" PREFIX:column="1">#<cpp:directive PREFIX:line="54" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="54" PREFIX:column="10">"wiring_private.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="55" PREFIX:column="1">#<cpp:directive PREFIX:line="55" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="55" PREFIX:column="10">"pins_arduino.h"</cpp:file></cpp:include>
+
+<cpp:else PREFIX:line="57" PREFIX:column="1">#<cpp:directive PREFIX:line="57" PREFIX:column="2">else</cpp:directive></cpp:else> 
+<cpp:include PREFIX:line="58" PREFIX:column="1">#<cpp:directive PREFIX:line="58" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="58" PREFIX:column="10">&lt;Arduino.h&gt;</cpp:file></cpp:include> 
+<cpp:include PREFIX:line="59" PREFIX:column="1">#<cpp:directive PREFIX:line="59" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="59" PREFIX:column="10">"wiring_private.h"</cpp:file></cpp:include>
+<cpp:endif PREFIX:line="60" PREFIX:column="1">#<cpp:directive PREFIX:line="60" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="62" PREFIX:column="1">#<cpp:directive PREFIX:line="62" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="62" PREFIX:column="5">defined</name><argument_list PREFIX:line="62" PREFIX:column="12">(<argument><expr><name PREFIX:line="62" PREFIX:column="13">__AVR__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<decl_stmt><decl><type><specifier PREFIX:line="64" PREFIX:column="1">static</specifier> <name PREFIX:line="64" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="64" PREFIX:column="16">u8g_bitData</name></decl>, <decl><type ref="prev"/><name PREFIX:line="64" PREFIX:column="29">u8g_bitNotData</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="65" PREFIX:column="1">static</specifier> <name PREFIX:line="65" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="65" PREFIX:column="16">u8g_bitClock</name></decl>, <decl><type ref="prev"/><name PREFIX:line="65" PREFIX:column="30">u8g_bitNotClock</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="66" PREFIX:column="1">static</specifier> <specifier PREFIX:line="66" PREFIX:column="8">volatile</specifier> <name PREFIX:line="66" PREFIX:column="17">uint8_t</name> *</type><name PREFIX:line="66" PREFIX:column="26">u8g_outData</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="67" PREFIX:column="1">static</specifier> <specifier PREFIX:line="67" PREFIX:column="8">volatile</specifier> <name PREFIX:line="67" PREFIX:column="17">uint8_t</name> *</type><name PREFIX:line="67" PREFIX:column="26">u8g_outClock</name></decl>;</decl_stmt>
+
+<function><type><specifier PREFIX:line="69" PREFIX:column="1">static</specifier> <name PREFIX:line="69" PREFIX:column="8">void</name></type> <name PREFIX:line="69" PREFIX:column="13">u8g_com_arduino_init_shift_out</name><parameter_list PREFIX:line="69" PREFIX:column="43">(<param><decl><type><name PREFIX:line="69" PREFIX:column="44">uint8_t</name></type> <name PREFIX:line="69" PREFIX:column="52">dataPin</name></decl></param>, <param><decl><type><name PREFIX:line="69" PREFIX:column="61">uint8_t</name></type> <name PREFIX:line="69" PREFIX:column="69">clockPin</name></decl></param>)</parameter_list>
+<block PREFIX:line="70" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="71" PREFIX:column="3">u8g_outData</name> = <call><name PREFIX:line="71" PREFIX:column="17">portOutputRegister</name><argument_list PREFIX:line="71" PREFIX:column="35">(<argument><expr><call><name PREFIX:line="71" PREFIX:column="36">digitalPinToPort</name><argument_list PREFIX:line="71" PREFIX:column="52">(<argument><expr><name PREFIX:line="71" PREFIX:column="53">dataPin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="72" PREFIX:column="3">u8g_outClock</name> = <call><name PREFIX:line="72" PREFIX:column="18">portOutputRegister</name><argument_list PREFIX:line="72" PREFIX:column="36">(<argument><expr><call><name PREFIX:line="72" PREFIX:column="37">digitalPinToPort</name><argument_list PREFIX:line="72" PREFIX:column="53">(<argument><expr><name PREFIX:line="72" PREFIX:column="54">clockPin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="73" PREFIX:column="3">u8g_bitData</name> = <call><name PREFIX:line="73" PREFIX:column="17">digitalPinToBitMask</name><argument_list PREFIX:line="73" PREFIX:column="36">(<argument><expr><name PREFIX:line="73" PREFIX:column="37">dataPin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="74" PREFIX:column="3">u8g_bitClock</name> = <call><name PREFIX:line="74" PREFIX:column="18">digitalPinToBitMask</name><argument_list PREFIX:line="74" PREFIX:column="37">(<argument><expr><name PREFIX:line="74" PREFIX:column="38">clockPin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="76" PREFIX:column="3">u8g_bitNotClock</name> = <name PREFIX:line="76" PREFIX:column="21">u8g_bitClock</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="77" PREFIX:column="3">u8g_bitNotClock</name> ^= 0x0ff</expr>;</expr_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="79" PREFIX:column="3">u8g_bitNotData</name> = <name PREFIX:line="79" PREFIX:column="20">u8g_bitData</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="80" PREFIX:column="3">u8g_bitNotData</name> ^= 0x0ff</expr>;</expr_stmt>
+}</block></function>
+
+<decl_stmt><decl><type><specifier PREFIX:line="83" PREFIX:column="1">static</specifier> <name PREFIX:line="83" PREFIX:column="8">void</name></type> <name PREFIX:line="83" PREFIX:column="13">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="83" PREFIX:column="51">(<argument><expr><name PREFIX:line="83" PREFIX:column="52">uint8_t</name> <name PREFIX:line="83" PREFIX:column="60">val</name></expr></argument>)</argument_list> <name PREFIX:line="83" PREFIX:column="65">U8G_NOINLINE</name></decl>;</decl_stmt>
+<function><type><specifier PREFIX:line="84" PREFIX:column="1">static</specifier> <name PREFIX:line="84" PREFIX:column="8">void</name></type> <name PREFIX:line="84" PREFIX:column="13">u8g_com_arduino_do_shift_out_msb_first</name><parameter_list PREFIX:line="84" PREFIX:column="51">(<param><decl><type><name PREFIX:line="84" PREFIX:column="52">uint8_t</name></type> <name PREFIX:line="84" PREFIX:column="60">val</name></decl></param>)</parameter_list>
+<block PREFIX:line="85" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="86" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="86" PREFIX:column="11">cnt</name> <init PREFIX:line="86" PREFIX:column="15">= <expr PREFIX:line="86" PREFIX:column="17">8</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="87" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="87" PREFIX:column="11">bitData</name> <init PREFIX:line="87" PREFIX:column="19">= <expr><name PREFIX:line="87" PREFIX:column="21">u8g_bitData</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="88" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="88" PREFIX:column="11">bitNotData</name> <init PREFIX:line="88" PREFIX:column="22">= <expr><name PREFIX:line="88" PREFIX:column="24">u8g_bitNotData</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="89" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="89" PREFIX:column="11">bitClock</name> <init PREFIX:line="89" PREFIX:column="20">= <expr><name PREFIX:line="89" PREFIX:column="22">u8g_bitClock</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="90" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="90" PREFIX:column="11">bitNotClock</name> <init PREFIX:line="90" PREFIX:column="23">= <expr><name PREFIX:line="90" PREFIX:column="25">u8g_bitNotClock</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><specifier PREFIX:line="91" PREFIX:column="3">volatile</specifier> <name PREFIX:line="91" PREFIX:column="12">uint8_t</name> *</type><name PREFIX:line="91" PREFIX:column="21">outData</name> <init PREFIX:line="91" PREFIX:column="29">= <expr><name PREFIX:line="91" PREFIX:column="31">u8g_outData</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><specifier PREFIX:line="92" PREFIX:column="3">volatile</specifier> <name PREFIX:line="92" PREFIX:column="12">uint8_t</name> *</type><name PREFIX:line="92" PREFIX:column="21">outClock</name> <init PREFIX:line="92" PREFIX:column="30">= <expr><name PREFIX:line="92" PREFIX:column="32">u8g_outClock</name></expr></init></decl>;</decl_stmt>
+  
+  
+  <expr_stmt><expr><call><name PREFIX:line="95" PREFIX:column="3">U8G_ATOMIC_START</name><argument_list PREFIX:line="95" PREFIX:column="19">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="96" PREFIX:column="3">bitData</name> |= *<name PREFIX:line="96" PREFIX:column="15">outData</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="97" PREFIX:column="3">bitNotData</name> &amp;= *<name PREFIX:line="97" PREFIX:column="18">outData</name></expr>;</expr_stmt>
+  <do PREFIX:line="98" PREFIX:column="3">do
+  <block PREFIX:line="99" PREFIX:column="3">{
+    <if PREFIX:line="100" PREFIX:column="5">if <condition PREFIX:line="100" PREFIX:column="8">( <expr><name PREFIX:line="100" PREFIX:column="10">val</name> &amp; 128</expr> )</condition><then PREFIX:line="100" PREFIX:column="21">
+      <expr_stmt><expr PREFIX:line="101" PREFIX:column="7">*<name PREFIX:line="101" PREFIX:column="8">outData</name> = <name PREFIX:line="101" PREFIX:column="18">bitData</name></expr>;</expr_stmt></then>
+    <else PREFIX:line="102" PREFIX:column="5">else
+      <expr_stmt><expr PREFIX:line="103" PREFIX:column="7">*<name PREFIX:line="103" PREFIX:column="8">outData</name> = <name PREFIX:line="103" PREFIX:column="18">bitNotData</name></expr>;</expr_stmt></else></if>
+
+    <comment type="block" PREFIX:line="105" PREFIX:column="5">/*
+    *outClock |= bitClock;
+    val &lt;&lt;= 1;
+    cnt--;
+    *outClock &amp;= bitNotClock;
+    */</comment>
+
+    <expr_stmt><expr><name PREFIX:line="112" PREFIX:column="5">val</name> &lt;&lt;= 1</expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="113" PREFIX:column="5">*<name PREFIX:line="113" PREFIX:column="6">outClock</name> &amp;= <name PREFIX:line="113" PREFIX:column="18">bitNotClock</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="114" PREFIX:column="5">cnt</name>--</expr>;</expr_stmt>
+    <comment type="line" PREFIX:line="115" PREFIX:column="5">// removed micro delays, because AVRs are too slow and the delay is not required</comment>
+    <comment type="line" PREFIX:line="116" PREFIX:column="5">//u8g_MicroDelay();</comment>
+    <expr_stmt><expr PREFIX:line="117" PREFIX:column="5">*<name PREFIX:line="117" PREFIX:column="6">outClock</name> |= <name PREFIX:line="117" PREFIX:column="18">bitClock</name></expr>;</expr_stmt>
+    <comment type="line" PREFIX:line="118" PREFIX:column="5">//u8g_MicroDelay();</comment>
+  }</block> while<condition PREFIX:line="119" PREFIX:column="10">( <expr><name PREFIX:line="119" PREFIX:column="12">cnt</name> != 0</expr> )</condition>;</do>
+  <expr_stmt><expr><call><name PREFIX:line="120" PREFIX:column="3">U8G_ATOMIC_END</name><argument_list PREFIX:line="120" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<cpp:elif PREFIX:line="123" PREFIX:column="1">#<cpp:directive PREFIX:line="123" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="123" PREFIX:column="7">defined</name><argument_list PREFIX:line="123" PREFIX:column="14">(<argument><expr><name PREFIX:line="123" PREFIX:column="15">__18CXX</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="123" PREFIX:column="27">defined</name><argument_list PREFIX:line="123" PREFIX:column="34">(<argument><expr><name PREFIX:line="123" PREFIX:column="35">__PIC32MX</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+
+<decl_stmt><decl><type><name PREFIX:line="125" PREFIX:column="1">uint16_t</name></type> <name PREFIX:line="125" PREFIX:column="10">dog_bitData</name></decl>, <decl><type ref="prev"/><name PREFIX:line="125" PREFIX:column="23">dog_bitNotData</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="126" PREFIX:column="1">uint16_t</name></type> <name PREFIX:line="126" PREFIX:column="10">dog_bitClock</name></decl>, <decl><type ref="prev"/><name PREFIX:line="126" PREFIX:column="24">dog_bitNotClock</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="127" PREFIX:column="1">volatile</specifier> <name PREFIX:line="127" PREFIX:column="10">uint32_t</name> *</type><name PREFIX:line="127" PREFIX:column="20">dog_outData</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="128" PREFIX:column="1">volatile</specifier> <name PREFIX:line="128" PREFIX:column="10">uint32_t</name> *</type><name PREFIX:line="128" PREFIX:column="20">dog_outClock</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="129" PREFIX:column="1">volatile</specifier> <name PREFIX:line="129" PREFIX:column="10">uint32_t</name></type> <name PREFIX:line="129" PREFIX:column="19">dog_pic32_spi_tmp</name></decl>;</decl_stmt>
+
+<function><type><specifier PREFIX:line="131" PREFIX:column="1">static</specifier> <name PREFIX:line="131" PREFIX:column="8">void</name></type> <name PREFIX:line="131" PREFIX:column="13">u8g_com_arduino_init_shift_out</name><parameter_list PREFIX:line="131" PREFIX:column="43">(<param><decl><type><name PREFIX:line="131" PREFIX:column="44">uint8_t</name></type> <name PREFIX:line="131" PREFIX:column="52">dataPin</name></decl></param>, <param><decl><type><name PREFIX:line="131" PREFIX:column="61">uint8_t</name></type> <name PREFIX:line="131" PREFIX:column="69">clockPin</name></decl></param>)</parameter_list>
+<block PREFIX:line="132" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="133" PREFIX:column="3">dog_outData</name> = <call><name PREFIX:line="133" PREFIX:column="17">portOutputRegister</name><argument_list PREFIX:line="133" PREFIX:column="35">(<argument><expr><call><name PREFIX:line="133" PREFIX:column="36">digitalPinToPort</name><argument_list PREFIX:line="133" PREFIX:column="52">(<argument><expr><name PREFIX:line="133" PREFIX:column="53">dataPin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="134" PREFIX:column="3">dog_outClock</name> = <call><name PREFIX:line="134" PREFIX:column="18">portOutputRegister</name><argument_list PREFIX:line="134" PREFIX:column="36">(<argument><expr><call><name PREFIX:line="134" PREFIX:column="37">digitalPinToPort</name><argument_list PREFIX:line="134" PREFIX:column="53">(<argument><expr><name PREFIX:line="134" PREFIX:column="54">clockPin</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="135" PREFIX:column="3">dog_bitData</name> = <call><name PREFIX:line="135" PREFIX:column="17">digitalPinToBitMask</name><argument_list PREFIX:line="135" PREFIX:column="36">(<argument><expr><name PREFIX:line="135" PREFIX:column="37">dataPin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="136" PREFIX:column="3">dog_bitClock</name> = <call><name PREFIX:line="136" PREFIX:column="18">digitalPinToBitMask</name><argument_list PREFIX:line="136" PREFIX:column="37">(<argument><expr><name PREFIX:line="136" PREFIX:column="38">clockPin</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="138" PREFIX:column="3">dog_bitNotClock</name> = <name PREFIX:line="138" PREFIX:column="21">dog_bitClock</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="139" PREFIX:column="3">dog_bitNotClock</name> ^= 0x0ffff</expr>;</expr_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="141" PREFIX:column="3">dog_bitNotData</name> = <name PREFIX:line="141" PREFIX:column="20">dog_bitData</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="142" PREFIX:column="3">dog_bitNotData</name> ^= 0x0ffff</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="145" PREFIX:column="1">static</specifier> <name PREFIX:line="145" PREFIX:column="8">void</name></type> <name PREFIX:line="145" PREFIX:column="13">u8g_com_arduino_do_shift_out_msb_first</name><parameter_list PREFIX:line="145" PREFIX:column="51">(<param><decl><type><name PREFIX:line="145" PREFIX:column="52">uint8_t</name></type> <name PREFIX:line="145" PREFIX:column="60">val</name></decl></param>)</parameter_list>
+<block PREFIX:line="146" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="147" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="147" PREFIX:column="11">cnt</name> <init PREFIX:line="147" PREFIX:column="15">= <expr PREFIX:line="147" PREFIX:column="17">8</expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="148" PREFIX:column="3">U8G_ATOMIC_START</name><argument_list PREFIX:line="148" PREFIX:column="19">()</argument_list></call></expr>;</expr_stmt>
+  <do PREFIX:line="149" PREFIX:column="3">do
+  <block PREFIX:line="150" PREFIX:column="3">{
+    <if PREFIX:line="151" PREFIX:column="5">if <condition PREFIX:line="151" PREFIX:column="8">( <expr><name PREFIX:line="151" PREFIX:column="10">val</name> &amp; 128</expr> )</condition><then PREFIX:line="151" PREFIX:column="21">
+	<expr_stmt><expr PREFIX:line="152" PREFIX:column="9">*<name PREFIX:line="152" PREFIX:column="10">dog_outData</name> |= <name PREFIX:line="152" PREFIX:column="25">dog_bitData</name></expr>;</expr_stmt></then>
+    <else PREFIX:line="153" PREFIX:column="5">else
+	<expr_stmt><expr PREFIX:line="154" PREFIX:column="9">*<name PREFIX:line="154" PREFIX:column="10">dog_outData</name> &amp;= <name PREFIX:line="154" PREFIX:column="25">dog_bitNotData</name></expr>;</expr_stmt></else></if>    
+    <expr_stmt><expr><name PREFIX:line="155" PREFIX:column="5">val</name> &lt;&lt;= 1</expr>;</expr_stmt>
+    <comment type="line" PREFIX:line="156" PREFIX:column="5">//u8g_MicroDelay();</comment>
+    <comment type="line" PREFIX:line="157" PREFIX:column="5">//*dog_outClock |= dog_bitClock;</comment>
+    <expr_stmt><expr PREFIX:line="158" PREFIX:column="5">*<name PREFIX:line="158" PREFIX:column="6">dog_outClock</name> &amp;= <name PREFIX:line="158" PREFIX:column="22">dog_bitNotClock</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="159" PREFIX:column="5">cnt</name>--</expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="160" PREFIX:column="5">u8g_MicroDelay</name><argument_list PREFIX:line="160" PREFIX:column="19">()</argument_list></call></expr>;</expr_stmt>
+    <comment type="line" PREFIX:line="161" PREFIX:column="5">//*dog_outClock &amp;= dog_bitNotClock;</comment>
+    <expr_stmt><expr PREFIX:line="162" PREFIX:column="5">*<name PREFIX:line="162" PREFIX:column="6">dog_outClock</name> |= <name PREFIX:line="162" PREFIX:column="22">dog_bitClock</name></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="163" PREFIX:column="5">u8g_MicroDelay</name><argument_list PREFIX:line="163" PREFIX:column="19">()</argument_list></call></expr>;</expr_stmt>
+    
+  }</block> while<condition PREFIX:line="165" PREFIX:column="10">( <expr><name PREFIX:line="165" PREFIX:column="12">cnt</name> != 0</expr> )</condition>;</do>
+  <expr_stmt><expr><call><name PREFIX:line="166" PREFIX:column="3">U8G_ATOMIC_END</name><argument_list PREFIX:line="166" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<cpp:else PREFIX:line="169" PREFIX:column="1">#<cpp:directive PREFIX:line="169" PREFIX:column="2">else</cpp:directive></cpp:else>
+
+<comment type="block" PREFIX:line="171" PREFIX:column="1">/* default interface, Arduino DUE (__arm__) */</comment>
+
+<decl_stmt><decl><type><name PREFIX:line="173" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="173" PREFIX:column="9">u8g_data_custom_pin</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="174" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="174" PREFIX:column="9">u8g_clock_custom_pin</name></decl>;</decl_stmt>
+
+<function><type><specifier PREFIX:line="176" PREFIX:column="1">static</specifier> <name PREFIX:line="176" PREFIX:column="8">void</name></type> <name PREFIX:line="176" PREFIX:column="13">u8g_com_arduino_init_shift_out</name><parameter_list PREFIX:line="176" PREFIX:column="43">(<param><decl><type><name PREFIX:line="176" PREFIX:column="44">uint8_t</name></type> <name PREFIX:line="176" PREFIX:column="52">dataPin</name></decl></param>, <param><decl><type><name PREFIX:line="176" PREFIX:column="61">uint8_t</name></type> <name PREFIX:line="176" PREFIX:column="69">clockPin</name></decl></param>)</parameter_list>
+<block PREFIX:line="177" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="178" PREFIX:column="3">u8g_data_custom_pin</name> = <name PREFIX:line="178" PREFIX:column="25">dataPin</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="179" PREFIX:column="3">u8g_clock_custom_pin</name> = <name PREFIX:line="179" PREFIX:column="26">clockPin</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="182" PREFIX:column="1">static</specifier> <name PREFIX:line="182" PREFIX:column="8">void</name></type> <name PREFIX:line="182" PREFIX:column="13">u8g_com_arduino_do_shift_out_msb_first</name><parameter_list PREFIX:line="182" PREFIX:column="51">(<param><decl><type><name PREFIX:line="182" PREFIX:column="52">uint8_t</name></type> <name PREFIX:line="182" PREFIX:column="60">val</name></decl></param>)</parameter_list>
+<block PREFIX:line="183" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="184" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="184" PREFIX:column="11">cnt</name> <init PREFIX:line="184" PREFIX:column="15">= <expr PREFIX:line="184" PREFIX:column="17">8</expr></init></decl>;</decl_stmt>
+  <do PREFIX:line="185" PREFIX:column="3">do
+  <block PREFIX:line="186" PREFIX:column="3">{
+    <if PREFIX:line="187" PREFIX:column="5">if <condition PREFIX:line="187" PREFIX:column="8">( <expr><name PREFIX:line="187" PREFIX:column="10">val</name> &amp; 128</expr> )</condition><then PREFIX:line="187" PREFIX:column="21">
+	<expr_stmt><expr><call><name PREFIX:line="188" PREFIX:column="9">digitalWrite</name><argument_list PREFIX:line="188" PREFIX:column="21">(<argument><expr><name PREFIX:line="188" PREFIX:column="22">u8g_data_custom_pin</name></expr></argument>, <argument><expr><name PREFIX:line="188" PREFIX:column="43">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></then>
+    <else PREFIX:line="189" PREFIX:column="5">else
+	<expr_stmt><expr><call><name PREFIX:line="190" PREFIX:column="9">digitalWrite</name><argument_list PREFIX:line="190" PREFIX:column="21">(<argument><expr><name PREFIX:line="190" PREFIX:column="22">u8g_data_custom_pin</name></expr></argument>, <argument><expr><name PREFIX:line="190" PREFIX:column="43">LOW</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></else></if>
+    <expr_stmt><expr><name PREFIX:line="191" PREFIX:column="5">val</name> &lt;&lt;= 1</expr>;</expr_stmt>
+    <comment type="line" PREFIX:line="192" PREFIX:column="5">//u8g_MicroDelay();</comment>
+    <expr_stmt><expr><call><name PREFIX:line="193" PREFIX:column="5">digitalWrite</name><argument_list PREFIX:line="193" PREFIX:column="17">(<argument><expr><name PREFIX:line="193" PREFIX:column="18">u8g_clock_custom_pin</name></expr></argument>, <argument><expr><name PREFIX:line="193" PREFIX:column="40">LOW</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="194" PREFIX:column="5">cnt</name>--</expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="195" PREFIX:column="5">u8g_MicroDelay</name><argument_list PREFIX:line="195" PREFIX:column="19">()</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="196" PREFIX:column="5">digitalWrite</name><argument_list PREFIX:line="196" PREFIX:column="17">(<argument><expr><name PREFIX:line="196" PREFIX:column="18">u8g_clock_custom_pin</name></expr></argument>, <argument><expr><name PREFIX:line="196" PREFIX:column="40">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="197" PREFIX:column="5">u8g_MicroDelay</name><argument_list PREFIX:line="197" PREFIX:column="19">()</argument_list></call></expr>;</expr_stmt>    
+  }</block> while<condition PREFIX:line="198" PREFIX:column="10">( <expr><name PREFIX:line="198" PREFIX:column="12">cnt</name> != 0</expr> )</condition>;</do>
+}</block></function>
+
+<cpp:endif PREFIX:line="201" PREFIX:column="1">#<cpp:directive PREFIX:line="201" PREFIX:column="2">endif</cpp:directive></cpp:endif> 
+
+
+<function><type><specifier PREFIX:line="204" PREFIX:column="1">static</specifier> <name PREFIX:line="204" PREFIX:column="8">void</name></type> <name PREFIX:line="204" PREFIX:column="13">u8g_com_arduino_st7920_write_byte_seq</name><parameter_list PREFIX:line="204" PREFIX:column="50">(<param><decl><type><name PREFIX:line="204" PREFIX:column="51">uint8_t</name></type> <name PREFIX:line="204" PREFIX:column="59">rs</name></decl></param>, <param><decl><type><name PREFIX:line="204" PREFIX:column="63">uint8_t</name> *</type><name PREFIX:line="204" PREFIX:column="72">ptr</name></decl></param>, <param><decl><type><name PREFIX:line="204" PREFIX:column="77">uint8_t</name></type> <name PREFIX:line="204" PREFIX:column="85">len</name></decl></param>)</parameter_list>
+<block PREFIX:line="205" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="206" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="206" PREFIX:column="11">i</name></decl>;</decl_stmt>
+
+  <if PREFIX:line="208" PREFIX:column="3">if <condition PREFIX:line="208" PREFIX:column="6">( <expr><name PREFIX:line="208" PREFIX:column="8">rs</name> == 0</expr> )</condition><then PREFIX:line="208" PREFIX:column="17">
+  <block PREFIX:line="209" PREFIX:column="3">{
+    <comment type="block" PREFIX:line="210" PREFIX:column="5">/* command */</comment>
+    <expr_stmt><expr><call><name PREFIX:line="211" PREFIX:column="5">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="211" PREFIX:column="43">(<argument><expr PREFIX:line="211" PREFIX:column="44">0x0f8</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then>
+  <else PREFIX:line="213" PREFIX:column="3">else <if PREFIX:line="213" PREFIX:column="8">if <condition PREFIX:line="213" PREFIX:column="11">( <expr><name PREFIX:line="213" PREFIX:column="13">rs</name> == 1</expr> )</condition><then PREFIX:line="213" PREFIX:column="22">
+  <block PREFIX:line="214" PREFIX:column="3">{
+    <comment type="block" PREFIX:line="215" PREFIX:column="5">/* data */</comment>
+    <expr_stmt><expr><call><name PREFIX:line="216" PREFIX:column="5">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="216" PREFIX:column="43">(<argument><expr PREFIX:line="216" PREFIX:column="44">0x0fa</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then></if></else></if>
+
+  <while PREFIX:line="219" PREFIX:column="3">while<condition PREFIX:line="219" PREFIX:column="8">( <expr><name PREFIX:line="219" PREFIX:column="10">len</name> &gt; 0</expr> )</condition>
+  <block PREFIX:line="220" PREFIX:column="3">{
+    <expr_stmt><expr><call><name PREFIX:line="221" PREFIX:column="5">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="221" PREFIX:column="43">(<argument><expr PREFIX:line="221" PREFIX:column="44">*<name PREFIX:line="221" PREFIX:column="45">ptr</name> &amp; 0x0f0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="222" PREFIX:column="5">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="222" PREFIX:column="43">(<argument><expr PREFIX:line="222" PREFIX:column="44">*<name PREFIX:line="222" PREFIX:column="45">ptr</name> &lt;&lt; 4</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="223" PREFIX:column="5">ptr</name>++</expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="224" PREFIX:column="5">len</name>--</expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="225" PREFIX:column="5">u8g_10MicroDelay</name><argument_list PREFIX:line="225" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt>
+  }</block></while>
+  
+  <for PREFIX:line="228" PREFIX:column="3">for( <init><expr><name PREFIX:line="228" PREFIX:column="8">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="228" PREFIX:column="15">i</name> &lt; 4</expr>;</condition> <incr><expr><name PREFIX:line="228" PREFIX:column="22">i</name>++</expr></incr> )
+    <expr_stmt><expr><call><name PREFIX:line="229" PREFIX:column="5">u8g_10MicroDelay</name><argument_list PREFIX:line="229" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt></for>
+}</block></function>
+
+<function><type><specifier PREFIX:line="232" PREFIX:column="1">static</specifier> <name PREFIX:line="232" PREFIX:column="8">void</name></type> <name PREFIX:line="232" PREFIX:column="13">u8g_com_arduino_st7920_write_byte</name><parameter_list PREFIX:line="232" PREFIX:column="46">(<param><decl><type><name PREFIX:line="232" PREFIX:column="47">uint8_t</name></type> <name PREFIX:line="232" PREFIX:column="55">rs</name></decl></param>, <param><decl><type><name PREFIX:line="232" PREFIX:column="59">uint8_t</name></type> <name PREFIX:line="232" PREFIX:column="67">val</name></decl></param>)</parameter_list>
+<block PREFIX:line="233" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="234" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="234" PREFIX:column="11">i</name></decl>;</decl_stmt>
+
+  <if PREFIX:line="236" PREFIX:column="3">if <condition PREFIX:line="236" PREFIX:column="6">( <expr><name PREFIX:line="236" PREFIX:column="8">rs</name> == 0</expr> )</condition><then PREFIX:line="236" PREFIX:column="17">
+  <block PREFIX:line="237" PREFIX:column="3">{
+    <comment type="block" PREFIX:line="238" PREFIX:column="5">/* command */</comment>
+    <expr_stmt><expr><call><name PREFIX:line="239" PREFIX:column="5">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="239" PREFIX:column="43">(<argument><expr PREFIX:line="239" PREFIX:column="44">0x0f8</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then>
+  <else PREFIX:line="241" PREFIX:column="3">else <if PREFIX:line="241" PREFIX:column="8">if <condition PREFIX:line="241" PREFIX:column="11">( <expr><name PREFIX:line="241" PREFIX:column="13">rs</name> == 1</expr> )</condition><then PREFIX:line="241" PREFIX:column="22">
+  <block PREFIX:line="242" PREFIX:column="3">{
+    <comment type="block" PREFIX:line="243" PREFIX:column="5">/* data */</comment>
+    <expr_stmt><expr><call><name PREFIX:line="244" PREFIX:column="5">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="244" PREFIX:column="43">(<argument><expr PREFIX:line="244" PREFIX:column="44">0x0fa</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></then></if></else></if>
+  
+  <expr_stmt><expr><call><name PREFIX:line="247" PREFIX:column="3">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="247" PREFIX:column="41">(<argument><expr><name PREFIX:line="247" PREFIX:column="42">val</name> &amp; 0x0f0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="248" PREFIX:column="3">u8g_com_arduino_do_shift_out_msb_first</name><argument_list PREFIX:line="248" PREFIX:column="41">(<argument><expr><name PREFIX:line="248" PREFIX:column="42">val</name> &lt;&lt; 4</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  
+  <for PREFIX:line="250" PREFIX:column="3">for( <init><expr><name PREFIX:line="250" PREFIX:column="8">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="250" PREFIX:column="15">i</name> &lt; 4</expr>;</condition> <incr><expr><name PREFIX:line="250" PREFIX:column="22">i</name>++</expr></incr> )
+    <expr_stmt><expr><call><name PREFIX:line="251" PREFIX:column="5">u8g_10MicroDelay</name><argument_list PREFIX:line="251" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt></for>
+    
+}</block></function>
+
+
+<function><type><name PREFIX:line="256" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="256" PREFIX:column="9">u8g_com_arduino_st7920_custom_fn</name><parameter_list PREFIX:line="256" PREFIX:column="41">(<param><decl><type><name PREFIX:line="256" PREFIX:column="42">u8g_t</name> *</type><name PREFIX:line="256" PREFIX:column="49">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="256" PREFIX:column="54">uint8_t</name></type> <name PREFIX:line="256" PREFIX:column="62">msg</name></decl></param>, <param><decl><type><name PREFIX:line="256" PREFIX:column="67">uint8_t</name></type> <name PREFIX:line="256" PREFIX:column="75">arg_val</name></decl></param>, <param><decl><type><name PREFIX:line="256" PREFIX:column="84">void</name> *</type><name PREFIX:line="256" PREFIX:column="90">arg_ptr</name></decl></param>)</parameter_list>
+<block PREFIX:line="257" PREFIX:column="1">{
+  <switch PREFIX:line="258" PREFIX:column="3">switch<condition PREFIX:line="258" PREFIX:column="9">(<expr><name PREFIX:line="258" PREFIX:column="10">msg</name></expr>)</condition>
+  <block PREFIX:line="259" PREFIX:column="3">{
+    <case PREFIX:line="260" PREFIX:column="5">case <expr><name PREFIX:line="260" PREFIX:column="10">U8G_COM_MSG_INIT</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="261" PREFIX:column="7">u8g_com_arduino_assign_pin_output_high</name><argument_list PREFIX:line="261" PREFIX:column="45">(<argument><expr><name PREFIX:line="261" PREFIX:column="46">u8g</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="262" PREFIX:column="7">u8g_com_arduino_digital_write</name><argument_list PREFIX:line="262" PREFIX:column="36">(<argument><expr><name PREFIX:line="262" PREFIX:column="37">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="262" PREFIX:column="42">U8G_PI_CS</name></expr></argument>, <argument><expr><name PREFIX:line="262" PREFIX:column="53">LOW</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <comment type="line" PREFIX:line="263" PREFIX:column="7">// u8g_com_arduino_digital_write(u8g, U8G_PI_SCK, LOW);</comment>
+      <expr_stmt><expr><call><name PREFIX:line="264" PREFIX:column="7">u8g_com_arduino_digital_write</name><argument_list PREFIX:line="264" PREFIX:column="36">(<argument><expr><name PREFIX:line="264" PREFIX:column="37">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="264" PREFIX:column="42">U8G_PI_SCK</name></expr></argument>, <argument><expr><name PREFIX:line="264" PREFIX:column="54">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="265" PREFIX:column="7">u8g_com_arduino_digital_write</name><argument_list PREFIX:line="265" PREFIX:column="36">(<argument><expr><name PREFIX:line="265" PREFIX:column="37">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="265" PREFIX:column="42">U8G_PI_MOSI</name></expr></argument>, <argument><expr><name PREFIX:line="265" PREFIX:column="55">LOW</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="266" PREFIX:column="7">u8g_com_arduino_init_shift_out</name><argument_list PREFIX:line="266" PREFIX:column="37">(<argument><expr><name><name PREFIX:line="266" PREFIX:column="38">u8g</name>-&gt;<name PREFIX:line="266" PREFIX:column="43">pin_list</name><index PREFIX:line="266" PREFIX:column="51">[<expr><name PREFIX:line="266" PREFIX:column="52">U8G_PI_MOSI</name></expr>]</index></name></expr></argument>, <argument><expr><name><name PREFIX:line="266" PREFIX:column="66">u8g</name>-&gt;<name PREFIX:line="266" PREFIX:column="71">pin_list</name><index PREFIX:line="266" PREFIX:column="79">[<expr><name PREFIX:line="266" PREFIX:column="80">U8G_PI_SCK</name></expr>]</index></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><name><name PREFIX:line="267" PREFIX:column="7">u8g</name>-&gt;<name PREFIX:line="267" PREFIX:column="12">pin_list</name><index PREFIX:line="267" PREFIX:column="20">[<expr><name PREFIX:line="267" PREFIX:column="21">U8G_PI_A0_STATE</name></expr>]</index></name> = 0</expr>;</expr_stmt>       <comment type="block" PREFIX:line="267" PREFIX:column="49">/* inital RS state: command mode */</comment>
+      <break PREFIX:line="268" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="270" PREFIX:column="5">case <expr><name PREFIX:line="270" PREFIX:column="10">U8G_COM_MSG_STOP</name></expr>:
+      <break PREFIX:line="271" PREFIX:column="7">break;</break>
+
+    </case><case PREFIX:line="273" PREFIX:column="5">case <expr><name PREFIX:line="273" PREFIX:column="10">U8G_COM_MSG_RESET</name></expr>:
+      <if PREFIX:line="274" PREFIX:column="7">if <condition PREFIX:line="274" PREFIX:column="10">( <expr><name><name PREFIX:line="274" PREFIX:column="12">u8g</name>-&gt;<name PREFIX:line="274" PREFIX:column="17">pin_list</name><index PREFIX:line="274" PREFIX:column="25">[<expr><name PREFIX:line="274" PREFIX:column="26">U8G_PI_RESET</name></expr>]</index></name> != <name PREFIX:line="274" PREFIX:column="43">U8G_PIN_NONE</name></expr> )</condition><then PREFIX:line="274" PREFIX:column="57">
+	<expr_stmt><expr><call><name PREFIX:line="275" PREFIX:column="9">u8g_com_arduino_digital_write</name><argument_list PREFIX:line="275" PREFIX:column="38">(<argument><expr><name PREFIX:line="275" PREFIX:column="39">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="275" PREFIX:column="44">U8G_PI_RESET</name></expr></argument>, <argument><expr><name PREFIX:line="275" PREFIX:column="58">arg_val</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></then></if>
+      <break PREFIX:line="276" PREFIX:column="7">break;</break>
+      
+    </case><case PREFIX:line="278" PREFIX:column="5">case <expr><name PREFIX:line="278" PREFIX:column="10">U8G_COM_MSG_CHIP_SELECT</name></expr>:
+      <if PREFIX:line="279" PREFIX:column="7">if <condition PREFIX:line="279" PREFIX:column="10">( <expr><name PREFIX:line="279" PREFIX:column="12">arg_val</name> == 0</expr> )</condition><then PREFIX:line="279" PREFIX:column="26">
+      <block PREFIX:line="280" PREFIX:column="7">{
+        <comment type="block" PREFIX:line="281" PREFIX:column="9">/* disable, note: the st7920 has an active high chip select */</comment>
+        <expr_stmt><expr><call><name PREFIX:line="282" PREFIX:column="9">u8g_com_arduino_digital_write</name><argument_list PREFIX:line="282" PREFIX:column="38">(<argument><expr><name PREFIX:line="282" PREFIX:column="39">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="282" PREFIX:column="44">U8G_PI_CS</name></expr></argument>, <argument><expr><name PREFIX:line="282" PREFIX:column="55">LOW</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      }</block></then>
+      <else PREFIX:line="284" PREFIX:column="7">else
+      <block PREFIX:line="285" PREFIX:column="7">{
+        <comment type="block" PREFIX:line="286" PREFIX:column="9">/* enable */</comment>
+        <comment type="line" PREFIX:line="287" PREFIX:column="9">//u8g_com_arduino_digital_write(u8g, U8G_PI_SCK, HIGH);</comment>
+        <expr_stmt><expr><call><name PREFIX:line="288" PREFIX:column="9">u8g_com_arduino_digital_write</name><argument_list PREFIX:line="288" PREFIX:column="38">(<argument><expr><name PREFIX:line="288" PREFIX:column="39">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="288" PREFIX:column="44">U8G_PI_CS</name></expr></argument>, <argument><expr><name PREFIX:line="288" PREFIX:column="55">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      }</block></else></if>
+      <break PREFIX:line="290" PREFIX:column="7">break;</break>
+
+    </case><case PREFIX:line="292" PREFIX:column="5">case <expr><name PREFIX:line="292" PREFIX:column="10">U8G_COM_MSG_WRITE_BYTE</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="293" PREFIX:column="7">u8g_com_arduino_st7920_write_byte</name><argument_list PREFIX:line="293" PREFIX:column="40">( <argument><expr><name><name PREFIX:line="293" PREFIX:column="42">u8g</name>-&gt;<name PREFIX:line="293" PREFIX:column="47">pin_list</name><index PREFIX:line="293" PREFIX:column="55">[<expr><name PREFIX:line="293" PREFIX:column="56">U8G_PI_A0_STATE</name></expr>]</index></name></expr></argument>, <argument><expr><name PREFIX:line="293" PREFIX:column="74">arg_val</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <comment type="line" PREFIX:line="294" PREFIX:column="7">//u8g-&gt;pin_list[U8G_PI_A0_STATE] = 2; </comment>
+      <comment type="line" PREFIX:line="295" PREFIX:column="7">//u8g_arduino_sw_spi_shift_out(u8g-&gt;pin_list[U8G_PI_MOSI], u8g-&gt;pin_list[U8G_PI_SCK], arg_val);</comment>
+      <break PREFIX:line="296" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="298" PREFIX:column="5">case <expr><name PREFIX:line="298" PREFIX:column="10">U8G_COM_MSG_WRITE_SEQ</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="299" PREFIX:column="7">u8g_com_arduino_st7920_write_byte_seq</name><argument_list PREFIX:line="299" PREFIX:column="44">(<argument><expr><name><name PREFIX:line="299" PREFIX:column="45">u8g</name>-&gt;<name PREFIX:line="299" PREFIX:column="50">pin_list</name><index PREFIX:line="299" PREFIX:column="58">[<expr><name PREFIX:line="299" PREFIX:column="59">U8G_PI_A0_STATE</name></expr>]</index></name></expr></argument>, <argument><expr PREFIX:line="299" PREFIX:column="77">(<name PREFIX:line="299" PREFIX:column="78">uint8_t</name> *)<name PREFIX:line="299" PREFIX:column="88">arg_ptr</name></expr></argument>, <argument><expr><name PREFIX:line="299" PREFIX:column="97">arg_val</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="300" PREFIX:column="7">break;</break>
+
+      </case><case PREFIX:line="302" PREFIX:column="7">case <expr><name PREFIX:line="302" PREFIX:column="12">U8G_COM_MSG_WRITE_SEQ_P</name></expr>:
+      <block PREFIX:line="303" PREFIX:column="7">{
+        <decl_stmt><decl><type><name PREFIX:line="304" PREFIX:column="9">register</name> <name PREFIX:line="304" PREFIX:column="18">uint8_t</name> *</type><name PREFIX:line="304" PREFIX:column="27">ptr</name> <init PREFIX:line="304" PREFIX:column="31">= <expr><name PREFIX:line="304" PREFIX:column="33">arg_ptr</name></expr></init></decl>;</decl_stmt>
+        <while PREFIX:line="305" PREFIX:column="9">while<condition PREFIX:line="305" PREFIX:column="14">( <expr><name PREFIX:line="305" PREFIX:column="16">arg_val</name> &gt; 0</expr> )</condition>
+        <block PREFIX:line="306" PREFIX:column="9">{
+          <expr_stmt><expr><call><name PREFIX:line="307" PREFIX:column="11">u8g_com_arduino_st7920_write_byte</name><argument_list PREFIX:line="307" PREFIX:column="44">(<argument><expr><name><name PREFIX:line="307" PREFIX:column="45">u8g</name>-&gt;<name PREFIX:line="307" PREFIX:column="50">pin_list</name><index PREFIX:line="307" PREFIX:column="58">[<expr><name PREFIX:line="307" PREFIX:column="59">U8G_PI_A0_STATE</name></expr>]</index></name></expr></argument>, <argument><expr><call><name PREFIX:line="307" PREFIX:column="77">u8g_pgm_read</name><argument_list PREFIX:line="307" PREFIX:column="89">(<argument><expr><name PREFIX:line="307" PREFIX:column="90">ptr</name></expr></argument>)</argument_list></call></expr></argument> )</argument_list></call></expr>;</expr_stmt>
+          <comment type="line" PREFIX:line="308" PREFIX:column="11">//u8g-&gt;pin_list[U8G_PI_A0_STATE] = 2; </comment>
+          <expr_stmt><expr><name PREFIX:line="309" PREFIX:column="11">ptr</name>++</expr>;</expr_stmt>
+          <expr_stmt><expr><name PREFIX:line="310" PREFIX:column="11">arg_val</name>--</expr>;</expr_stmt>
+        }</block></while>
+      }</block>
+      <break PREFIX:line="313" PREFIX:column="7">break;</break>
+      
+    </case><case PREFIX:line="315" PREFIX:column="5">case <expr><name PREFIX:line="315" PREFIX:column="10">U8G_COM_MSG_ADDRESS</name></expr>:                     <comment type="block" PREFIX:line="315" PREFIX:column="51">/* define cmd (arg_val = 0) or data mode (arg_val = 1) */</comment>
+      <expr_stmt><expr><name><name PREFIX:line="316" PREFIX:column="7">u8g</name>-&gt;<name PREFIX:line="316" PREFIX:column="12">pin_list</name><index PREFIX:line="316" PREFIX:column="20">[<expr><name PREFIX:line="316" PREFIX:column="21">U8G_PI_A0_STATE</name></expr>]</index></name> = <name PREFIX:line="316" PREFIX:column="40">arg_val</name></expr>;</expr_stmt>
+      <break PREFIX:line="317" PREFIX:column="7">break;</break>
+  </case>}</block></switch>
+  <return PREFIX:line="319" PREFIX:column="3">return <expr PREFIX:line="319" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<cpp:else PREFIX:line="322" PREFIX:column="1">#<cpp:directive PREFIX:line="322" PREFIX:column="2">else</cpp:directive></cpp:else> <comment type="block" PREFIX:line="322" PREFIX:column="7">/* ARDUINO */</comment>
+
+<function><type><name PREFIX:line="324" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="324" PREFIX:column="9">u8g_com_arduino_st7920_custom_fn</name><parameter_list PREFIX:line="324" PREFIX:column="41">(<param><decl><type><name PREFIX:line="324" PREFIX:column="42">u8g_t</name> *</type><name PREFIX:line="324" PREFIX:column="49">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="324" PREFIX:column="54">uint8_t</name></type> <name PREFIX:line="324" PREFIX:column="62">msg</name></decl></param>, <param><decl><type><name PREFIX:line="324" PREFIX:column="67">uint8_t</name></type> <name PREFIX:line="324" PREFIX:column="75">arg_val</name></decl></param>, <param><decl><type><name PREFIX:line="324" PREFIX:column="84">void</name> *</type><name PREFIX:line="324" PREFIX:column="90">arg_ptr</name></decl></param>)</parameter_list>
+<block PREFIX:line="325" PREFIX:column="1">{
+  <return PREFIX:line="326" PREFIX:column="3">return <expr PREFIX:line="326" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<cpp:endif PREFIX:line="329" PREFIX:column="1">#<cpp:directive PREFIX:line="329" PREFIX:column="2">endif</cpp:directive></cpp:endif> <comment type="block" PREFIX:line="329" PREFIX:column="8">/* ARDUINO */</comment>
+
+</unit>

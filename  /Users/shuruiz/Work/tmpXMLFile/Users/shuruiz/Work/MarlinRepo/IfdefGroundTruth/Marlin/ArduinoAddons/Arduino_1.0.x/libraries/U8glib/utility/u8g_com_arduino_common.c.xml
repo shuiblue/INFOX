@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/libraries/U8glib/utility/u8g_com_arduino_common.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  
+  u8g_com_arduino_common.c
+  
+  shared procedures for the arduino communication procedures
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+
+*/</comment>
+
+<cpp:include PREFIX:line="39" PREFIX:column="1">#<cpp:directive PREFIX:line="39" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="39" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="41" PREFIX:column="1">#<cpp:directive PREFIX:line="41" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="41" PREFIX:column="5">defined</name><argument_list PREFIX:line="41" PREFIX:column="12">(<argument><expr><name PREFIX:line="41" PREFIX:column="13">ARDUINO</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<cpp:if PREFIX:line="43" PREFIX:column="1">#<cpp:directive PREFIX:line="43" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="43" PREFIX:column="5">ARDUINO</name> &lt; 100</expr></cpp:if> 
+<cpp:include PREFIX:line="44" PREFIX:column="1">#<cpp:directive PREFIX:line="44" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="44" PREFIX:column="10">&lt;WProgram.h&gt;</cpp:file></cpp:include> 
+<cpp:else PREFIX:line="45" PREFIX:column="1">#<cpp:directive PREFIX:line="45" PREFIX:column="2">else</cpp:directive></cpp:else> 
+<cpp:include PREFIX:line="46" PREFIX:column="1">#<cpp:directive PREFIX:line="46" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="46" PREFIX:column="10">&lt;Arduino.h&gt;</cpp:file></cpp:include> 
+<cpp:endif PREFIX:line="47" PREFIX:column="1">#<cpp:directive PREFIX:line="47" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<function><type><name PREFIX:line="49" PREFIX:column="1">void</name></type> <name PREFIX:line="49" PREFIX:column="6">u8g_com_arduino_digital_write</name><parameter_list PREFIX:line="49" PREFIX:column="35">(<param><decl><type><name PREFIX:line="49" PREFIX:column="36">u8g_t</name> *</type><name PREFIX:line="49" PREFIX:column="43">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="49" PREFIX:column="48">uint8_t</name></type> <name PREFIX:line="49" PREFIX:column="56">pin_index</name></decl></param>, <param><decl><type><name PREFIX:line="49" PREFIX:column="67">uint8_t</name></type> <name PREFIX:line="49" PREFIX:column="75">value</name></decl></param>)</parameter_list>
+<block PREFIX:line="50" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="51" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="51" PREFIX:column="11">pin</name></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="52" PREFIX:column="3">pin</name> = <name><name PREFIX:line="52" PREFIX:column="9">u8g</name>-&gt;<name PREFIX:line="52" PREFIX:column="14">pin_list</name><index PREFIX:line="52" PREFIX:column="22">[<expr><name PREFIX:line="52" PREFIX:column="23">pin_index</name></expr>]</index></name></expr>;</expr_stmt>
+  <if PREFIX:line="53" PREFIX:column="3">if <condition PREFIX:line="53" PREFIX:column="6">( <expr><name PREFIX:line="53" PREFIX:column="8">pin</name> != <name PREFIX:line="53" PREFIX:column="15">U8G_PIN_NONE</name></expr> )</condition><then PREFIX:line="53" PREFIX:column="29">
+    <expr_stmt><expr><call><name PREFIX:line="54" PREFIX:column="5">digitalWrite</name><argument_list PREFIX:line="54" PREFIX:column="17">(<argument><expr><name PREFIX:line="54" PREFIX:column="18">pin</name></expr></argument>, <argument><expr><name PREFIX:line="54" PREFIX:column="23">value</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></then></if>
+}</block></function>
+
+<comment type="block" PREFIX:line="57" PREFIX:column="1">/* this procedure does not set the RW pin */</comment>
+<function><type><name PREFIX:line="58" PREFIX:column="1">void</name></type> <name PREFIX:line="58" PREFIX:column="6">u8g_com_arduino_assign_pin_output_high</name><parameter_list PREFIX:line="58" PREFIX:column="44">(<param><decl><type><name PREFIX:line="58" PREFIX:column="45">u8g_t</name> *</type><name PREFIX:line="58" PREFIX:column="52">u8g</name></decl></param>)</parameter_list>
+<block PREFIX:line="59" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="60" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="60" PREFIX:column="11">i</name></decl>;</decl_stmt>
+  <comment type="block" PREFIX:line="61" PREFIX:column="3">/* skip the RW pin, which is the last pin in the list */</comment>
+  <for PREFIX:line="62" PREFIX:column="3">for( <init><expr><name PREFIX:line="62" PREFIX:column="8">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="62" PREFIX:column="15">i</name> &lt; <name PREFIX:line="62" PREFIX:column="19">U8G_PIN_LIST_LEN</name>-1</expr>;</condition> <incr><expr><name PREFIX:line="62" PREFIX:column="39">i</name>++</expr></incr> )
+  <block PREFIX:line="63" PREFIX:column="3">{
+    <if PREFIX:line="64" PREFIX:column="5">if <condition PREFIX:line="64" PREFIX:column="8">( <expr><name><name PREFIX:line="64" PREFIX:column="10">u8g</name>-&gt;<name PREFIX:line="64" PREFIX:column="15">pin_list</name><index PREFIX:line="64" PREFIX:column="23">[<expr><name PREFIX:line="64" PREFIX:column="24">i</name></expr>]</index></name> != <name PREFIX:line="64" PREFIX:column="30">U8G_PIN_NONE</name></expr> )</condition><then PREFIX:line="64" PREFIX:column="44">
+    <block PREFIX:line="65" PREFIX:column="5">{
+      <expr_stmt><expr><call><name PREFIX:line="66" PREFIX:column="7">pinMode</name><argument_list PREFIX:line="66" PREFIX:column="14">(<argument><expr><name><name PREFIX:line="66" PREFIX:column="15">u8g</name>-&gt;<name PREFIX:line="66" PREFIX:column="20">pin_list</name><index PREFIX:line="66" PREFIX:column="28">[<expr><name PREFIX:line="66" PREFIX:column="29">i</name></expr>]</index></name></expr></argument>, <argument><expr><name PREFIX:line="66" PREFIX:column="33">OUTPUT</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>	
+      <expr_stmt><expr><call><name PREFIX:line="67" PREFIX:column="7">digitalWrite</name><argument_list PREFIX:line="67" PREFIX:column="19">(<argument><expr><name><name PREFIX:line="67" PREFIX:column="20">u8g</name>-&gt;<name PREFIX:line="67" PREFIX:column="25">pin_list</name><index PREFIX:line="67" PREFIX:column="33">[<expr><name PREFIX:line="67" PREFIX:column="34">i</name></expr>]</index></name></expr></argument>, <argument><expr><name PREFIX:line="67" PREFIX:column="38">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    }</block></then></if>
+  }</block></for>
+}</block></function>
+
+
+<cpp:endif PREFIX:line="73" PREFIX:column="1">#<cpp:directive PREFIX:line="73" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+</unit>

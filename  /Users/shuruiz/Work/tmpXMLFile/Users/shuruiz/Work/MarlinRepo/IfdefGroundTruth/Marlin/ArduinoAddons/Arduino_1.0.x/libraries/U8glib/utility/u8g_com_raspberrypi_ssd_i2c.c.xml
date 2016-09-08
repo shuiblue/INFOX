@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/libraries/U8glib/utility/u8g_com_raspberrypi_ssd_i2c.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*  
+  Special pin usage:
+    U8G_PI_I2C_OPTION	additional options
+    U8G_PI_A0_STATE	used to store the last value of the command/data register selection
+    U8G_PI_SET_A0		1: Signal request to update I2C device with new A0_STATE, 0: Do nothing, A0_STATE matches I2C device
+    U8G_PI_SCL		clock line (NOT USED)
+    U8G_PI_SDA		data line (NOT USED)
+    
+    U8G_PI_RESET		reset line (currently disabled, see below)
+
+  Protocol:
+    SLA, Cmd/Data Selection, Arguments
+    The command/data register is selected by a special instruction byte, which is sent after SLA
+    
+    The continue bit is always 0 so that a (re)start is equired for the change from cmd to/data mode
+*/</comment>
+
+<cpp:include PREFIX:line="18" PREFIX:column="1">#<cpp:directive PREFIX:line="18" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="18" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="20" PREFIX:column="5">defined</name><argument_list PREFIX:line="20" PREFIX:column="12">(<argument><expr><name PREFIX:line="20" PREFIX:column="13">U8G_RASPBERRY_PI</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<cpp:include PREFIX:line="22" PREFIX:column="1">#<cpp:directive PREFIX:line="22" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="22" PREFIX:column="10">&lt;wiringPi.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="23" PREFIX:column="10">&lt;wiringPiI2C.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="24" PREFIX:column="1">#<cpp:directive PREFIX:line="24" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="24" PREFIX:column="10">&lt;stdio.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="25" PREFIX:column="10">&lt;stdlib.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="26" PREFIX:column="10">&lt;errno.h&gt;</cpp:file></cpp:include>
+
+<cpp:define PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="28" PREFIX:column="9">I2C_SLA</name></cpp:macro>		<cpp:value PREFIX:line="28" PREFIX:column="25">0x3c</cpp:value></cpp:define>
+<cpp:define PREFIX:line="29" PREFIX:column="1">#<cpp:directive PREFIX:line="29" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="29" PREFIX:column="9">I2C_CMD_MODE</name></cpp:macro>	<cpp:value PREFIX:line="29" PREFIX:column="25">0x000</cpp:value></cpp:define>
+<cpp:define PREFIX:line="30" PREFIX:column="1">#<cpp:directive PREFIX:line="30" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="30" PREFIX:column="9">I2C_DATA_MODE</name></cpp:macro>	<cpp:value PREFIX:line="30" PREFIX:column="25">0x040</cpp:value></cpp:define>
+
+<cpp:if PREFIX:line="32" PREFIX:column="1">#<cpp:directive PREFIX:line="32" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="32" PREFIX:column="5">defined</name><argument_list PREFIX:line="32" PREFIX:column="12">(<argument><expr><name PREFIX:line="32" PREFIX:column="13">U8G_WITH_PINLIST</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<function><type><name PREFIX:line="34" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="34" PREFIX:column="9">u8g_com_raspberrypi_ssd_start_sequence</name><parameter_list PREFIX:line="34" PREFIX:column="47">(<param><decl><type><name PREFIX:line="34" PREFIX:column="48">u8g_t</name> *</type><name PREFIX:line="34" PREFIX:column="55">u8g</name></decl></param>)</parameter_list>
+<block PREFIX:line="35" PREFIX:column="1">{
+  <comment type="block" PREFIX:line="36" PREFIX:column="3">/* are we requested to set the a0 state? */</comment>
+  <if PREFIX:line="37" PREFIX:column="3">if <condition PREFIX:line="37" PREFIX:column="6">( <expr><name><name PREFIX:line="37" PREFIX:column="8">u8g</name>-&gt;<name PREFIX:line="37" PREFIX:column="13">pin_list</name><index PREFIX:line="37" PREFIX:column="21">[<expr><name PREFIX:line="37" PREFIX:column="22">U8G_PI_SET_A0</name></expr>]</index></name> == 0</expr> )</condition><then PREFIX:line="37" PREFIX:column="43">
+    <return PREFIX:line="38" PREFIX:column="5">return <expr PREFIX:line="38" PREFIX:column="12">1</expr>;</return></then></if>	
+  
+  <comment type="block" PREFIX:line="40" PREFIX:column="3">/* setup bus, might be a repeated start */</comment>
+  <if PREFIX:line="41" PREFIX:column="3">if <condition PREFIX:line="41" PREFIX:column="6">( <expr><call><name PREFIX:line="41" PREFIX:column="8">u8g_i2c_start</name><argument_list PREFIX:line="41" PREFIX:column="21">(<argument><expr><name PREFIX:line="41" PREFIX:column="22">I2C_SLA</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="41" PREFIX:column="37">
+    <return PREFIX:line="42" PREFIX:column="5">return <expr PREFIX:line="42" PREFIX:column="12">0</expr>;</return></then></if>
+  <if PREFIX:line="43" PREFIX:column="3">if <condition PREFIX:line="43" PREFIX:column="6">( <expr><name><name PREFIX:line="43" PREFIX:column="8">u8g</name>-&gt;<name PREFIX:line="43" PREFIX:column="13">pin_list</name><index PREFIX:line="43" PREFIX:column="21">[<expr><name PREFIX:line="43" PREFIX:column="22">U8G_PI_A0_STATE</name></expr>]</index></name> == 0</expr> )</condition><then PREFIX:line="43" PREFIX:column="45">
+  <block PREFIX:line="44" PREFIX:column="3">{
+    <if PREFIX:line="45" PREFIX:column="5">if <condition PREFIX:line="45" PREFIX:column="8">( <expr><call><name PREFIX:line="45" PREFIX:column="10">u8g_i2c_send_mode</name><argument_list PREFIX:line="45" PREFIX:column="27">(<argument><expr><name PREFIX:line="45" PREFIX:column="28">I2C_CMD_MODE</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="45" PREFIX:column="48">
+      <return PREFIX:line="46" PREFIX:column="7">return <expr PREFIX:line="46" PREFIX:column="14">0</expr>;</return></then></if>
+  }</block></then>
+  <else PREFIX:line="48" PREFIX:column="3">else
+  <block PREFIX:line="49" PREFIX:column="3">{
+    <if PREFIX:line="50" PREFIX:column="5">if <condition PREFIX:line="50" PREFIX:column="8">( <expr><call><name PREFIX:line="50" PREFIX:column="10">u8g_i2c_send_mode</name><argument_list PREFIX:line="50" PREFIX:column="27">(<argument><expr><name PREFIX:line="50" PREFIX:column="28">I2C_DATA_MODE</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="50" PREFIX:column="49">
+      <return PREFIX:line="51" PREFIX:column="7">return <expr PREFIX:line="51" PREFIX:column="14">0</expr>;</return></then></if>
+  }</block></else></if>
+  
+  
+  <expr_stmt><expr><name><name PREFIX:line="55" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="55" PREFIX:column="8">pin_list</name><index PREFIX:line="55" PREFIX:column="16">[<expr><name PREFIX:line="55" PREFIX:column="17">U8G_PI_SET_A0</name></expr>]</index></name> = 0</expr>;</expr_stmt>
+  <return PREFIX:line="56" PREFIX:column="3">return <expr PREFIX:line="56" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="59" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="59" PREFIX:column="9">u8g_com_raspberrypi_ssd_i2c_fn</name><parameter_list PREFIX:line="59" PREFIX:column="39">(<param><decl><type><name PREFIX:line="59" PREFIX:column="40">u8g_t</name> *</type><name PREFIX:line="59" PREFIX:column="47">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="59" PREFIX:column="52">uint8_t</name></type> <name PREFIX:line="59" PREFIX:column="60">msg</name></decl></param>, <param><decl><type><name PREFIX:line="59" PREFIX:column="65">uint8_t</name></type> <name PREFIX:line="59" PREFIX:column="73">arg_val</name></decl></param>, <param><decl><type><name PREFIX:line="59" PREFIX:column="82">void</name> *</type><name PREFIX:line="59" PREFIX:column="88">arg_ptr</name></decl></param>)</parameter_list>
+<block PREFIX:line="60" PREFIX:column="1">{
+  <switch PREFIX:line="61" PREFIX:column="3">switch<condition PREFIX:line="61" PREFIX:column="9">(<expr><name PREFIX:line="61" PREFIX:column="10">msg</name></expr>)</condition>
+  <block PREFIX:line="62" PREFIX:column="3">{
+    <case PREFIX:line="63" PREFIX:column="5">case <expr><name PREFIX:line="63" PREFIX:column="10">U8G_COM_MSG_INIT</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="64" PREFIX:column="7">u8g_i2c_init</name><argument_list PREFIX:line="64" PREFIX:column="19">(<argument><expr><name><name PREFIX:line="64" PREFIX:column="20">u8g</name>-&gt;<name PREFIX:line="64" PREFIX:column="25">pin_list</name><index PREFIX:line="64" PREFIX:column="33">[<expr><name PREFIX:line="64" PREFIX:column="34">U8G_PI_I2C_OPTION</name></expr>]</index></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="65" PREFIX:column="7">u8g_SetPIOutput</name><argument_list PREFIX:line="65" PREFIX:column="22">(<argument><expr><name PREFIX:line="65" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="65" PREFIX:column="28">U8G_PI_RESET</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="66" PREFIX:column="7">u8g_SetPIOutput</name><argument_list PREFIX:line="66" PREFIX:column="22">(<argument><expr><name PREFIX:line="66" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="66" PREFIX:column="28">U8G_PI_A0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="67" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="69" PREFIX:column="5">case <expr><name PREFIX:line="69" PREFIX:column="10">U8G_COM_MSG_STOP</name></expr>:
+      <break PREFIX:line="70" PREFIX:column="7">break;</break>
+
+    </case><case PREFIX:line="72" PREFIX:column="5">case <expr><name PREFIX:line="72" PREFIX:column="10">U8G_COM_MSG_RESET</name></expr>:
+      <break PREFIX:line="73" PREFIX:column="7">break;</break>
+      
+    </case><case PREFIX:line="75" PREFIX:column="5">case <expr><name PREFIX:line="75" PREFIX:column="10">U8G_COM_MSG_CHIP_SELECT</name></expr>:
+      <expr_stmt><expr><name><name PREFIX:line="76" PREFIX:column="7">u8g</name>-&gt;<name PREFIX:line="76" PREFIX:column="12">pin_list</name><index PREFIX:line="76" PREFIX:column="20">[<expr><name PREFIX:line="76" PREFIX:column="21">U8G_PI_A0_STATE</name></expr>]</index></name> = 0</expr>;</expr_stmt>
+      <expr_stmt><expr><name><name PREFIX:line="77" PREFIX:column="7">u8g</name>-&gt;<name PREFIX:line="77" PREFIX:column="12">pin_list</name><index PREFIX:line="77" PREFIX:column="20">[<expr><name PREFIX:line="77" PREFIX:column="21">U8G_PI_SET_A0</name></expr>]</index></name> = 1</expr>;</expr_stmt>		<comment type="block" PREFIX:line="77" PREFIX:column="49">/* force a0 to set again, also forces start condition */</comment>
+      <if PREFIX:line="78" PREFIX:column="7">if <condition PREFIX:line="78" PREFIX:column="10">( <expr><name PREFIX:line="78" PREFIX:column="12">arg_val</name> == 0</expr> )</condition><then PREFIX:line="78" PREFIX:column="26">
+      <block PREFIX:line="79" PREFIX:column="7">{
+        <comment type="block" PREFIX:line="80" PREFIX:column="9">/* disable chip, send stop condition */</comment>
+	<expr_stmt><expr><call><name PREFIX:line="81" PREFIX:column="9">u8g_i2c_stop</name><argument_list PREFIX:line="81" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt>
+     }</block></then>
+      <else PREFIX:line="83" PREFIX:column="7">else
+      <block PREFIX:line="84" PREFIX:column="7">{
+        <comment type="block" PREFIX:line="85" PREFIX:column="9">/* enable, do nothing: any byte writing will trigger the i2c start */</comment>
+      }</block></else></if>
+      <break PREFIX:line="87" PREFIX:column="7">break;</break>
+
+    </case><case PREFIX:line="89" PREFIX:column="5">case <expr><name PREFIX:line="89" PREFIX:column="10">U8G_COM_MSG_WRITE_BYTE</name></expr>:
+      <comment type="line" PREFIX:line="90" PREFIX:column="7">//u8g-&gt;pin_list[U8G_PI_SET_A0] = 1;</comment>
+      <if PREFIX:line="91" PREFIX:column="7">if <condition PREFIX:line="91" PREFIX:column="10">( <expr><call><name PREFIX:line="91" PREFIX:column="12">u8g_com_raspberrypi_ssd_start_sequence</name><argument_list PREFIX:line="91" PREFIX:column="50">(<argument><expr><name PREFIX:line="91" PREFIX:column="51">u8g</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="91" PREFIX:column="62">
+	<return PREFIX:line="92" PREFIX:column="9">return <expr><call><name PREFIX:line="92" PREFIX:column="16">u8g_i2c_stop</name><argument_list PREFIX:line="92" PREFIX:column="28">()</argument_list></call></expr>, <expr PREFIX:line="92" PREFIX:column="32">0</expr>;</return></then></if>
+      <if PREFIX:line="93" PREFIX:column="7">if <condition PREFIX:line="93" PREFIX:column="10">( <expr><call><name PREFIX:line="93" PREFIX:column="12">u8g_i2c_send_byte</name><argument_list PREFIX:line="93" PREFIX:column="29">(<argument><expr><name PREFIX:line="93" PREFIX:column="30">arg_val</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="93" PREFIX:column="45">
+	<return PREFIX:line="94" PREFIX:column="9">return <expr><call><name PREFIX:line="94" PREFIX:column="16">u8g_i2c_stop</name><argument_list PREFIX:line="94" PREFIX:column="28">()</argument_list></call></expr>, <expr PREFIX:line="94" PREFIX:column="32">0</expr>;</return></then></if>
+      <comment type="line" PREFIX:line="95" PREFIX:column="7">// u8g_i2c_stop();</comment>
+      <break PREFIX:line="96" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="98" PREFIX:column="5">case <expr><name PREFIX:line="98" PREFIX:column="10">U8G_COM_MSG_WRITE_SEQ</name></expr>:
+      <comment type="line" PREFIX:line="99" PREFIX:column="7">//u8g-&gt;pin_list[U8G_PI_SET_A0] = 1;</comment>
+      <if PREFIX:line="100" PREFIX:column="7">if <condition PREFIX:line="100" PREFIX:column="10">( <expr><call><name PREFIX:line="100" PREFIX:column="12">u8g_com_raspberrypi_ssd_start_sequence</name><argument_list PREFIX:line="100" PREFIX:column="50">(<argument><expr><name PREFIX:line="100" PREFIX:column="51">u8g</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="100" PREFIX:column="62">
+	<return PREFIX:line="101" PREFIX:column="9">return <expr><call><name PREFIX:line="101" PREFIX:column="16">u8g_i2c_stop</name><argument_list PREFIX:line="101" PREFIX:column="28">()</argument_list></call></expr>, <expr PREFIX:line="101" PREFIX:column="32">0</expr>;</return></then></if>
+      <block PREFIX:line="102" PREFIX:column="7">{
+        <decl_stmt><decl><type><name PREFIX:line="103" PREFIX:column="9">register</name> <name PREFIX:line="103" PREFIX:column="18">uint8_t</name> *</type><name PREFIX:line="103" PREFIX:column="27">ptr</name> <init PREFIX:line="103" PREFIX:column="31">= <expr PREFIX:line="103" PREFIX:column="33">(<name PREFIX:line="103" PREFIX:column="34">uint8_t</name> *)<name PREFIX:line="103" PREFIX:column="44">arg_ptr</name></expr></init></decl>;</decl_stmt>
+        <while PREFIX:line="104" PREFIX:column="9">while<condition PREFIX:line="104" PREFIX:column="14">( <expr><name PREFIX:line="104" PREFIX:column="16">arg_val</name> &gt; 0</expr> )</condition>
+        <block PREFIX:line="105" PREFIX:column="9">{
+	  <if PREFIX:line="106" PREFIX:column="11">if <condition PREFIX:line="106" PREFIX:column="14">( <expr><call><name PREFIX:line="106" PREFIX:column="16">u8g_i2c_send_byte</name><argument_list PREFIX:line="106" PREFIX:column="33">(<argument><expr PREFIX:line="106" PREFIX:column="34">*<name PREFIX:line="106" PREFIX:column="35">ptr</name>++</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="106" PREFIX:column="48">
+	    <return PREFIX:line="107" PREFIX:column="13">return <expr><call><name PREFIX:line="107" PREFIX:column="20">u8g_i2c_stop</name><argument_list PREFIX:line="107" PREFIX:column="32">()</argument_list></call></expr>, <expr PREFIX:line="107" PREFIX:column="36">0</expr>;</return></then></if>
+          <expr_stmt><expr><name PREFIX:line="108" PREFIX:column="11">arg_val</name>--</expr>;</expr_stmt>
+        }</block></while>
+      }</block>
+      <comment type="line" PREFIX:line="111" PREFIX:column="7">// u8g_i2c_stop();</comment>
+      <break PREFIX:line="112" PREFIX:column="7">break;</break>
+
+    </case><case PREFIX:line="114" PREFIX:column="5">case <expr><name PREFIX:line="114" PREFIX:column="10">U8G_COM_MSG_WRITE_SEQ_P</name></expr>:
+      <comment type="line" PREFIX:line="115" PREFIX:column="7">//u8g-&gt;pin_list[U8G_PI_SET_A0] = 1;</comment>
+      <if PREFIX:line="116" PREFIX:column="7">if <condition PREFIX:line="116" PREFIX:column="10">( <expr><call><name PREFIX:line="116" PREFIX:column="12">u8g_com_raspberrypi_ssd_start_sequence</name><argument_list PREFIX:line="116" PREFIX:column="50">(<argument><expr><name PREFIX:line="116" PREFIX:column="51">u8g</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="116" PREFIX:column="62">
+	<return PREFIX:line="117" PREFIX:column="9">return <expr><call><name PREFIX:line="117" PREFIX:column="16">u8g_i2c_stop</name><argument_list PREFIX:line="117" PREFIX:column="28">()</argument_list></call></expr>, <expr PREFIX:line="117" PREFIX:column="32">0</expr>;</return></then></if>
+      <block PREFIX:line="118" PREFIX:column="7">{
+        <decl_stmt><decl><type><name PREFIX:line="119" PREFIX:column="9">register</name> <name PREFIX:line="119" PREFIX:column="18">uint8_t</name> *</type><name PREFIX:line="119" PREFIX:column="27">ptr</name> <init PREFIX:line="119" PREFIX:column="31">= <expr PREFIX:line="119" PREFIX:column="33">(<name PREFIX:line="119" PREFIX:column="34">uint8_t</name> *)<name PREFIX:line="119" PREFIX:column="44">arg_ptr</name></expr></init></decl>;</decl_stmt>
+        <while PREFIX:line="120" PREFIX:column="9">while<condition PREFIX:line="120" PREFIX:column="14">( <expr><name PREFIX:line="120" PREFIX:column="16">arg_val</name> &gt; 0</expr> )</condition>
+        <block PREFIX:line="121" PREFIX:column="9">{
+	  <if PREFIX:line="122" PREFIX:column="11">if <condition PREFIX:line="122" PREFIX:column="14">( <expr><call><name PREFIX:line="122" PREFIX:column="16">u8g_i2c_send_byte</name><argument_list PREFIX:line="122" PREFIX:column="33">(<argument><expr><call><name PREFIX:line="122" PREFIX:column="34">u8g_pgm_read</name><argument_list PREFIX:line="122" PREFIX:column="46">(<argument><expr><name PREFIX:line="122" PREFIX:column="47">ptr</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="122" PREFIX:column="59">
+	    <return PREFIX:line="123" PREFIX:column="13">return <expr PREFIX:line="123" PREFIX:column="20">0</expr>;</return></then></if>
+          <expr_stmt><expr><name PREFIX:line="124" PREFIX:column="11">ptr</name>++</expr>;</expr_stmt>
+          <expr_stmt><expr><name PREFIX:line="125" PREFIX:column="11">arg_val</name>--</expr>;</expr_stmt>
+        }</block></while>
+      }</block>
+      <comment type="line" PREFIX:line="128" PREFIX:column="7">// u8g_i2c_stop();</comment>
+      <break PREFIX:line="129" PREFIX:column="7">break;</break>
+      
+    </case><case PREFIX:line="131" PREFIX:column="5">case <expr><name PREFIX:line="131" PREFIX:column="10">U8G_COM_MSG_ADDRESS</name></expr>:                     <comment type="block" PREFIX:line="131" PREFIX:column="51">/* define cmd (arg_val = 0) or data mode (arg_val = 1) */</comment>
+      <expr_stmt><expr><name><name PREFIX:line="132" PREFIX:column="7">u8g</name>-&gt;<name PREFIX:line="132" PREFIX:column="12">pin_list</name><index PREFIX:line="132" PREFIX:column="20">[<expr><name PREFIX:line="132" PREFIX:column="21">U8G_PI_A0_STATE</name></expr>]</index></name> = <name PREFIX:line="132" PREFIX:column="40">arg_val</name></expr>;</expr_stmt>
+      <expr_stmt><expr><name><name PREFIX:line="133" PREFIX:column="7">u8g</name>-&gt;<name PREFIX:line="133" PREFIX:column="12">pin_list</name><index PREFIX:line="133" PREFIX:column="20">[<expr><name PREFIX:line="133" PREFIX:column="21">U8G_PI_SET_A0</name></expr>]</index></name> = 1</expr>;</expr_stmt>		<comment type="block" PREFIX:line="133" PREFIX:column="49">/* force a0 to set again */</comment>
+    
+<cpp:ifdef PREFIX:line="135" PREFIX:column="1">#<cpp:directive PREFIX:line="135" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="135" PREFIX:column="8">OLD_CODE</name></cpp:ifdef>    
+      <if PREFIX:line="136" PREFIX:column="7">if <condition PREFIX:line="136" PREFIX:column="10">( <expr><name PREFIX:line="136" PREFIX:column="12">i2c_state</name> != 0</expr> )</condition><then PREFIX:line="136" PREFIX:column="28">
+      <block PREFIX:line="137" PREFIX:column="7">{
+	<expr_stmt><expr><call><name PREFIX:line="138" PREFIX:column="9">u8g_i2c_stop</name><argument_list PREFIX:line="138" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="139" PREFIX:column="9">i2c_state</name> = 0</expr>;</expr_stmt>
+      }</block></then></if>
+
+      <if PREFIX:line="142" PREFIX:column="7">if <condition PREFIX:line="142" PREFIX:column="10">( <expr><call><name PREFIX:line="142" PREFIX:column="12">u8g_com_raspberrypi_ssd_start_sequence</name><argument_list PREFIX:line="142" PREFIX:column="50">(<argument><expr><name PREFIX:line="142" PREFIX:column="51">arg_val</name></expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="142" PREFIX:column="66">
+	<return PREFIX:line="143" PREFIX:column="9">return <expr PREFIX:line="143" PREFIX:column="16">0</expr>;</return></then></if>
+    
+      <comment type="block" PREFIX:line="145" PREFIX:column="7">/* setup bus, might be a repeated start */</comment>
+      <comment type="block" PREFIX:line="146" PREFIX:column="7">/*
+      if ( u8g_i2c_start(I2C_SLA) == 0 )
+	return 0;
+      if ( arg_val == 0 )
+      {
+	i2c_state = 1;
+	
+	if ( u8g_i2c_send_byte(I2C_CMD_MODE) == 0 )
+	  return 0;
+      }
+      else
+      {
+	i2c_state = 2;
+	if ( u8g_i2c_send_byte(I2C_DATA_MODE) == 0 )
+	  return 0;
+      }
+      */</comment>
+<cpp:endif PREFIX:line="163" PREFIX:column="1">#<cpp:directive PREFIX:line="163" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+      <break PREFIX:line="164" PREFIX:column="7">break;</break>
+  </case>}</block></switch>
+  <return PREFIX:line="166" PREFIX:column="3">return <expr PREFIX:line="166" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<cpp:else PREFIX:line="169" PREFIX:column="1">#<cpp:directive PREFIX:line="169" PREFIX:column="2">else</cpp:directive></cpp:else>	<comment type="block" PREFIX:line="169" PREFIX:column="9">/* defined(U8G_WITH_PINLIST) */</comment>
+
+<function><type><name PREFIX:line="171" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="171" PREFIX:column="9">u8g_com_raspberrypi_ssd_i2c_fn</name><parameter_list PREFIX:line="171" PREFIX:column="39">(<param><decl><type><name PREFIX:line="171" PREFIX:column="40">u8g_t</name> *</type><name PREFIX:line="171" PREFIX:column="47">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="171" PREFIX:column="52">uint8_t</name></type> <name PREFIX:line="171" PREFIX:column="60">msg</name></decl></param>, <param><decl><type><name PREFIX:line="171" PREFIX:column="65">uint8_t</name></type> <name PREFIX:line="171" PREFIX:column="73">arg_val</name></decl></param>, <param><decl><type><name PREFIX:line="171" PREFIX:column="82">void</name> *</type><name PREFIX:line="171" PREFIX:column="88">arg_ptr</name></decl></param>)</parameter_list> <block PREFIX:line="171" PREFIX:column="97">{
+   <return PREFIX:line="172" PREFIX:column="4">return <expr PREFIX:line="172" PREFIX:column="11">1</expr>;</return>
+}</block></function>
+
+<cpp:endif PREFIX:line="175" PREFIX:column="1">#<cpp:directive PREFIX:line="175" PREFIX:column="2">endif</cpp:directive></cpp:endif>	<comment type="block" PREFIX:line="175" PREFIX:column="9">/* defined(U8G_WITH_PINLIST) */</comment>
+<cpp:endif PREFIX:line="176" PREFIX:column="1">#<cpp:directive PREFIX:line="176" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+</unit>

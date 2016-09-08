@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/Wire/utility/twi.h.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  twi.h - TWI/I2C library for Wiring &amp; Arduino
+  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/</comment>
+
+<cpp:ifndef PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">ifndef</cpp:directive> <name PREFIX:line="20" PREFIX:column="9">twi_h</name></cpp:ifndef>
+<cpp:define PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="21" PREFIX:column="9">twi_h</name></cpp:macro></cpp:define>
+
+  <cpp:include PREFIX:line="23" PREFIX:column="3">#<cpp:directive PREFIX:line="23" PREFIX:column="4">include</cpp:directive> <cpp:file PREFIX:line="23" PREFIX:column="12">&lt;inttypes.h&gt;</cpp:file></cpp:include>
+
+  <comment type="line" PREFIX:line="25" PREFIX:column="3">//#define ATMEGA8</comment>
+
+  <cpp:ifndef PREFIX:line="27" PREFIX:column="3">#<cpp:directive PREFIX:line="27" PREFIX:column="4">ifndef</cpp:directive> <name PREFIX:line="27" PREFIX:column="11">TWI_FREQ</name></cpp:ifndef>
+  <cpp:define PREFIX:line="28" PREFIX:column="3">#<cpp:directive PREFIX:line="28" PREFIX:column="4">define</cpp:directive> <cpp:macro><name PREFIX:line="28" PREFIX:column="11">TWI_FREQ</name></cpp:macro> <cpp:value PREFIX:line="28" PREFIX:column="20">100000L</cpp:value></cpp:define>
+  <cpp:endif PREFIX:line="29" PREFIX:column="3">#<cpp:directive PREFIX:line="29" PREFIX:column="4">endif</cpp:directive></cpp:endif>
+
+  <cpp:ifndef PREFIX:line="31" PREFIX:column="3">#<cpp:directive PREFIX:line="31" PREFIX:column="4">ifndef</cpp:directive> <name PREFIX:line="31" PREFIX:column="11">TWI_BUFFER_LENGTH</name></cpp:ifndef>
+  <cpp:define PREFIX:line="32" PREFIX:column="3">#<cpp:directive PREFIX:line="32" PREFIX:column="4">define</cpp:directive> <cpp:macro><name PREFIX:line="32" PREFIX:column="11">TWI_BUFFER_LENGTH</name></cpp:macro> <cpp:value PREFIX:line="32" PREFIX:column="29">32</cpp:value></cpp:define>
+  <cpp:endif PREFIX:line="33" PREFIX:column="3">#<cpp:directive PREFIX:line="33" PREFIX:column="4">endif</cpp:directive></cpp:endif>
+
+  <cpp:define PREFIX:line="35" PREFIX:column="3">#<cpp:directive PREFIX:line="35" PREFIX:column="4">define</cpp:directive> <cpp:macro><name PREFIX:line="35" PREFIX:column="11">TWI_READY</name></cpp:macro> <cpp:value PREFIX:line="35" PREFIX:column="21">0</cpp:value></cpp:define>
+  <cpp:define PREFIX:line="36" PREFIX:column="3">#<cpp:directive PREFIX:line="36" PREFIX:column="4">define</cpp:directive> <cpp:macro><name PREFIX:line="36" PREFIX:column="11">TWI_MRX</name></cpp:macro>   <cpp:value PREFIX:line="36" PREFIX:column="21">1</cpp:value></cpp:define>
+  <cpp:define PREFIX:line="37" PREFIX:column="3">#<cpp:directive PREFIX:line="37" PREFIX:column="4">define</cpp:directive> <cpp:macro><name PREFIX:line="37" PREFIX:column="11">TWI_MTX</name></cpp:macro>   <cpp:value PREFIX:line="37" PREFIX:column="21">2</cpp:value></cpp:define>
+  <cpp:define PREFIX:line="38" PREFIX:column="3">#<cpp:directive PREFIX:line="38" PREFIX:column="4">define</cpp:directive> <cpp:macro><name PREFIX:line="38" PREFIX:column="11">TWI_SRX</name></cpp:macro>   <cpp:value PREFIX:line="38" PREFIX:column="21">3</cpp:value></cpp:define>
+  <cpp:define PREFIX:line="39" PREFIX:column="3">#<cpp:directive PREFIX:line="39" PREFIX:column="4">define</cpp:directive> <cpp:macro><name PREFIX:line="39" PREFIX:column="11">TWI_STX</name></cpp:macro>   <cpp:value PREFIX:line="39" PREFIX:column="21">4</cpp:value></cpp:define>
+  
+  <function_decl><type><name PREFIX:line="41" PREFIX:column="3">void</name></type> <name PREFIX:line="41" PREFIX:column="8">twi_init</name><parameter_list PREFIX:line="41" PREFIX:column="16">(<param><decl><type><name PREFIX:line="41" PREFIX:column="17">void</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="42" PREFIX:column="3">void</name></type> <name PREFIX:line="42" PREFIX:column="8">twi_setAddress</name><parameter_list PREFIX:line="42" PREFIX:column="22">(<param><decl><type><name PREFIX:line="42" PREFIX:column="23">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="43" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="43" PREFIX:column="11">twi_readFrom</name><parameter_list PREFIX:line="43" PREFIX:column="23">(<param><decl><type><name PREFIX:line="43" PREFIX:column="24">uint8_t</name></type></decl></param>, <param><decl><type><name PREFIX:line="43" PREFIX:column="33">uint8_t</name>*</type></decl></param>, <param><decl><type><name PREFIX:line="43" PREFIX:column="43">uint8_t</name></type></decl></param>, <param><decl><type><name PREFIX:line="43" PREFIX:column="52">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="44" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="44" PREFIX:column="11">twi_writeTo</name><parameter_list PREFIX:line="44" PREFIX:column="22">(<param><decl><type><name PREFIX:line="44" PREFIX:column="23">uint8_t</name></type></decl></param>, <param><decl><type><name PREFIX:line="44" PREFIX:column="32">uint8_t</name>*</type></decl></param>, <param><decl><type><name PREFIX:line="44" PREFIX:column="42">uint8_t</name></type></decl></param>, <param><decl><type><name PREFIX:line="44" PREFIX:column="51">uint8_t</name></type></decl></param>, <param><decl><type><name PREFIX:line="44" PREFIX:column="60">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="45" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="45" PREFIX:column="11">twi_transmit</name><parameter_list PREFIX:line="45" PREFIX:column="23">( <param><decl><type><name PREFIX:line="45" PREFIX:column="25">uint8_t</name>*</type></decl></param>, <param><decl><type><name PREFIX:line="45" PREFIX:column="35">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="46" PREFIX:column="3">void</name></type> <name PREFIX:line="46" PREFIX:column="8">twi_attachSlaveRxEvent</name><parameter_list PREFIX:line="46" PREFIX:column="30">( <param><function_decl><type><name PREFIX:line="46" PREFIX:column="32">void</name></type> (*)<parameter_list PREFIX:line="46" PREFIX:column="40">(<param><decl><type><name PREFIX:line="46" PREFIX:column="41">uint8_t</name>*</type></decl></param>, <param><decl><type><name PREFIX:line="46" PREFIX:column="51">int</name></type></decl></param>)</parameter_list></function_decl></param> )</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="47" PREFIX:column="3">void</name></type> <name PREFIX:line="47" PREFIX:column="8">twi_attachSlaveTxEvent</name><parameter_list PREFIX:line="47" PREFIX:column="30">( <param><function_decl><type><name PREFIX:line="47" PREFIX:column="32">void</name></type> (*)<parameter_list PREFIX:line="47" PREFIX:column="40">(<param><decl><type><name PREFIX:line="47" PREFIX:column="41">void</name></type></decl></param>)</parameter_list></function_decl></param> )</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="48" PREFIX:column="3">void</name></type> <name PREFIX:line="48" PREFIX:column="8">twi_reply</name><parameter_list PREFIX:line="48" PREFIX:column="17">(<param><decl><type><name PREFIX:line="48" PREFIX:column="18">uint8_t</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="49" PREFIX:column="3">void</name></type> <name PREFIX:line="49" PREFIX:column="8">twi_stop</name><parameter_list PREFIX:line="49" PREFIX:column="16">(<param><decl><type><name PREFIX:line="49" PREFIX:column="17">void</name></type></decl></param>)</parameter_list>;</function_decl>
+  <function_decl><type><name PREFIX:line="50" PREFIX:column="3">void</name></type> <name PREFIX:line="50" PREFIX:column="8">twi_releaseBus</name><parameter_list PREFIX:line="50" PREFIX:column="22">(<param><decl><type><name PREFIX:line="50" PREFIX:column="23">void</name></type></decl></param>)</parameter_list>;</function_decl>
+
+<cpp:endif PREFIX:line="52" PREFIX:column="1">#<cpp:directive PREFIX:line="52" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+</unit>

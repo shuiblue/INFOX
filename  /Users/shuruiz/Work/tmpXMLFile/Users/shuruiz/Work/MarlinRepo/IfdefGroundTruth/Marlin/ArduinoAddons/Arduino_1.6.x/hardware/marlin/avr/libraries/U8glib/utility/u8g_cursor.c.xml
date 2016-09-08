@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/libraries/U8glib/utility/u8g_cursor.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_cursor.c
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  
+*/</comment>
+
+<cpp:include PREFIX:line="37" PREFIX:column="1">#<cpp:directive PREFIX:line="37" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="37" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<function><type><name PREFIX:line="39" PREFIX:column="1">void</name></type> <name PREFIX:line="39" PREFIX:column="6">u8g_SetCursorFont</name><parameter_list PREFIX:line="39" PREFIX:column="23">(<param><decl><type><name PREFIX:line="39" PREFIX:column="24">u8g_t</name> *</type><name PREFIX:line="39" PREFIX:column="31">u8g</name></decl></param>,  <param><decl><type><name PREFIX:line="39" PREFIX:column="37">u8g_pgm_uint8_t</name> *</type><name PREFIX:line="39" PREFIX:column="54">cursor_font</name></decl></param>)</parameter_list>
+<block PREFIX:line="40" PREFIX:column="1">{
+  <expr_stmt><expr><name><name PREFIX:line="41" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="41" PREFIX:column="8">cursor_font</name></name> = <name PREFIX:line="41" PREFIX:column="22">cursor_font</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="44" PREFIX:column="1">void</name></type> <name PREFIX:line="44" PREFIX:column="6">u8g_SetCursorStyle</name><parameter_list PREFIX:line="44" PREFIX:column="24">(<param><decl><type><name PREFIX:line="44" PREFIX:column="25">u8g_t</name> *</type><name PREFIX:line="44" PREFIX:column="32">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="44" PREFIX:column="37">uint8_t</name></type> <name PREFIX:line="44" PREFIX:column="45">encoding</name></decl></param>)</parameter_list>
+<block PREFIX:line="45" PREFIX:column="1">{
+  <expr_stmt><expr><name><name PREFIX:line="46" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="46" PREFIX:column="8">cursor_encoding</name></name> = <name PREFIX:line="46" PREFIX:column="26">encoding</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="49" PREFIX:column="1">void</name></type> <name PREFIX:line="49" PREFIX:column="6">u8g_SetCursorColor</name><parameter_list PREFIX:line="49" PREFIX:column="24">(<param><decl><type><name PREFIX:line="49" PREFIX:column="25">u8g_t</name> *</type><name PREFIX:line="49" PREFIX:column="32">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="49" PREFIX:column="37">uint8_t</name></type> <name PREFIX:line="49" PREFIX:column="45">fg</name></decl></param>, <param><decl><type><name PREFIX:line="49" PREFIX:column="49">uint8_t</name></type> <name PREFIX:line="49" PREFIX:column="57">bg</name></decl></param>)</parameter_list>
+<block PREFIX:line="50" PREFIX:column="1">{
+  <expr_stmt><expr><name><name PREFIX:line="51" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="51" PREFIX:column="8">cursor_bg_color</name></name> = <name PREFIX:line="51" PREFIX:column="26">bg</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="52" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="52" PREFIX:column="8">cursor_fg_color</name></name> = <name PREFIX:line="52" PREFIX:column="26">fg</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="55" PREFIX:column="1">void</name></type> <name PREFIX:line="55" PREFIX:column="6">u8g_SetCursorPos</name><parameter_list PREFIX:line="55" PREFIX:column="22">(<param><decl><type><name PREFIX:line="55" PREFIX:column="23">u8g_t</name> *</type><name PREFIX:line="55" PREFIX:column="30">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="55" PREFIX:column="35">u8g_uint_t</name></type> <name PREFIX:line="55" PREFIX:column="46">cursor_x</name></decl></param>, <param><decl><type><name PREFIX:line="55" PREFIX:column="56">u8g_uint_t</name></type> <name PREFIX:line="55" PREFIX:column="67">cursor_y</name></decl></param>)</parameter_list>
+<block PREFIX:line="56" PREFIX:column="1">{
+  <expr_stmt><expr><name><name PREFIX:line="57" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="57" PREFIX:column="8">cursor_x</name></name> = <name PREFIX:line="57" PREFIX:column="19">cursor_x</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="58" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="58" PREFIX:column="8">cursor_y</name></name> = <name PREFIX:line="58" PREFIX:column="19">cursor_y</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="61" PREFIX:column="1">void</name></type> <name PREFIX:line="61" PREFIX:column="6">u8g_EnableCursor</name><parameter_list PREFIX:line="61" PREFIX:column="22">(<param><decl><type><name PREFIX:line="61" PREFIX:column="23">u8g_t</name> *</type><name PREFIX:line="61" PREFIX:column="30">u8g</name></decl></param>)</parameter_list>
+<block PREFIX:line="62" PREFIX:column="1">{
+    <expr_stmt><expr><name><name PREFIX:line="63" PREFIX:column="5">u8g</name>-&gt;<name PREFIX:line="63" PREFIX:column="10">cursor_fn</name></name> = <name PREFIX:line="63" PREFIX:column="22">u8g_DrawCursor</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="66" PREFIX:column="1">void</name></type> <name PREFIX:line="66" PREFIX:column="6">u8g_DisableCursor</name><parameter_list PREFIX:line="66" PREFIX:column="23">(<param><decl><type><name PREFIX:line="66" PREFIX:column="24">u8g_t</name> *</type><name PREFIX:line="66" PREFIX:column="31">u8g</name></decl></param>)</parameter_list>
+<block PREFIX:line="67" PREFIX:column="1">{
+    <expr_stmt><expr><name><name PREFIX:line="68" PREFIX:column="5">u8g</name>-&gt;<name PREFIX:line="68" PREFIX:column="10">cursor_fn</name></name> = (<name PREFIX:line="68" PREFIX:column="23">u8g_draw_cursor_fn</name>)0</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="71" PREFIX:column="1">void</name></type> <name PREFIX:line="71" PREFIX:column="6">u8g_DrawCursor</name><parameter_list PREFIX:line="71" PREFIX:column="20">(<param><decl><type><name PREFIX:line="71" PREFIX:column="21">u8g_t</name> *</type><name PREFIX:line="71" PREFIX:column="28">u8g</name></decl></param>)</parameter_list>
+<block PREFIX:line="72" PREFIX:column="1">{
+   <decl_stmt><decl><type><name PREFIX:line="73" PREFIX:column="4">u8g_pgm_uint8_t</name> *</type><name PREFIX:line="73" PREFIX:column="21">font</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="74" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="74" PREFIX:column="11">color</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="75" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="75" PREFIX:column="11">encoding</name> <init PREFIX:line="75" PREFIX:column="20">= <expr><name><name PREFIX:line="75" PREFIX:column="22">u8g</name>-&gt;<name PREFIX:line="75" PREFIX:column="27">cursor_encoding</name></name></expr></init></decl>;</decl_stmt>
+  
+  <comment type="block" PREFIX:line="77" PREFIX:column="3">/* get current values */</comment>
+  <expr_stmt><expr><name PREFIX:line="78" PREFIX:column="3">color</name> = <call><name PREFIX:line="78" PREFIX:column="11">u8g_GetColorIndex</name><argument_list PREFIX:line="78" PREFIX:column="28">(<argument><expr><name PREFIX:line="78" PREFIX:column="29">u8g</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="79" PREFIX:column="3">font</name> = <name><name PREFIX:line="79" PREFIX:column="10">u8g</name>-&gt;<name PREFIX:line="79" PREFIX:column="15">font</name></name></expr>;</expr_stmt>
+  
+  <comment type="block" PREFIX:line="81" PREFIX:column="3">/* draw cursor */</comment>
+  <expr_stmt><expr><name><name PREFIX:line="82" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="82" PREFIX:column="8">font</name></name> = <name><name PREFIX:line="82" PREFIX:column="15">u8g</name>-&gt;<name PREFIX:line="82" PREFIX:column="20">cursor_font</name></name></expr>;</expr_stmt>  
+  <expr_stmt><expr><name PREFIX:line="83" PREFIX:column="3">encoding</name>++</expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="84" PREFIX:column="3">u8g_SetColorIndex</name><argument_list PREFIX:line="84" PREFIX:column="20">(<argument><expr><name PREFIX:line="84" PREFIX:column="21">u8g</name></expr></argument>, <argument><expr><name><name PREFIX:line="84" PREFIX:column="26">u8g</name>-&gt;<name PREFIX:line="84" PREFIX:column="31">cursor_bg_color</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt> 
+  <comment type="block" PREFIX:line="85" PREFIX:column="3">/* 27. Jan 2013: replaced call to u8g_DrawGlyph with call to u8g_draw_glyph */</comment>
+  <comment type="block" PREFIX:line="86" PREFIX:column="3">/* required, because y adjustment should not happen to the cursor fonts */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="87" PREFIX:column="3">u8g_draw_glyph</name><argument_list PREFIX:line="87" PREFIX:column="17">(<argument><expr><name PREFIX:line="87" PREFIX:column="18">u8g</name></expr></argument>, <argument><expr><name><name PREFIX:line="87" PREFIX:column="23">u8g</name>-&gt;<name PREFIX:line="87" PREFIX:column="28">cursor_x</name></name></expr></argument>, <argument><expr><name><name PREFIX:line="87" PREFIX:column="38">u8g</name>-&gt;<name PREFIX:line="87" PREFIX:column="43">cursor_y</name></name></expr></argument>, <argument><expr><name PREFIX:line="87" PREFIX:column="53">encoding</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="88" PREFIX:column="3">encoding</name>--</expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="89" PREFIX:column="3">u8g_SetColorIndex</name><argument_list PREFIX:line="89" PREFIX:column="20">(<argument><expr><name PREFIX:line="89" PREFIX:column="21">u8g</name></expr></argument>, <argument><expr><name><name PREFIX:line="89" PREFIX:column="26">u8g</name>-&gt;<name PREFIX:line="89" PREFIX:column="31">cursor_fg_color</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt> 
+  <comment type="block" PREFIX:line="90" PREFIX:column="3">/* 27. Jan 2013: replaced call to u8g_DrawGlyph with call to u8g_draw_glyph */</comment>
+  <comment type="block" PREFIX:line="91" PREFIX:column="3">/* required, because y adjustment should not happen to the cursor fonts */</comment>
+  <comment type="block" PREFIX:line="92" PREFIX:column="3">/* u8g_DrawGlyph(u8g, u8g-&gt;cursor_x, u8g-&gt;cursor_y, encoding); */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="93" PREFIX:column="3">u8g_draw_glyph</name><argument_list PREFIX:line="93" PREFIX:column="17">(<argument><expr><name PREFIX:line="93" PREFIX:column="18">u8g</name></expr></argument>, <argument><expr><name><name PREFIX:line="93" PREFIX:column="23">u8g</name>-&gt;<name PREFIX:line="93" PREFIX:column="28">cursor_x</name></name></expr></argument>, <argument><expr><name><name PREFIX:line="93" PREFIX:column="38">u8g</name>-&gt;<name PREFIX:line="93" PREFIX:column="43">cursor_y</name></name></expr></argument>, <argument><expr><name PREFIX:line="93" PREFIX:column="53">encoding</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  
+  <comment type="block" PREFIX:line="95" PREFIX:column="3">/* restore previous values */</comment>
+  <expr_stmt><expr><name><name PREFIX:line="96" PREFIX:column="3">u8g</name>-&gt;<name PREFIX:line="96" PREFIX:column="8">font</name></name> = <name PREFIX:line="96" PREFIX:column="15">font</name></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="97" PREFIX:column="3">u8g_SetColorIndex</name><argument_list PREFIX:line="97" PREFIX:column="20">(<argument><expr><name PREFIX:line="97" PREFIX:column="21">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="97" PREFIX:column="26">color</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> 
+}</block></function>
+
+</unit>

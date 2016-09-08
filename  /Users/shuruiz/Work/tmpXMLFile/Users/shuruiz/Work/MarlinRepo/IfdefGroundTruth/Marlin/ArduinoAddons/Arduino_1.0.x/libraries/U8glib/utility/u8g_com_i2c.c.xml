@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/libraries/U8glib/utility/u8g_com_i2c.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  
+  u8g_com_i2c.c
+
+  generic i2c interface
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+*/</comment>
+
+
+<cpp:include PREFIX:line="39" PREFIX:column="1">#<cpp:directive PREFIX:line="39" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="39" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="41" PREFIX:column="1">//#define U8G_I2C_WITH_NO_ACK</comment>
+
+<decl_stmt><decl><type><specifier PREFIX:line="43" PREFIX:column="1">static</specifier> <name PREFIX:line="43" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="43" PREFIX:column="16">u8g_i2c_err_code</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="44" PREFIX:column="1">static</specifier> <name PREFIX:line="44" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="44" PREFIX:column="16">u8g_i2c_opt</name></decl>;</decl_stmt>		<comment type="block" PREFIX:line="44" PREFIX:column="41">/* U8G_I2C_OPT_NO_ACK, SAM: U8G_I2C_OPT_DEV_1 */</comment>
+<comment type="block" PREFIX:line="45" PREFIX:column="1">/*
+  position values
+    1: start condition
+    2: sla transfer
+*/</comment>
+<decl_stmt><decl><type><specifier PREFIX:line="50" PREFIX:column="1">static</specifier> <name PREFIX:line="50" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="50" PREFIX:column="16">u8g_i2c_err_pos</name></decl>;</decl_stmt>
+
+
+<function><type><name PREFIX:line="53" PREFIX:column="1">void</name></type> <name PREFIX:line="53" PREFIX:column="6">u8g_i2c_clear_error</name><parameter_list PREFIX:line="53" PREFIX:column="25">(<param><decl><type><name PREFIX:line="53" PREFIX:column="26">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="54" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="55" PREFIX:column="3">u8g_i2c_err_code</name> = <name PREFIX:line="55" PREFIX:column="22">U8G_I2C_ERR_NONE</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="56" PREFIX:column="3">u8g_i2c_err_pos</name> = 0</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="59" PREFIX:column="1">uint8_t</name></type>  <name PREFIX:line="59" PREFIX:column="10">u8g_i2c_get_error</name><parameter_list PREFIX:line="59" PREFIX:column="27">(<param><decl><type><name PREFIX:line="59" PREFIX:column="28">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="60" PREFIX:column="1">{
+  <return PREFIX:line="61" PREFIX:column="3">return <expr><name PREFIX:line="61" PREFIX:column="10">u8g_i2c_err_code</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="64" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="64" PREFIX:column="9">u8g_i2c_get_err_pos</name><parameter_list PREFIX:line="64" PREFIX:column="28">(<param><decl><type><name PREFIX:line="64" PREFIX:column="29">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="65" PREFIX:column="1">{
+  <return PREFIX:line="66" PREFIX:column="3">return <expr><name PREFIX:line="66" PREFIX:column="10">u8g_i2c_err_pos</name></expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="69" PREFIX:column="1">static</specifier> <name PREFIX:line="69" PREFIX:column="8">void</name></type> <name PREFIX:line="69" PREFIX:column="13">u8g_i2c_set_error</name><parameter_list PREFIX:line="69" PREFIX:column="30">(<param><decl><type><name PREFIX:line="69" PREFIX:column="31">uint8_t</name></type> <name PREFIX:line="69" PREFIX:column="39">code</name></decl></param>, <param><decl><type><name PREFIX:line="69" PREFIX:column="45">uint8_t</name></type> <name PREFIX:line="69" PREFIX:column="53">pos</name></decl></param>)</parameter_list>
+<block PREFIX:line="70" PREFIX:column="1">{
+  <if PREFIX:line="71" PREFIX:column="3">if <condition PREFIX:line="71" PREFIX:column="6">( <expr><name PREFIX:line="71" PREFIX:column="8">u8g_i2c_err_code</name> &gt; 0</expr> )</condition><then PREFIX:line="71" PREFIX:column="30">
+    <return PREFIX:line="72" PREFIX:column="5">return;</return></then></if>
+  <expr_stmt><expr><name PREFIX:line="73" PREFIX:column="3">u8g_i2c_err_code</name> |= <name PREFIX:line="73" PREFIX:column="23">code</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="74" PREFIX:column="3">u8g_i2c_err_pos</name> = <name PREFIX:line="74" PREFIX:column="21">pos</name></expr>;</expr_stmt>
+}</block></function>
+
+
+
+<cpp:if PREFIX:line="79" PREFIX:column="1">#<cpp:directive PREFIX:line="79" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="79" PREFIX:column="5">defined</name><argument_list PREFIX:line="79" PREFIX:column="12">(<argument><expr><name PREFIX:line="79" PREFIX:column="13">__AVR__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<cpp:define PREFIX:line="80" PREFIX:column="1">#<cpp:directive PREFIX:line="80" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="80" PREFIX:column="9">U8G_ATMEGA_HW_TWI</name></cpp:macro></cpp:define>
+
+<comment type="block" PREFIX:line="82" PREFIX:column="1">/* remove the definition for attiny */</comment>
+<cpp:if PREFIX:line="83" PREFIX:column="1">#<cpp:directive PREFIX:line="83" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="83" PREFIX:column="5">__AVR_ARCH__</name> == 2</expr></cpp:if>
+<cpp:undef PREFIX:line="84" PREFIX:column="1">#<cpp:directive PREFIX:line="84" PREFIX:column="2">undef</cpp:directive> <name PREFIX:line="84" PREFIX:column="8">U8G_ATMEGA_HW_TWI</name></cpp:undef>
+<cpp:endif PREFIX:line="85" PREFIX:column="1">#<cpp:directive PREFIX:line="85" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="86" PREFIX:column="1">#<cpp:directive PREFIX:line="86" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="86" PREFIX:column="5">__AVR_ARCH__</name> == 25</expr></cpp:if>
+<cpp:undef PREFIX:line="87" PREFIX:column="1">#<cpp:directive PREFIX:line="87" PREFIX:column="2">undef</cpp:directive> <name PREFIX:line="87" PREFIX:column="8">U8G_ATMEGA_HW_TWI</name></cpp:undef>
+<cpp:endif PREFIX:line="88" PREFIX:column="1">#<cpp:directive PREFIX:line="88" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:endif PREFIX:line="89" PREFIX:column="1">#<cpp:directive PREFIX:line="89" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="91" PREFIX:column="1">#<cpp:directive PREFIX:line="91" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="91" PREFIX:column="5">defined</name><argument_list PREFIX:line="91" PREFIX:column="12">(<argument><expr><name PREFIX:line="91" PREFIX:column="13">U8G_ATMEGA_HW_TWI</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<cpp:include PREFIX:line="93" PREFIX:column="1">#<cpp:directive PREFIX:line="93" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="93" PREFIX:column="10">&lt;avr/io.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="94" PREFIX:column="1">#<cpp:directive PREFIX:line="94" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="94" PREFIX:column="10">&lt;util/twi.h&gt;</cpp:file></cpp:include>
+
+
+
+<function><type><name PREFIX:line="98" PREFIX:column="1">void</name></type> <name PREFIX:line="98" PREFIX:column="6">u8g_i2c_init</name><parameter_list PREFIX:line="98" PREFIX:column="18">(<param><decl><type><name PREFIX:line="98" PREFIX:column="19">uint8_t</name></type> <name PREFIX:line="98" PREFIX:column="27">options</name></decl></param>)</parameter_list>
+<block PREFIX:line="99" PREFIX:column="1">{
+  <comment type="block" PREFIX:line="100" PREFIX:column="3">/*
+  TWBR: bit rate register
+  TWSR: status register (contains preselector bits)
+
+  prescalar
+    0		1
+    1		4
+    2		16
+    3		64
+
+  f = F_CPU/(16+2*TWBR*prescalar)
+  
+  F_CPU = 16MHz
+    TWBR = 152;
+    TWSR = 0;
+	--&gt; 50KHz
+
+    TWBR = 72;
+    TWSR = 0;
+	--&gt; 100KHz
+
+    TWBR = 12;
+    TWSR = 0;
+	--&gt; 400KHz
+
+    F_CPU/(2*100000)-8  --&gt; calculate TWBR value for 100KHz
+*/</comment>
+  <expr_stmt><expr><name PREFIX:line="127" PREFIX:column="3">u8g_i2c_opt</name> = <name PREFIX:line="127" PREFIX:column="17">options</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="128" PREFIX:column="3">TWSR</name> = 0</expr>;</expr_stmt>
+  <if PREFIX:line="129" PREFIX:column="3">if <condition PREFIX:line="129" PREFIX:column="6">( <expr><name PREFIX:line="129" PREFIX:column="8">options</name> &amp; <name PREFIX:line="129" PREFIX:column="18">U8G_I2C_OPT_FAST</name></expr> )</condition><then PREFIX:line="129" PREFIX:column="36">
+  <block PREFIX:line="130" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="131" PREFIX:column="5">TWBR</name> = <name PREFIX:line="131" PREFIX:column="12">F_CPU</name>/(2*400000)-8</expr>;</expr_stmt>
+  }</block></then>
+  <else PREFIX:line="133" PREFIX:column="3">else
+  <block PREFIX:line="134" PREFIX:column="3">{  
+    <expr_stmt><expr><name PREFIX:line="135" PREFIX:column="5">TWBR</name> = <name PREFIX:line="135" PREFIX:column="12">F_CPU</name>/(2*100000)-8</expr>;</expr_stmt>
+  }</block></else></if>
+  <expr_stmt><expr><call><name PREFIX:line="137" PREFIX:column="3">u8g_i2c_clear_error</name><argument_list PREFIX:line="137" PREFIX:column="22">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="140" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="140" PREFIX:column="9">u8g_i2c_wait</name><parameter_list PREFIX:line="140" PREFIX:column="21">(<param><decl><type><name PREFIX:line="140" PREFIX:column="22">uint8_t</name></type> <name PREFIX:line="140" PREFIX:column="30">mask</name></decl></param>, <param><decl><type><name PREFIX:line="140" PREFIX:column="36">uint8_t</name></type> <name PREFIX:line="140" PREFIX:column="44">pos</name></decl></param>)</parameter_list>
+<block PREFIX:line="141" PREFIX:column="1">{
+  <decl_stmt><decl><type><specifier PREFIX:line="142" PREFIX:column="3">volatile</specifier> <name PREFIX:line="142" PREFIX:column="12">uint16_t</name></type> <name PREFIX:line="142" PREFIX:column="21">cnt</name> <init PREFIX:line="142" PREFIX:column="25">= <expr PREFIX:line="142" PREFIX:column="27">2000</expr></init></decl>;</decl_stmt>	<comment type="block" PREFIX:line="142" PREFIX:column="33">/* timout value should be &gt; 280 for 50KHz Bus and 16 Mhz CPU, however the start condition might need longer */</comment>
+  <while PREFIX:line="143" PREFIX:column="3">while<condition PREFIX:line="143" PREFIX:column="8">( <expr PREFIX:line="143" PREFIX:column="10">!(<name PREFIX:line="143" PREFIX:column="12">TWCR</name> &amp; <name PREFIX:line="143" PREFIX:column="19">mask</name>)</expr> )</condition>
+  <block PREFIX:line="144" PREFIX:column="3">{
+      <if PREFIX:line="145" PREFIX:column="7">if <condition PREFIX:line="145" PREFIX:column="10">( <expr><name PREFIX:line="145" PREFIX:column="12">cnt</name> == 0</expr> )</condition><then PREFIX:line="145" PREFIX:column="22">
+      <block PREFIX:line="146" PREFIX:column="7">{
+	<if PREFIX:line="147" PREFIX:column="9">if <condition PREFIX:line="147" PREFIX:column="12">( <expr><name PREFIX:line="147" PREFIX:column="14">u8g_i2c_opt</name> &amp; <name PREFIX:line="147" PREFIX:column="28">U8G_I2C_OPT_NO_ACK</name></expr> )</condition><then PREFIX:line="147" PREFIX:column="48">
+	<block PREFIX:line="148" PREFIX:column="9">{
+	  <return PREFIX:line="149" PREFIX:column="11">return <expr PREFIX:line="149" PREFIX:column="18">1</expr>;</return>	<comment type="block" PREFIX:line="149" PREFIX:column="25">/* all ok */</comment>
+	}</block></then>
+	<else PREFIX:line="151" PREFIX:column="9">else
+	<block PREFIX:line="152" PREFIX:column="9">{
+	  <expr_stmt><expr><call><name PREFIX:line="153" PREFIX:column="11">u8g_i2c_set_error</name><argument_list PREFIX:line="153" PREFIX:column="28">(<argument><expr><name PREFIX:line="153" PREFIX:column="29">U8G_I2C_ERR_TIMEOUT</name></expr></argument>, <argument><expr><name PREFIX:line="153" PREFIX:column="50">pos</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	  <return PREFIX:line="154" PREFIX:column="11">return <expr PREFIX:line="154" PREFIX:column="18">0</expr>;</return> <comment type="block" PREFIX:line="154" PREFIX:column="21">/* error */</comment>
+	}</block></else></if>
+      }</block></then></if>
+      <expr_stmt><expr><name PREFIX:line="157" PREFIX:column="7">cnt</name>--</expr>;</expr_stmt>
+    }</block></while>
+  <return PREFIX:line="159" PREFIX:column="3">return <expr PREFIX:line="159" PREFIX:column="10">1</expr>;</return>	<comment type="block" PREFIX:line="159" PREFIX:column="17">/* all ok */</comment>
+}</block></function>
+
+<comment type="block" PREFIX:line="162" PREFIX:column="1">/* sla includes all 8 bits (with r/w bit), assums master transmit */</comment>
+<function><type><name PREFIX:line="163" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="163" PREFIX:column="9">u8g_i2c_start</name><parameter_list PREFIX:line="163" PREFIX:column="22">(<param><decl><type><name PREFIX:line="163" PREFIX:column="23">uint8_t</name></type> <name PREFIX:line="163" PREFIX:column="31">sla</name></decl></param>)</parameter_list>
+<block PREFIX:line="164" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="165" PREFIX:column="3">register</name> <name PREFIX:line="165" PREFIX:column="12">uint8_t</name></type> <name PREFIX:line="165" PREFIX:column="20">status</name></decl>;</decl_stmt>
+  
+  <comment type="block" PREFIX:line="167" PREFIX:column="3">/* send start */</comment>
+  <expr_stmt><expr><name PREFIX:line="168" PREFIX:column="3">TWCR</name> = <call><name PREFIX:line="168" PREFIX:column="10">_BV</name><argument_list PREFIX:line="168" PREFIX:column="13">(<argument><expr><name PREFIX:line="168" PREFIX:column="14">TWINT</name></expr></argument>)</argument_list></call> |  <call><name PREFIX:line="168" PREFIX:column="24">_BV</name><argument_list PREFIX:line="168" PREFIX:column="27">(<argument><expr><name PREFIX:line="168" PREFIX:column="28">TWSTA</name></expr></argument>)</argument_list></call>  |  <call><name PREFIX:line="168" PREFIX:column="39">_BV</name><argument_list PREFIX:line="168" PREFIX:column="42">(<argument><expr><name PREFIX:line="168" PREFIX:column="43">TWEN</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+   
+  <comment type="block" PREFIX:line="170" PREFIX:column="3">/* wait */</comment>
+  <if PREFIX:line="171" PREFIX:column="3">if <condition PREFIX:line="171" PREFIX:column="6">( <expr><call><name PREFIX:line="171" PREFIX:column="8">u8g_i2c_wait</name><argument_list PREFIX:line="171" PREFIX:column="20">(<argument><expr><call><name PREFIX:line="171" PREFIX:column="21">_BV</name><argument_list PREFIX:line="171" PREFIX:column="24">(<argument><expr><name PREFIX:line="171" PREFIX:column="25">TWINT</name></expr></argument>)</argument_list></call></expr></argument>, <argument><expr PREFIX:line="171" PREFIX:column="33">1</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="171" PREFIX:column="42">
+    <return PREFIX:line="172" PREFIX:column="5">return <expr PREFIX:line="172" PREFIX:column="12">0</expr>;</return></then></if>
+  
+  <expr_stmt><expr><name PREFIX:line="174" PREFIX:column="3">status</name> = <name PREFIX:line="174" PREFIX:column="12">TW_STATUS</name></expr>;</expr_stmt>
+ 
+  <comment type="block" PREFIX:line="176" PREFIX:column="3">/* check status after start */</comment>  
+  <if PREFIX:line="177" PREFIX:column="3">if <condition PREFIX:line="177" PREFIX:column="6">( <expr><name PREFIX:line="177" PREFIX:column="8">status</name> != <name PREFIX:line="177" PREFIX:column="18">TW_START</name> &amp;&amp; <name PREFIX:line="177" PREFIX:column="30">status</name> != <name PREFIX:line="177" PREFIX:column="40">TW_REP_START</name></expr> )</condition><then PREFIX:line="177" PREFIX:column="54">
+  <block PREFIX:line="178" PREFIX:column="3">{
+    <expr_stmt><expr><call><name PREFIX:line="179" PREFIX:column="5">u8g_i2c_set_error</name><argument_list PREFIX:line="179" PREFIX:column="22">(<argument><expr><name PREFIX:line="179" PREFIX:column="23">U8G_I2C_ERR_BUS</name></expr></argument>, <argument><expr PREFIX:line="179" PREFIX:column="40">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    <return PREFIX:line="180" PREFIX:column="5">return <expr PREFIX:line="180" PREFIX:column="12">0</expr>;</return>
+  }</block></then></if>
+
+  <comment type="block" PREFIX:line="183" PREFIX:column="3">/* set slave address */</comment>  
+  <expr_stmt><expr><name PREFIX:line="184" PREFIX:column="3">TWDR</name> = <name PREFIX:line="184" PREFIX:column="10">sla</name></expr>;</expr_stmt>
+  
+  <comment type="block" PREFIX:line="186" PREFIX:column="3">/* enable sla transfer */</comment>
+  <expr_stmt><expr><name PREFIX:line="187" PREFIX:column="3">TWCR</name> = <call><name PREFIX:line="187" PREFIX:column="10">_BV</name><argument_list PREFIX:line="187" PREFIX:column="13">(<argument><expr><name PREFIX:line="187" PREFIX:column="14">TWINT</name></expr></argument>)</argument_list></call>  |  <call><name PREFIX:line="187" PREFIX:column="25">_BV</name><argument_list PREFIX:line="187" PREFIX:column="28">(<argument><expr><name PREFIX:line="187" PREFIX:column="29">TWEN</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <comment type="block" PREFIX:line="189" PREFIX:column="3">/* wait */</comment>
+  <if PREFIX:line="190" PREFIX:column="3">if <condition PREFIX:line="190" PREFIX:column="6">( <expr><call><name PREFIX:line="190" PREFIX:column="8">u8g_i2c_wait</name><argument_list PREFIX:line="190" PREFIX:column="20">(<argument><expr><call><name PREFIX:line="190" PREFIX:column="21">_BV</name><argument_list PREFIX:line="190" PREFIX:column="24">(<argument><expr><name PREFIX:line="190" PREFIX:column="25">TWINT</name></expr></argument>)</argument_list></call></expr></argument>, <argument><expr PREFIX:line="190" PREFIX:column="33">2</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="190" PREFIX:column="42">
+    <return PREFIX:line="191" PREFIX:column="5">return <expr PREFIX:line="191" PREFIX:column="12">0</expr>;</return></then></if>
+
+  <if PREFIX:line="193" PREFIX:column="3">if <condition PREFIX:line="193" PREFIX:column="6">( <expr><name PREFIX:line="193" PREFIX:column="8">u8g_i2c_opt</name> &amp; <name PREFIX:line="193" PREFIX:column="22">U8G_I2C_OPT_NO_ACK</name></expr> )</condition><then PREFIX:line="193" PREFIX:column="42">
+  <block PREFIX:line="194" PREFIX:column="3">{
+    <comment type="block" PREFIX:line="195" PREFIX:column="5">/* do not check for ACK */</comment>
+  }</block></then>
+  <else PREFIX:line="197" PREFIX:column="3">else
+  <block PREFIX:line="198" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="199" PREFIX:column="5">status</name> = <name PREFIX:line="199" PREFIX:column="14">TW_STATUS</name></expr>;</expr_stmt>
+    <comment type="block" PREFIX:line="200" PREFIX:column="5">/* check status after sla */</comment>  
+    <if PREFIX:line="201" PREFIX:column="5">if <condition PREFIX:line="201" PREFIX:column="8">( <expr><name PREFIX:line="201" PREFIX:column="10">status</name> != <name PREFIX:line="201" PREFIX:column="20">TW_MT_SLA_ACK</name></expr> )</condition><then PREFIX:line="201" PREFIX:column="35">
+    <block PREFIX:line="202" PREFIX:column="5">{
+      <expr_stmt><expr><call><name PREFIX:line="203" PREFIX:column="7">u8g_i2c_set_error</name><argument_list PREFIX:line="203" PREFIX:column="24">(<argument><expr><name PREFIX:line="203" PREFIX:column="25">U8G_I2C_ERR_BUS</name></expr></argument>, <argument><expr PREFIX:line="203" PREFIX:column="42">2</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <return PREFIX:line="204" PREFIX:column="7">return <expr PREFIX:line="204" PREFIX:column="14">0</expr>;</return>
+    }</block></then></if>
+  }</block></else></if>
+
+   <return PREFIX:line="208" PREFIX:column="4">return <expr PREFIX:line="208" PREFIX:column="11">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="211" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="211" PREFIX:column="9">u8g_i2c_send_byte</name><parameter_list PREFIX:line="211" PREFIX:column="26">(<param><decl><type><name PREFIX:line="211" PREFIX:column="27">uint8_t</name></type> <name PREFIX:line="211" PREFIX:column="35">data</name></decl></param>)</parameter_list>
+<block PREFIX:line="212" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="213" PREFIX:column="3">register</name> <name PREFIX:line="213" PREFIX:column="12">uint8_t</name></type> <name PREFIX:line="213" PREFIX:column="20">status</name></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="214" PREFIX:column="3">TWDR</name> = <name PREFIX:line="214" PREFIX:column="10">data</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="215" PREFIX:column="3">TWCR</name> = <call><name PREFIX:line="215" PREFIX:column="10">_BV</name><argument_list PREFIX:line="215" PREFIX:column="13">(<argument><expr><name PREFIX:line="215" PREFIX:column="14">TWINT</name></expr></argument>)</argument_list></call>  |  <call><name PREFIX:line="215" PREFIX:column="25">_BV</name><argument_list PREFIX:line="215" PREFIX:column="28">(<argument><expr><name PREFIX:line="215" PREFIX:column="29">TWEN</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <if PREFIX:line="216" PREFIX:column="3">if <condition PREFIX:line="216" PREFIX:column="6">( <expr><call><name PREFIX:line="216" PREFIX:column="8">u8g_i2c_wait</name><argument_list PREFIX:line="216" PREFIX:column="20">(<argument><expr><call><name PREFIX:line="216" PREFIX:column="21">_BV</name><argument_list PREFIX:line="216" PREFIX:column="24">(<argument><expr><name PREFIX:line="216" PREFIX:column="25">TWINT</name></expr></argument>)</argument_list></call></expr></argument>, <argument><expr PREFIX:line="216" PREFIX:column="33">3</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="216" PREFIX:column="42">
+    <return PREFIX:line="217" PREFIX:column="5">return <expr PREFIX:line="217" PREFIX:column="12">0</expr>;</return></then></if>
+    
+  <if PREFIX:line="219" PREFIX:column="3">if <condition PREFIX:line="219" PREFIX:column="6">( <expr><name PREFIX:line="219" PREFIX:column="8">u8g_i2c_opt</name> &amp; <name PREFIX:line="219" PREFIX:column="22">U8G_I2C_OPT_NO_ACK</name></expr> )</condition><then PREFIX:line="219" PREFIX:column="42">
+  <block PREFIX:line="220" PREFIX:column="3">{
+    <comment type="block" PREFIX:line="221" PREFIX:column="5">/* do not check for ACK */</comment>
+  }</block></then>
+  <else PREFIX:line="223" PREFIX:column="3">else
+  <block PREFIX:line="224" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="225" PREFIX:column="5">status</name> = <name PREFIX:line="225" PREFIX:column="14">TW_STATUS</name></expr>;</expr_stmt>  
+    <if PREFIX:line="226" PREFIX:column="5">if <condition PREFIX:line="226" PREFIX:column="8">( <expr><name PREFIX:line="226" PREFIX:column="10">status</name> != <name PREFIX:line="226" PREFIX:column="20">TW_MT_DATA_ACK</name></expr> )</condition><then PREFIX:line="226" PREFIX:column="36">
+    <block PREFIX:line="227" PREFIX:column="5">{
+      <expr_stmt><expr><call><name PREFIX:line="228" PREFIX:column="7">u8g_i2c_set_error</name><argument_list PREFIX:line="228" PREFIX:column="24">(<argument><expr><name PREFIX:line="228" PREFIX:column="25">U8G_I2C_ERR_BUS</name></expr></argument>, <argument><expr PREFIX:line="228" PREFIX:column="42">3</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <return PREFIX:line="229" PREFIX:column="7">return <expr PREFIX:line="229" PREFIX:column="14">0</expr>;</return>
+    }</block></then></if>
+  }</block></else></if>
+
+  <return PREFIX:line="233" PREFIX:column="3">return <expr PREFIX:line="233" PREFIX:column="10">1</expr>;</return>  
+}</block></function>
+
+<function><type><name PREFIX:line="236" PREFIX:column="1">void</name></type> <name PREFIX:line="236" PREFIX:column="6">u8g_i2c_stop</name><parameter_list PREFIX:line="236" PREFIX:column="18">(<param><decl><type><name PREFIX:line="236" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="237" PREFIX:column="1">{
+  <comment type="block" PREFIX:line="238" PREFIX:column="3">/* write stop */</comment>
+  <expr_stmt><expr><name PREFIX:line="239" PREFIX:column="3">TWCR</name> = <call><name PREFIX:line="239" PREFIX:column="10">_BV</name><argument_list PREFIX:line="239" PREFIX:column="13">(<argument><expr><name PREFIX:line="239" PREFIX:column="14">TWINT</name></expr></argument>)</argument_list></call> | <call><name PREFIX:line="239" PREFIX:column="23">_BV</name><argument_list PREFIX:line="239" PREFIX:column="26">(<argument><expr><name PREFIX:line="239" PREFIX:column="27">TWEN</name></expr></argument>)</argument_list></call> | <call><name PREFIX:line="239" PREFIX:column="35">_BV</name><argument_list PREFIX:line="239" PREFIX:column="38">(<argument><expr><name PREFIX:line="239" PREFIX:column="39">TWSTO</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+  <comment type="block" PREFIX:line="241" PREFIX:column="3">/* no error is checked for the stop condition */</comment>  
+  <expr_stmt><expr><call><name PREFIX:line="242" PREFIX:column="3">u8g_i2c_wait</name><argument_list PREFIX:line="242" PREFIX:column="15">(<argument><expr><call><name PREFIX:line="242" PREFIX:column="16">_BV</name><argument_list PREFIX:line="242" PREFIX:column="19">(<argument><expr><name PREFIX:line="242" PREFIX:column="20">TWSTO</name></expr></argument>)</argument_list></call></expr></argument>, <argument><expr PREFIX:line="242" PREFIX:column="28">4</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  
+}</block></function>
+
+<comment type="block" PREFIX:line="246" PREFIX:column="1">/*
+void twi_send(uint8_t adr, uint8_t data1, uint8_t data2)
+{
+  u8g_i2c_start(adr&lt;&lt;1);
+  u8g_i2c_send_byte(data1);
+  u8g_i2c_send_byte(data2);
+  u8g_i2c_stop();
+}
+*/</comment>
+
+<cpp:elif PREFIX:line="256" PREFIX:column="1">#<cpp:directive PREFIX:line="256" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="256" PREFIX:column="7">defined</name><argument_list PREFIX:line="256" PREFIX:column="14">(<argument><expr><name PREFIX:line="256" PREFIX:column="15">ARDUINO</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="256" PREFIX:column="27">defined</name><argument_list PREFIX:line="256" PREFIX:column="34">(<argument><expr><name PREFIX:line="256" PREFIX:column="35">__SAM3X8E__</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+<comment type="block" PREFIX:line="257" PREFIX:column="1">/* Arduino Due */</comment>
+<cpp:include PREFIX:line="258" PREFIX:column="1">#<cpp:directive PREFIX:line="258" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="258" PREFIX:column="10">"Arduino.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="259" PREFIX:column="1">#<cpp:directive PREFIX:line="259" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="259" PREFIX:column="10">"sam.h"</cpp:file></cpp:include>
+
+<comment type="block" PREFIX:line="261" PREFIX:column="1">/*
+
+Controller
+
+TWI0 TWCK0 PA18 A			DUE PCB: SCL1
+TWI0 TWD0 PA17 A			DUE PCB: SDA1 
+TWI1 TWCK1 PB13 A			DUE PCB: SCL 21
+TWI1 TWD1 PB12 A			DUE PCB: SDA 20
+
+Arduino definitions
+
+#define PIN_WIRE_SDA         (20u)
+#define PIN_WIRE_SCL         (21u)
+#define WIRE_INTERFACE       TWI1
+#define WIRE_INTERFACE_ID    ID_TWI1
+#define WIRE_ISR_HANDLER     TWI1_Handler
+
+#define PIN_WIRE1_SDA        (70u)
+#define PIN_WIRE1_SCL        (71u)
+#define WIRE1_INTERFACE      TWI0
+#define WIRE1_INTERFACE_ID   ID_TWI0
+#define WIRE1_ISR_HANDLER    TWI0_Handler
+
+
+*/</comment>
+
+<function><type><specifier PREFIX:line="287" PREFIX:column="1">static</specifier> <name PREFIX:line="287" PREFIX:column="8">void</name></type> <name PREFIX:line="287" PREFIX:column="13">i2c_400KHz_delay</name><parameter_list PREFIX:line="287" PREFIX:column="29">(<param><decl><type><name PREFIX:line="287" PREFIX:column="30">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="288" PREFIX:column="1">{
+  <comment type="block" PREFIX:line="289" PREFIX:column="3">/* should be at least 4 */</comment>
+  <comment type="block" PREFIX:line="290" PREFIX:column="3">/* should be 5 for 100KHz transfer speed */</comment>
+ 
+  
+  <comment type="block" PREFIX:line="293" PREFIX:column="3">/*
+    Arduino Due
+    0x NOP: 470KHz
+    4x NOP: 450KHz
+    8x NOP: 430KHz
+    16x NOP: 400KHz
+  */</comment>
+  
+  <expr_stmt><expr><call><name PREFIX:line="301" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="301" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="302" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="302" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="303" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="303" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="304" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="304" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  
+  <expr_stmt><expr><call><name PREFIX:line="306" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="306" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="307" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="307" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="308" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="308" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="309" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="309" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+
+  <expr_stmt><expr><call><name PREFIX:line="311" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="311" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="312" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="312" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="313" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="313" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="314" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="314" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+
+  <expr_stmt><expr><call><name PREFIX:line="316" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="316" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="317" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="317" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="318" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="318" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="319" PREFIX:column="3">__NOP</name><argument_list PREFIX:line="319" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="322" PREFIX:column="1">static</specifier> <name PREFIX:line="322" PREFIX:column="8">void</name></type> <name PREFIX:line="322" PREFIX:column="13">i2c_100KHz_delay</name><parameter_list PREFIX:line="322" PREFIX:column="29">(<param><decl><type><name PREFIX:line="322" PREFIX:column="30">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="323" PREFIX:column="1">{
+  <comment type="block" PREFIX:line="324" PREFIX:column="3">/* 
+    1x u8g_MicroDelay()	ca. 130KHz
+    2x u8g_MicroDelay()	ca. 80KHz 
+  */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="328" PREFIX:column="3">u8g_MicroDelay</name><argument_list PREFIX:line="328" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="329" PREFIX:column="3">u8g_MicroDelay</name><argument_list PREFIX:line="329" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>  
+}</block></function>
+
+
+<decl_stmt><decl><type><name PREFIX:line="333" PREFIX:column="1">uint32_t</name></type> <name PREFIX:line="333" PREFIX:column="10">i2c_started</name> <init PREFIX:line="333" PREFIX:column="22">= <expr PREFIX:line="333" PREFIX:column="24">0</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="334" PREFIX:column="1">uint32_t</name></type> <name PREFIX:line="334" PREFIX:column="10">i2c_scl_pin</name> <init PREFIX:line="334" PREFIX:column="22">= <expr PREFIX:line="334" PREFIX:column="24">0</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="335" PREFIX:column="1">uint32_t</name></type> <name PREFIX:line="335" PREFIX:column="10">i2c_sda_pin</name> <init PREFIX:line="335" PREFIX:column="22">= <expr PREFIX:line="335" PREFIX:column="24">0</expr></init></decl>;</decl_stmt>
+<expr_stmt><expr><call><call><name PREFIX:line="336" PREFIX:column="1">void</name> <argument_list PREFIX:line="336" PREFIX:column="6">(<argument><expr PREFIX:line="336" PREFIX:column="7">*<name PREFIX:line="336" PREFIX:column="8">i2c_delay</name></expr></argument>)</argument_list></call><argument_list PREFIX:line="336" PREFIX:column="18">(<argument><expr><name PREFIX:line="336" PREFIX:column="19">void</name></expr></argument>)</argument_list></call> = <name PREFIX:line="336" PREFIX:column="27">i2c_100KHz_delay</name></expr>;</expr_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="338" PREFIX:column="2">PinDescription</name> *</type><name PREFIX:line="338" PREFIX:column="18">i2c_scl_pin_desc</name></decl>;</decl_stmt>
+ <decl_stmt><decl><type><name PREFIX:line="339" PREFIX:column="2">PinDescription</name> *</type><name PREFIX:line="339" PREFIX:column="18">i2c_sda_pin_desc</name></decl>;</decl_stmt>
+
+
+<comment type="block" PREFIX:line="342" PREFIX:column="1">/* maybe this can be optimized */</comment>
+<function><type><specifier PREFIX:line="343" PREFIX:column="1">static</specifier> <name PREFIX:line="343" PREFIX:column="8">void</name></type> <name PREFIX:line="343" PREFIX:column="13">i2c_init</name><parameter_list PREFIX:line="343" PREFIX:column="21">(<param><decl><type><name PREFIX:line="343" PREFIX:column="22">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="344" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="345" PREFIX:column="3">i2c_sda_pin_desc</name> = &amp;(<name><name PREFIX:line="345" PREFIX:column="24">g_APinDescription</name><index PREFIX:line="345" PREFIX:column="41">[<expr><name PREFIX:line="345" PREFIX:column="42">i2c_sda_pin</name></expr>]</index></name>)</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="346" PREFIX:column="3">i2c_scl_pin_desc</name> = &amp;(<name><name PREFIX:line="346" PREFIX:column="24">g_APinDescription</name><index PREFIX:line="346" PREFIX:column="41">[<expr><name PREFIX:line="346" PREFIX:column="42">i2c_scl_pin</name></expr>]</index></name>)</expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="347" PREFIX:column="3">pinMode</name><argument_list PREFIX:line="347" PREFIX:column="10">(<argument><expr><name PREFIX:line="347" PREFIX:column="11">i2c_sda_pin</name></expr></argument>, <argument><expr><name PREFIX:line="347" PREFIX:column="24">OUTPUT</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="348" PREFIX:column="3">digitalWrite</name><argument_list PREFIX:line="348" PREFIX:column="15">(<argument><expr><name PREFIX:line="348" PREFIX:column="16">i2c_sda_pin</name></expr></argument>, <argument><expr><name PREFIX:line="348" PREFIX:column="29">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="349" PREFIX:column="3">pinMode</name><argument_list PREFIX:line="349" PREFIX:column="10">(<argument><expr><name PREFIX:line="349" PREFIX:column="11">i2c_scl_pin</name></expr></argument>, <argument><expr><name PREFIX:line="349" PREFIX:column="24">OUTPUT</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="350" PREFIX:column="3">digitalWrite</name><argument_list PREFIX:line="350" PREFIX:column="15">(<argument><expr><name PREFIX:line="350" PREFIX:column="16">i2c_scl_pin</name></expr></argument>, <argument><expr><name PREFIX:line="350" PREFIX:column="29">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="351" PREFIX:column="3">PIO_Configure</name><argument_list PREFIX:line="351" PREFIX:column="16">( <argument><expr><name><name PREFIX:line="351" PREFIX:column="18">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="351" PREFIX:column="36">pPort</name></name></expr></argument>, <argument><expr><name PREFIX:line="351" PREFIX:column="43">PIO_OUTPUT_0</name></expr></argument>, <argument><expr><name><name PREFIX:line="351" PREFIX:column="57">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="351" PREFIX:column="75">ulPin</name></name></expr></argument>, <argument><expr><name PREFIX:line="351" PREFIX:column="82">PIO_OPENDRAIN</name></expr></argument> )</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="352" PREFIX:column="3">PIO_Configure</name><argument_list PREFIX:line="352" PREFIX:column="16">( <argument><expr><name><name PREFIX:line="352" PREFIX:column="18">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="352" PREFIX:column="36">pPort</name></name></expr></argument>, <argument><expr><name PREFIX:line="352" PREFIX:column="43">PIO_OUTPUT_0</name></expr></argument>, <argument><expr><name><name PREFIX:line="352" PREFIX:column="57">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="352" PREFIX:column="75">ulPin</name></name></expr></argument>, <argument><expr><name PREFIX:line="352" PREFIX:column="82">PIO_OPENDRAIN</name></expr></argument> )</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="353" PREFIX:column="3">PIO_Clear</name><argument_list PREFIX:line="353" PREFIX:column="12">( <argument><expr><name><name PREFIX:line="353" PREFIX:column="14">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="353" PREFIX:column="32">pPort</name></name></expr></argument>, <argument><expr><name><name PREFIX:line="353" PREFIX:column="39">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="353" PREFIX:column="57">ulPin</name></name></expr></argument>)</argument_list></call></expr> ;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="354" PREFIX:column="3">PIO_Clear</name><argument_list PREFIX:line="354" PREFIX:column="12">( <argument><expr><name><name PREFIX:line="354" PREFIX:column="14">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="354" PREFIX:column="32">pPort</name></name></expr></argument>, <argument><expr><name><name PREFIX:line="354" PREFIX:column="39">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="354" PREFIX:column="57">ulPin</name></name></expr></argument>)</argument_list></call></expr> ;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="355" PREFIX:column="3">PIO_Configure</name><argument_list PREFIX:line="355" PREFIX:column="16">( <argument><expr><name><name PREFIX:line="355" PREFIX:column="18">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="355" PREFIX:column="36">pPort</name></name></expr></argument>, <argument><expr><name PREFIX:line="355" PREFIX:column="43">PIO_INPUT</name></expr></argument>, <argument><expr><name><name PREFIX:line="355" PREFIX:column="54">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="355" PREFIX:column="72">ulPin</name></name></expr></argument>, <argument><expr><name PREFIX:line="355" PREFIX:column="79">PIO_DEFAULT</name></expr></argument> )</argument_list></call></expr> ;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="356" PREFIX:column="3">PIO_Configure</name><argument_list PREFIX:line="356" PREFIX:column="16">( <argument><expr><name><name PREFIX:line="356" PREFIX:column="18">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="356" PREFIX:column="36">pPort</name></name></expr></argument>, <argument><expr><name PREFIX:line="356" PREFIX:column="43">PIO_INPUT</name></expr></argument>, <argument><expr><name><name PREFIX:line="356" PREFIX:column="54">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="356" PREFIX:column="72">ulPin</name></name></expr></argument>, <argument><expr><name PREFIX:line="356" PREFIX:column="79">PIO_DEFAULT</name></expr></argument> )</argument_list></call></expr> ;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="357" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="357" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<comment type="block" PREFIX:line="360" PREFIX:column="1">/* actually, the scl line is not observed, so this procedure does not return a value */</comment>
+<function><type><specifier PREFIX:line="361" PREFIX:column="1">static</specifier> <name PREFIX:line="361" PREFIX:column="8">void</name></type> <name PREFIX:line="361" PREFIX:column="13">i2c_read_scl_and_delay</name><parameter_list PREFIX:line="361" PREFIX:column="35">(<param><decl><type><name PREFIX:line="361" PREFIX:column="36">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="362" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="363" PREFIX:column="3">uint32_t</name></type> <name PREFIX:line="363" PREFIX:column="12">dwMask</name> <init PREFIX:line="363" PREFIX:column="19">= <expr><name><name PREFIX:line="363" PREFIX:column="21">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="363" PREFIX:column="39">ulPin</name></name></expr></init></decl>;</decl_stmt>
+  <comment type="line" PREFIX:line="364" PREFIX:column="3">//PIO_Configure( i2c_scl_pin_desc-&gt;pPort, PIO_INPUT, i2c_scl_pin_desc-&gt;ulPin, PIO_DEFAULT ) ;</comment>
+  <comment type="line" PREFIX:line="365" PREFIX:column="3">//PIO_SetInput( i2c_scl_pin_desc-&gt;pPort, i2c_scl_pin_desc-&gt;ulPin, PIO_DEFAULT ) ;</comment>
+
+  <comment type="block" PREFIX:line="367" PREFIX:column="3">/* set as input */</comment>
+  <expr_stmt><expr><name><name PREFIX:line="368" PREFIX:column="3">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="368" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="368" PREFIX:column="28">PIO_ODR</name></name> = <name PREFIX:line="368" PREFIX:column="38">dwMask</name></expr> ;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="369" PREFIX:column="3">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="369" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="369" PREFIX:column="28">PIO_PER</name></name> = <name PREFIX:line="369" PREFIX:column="38">dwMask</name></expr> ;</expr_stmt>
+
+  <expr_stmt><expr><call><name PREFIX:line="371" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="371" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="374" PREFIX:column="1">static</specifier> <name PREFIX:line="374" PREFIX:column="8">void</name></type> <name PREFIX:line="374" PREFIX:column="13">i2c_clear_scl</name><parameter_list PREFIX:line="374" PREFIX:column="26">(<param><decl><type><name PREFIX:line="374" PREFIX:column="27">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="375" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="376" PREFIX:column="3">uint32_t</name></type> <name PREFIX:line="376" PREFIX:column="12">dwMask</name> <init PREFIX:line="376" PREFIX:column="19">= <expr><name><name PREFIX:line="376" PREFIX:column="21">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="376" PREFIX:column="39">ulPin</name></name></expr></init></decl>;</decl_stmt>
+  
+  <comment type="block" PREFIX:line="378" PREFIX:column="3">/* set open collector and drive low */</comment>
+  <comment type="line" PREFIX:line="379" PREFIX:column="3">//PIO_Configure( i2c_scl_pin_desc-&gt;pPort, PIO_OUTPUT_0, i2c_scl_pin_desc-&gt;ulPin, PIO_OPENDRAIN );</comment>
+  <comment type="line" PREFIX:line="380" PREFIX:column="3">//PIO_SetOutput( i2c_scl_pin_desc-&gt;pPort, i2c_scl_pin_desc-&gt;ulPin, 0, 1, 0);</comment>
+
+  <comment type="block" PREFIX:line="382" PREFIX:column="3">/* open drain, zero default output */</comment>
+  <expr_stmt><expr><name><name PREFIX:line="383" PREFIX:column="3">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="383" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="383" PREFIX:column="28">PIO_MDER</name></name> = <name PREFIX:line="383" PREFIX:column="39">dwMask</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="384" PREFIX:column="3">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="384" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="384" PREFIX:column="28">PIO_CODR</name></name> = <name PREFIX:line="384" PREFIX:column="39">dwMask</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="385" PREFIX:column="3">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="385" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="385" PREFIX:column="28">PIO_OER</name></name> = <name PREFIX:line="385" PREFIX:column="38">dwMask</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="386" PREFIX:column="3">i2c_scl_pin_desc</name>-&gt;<name PREFIX:line="386" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="386" PREFIX:column="28">PIO_PER</name></name> = <name PREFIX:line="386" PREFIX:column="38">dwMask</name></expr>;</expr_stmt>
+
+  <comment type="line" PREFIX:line="388" PREFIX:column="3">//PIO_Clear( i2c_scl_pin_desc-&gt;pPort, i2c_scl_pin_desc-&gt;ulPin) ;</comment>
+}</block></function>
+
+<function><type><specifier PREFIX:line="391" PREFIX:column="1">static</specifier> <name PREFIX:line="391" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="391" PREFIX:column="16">i2c_read_sda</name><parameter_list PREFIX:line="391" PREFIX:column="28">(<param><decl><type><name PREFIX:line="391" PREFIX:column="29">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="392" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="393" PREFIX:column="3">uint32_t</name></type> <name PREFIX:line="393" PREFIX:column="12">dwMask</name> <init PREFIX:line="393" PREFIX:column="19">= <expr><name><name PREFIX:line="393" PREFIX:column="21">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="393" PREFIX:column="39">ulPin</name></name></expr></init></decl>;</decl_stmt>
+  <comment type="line" PREFIX:line="394" PREFIX:column="3">//PIO_Configure( i2c_sda_pin_desc-&gt;pPort, PIO_INPUT, i2c_sda_pin_desc-&gt;ulPin, PIO_DEFAULT ) ;</comment>
+  <comment type="line" PREFIX:line="395" PREFIX:column="3">//PIO_SetInput( i2c_sda_pin_desc-&gt;pPort, i2c_sda_pin_desc-&gt;ulPin, PIO_DEFAULT ) ;</comment>
+
+  <comment type="block" PREFIX:line="397" PREFIX:column="3">/* set as input */</comment>
+  <expr_stmt><expr><name><name PREFIX:line="398" PREFIX:column="3">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="398" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="398" PREFIX:column="28">PIO_ODR</name></name> = <name PREFIX:line="398" PREFIX:column="38">dwMask</name></expr> ;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="399" PREFIX:column="3">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="399" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="399" PREFIX:column="28">PIO_PER</name></name> = <name PREFIX:line="399" PREFIX:column="38">dwMask</name></expr> ;</expr_stmt>
+
+
+  <return PREFIX:line="402" PREFIX:column="3">return <expr PREFIX:line="402" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="405" PREFIX:column="1">static</specifier> <name PREFIX:line="405" PREFIX:column="8">void</name></type> <name PREFIX:line="405" PREFIX:column="13">i2c_clear_sda</name><parameter_list PREFIX:line="405" PREFIX:column="26">(<param><decl><type><name PREFIX:line="405" PREFIX:column="27">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="406" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="407" PREFIX:column="3">uint32_t</name></type> <name PREFIX:line="407" PREFIX:column="12">dwMask</name> <init PREFIX:line="407" PREFIX:column="19">= <expr><name><name PREFIX:line="407" PREFIX:column="21">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="407" PREFIX:column="39">ulPin</name></name></expr></init></decl>;</decl_stmt>
+  
+  <comment type="block" PREFIX:line="409" PREFIX:column="3">/* set open collector and drive low */</comment>
+  <comment type="line" PREFIX:line="410" PREFIX:column="3">//PIO_Configure( i2c_sda_pin_desc-&gt;pPort, PIO_OUTPUT_0, i2c_sda_pin_desc-&gt;ulPin, PIO_OPENDRAIN );</comment>
+  <comment type="line" PREFIX:line="411" PREFIX:column="3">//PIO_SetOutput( i2c_sda_pin_desc-&gt;pPort, i2c_sda_pin_desc-&gt;ulPin, 0, 1, 0);</comment>
+  
+  <comment type="block" PREFIX:line="413" PREFIX:column="3">/* open drain, zero default output */</comment>
+  <expr_stmt><expr><name><name PREFIX:line="414" PREFIX:column="3">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="414" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="414" PREFIX:column="28">PIO_MDER</name></name> = <name PREFIX:line="414" PREFIX:column="39">dwMask</name></expr> ;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="415" PREFIX:column="3">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="415" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="415" PREFIX:column="28">PIO_CODR</name></name> = <name PREFIX:line="415" PREFIX:column="39">dwMask</name></expr> ;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="416" PREFIX:column="3">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="416" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="416" PREFIX:column="28">PIO_OER</name></name> = <name PREFIX:line="416" PREFIX:column="38">dwMask</name></expr> ;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="417" PREFIX:column="3">i2c_sda_pin_desc</name>-&gt;<name PREFIX:line="417" PREFIX:column="21">pPort</name>-&gt;<name PREFIX:line="417" PREFIX:column="28">PIO_PER</name></name> = <name PREFIX:line="417" PREFIX:column="38">dwMask</name></expr> ;</expr_stmt>
+  
+  <comment type="line" PREFIX:line="419" PREFIX:column="3">//PIO_Clear( i2c_sda_pin_desc-&gt;pPort, i2c_sda_pin_desc-&gt;ulPin) ;</comment>
+}</block></function>
+
+<function><type><specifier PREFIX:line="422" PREFIX:column="1">static</specifier> <name PREFIX:line="422" PREFIX:column="8">void</name></type> <name PREFIX:line="422" PREFIX:column="13">i2c_start</name><parameter_list PREFIX:line="422" PREFIX:column="22">(<param><decl><type><name PREFIX:line="422" PREFIX:column="23">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="423" PREFIX:column="1">{
+  <if PREFIX:line="424" PREFIX:column="3">if <condition PREFIX:line="424" PREFIX:column="6">( <expr><name PREFIX:line="424" PREFIX:column="8">i2c_started</name> != 0</expr> )</condition><then PREFIX:line="424" PREFIX:column="26">
+  <block PREFIX:line="425" PREFIX:column="3">{
+    <comment type="block" PREFIX:line="426" PREFIX:column="5">/* if already started: do restart */</comment>
+    <expr_stmt><expr><call><name PREFIX:line="427" PREFIX:column="5">i2c_read_sda</name><argument_list PREFIX:line="427" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>     <comment type="block" PREFIX:line="427" PREFIX:column="25">/* SDA = 1 */</comment>
+    <expr_stmt><expr><call><name PREFIX:line="428" PREFIX:column="5">i2c_delay</name><argument_list PREFIX:line="428" PREFIX:column="14">()</argument_list></call></expr>;</expr_stmt>
+    <expr_stmt><expr><call><name PREFIX:line="429" PREFIX:column="5">i2c_read_scl_and_delay</name><argument_list PREFIX:line="429" PREFIX:column="27">()</argument_list></call></expr>;</expr_stmt>
+  }</block></then></if>
+  <expr_stmt><expr><call><name PREFIX:line="431" PREFIX:column="3">i2c_read_sda</name><argument_list PREFIX:line="431" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <comment type="block" PREFIX:line="432" PREFIX:column="3">/*
+  if (i2c_read_sda() == 0)
+  {
+    // do something because arbitration is lost
+  }
+  */</comment>
+  <comment type="block" PREFIX:line="438" PREFIX:column="3">/* send the start condition, both lines go from 1 to 0 */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="439" PREFIX:column="3">i2c_clear_sda</name><argument_list PREFIX:line="439" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="440" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="440" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="441" PREFIX:column="3">i2c_clear_scl</name><argument_list PREFIX:line="441" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="442" PREFIX:column="3">i2c_started</name> = 1</expr>;</expr_stmt>
+}</block></function>
+
+
+<function><type><specifier PREFIX:line="446" PREFIX:column="1">static</specifier> <name PREFIX:line="446" PREFIX:column="8">void</name></type> <name PREFIX:line="446" PREFIX:column="13">i2c_stop</name><parameter_list PREFIX:line="446" PREFIX:column="21">(<param><decl><type><name PREFIX:line="446" PREFIX:column="22">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="447" PREFIX:column="1">{
+  <comment type="block" PREFIX:line="448" PREFIX:column="3">/* set SDA to 0 */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="449" PREFIX:column="3">i2c_clear_sda</name><argument_list PREFIX:line="449" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>  
+  <expr_stmt><expr><call><name PREFIX:line="450" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="450" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+ 
+  <comment type="block" PREFIX:line="452" PREFIX:column="3">/* now release all lines */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="453" PREFIX:column="3">i2c_read_scl_and_delay</name><argument_list PREFIX:line="453" PREFIX:column="25">()</argument_list></call></expr>;</expr_stmt>
+ 
+  <comment type="block" PREFIX:line="455" PREFIX:column="3">/* set SDA to 1 */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="456" PREFIX:column="3">i2c_read_sda</name><argument_list PREFIX:line="456" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="457" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="457" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="458" PREFIX:column="3">i2c_started</name> = 0</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="461" PREFIX:column="1">static</specifier> <name PREFIX:line="461" PREFIX:column="8">void</name></type> <name PREFIX:line="461" PREFIX:column="13">i2c_write_bit</name><parameter_list PREFIX:line="461" PREFIX:column="26">(<param><decl><type><name PREFIX:line="461" PREFIX:column="27">uint8_t</name></type> <name PREFIX:line="461" PREFIX:column="35">val</name></decl></param>)</parameter_list>
+<block PREFIX:line="462" PREFIX:column="1">{
+  <if PREFIX:line="463" PREFIX:column="3">if <condition PREFIX:line="463" PREFIX:column="6">(<expr><name PREFIX:line="463" PREFIX:column="7">val</name></expr>)</condition><then PREFIX:line="463" PREFIX:column="11">
+    <expr_stmt><expr><call><name PREFIX:line="464" PREFIX:column="5">i2c_read_sda</name><argument_list PREFIX:line="464" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt></then>
+  <else PREFIX:line="465" PREFIX:column="3">else
+    <expr_stmt><expr><call><name PREFIX:line="466" PREFIX:column="5">i2c_clear_sda</name><argument_list PREFIX:line="466" PREFIX:column="18">()</argument_list></call></expr>;</expr_stmt></else></if>
+ 
+  <expr_stmt><expr><call><name PREFIX:line="468" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="468" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="469" PREFIX:column="3">i2c_read_scl_and_delay</name><argument_list PREFIX:line="469" PREFIX:column="25">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="470" PREFIX:column="3">i2c_clear_scl</name><argument_list PREFIX:line="470" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="473" PREFIX:column="1">static</specifier> <name PREFIX:line="473" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="473" PREFIX:column="16">i2c_read_bit</name><parameter_list PREFIX:line="473" PREFIX:column="28">(<param><decl><type><name PREFIX:line="473" PREFIX:column="29">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="474" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="475" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="475" PREFIX:column="11">val</name></decl>;</decl_stmt>
+  <comment type="block" PREFIX:line="476" PREFIX:column="3">/* do not drive SDA */</comment>
+  <expr_stmt><expr><call><name PREFIX:line="477" PREFIX:column="3">i2c_read_sda</name><argument_list PREFIX:line="477" PREFIX:column="15">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="478" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="478" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="479" PREFIX:column="3">i2c_read_scl_and_delay</name><argument_list PREFIX:line="479" PREFIX:column="25">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="480" PREFIX:column="3">val</name> = <call><name PREFIX:line="480" PREFIX:column="9">i2c_read_sda</name><argument_list PREFIX:line="480" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="481" PREFIX:column="3">i2c_delay</name><argument_list PREFIX:line="481" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="482" PREFIX:column="3">i2c_clear_scl</name><argument_list PREFIX:line="482" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="483" PREFIX:column="3">return <expr><name PREFIX:line="483" PREFIX:column="10">val</name></expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="486" PREFIX:column="1">static</specifier> <name PREFIX:line="486" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="486" PREFIX:column="16">i2c_write_byte</name><parameter_list PREFIX:line="486" PREFIX:column="30">(<param><decl><type><name PREFIX:line="486" PREFIX:column="31">uint8_t</name></type> <name PREFIX:line="486" PREFIX:column="39">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="487" PREFIX:column="1">{
+  <expr_stmt><expr><call><name PREFIX:line="488" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="488" PREFIX:column="16">(<argument><expr><name PREFIX:line="488" PREFIX:column="17">b</name> &amp; 128</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="489" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="489" PREFIX:column="16">(<argument><expr><name PREFIX:line="489" PREFIX:column="17">b</name> &amp; 64</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="490" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="490" PREFIX:column="16">(<argument><expr><name PREFIX:line="490" PREFIX:column="17">b</name> &amp; 32</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="491" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="491" PREFIX:column="16">(<argument><expr><name PREFIX:line="491" PREFIX:column="17">b</name> &amp; 16</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="492" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="492" PREFIX:column="16">(<argument><expr><name PREFIX:line="492" PREFIX:column="17">b</name> &amp; 8</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="493" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="493" PREFIX:column="16">(<argument><expr><name PREFIX:line="493" PREFIX:column="17">b</name> &amp; 4</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="494" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="494" PREFIX:column="16">(<argument><expr><name PREFIX:line="494" PREFIX:column="17">b</name> &amp; 2</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="495" PREFIX:column="3">i2c_write_bit</name><argument_list PREFIX:line="495" PREFIX:column="16">(<argument><expr><name PREFIX:line="495" PREFIX:column="17">b</name> &amp; 1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    
+  <comment type="block" PREFIX:line="497" PREFIX:column="3">/* read ack from client */</comment>
+  <comment type="block" PREFIX:line="498" PREFIX:column="3">/* 0: ack was given by client */</comment>
+  <comment type="block" PREFIX:line="499" PREFIX:column="3">/* 1: nothing happend during ack cycle */</comment>  
+  <return PREFIX:line="500" PREFIX:column="3">return <expr><call><name PREFIX:line="500" PREFIX:column="10">i2c_read_bit</name><argument_list PREFIX:line="500" PREFIX:column="22">()</argument_list></call></expr>;</return>
+}</block></function>
+
+
+
+<function><type><name PREFIX:line="505" PREFIX:column="1">void</name></type> <name PREFIX:line="505" PREFIX:column="6">u8g_i2c_init</name><parameter_list PREFIX:line="505" PREFIX:column="18">(<param><decl><type><name PREFIX:line="505" PREFIX:column="19">uint8_t</name></type> <name PREFIX:line="505" PREFIX:column="27">options</name></decl></param>)</parameter_list>
+<block PREFIX:line="506" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="507" PREFIX:column="3">u8g_i2c_opt</name> = <name PREFIX:line="507" PREFIX:column="17">options</name></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="508" PREFIX:column="3">u8g_i2c_clear_error</name><argument_list PREFIX:line="508" PREFIX:column="22">()</argument_list></call></expr>;</expr_stmt>
+
+  <if PREFIX:line="510" PREFIX:column="3">if <condition PREFIX:line="510" PREFIX:column="6">( <expr><name PREFIX:line="510" PREFIX:column="8">u8g_i2c_opt</name> &amp; <name PREFIX:line="510" PREFIX:column="22">U8G_I2C_OPT_FAST</name></expr> )</condition><then PREFIX:line="510" PREFIX:column="40">
+  <block PREFIX:line="511" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="512" PREFIX:column="5">i2c_delay</name> = <name PREFIX:line="512" PREFIX:column="17">i2c_400KHz_delay</name></expr>;</expr_stmt>
+  }</block></then>
+  <else PREFIX:line="514" PREFIX:column="3">else
+  <block PREFIX:line="515" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="516" PREFIX:column="5">i2c_delay</name> = <name PREFIX:line="516" PREFIX:column="17">i2c_100KHz_delay</name></expr>;</expr_stmt>
+  }</block></else></if>
+
+
+  <if PREFIX:line="520" PREFIX:column="3">if <condition PREFIX:line="520" PREFIX:column="6">( <expr><name PREFIX:line="520" PREFIX:column="8">u8g_i2c_opt</name> &amp; <name PREFIX:line="520" PREFIX:column="22">U8G_I2C_OPT_DEV_1</name></expr> )</condition><then PREFIX:line="520" PREFIX:column="41">
+  <block PREFIX:line="521" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="522" PREFIX:column="5">i2c_scl_pin</name> = <name PREFIX:line="522" PREFIX:column="19">PIN_WIRE1_SCL</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="523" PREFIX:column="5">i2c_sda_pin</name> = <name PREFIX:line="523" PREFIX:column="19">PIN_WIRE1_SDA</name></expr>;</expr_stmt>
+    
+    <comment type="line" PREFIX:line="525" PREFIX:column="5">//REG_PIOA_PDR = PIO_PB12A_TWD1 | PIO_PB13A_TWCK1;</comment>
+  }</block></then>
+  <else PREFIX:line="527" PREFIX:column="3">else
+  <block PREFIX:line="528" PREFIX:column="3">{    
+    
+    <expr_stmt><expr><name PREFIX:line="530" PREFIX:column="5">i2c_scl_pin</name> = <name PREFIX:line="530" PREFIX:column="19">PIN_WIRE_SCL</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="531" PREFIX:column="5">i2c_sda_pin</name> = <name PREFIX:line="531" PREFIX:column="19">PIN_WIRE_SDA</name></expr>;</expr_stmt>
+    
+    <comment type="line" PREFIX:line="533" PREFIX:column="5">//REG_PIOA_PDR = PIO_PA17A_TWD0 | PIO_PA18A_TWCK0;</comment>
+  }</block></else></if>
+  
+  <expr_stmt><expr><call><name PREFIX:line="536" PREFIX:column="3">i2c_init</name><argument_list PREFIX:line="536" PREFIX:column="11">()</argument_list></call></expr>;</expr_stmt>
+
+}</block></function>
+
+<comment type="block" PREFIX:line="540" PREFIX:column="1">/* sla includes also the r/w bit */</comment>
+<function><type><name PREFIX:line="541" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="541" PREFIX:column="9">u8g_i2c_start</name><parameter_list PREFIX:line="541" PREFIX:column="22">(<param><decl><type><name PREFIX:line="541" PREFIX:column="23">uint8_t</name></type> <name PREFIX:line="541" PREFIX:column="31">sla</name></decl></param>)</parameter_list>
+<block PREFIX:line="542" PREFIX:column="1">{  
+  <expr_stmt><expr><call><name PREFIX:line="543" PREFIX:column="3">i2c_start</name><argument_list PREFIX:line="543" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="544" PREFIX:column="3">i2c_write_byte</name><argument_list PREFIX:line="544" PREFIX:column="17">(<argument><expr><name PREFIX:line="544" PREFIX:column="18">sla</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="545" PREFIX:column="3">return <expr PREFIX:line="545" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="548" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="548" PREFIX:column="9">u8g_i2c_send_byte</name><parameter_list PREFIX:line="548" PREFIX:column="26">(<param><decl><type><name PREFIX:line="548" PREFIX:column="27">uint8_t</name></type> <name PREFIX:line="548" PREFIX:column="35">data</name></decl></param>)</parameter_list>
+<block PREFIX:line="549" PREFIX:column="1">{
+  <return PREFIX:line="550" PREFIX:column="3">return <expr><call><name PREFIX:line="550" PREFIX:column="10">i2c_write_byte</name><argument_list PREFIX:line="550" PREFIX:column="24">(<argument><expr><name PREFIX:line="550" PREFIX:column="25">data</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="553" PREFIX:column="1">void</name></type> <name PREFIX:line="553" PREFIX:column="6">u8g_i2c_stop</name><parameter_list PREFIX:line="553" PREFIX:column="18">(<param><decl><type><name PREFIX:line="553" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="554" PREFIX:column="1">{
+  <expr_stmt><expr><call><name PREFIX:line="555" PREFIX:column="3">i2c_stop</name><argument_list PREFIX:line="555" PREFIX:column="11">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+
+<cpp:elif PREFIX:line="559" PREFIX:column="1">#<cpp:directive PREFIX:line="559" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="559" PREFIX:column="7">defined</name><argument_list PREFIX:line="559" PREFIX:column="14">(<argument><expr><name PREFIX:line="559" PREFIX:column="15">U8G_RASPBERRY_PI</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+
+<cpp:include PREFIX:line="561" PREFIX:column="1">#<cpp:directive PREFIX:line="561" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="561" PREFIX:column="10">&lt;wiringPi.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="562" PREFIX:column="1">#<cpp:directive PREFIX:line="562" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="562" PREFIX:column="10">&lt;wiringPiI2C.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="563" PREFIX:column="1">#<cpp:directive PREFIX:line="563" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="563" PREFIX:column="10">&lt;stdio.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="564" PREFIX:column="1">#<cpp:directive PREFIX:line="564" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="564" PREFIX:column="10">&lt;stdlib.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="565" PREFIX:column="1">#<cpp:directive PREFIX:line="565" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="565" PREFIX:column="10">&lt;errno.h&gt;</cpp:file></cpp:include>
+
+<cpp:define PREFIX:line="567" PREFIX:column="1">#<cpp:directive PREFIX:line="567" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="567" PREFIX:column="9">I2C_SLA</name></cpp:macro>         <cpp:value PREFIX:line="567" PREFIX:column="25">0x3c</cpp:value></cpp:define>
+
+<decl_stmt><decl><type><specifier PREFIX:line="569" PREFIX:column="1">static</specifier> <name PREFIX:line="569" PREFIX:column="8">int</name></type> <name PREFIX:line="569" PREFIX:column="12">fd</name><init PREFIX:line="569" PREFIX:column="14">=<expr PREFIX:line="569" PREFIX:column="15">-1</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="570" PREFIX:column="1">static</specifier> <name PREFIX:line="570" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="570" PREFIX:column="16">i2cMode</name> <init PREFIX:line="570" PREFIX:column="24">= <expr PREFIX:line="570" PREFIX:column="26">0</expr></init></decl>;</decl_stmt>
+
+<function><type><name PREFIX:line="572" PREFIX:column="1">void</name></type> <name PREFIX:line="572" PREFIX:column="6">u8g_i2c_init</name><parameter_list PREFIX:line="572" PREFIX:column="18">(<param><decl><type><name PREFIX:line="572" PREFIX:column="19">uint8_t</name></type> <name PREFIX:line="572" PREFIX:column="27">options</name></decl></param>)</parameter_list> <block PREFIX:line="572" PREFIX:column="36">{
+   <expr_stmt><expr><call><name PREFIX:line="573" PREFIX:column="4">u8g_i2c_clear_error</name><argument_list PREFIX:line="573" PREFIX:column="23">()</argument_list></call></expr>;</expr_stmt>
+   <expr_stmt><expr><name PREFIX:line="574" PREFIX:column="4">u8g_i2c_opt</name> = <name PREFIX:line="574" PREFIX:column="18">options</name></expr>;</expr_stmt>
+
+   <if PREFIX:line="576" PREFIX:column="4">if <condition PREFIX:line="576" PREFIX:column="7">(<expr><call><name PREFIX:line="576" PREFIX:column="8">wiringPiSetup</name><argument_list PREFIX:line="576" PREFIX:column="21">()</argument_list></call> == -1</expr>)</condition><then PREFIX:line="576" PREFIX:column="30"> <block PREFIX:line="576" PREFIX:column="31">{
+      <expr_stmt><expr><call><name PREFIX:line="577" PREFIX:column="7">printf</name><argument_list PREFIX:line="577" PREFIX:column="13">(<argument><expr PREFIX:line="577" PREFIX:column="14">"wiringPi-Error\n"</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="578" PREFIX:column="7">exit</name><argument_list PREFIX:line="578" PREFIX:column="11">(<argument><expr PREFIX:line="578" PREFIX:column="12">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+   }</block></then></if>
+
+   <expr_stmt><expr><name PREFIX:line="581" PREFIX:column="4">fd</name> = <call><name PREFIX:line="581" PREFIX:column="9">wiringPiI2CSetup</name><argument_list PREFIX:line="581" PREFIX:column="25">(<argument><expr><name PREFIX:line="581" PREFIX:column="26">I2C_SLA</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+   <if PREFIX:line="582" PREFIX:column="4">if <condition PREFIX:line="582" PREFIX:column="7">(<expr><name PREFIX:line="582" PREFIX:column="8">fd</name> &lt; 0</expr>)</condition><then PREFIX:line="582" PREFIX:column="15"> <block PREFIX:line="582" PREFIX:column="16">{
+      <expr_stmt><expr><call><name PREFIX:line="583" PREFIX:column="7">printf</name> <argument_list PREFIX:line="583" PREFIX:column="14">(<argument><expr PREFIX:line="583" PREFIX:column="15">"Unable to open I2C device 0: %s\n"</expr></argument>, <argument><expr><call><name PREFIX:line="583" PREFIX:column="52">strerror</name> <argument_list PREFIX:line="583" PREFIX:column="61">(<argument><expr><name PREFIX:line="583" PREFIX:column="62">errno</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr> ;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="584" PREFIX:column="7">exit</name> <argument_list PREFIX:line="584" PREFIX:column="12">(<argument><expr PREFIX:line="584" PREFIX:column="13">1</expr></argument>)</argument_list></call></expr> ;</expr_stmt>
+   }</block></then></if>
+   <comment type="line" PREFIX:line="586" PREFIX:column="4">//u8g_SetPIOutput(u8g, U8G_PI_RESET);</comment>
+   <comment type="line" PREFIX:line="587" PREFIX:column="4">//u8g_SetPIOutput(u8g, U8G_PI_A0);</comment>
+}</block></function>
+<function><type><name PREFIX:line="589" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="589" PREFIX:column="9">u8g_i2c_start</name><parameter_list PREFIX:line="589" PREFIX:column="22">(<param><decl><type><name PREFIX:line="589" PREFIX:column="23">uint8_t</name></type> <name PREFIX:line="589" PREFIX:column="31">sla</name></decl></param>)</parameter_list> <block PREFIX:line="589" PREFIX:column="36">{
+   <expr_stmt><expr><call><name PREFIX:line="590" PREFIX:column="4">u8g_i2c_send_mode</name><argument_list PREFIX:line="590" PREFIX:column="21">(<argument><expr PREFIX:line="590" PREFIX:column="22">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+   <return PREFIX:line="592" PREFIX:column="4">return <expr PREFIX:line="592" PREFIX:column="11">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="595" PREFIX:column="1">void</name></type> <name PREFIX:line="595" PREFIX:column="6">u8g_i2c_stop</name><parameter_list PREFIX:line="595" PREFIX:column="18">(<param><decl><type><name PREFIX:line="595" PREFIX:column="19">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="595" PREFIX:column="25">{
+}</block></function>
+
+<function><type><name PREFIX:line="598" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="598" PREFIX:column="9">u8g_i2c_send_mode</name><parameter_list PREFIX:line="598" PREFIX:column="26">(<param><decl><type><name PREFIX:line="598" PREFIX:column="27">uint8_t</name></type> <name PREFIX:line="598" PREFIX:column="35">mode</name></decl></param>)</parameter_list> <block PREFIX:line="598" PREFIX:column="41">{
+   <expr_stmt><expr><name PREFIX:line="599" PREFIX:column="4">i2cMode</name> = <name PREFIX:line="599" PREFIX:column="14">mode</name></expr>;</expr_stmt>
+}</block></function> 
+
+<function><type><name PREFIX:line="602" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="602" PREFIX:column="9">u8g_i2c_send_byte</name><parameter_list PREFIX:line="602" PREFIX:column="26">(<param><decl><type><name PREFIX:line="602" PREFIX:column="27">uint8_t</name></type> <name PREFIX:line="602" PREFIX:column="35">data</name></decl></param>)</parameter_list> <block PREFIX:line="602" PREFIX:column="41">{
+   <expr_stmt><expr><call><name PREFIX:line="603" PREFIX:column="4">wiringPiI2CWriteReg8</name><argument_list PREFIX:line="603" PREFIX:column="24">(<argument><expr><name PREFIX:line="603" PREFIX:column="25">fd</name></expr></argument>, <argument><expr><name PREFIX:line="603" PREFIX:column="29">i2cMode</name></expr></argument>, <argument><expr><name PREFIX:line="603" PREFIX:column="38">data</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+   <return PREFIX:line="605" PREFIX:column="4">return <expr PREFIX:line="605" PREFIX:column="11">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="608" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="608" PREFIX:column="9">u8g_i2c_wait</name><parameter_list PREFIX:line="608" PREFIX:column="21">(<param><decl><type><name PREFIX:line="608" PREFIX:column="22">uint8_t</name></type> <name PREFIX:line="608" PREFIX:column="30">mask</name></decl></param>, <param><decl><type><name PREFIX:line="608" PREFIX:column="36">uint8_t</name></type> <name PREFIX:line="608" PREFIX:column="44">pos</name></decl></param>)</parameter_list>
+<block PREFIX:line="609" PREFIX:column="1">{
+  <return PREFIX:line="610" PREFIX:column="3">return <expr PREFIX:line="610" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<cpp:else PREFIX:line="613" PREFIX:column="1">#<cpp:directive PREFIX:line="613" PREFIX:column="2">else</cpp:directive></cpp:else>
+
+<comment type="block" PREFIX:line="615" PREFIX:column="1">/* empty interface */</comment>
+
+<function><type><name PREFIX:line="617" PREFIX:column="1">void</name></type> <name PREFIX:line="617" PREFIX:column="6">u8g_i2c_init</name><parameter_list PREFIX:line="617" PREFIX:column="18">(<param><decl><type><name PREFIX:line="617" PREFIX:column="19">uint8_t</name></type> <name PREFIX:line="617" PREFIX:column="27">options</name></decl></param>)</parameter_list>
+<block PREFIX:line="618" PREFIX:column="1">{
+  <expr_stmt><expr><call><name PREFIX:line="619" PREFIX:column="3">u8g_i2c_clear_error</name><argument_list PREFIX:line="619" PREFIX:column="22">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="622" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="622" PREFIX:column="9">u8g_i2c_wait</name><parameter_list PREFIX:line="622" PREFIX:column="21">(<param><decl><type><name PREFIX:line="622" PREFIX:column="22">uint8_t</name></type> <name PREFIX:line="622" PREFIX:column="30">mask</name></decl></param>, <param><decl><type><name PREFIX:line="622" PREFIX:column="36">uint8_t</name></type> <name PREFIX:line="622" PREFIX:column="44">pos</name></decl></param>)</parameter_list>
+<block PREFIX:line="623" PREFIX:column="1">{
+  <return PREFIX:line="624" PREFIX:column="3">return <expr PREFIX:line="624" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="627" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="627" PREFIX:column="9">u8g_i2c_start</name><parameter_list PREFIX:line="627" PREFIX:column="22">(<param><decl><type><name PREFIX:line="627" PREFIX:column="23">uint8_t</name></type> <name PREFIX:line="627" PREFIX:column="31">sla</name></decl></param>)</parameter_list>
+<block PREFIX:line="628" PREFIX:column="1">{
+  <return PREFIX:line="629" PREFIX:column="3">return <expr PREFIX:line="629" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+<function><type><name PREFIX:line="631" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="631" PREFIX:column="9">u8g_i2c_send_byte</name><parameter_list PREFIX:line="631" PREFIX:column="26">(<param><decl><type><name PREFIX:line="631" PREFIX:column="27">uint8_t</name></type> <name PREFIX:line="631" PREFIX:column="35">data</name></decl></param>)</parameter_list>
+<block PREFIX:line="632" PREFIX:column="1">{
+  <return PREFIX:line="633" PREFIX:column="3">return <expr PREFIX:line="633" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="636" PREFIX:column="1">void</name></type> <name PREFIX:line="636" PREFIX:column="6">u8g_i2c_stop</name><parameter_list PREFIX:line="636" PREFIX:column="18">(<param><decl><type><name PREFIX:line="636" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="637" PREFIX:column="1">{
+}</block></function>
+
+
+<cpp:endif PREFIX:line="641" PREFIX:column="1">#<cpp:directive PREFIX:line="641" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+</unit>

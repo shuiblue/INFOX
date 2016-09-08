@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/arduino/abi.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  Copyright (c) 2014 Arduino.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/</comment>
+
+<cpp:include PREFIX:line="19" PREFIX:column="1">#<cpp:directive PREFIX:line="19" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="19" PREFIX:column="10">&lt;stdlib.h&gt;</cpp:file></cpp:include>
+
+<extern PREFIX:line="21" PREFIX:column="1">extern "C" <decl_stmt><decl><type><name PREFIX:line="21" PREFIX:column="12">void</name></type> <name PREFIX:line="21" PREFIX:column="17">__cxa_pure_virtual</name><argument_list PREFIX:line="21" PREFIX:column="35">(<argument><expr><name PREFIX:line="21" PREFIX:column="36">void</name></expr></argument>)</argument_list> <name PREFIX:line="21" PREFIX:column="42">__attribute__</name> <argument_list PREFIX:line="21" PREFIX:column="56">(<argument><expr PREFIX:line="21" PREFIX:column="57">(<name PREFIX:line="21" PREFIX:column="58">__noreturn__</name>)</expr></argument>)</argument_list></decl>;</decl_stmt></extern>
+<extern PREFIX:line="22" PREFIX:column="1">extern "C" <decl_stmt><decl><type><name PREFIX:line="22" PREFIX:column="12">void</name></type> <name PREFIX:line="22" PREFIX:column="17">__cxa_deleted_virtual</name><argument_list PREFIX:line="22" PREFIX:column="38">(<argument><expr><name PREFIX:line="22" PREFIX:column="39">void</name></expr></argument>)</argument_list> <name PREFIX:line="22" PREFIX:column="45">__attribute__</name> <argument_list PREFIX:line="22" PREFIX:column="59">(<argument><expr PREFIX:line="22" PREFIX:column="60">(<name PREFIX:line="22" PREFIX:column="61">__noreturn__</name>)</expr></argument>)</argument_list></decl>;</decl_stmt></extern>
+
+<function><type><name PREFIX:line="24" PREFIX:column="1">void</name></type> <name PREFIX:line="24" PREFIX:column="6">__cxa_pure_virtual</name><parameter_list PREFIX:line="24" PREFIX:column="24">(<param><decl><type><name PREFIX:line="24" PREFIX:column="25">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="24" PREFIX:column="31">{
+  <comment type="line" PREFIX:line="25" PREFIX:column="3">// We might want to write some diagnostics to uart in this case</comment>
+  <comment type="line" PREFIX:line="26" PREFIX:column="3">//std::terminate();</comment>
+  <expr_stmt><expr><call><name PREFIX:line="27" PREFIX:column="3">abort</name><argument_list PREFIX:line="27" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="30" PREFIX:column="1">void</name></type> <name PREFIX:line="30" PREFIX:column="6">__cxa_deleted_virtual</name><parameter_list PREFIX:line="30" PREFIX:column="27">(<param><decl><type><name PREFIX:line="30" PREFIX:column="28">void</name></type></decl></param>)</parameter_list> <block PREFIX:line="30" PREFIX:column="34">{
+  <comment type="line" PREFIX:line="31" PREFIX:column="3">// We might want to write some diagnostics to uart in this case</comment>
+  <comment type="line" PREFIX:line="32" PREFIX:column="3">//std::terminate();</comment>
+  <expr_stmt><expr><call><name PREFIX:line="33" PREFIX:column="3">abort</name><argument_list PREFIX:line="33" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+</unit>

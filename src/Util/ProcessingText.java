@@ -3,17 +3,19 @@ package Util;
 /**
  * Created by shuruiz on 6/2/2016.
  */
-        import DependencyGraph.Symbol;
-        import nu.xom.Builder;
-        import nu.xom.Document;
-        import nu.xom.ParsingException;
-        import java.io.*;
-        import java.nio.file.Files;
-        import java.nio.file.Path;
-        import java.nio.file.Paths;
-        import java.util.*;
-        import java.util.regex.Matcher;
-        import java.util.regex.Pattern;
+
+import DependencyGraph.Symbol;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.ParsingException;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProcessingText {
 
@@ -141,9 +143,13 @@ public class ProcessingText {
         //run srcML
         if (new File(inputFile).isFile()) {
             try {
-//                ProcessBuilder processBuilder = new ProcessBuilder("srcML/src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position",
-                ProcessBuilder processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
-                        inputFile, "-o", outXmlFile);
+                ProcessBuilder processBuilder = new ProcessBuilder("src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
+//                ProcessBuilder processBuilder = new ProcessBuilder("srcML/src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
+    /* for windows
+              ProcessBuilder processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
+              inputFile, "-o", outXmlFile);
+     */
+
                 Process process = processBuilder.start();
                 process.waitFor();
 
@@ -195,6 +201,7 @@ public class ProcessingText {
 
     /**
      * This method replace source code that cannot be correctly parsed by srcML,
+     *
      * @param inputFile
      */
     public static void removeSrcmlCannotHandleText(String inputFile) {
@@ -319,6 +326,6 @@ public class ProcessingText {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.print("linenumber : "+lines[0]);
+        System.out.print("linenumber : " + lines[0]);
     }
 }

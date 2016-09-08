@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/at90usb/HID.cpp" PREFIX:tabs="8" PREFIX:line="1" PREFIX:column="1">
+
+<comment type="block" PREFIX:line="3" PREFIX:column="1">/* Copyright (c) 2011, Peter Barrett  
+**  
+** Permission to use, copy, modify, and/or distribute this software for  
+** any purpose with or without fee is hereby granted, provided that the  
+** above copyright notice and this permission notice appear in all copies.  
+** 
+** THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL  
+** WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED  
+** WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR  
+** BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES  
+** OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
+** WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,  
+** ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS  
+** SOFTWARE.  
+*/</comment>
+
+<cpp:include PREFIX:line="19" PREFIX:column="1">#<cpp:directive PREFIX:line="19" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="19" PREFIX:column="10">"Platform.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="20" PREFIX:column="10">"USBAPI.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="21" PREFIX:column="10">"USBDesc.h"</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="23" PREFIX:column="5">defined</name><argument_list PREFIX:line="23" PREFIX:column="12">(<argument><expr><name PREFIX:line="23" PREFIX:column="13">USBCON</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<cpp:ifdef PREFIX:line="24" PREFIX:column="1">#<cpp:directive PREFIX:line="24" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="24" PREFIX:column="8">HID_ENABLED</name></cpp:ifdef>
+
+<comment type="line" PREFIX:line="26" PREFIX:column="1">//#define RAWHID_ENABLED</comment>
+
+<comment type="line" PREFIX:line="28" PREFIX:column="1">//	Singletons for mouse and keyboard</comment>
+
+<decl_stmt><decl><type><name PREFIX:line="30" PREFIX:column="1">Mouse_</name></type> <name PREFIX:line="30" PREFIX:column="8">Mouse</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="31" PREFIX:column="1">Keyboard_</name></type> <name PREFIX:line="31" PREFIX:column="11">Keyboard</name></decl>;</decl_stmt>
+
+<comment type="line" PREFIX:line="33" PREFIX:column="1">//================================================================================</comment>
+<comment type="line" PREFIX:line="34" PREFIX:column="1">//================================================================================</comment>
+
+<comment type="line" PREFIX:line="36" PREFIX:column="1">//	HID report descriptor</comment>
+
+<cpp:define PREFIX:line="38" PREFIX:column="1">#<cpp:directive PREFIX:line="38" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="38" PREFIX:column="9">LSB</name><parameter_list PREFIX:line="38" PREFIX:column="12">(<param><type><name PREFIX:line="38" PREFIX:column="13">_x</name></type></param>)</parameter_list></cpp:macro> <cpp:value PREFIX:line="38" PREFIX:column="17">((_x) &amp; 0xFF)</cpp:value></cpp:define>
+<cpp:define PREFIX:line="39" PREFIX:column="1">#<cpp:directive PREFIX:line="39" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="39" PREFIX:column="9">MSB</name><parameter_list PREFIX:line="39" PREFIX:column="12">(<param><type><name PREFIX:line="39" PREFIX:column="13">_x</name></type></param>)</parameter_list></cpp:macro> <cpp:value PREFIX:line="39" PREFIX:column="17">((_x) &gt;&gt; 8)</cpp:value></cpp:define>
+
+<cpp:define PREFIX:line="41" PREFIX:column="1">#<cpp:directive PREFIX:line="41" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="41" PREFIX:column="9">RAWHID_USAGE_PAGE</name></cpp:macro>	<cpp:value PREFIX:line="41" PREFIX:column="33">0xFFC0</cpp:value></cpp:define>
+<cpp:define PREFIX:line="42" PREFIX:column="1">#<cpp:directive PREFIX:line="42" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="42" PREFIX:column="9">RAWHID_USAGE</name></cpp:macro>		<cpp:value PREFIX:line="42" PREFIX:column="33">0x0C00</cpp:value></cpp:define>
+<cpp:define PREFIX:line="43" PREFIX:column="1">#<cpp:directive PREFIX:line="43" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="43" PREFIX:column="9">RAWHID_TX_SIZE</name></cpp:macro> <cpp:value PREFIX:line="43" PREFIX:column="24">64</cpp:value></cpp:define>
+<cpp:define PREFIX:line="44" PREFIX:column="1">#<cpp:directive PREFIX:line="44" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="44" PREFIX:column="9">RAWHID_RX_SIZE</name></cpp:macro> <cpp:value PREFIX:line="44" PREFIX:column="24">64</cpp:value></cpp:define>
+
+  <decl_stmt><decl><type><name PREFIX:line="46" PREFIX:column="3">u8</name> <name PREFIX:line="46" PREFIX:column="6">_hidReportDescriptor</name><index PREFIX:line="46" PREFIX:column="26">[]</index></type> <name PREFIX:line="46" PREFIX:column="29">PROGMEM</name></decl>;</decl_stmt>
+ <decl_stmt><decl><type><name PREFIX:line="47" PREFIX:column="2">u8</name></type> <name><name PREFIX:line="47" PREFIX:column="5">_hidReportDescriptor</name><index PREFIX:line="47" PREFIX:column="25">[]</index></name> <init PREFIX:line="47" PREFIX:column="28">= <expr><block PREFIX:line="47" PREFIX:column="30">{
+	
+	<comment type="line" PREFIX:line="49" PREFIX:column="9">//	Mouse</comment>
+    <expr PREFIX:line="50" PREFIX:column="5">0x05</expr>, <expr PREFIX:line="50" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="50" PREFIX:column="36">// USAGE_PAGE (Generic Desktop)	// 54</comment>
+    <expr PREFIX:line="51" PREFIX:column="5">0x09</expr>, <expr PREFIX:line="51" PREFIX:column="11">0x02</expr>,                    <comment type="line" PREFIX:line="51" PREFIX:column="36">// USAGE (Mouse)</comment>
+    <expr PREFIX:line="52" PREFIX:column="5">0xa1</expr>, <expr PREFIX:line="52" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="52" PREFIX:column="36">// COLLECTION (Application)</comment>
+    <expr PREFIX:line="53" PREFIX:column="5">0x09</expr>, <expr PREFIX:line="53" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="53" PREFIX:column="36">//   USAGE (Pointer)</comment>
+    <expr PREFIX:line="54" PREFIX:column="5">0xa1</expr>, <expr PREFIX:line="54" PREFIX:column="11">0x00</expr>,                    <comment type="line" PREFIX:line="54" PREFIX:column="36">//   COLLECTION (Physical)</comment>
+    <expr PREFIX:line="55" PREFIX:column="5">0x85</expr>, <expr PREFIX:line="55" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="55" PREFIX:column="36">//     REPORT_ID (1)</comment>
+    <expr PREFIX:line="56" PREFIX:column="5">0x05</expr>, <expr PREFIX:line="56" PREFIX:column="11">0x09</expr>,                    <comment type="line" PREFIX:line="56" PREFIX:column="36">//     USAGE_PAGE (Button)</comment>
+    <expr PREFIX:line="57" PREFIX:column="5">0x19</expr>, <expr PREFIX:line="57" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="57" PREFIX:column="36">//     USAGE_MINIMUM (Button 1)</comment>
+    <expr PREFIX:line="58" PREFIX:column="5">0x29</expr>, <expr PREFIX:line="58" PREFIX:column="11">0x03</expr>,                    <comment type="line" PREFIX:line="58" PREFIX:column="36">//     USAGE_MAXIMUM (Button 3)</comment>
+    <expr PREFIX:line="59" PREFIX:column="5">0x15</expr>, <expr PREFIX:line="59" PREFIX:column="11">0x00</expr>,                    <comment type="line" PREFIX:line="59" PREFIX:column="36">//     LOGICAL_MINIMUM (0)</comment>
+    <expr PREFIX:line="60" PREFIX:column="5">0x25</expr>, <expr PREFIX:line="60" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="60" PREFIX:column="36">//     LOGICAL_MAXIMUM (1)</comment>
+    <expr PREFIX:line="61" PREFIX:column="5">0x95</expr>, <expr PREFIX:line="61" PREFIX:column="11">0x03</expr>,                    <comment type="line" PREFIX:line="61" PREFIX:column="36">//     REPORT_COUNT (3)</comment>
+    <expr PREFIX:line="62" PREFIX:column="5">0x75</expr>, <expr PREFIX:line="62" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="62" PREFIX:column="36">//     REPORT_SIZE (1)</comment>
+    <expr PREFIX:line="63" PREFIX:column="5">0x81</expr>, <expr PREFIX:line="63" PREFIX:column="11">0x02</expr>,                    <comment type="line" PREFIX:line="63" PREFIX:column="36">//     INPUT (Data,Var,Abs)</comment>
+    <expr PREFIX:line="64" PREFIX:column="5">0x95</expr>, <expr PREFIX:line="64" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="64" PREFIX:column="36">//     REPORT_COUNT (1)</comment>
+    <expr PREFIX:line="65" PREFIX:column="5">0x75</expr>, <expr PREFIX:line="65" PREFIX:column="11">0x05</expr>,                    <comment type="line" PREFIX:line="65" PREFIX:column="36">//     REPORT_SIZE (5)</comment>
+    <expr PREFIX:line="66" PREFIX:column="5">0x81</expr>, <expr PREFIX:line="66" PREFIX:column="11">0x03</expr>,                    <comment type="line" PREFIX:line="66" PREFIX:column="36">//     INPUT (Cnst,Var,Abs)</comment>
+    <expr PREFIX:line="67" PREFIX:column="5">0x05</expr>, <expr PREFIX:line="67" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="67" PREFIX:column="36">//     USAGE_PAGE (Generic Desktop)</comment>
+    <expr PREFIX:line="68" PREFIX:column="5">0x09</expr>, <expr PREFIX:line="68" PREFIX:column="11">0x30</expr>,                    <comment type="line" PREFIX:line="68" PREFIX:column="36">//     USAGE (X)</comment>
+    <expr PREFIX:line="69" PREFIX:column="5">0x09</expr>, <expr PREFIX:line="69" PREFIX:column="11">0x31</expr>,                    <comment type="line" PREFIX:line="69" PREFIX:column="36">//     USAGE (Y)</comment>
+    <expr PREFIX:line="70" PREFIX:column="5">0x09</expr>, <expr PREFIX:line="70" PREFIX:column="11">0x38</expr>,                    <comment type="line" PREFIX:line="70" PREFIX:column="36">//     USAGE (Wheel)</comment>
+    <expr PREFIX:line="71" PREFIX:column="5">0x15</expr>, <expr PREFIX:line="71" PREFIX:column="11">0x81</expr>,                    <comment type="line" PREFIX:line="71" PREFIX:column="36">//     LOGICAL_MINIMUM (-127)</comment>
+    <expr PREFIX:line="72" PREFIX:column="5">0x25</expr>, <expr PREFIX:line="72" PREFIX:column="11">0x7f</expr>,                    <comment type="line" PREFIX:line="72" PREFIX:column="36">//     LOGICAL_MAXIMUM (127)</comment>
+    <expr PREFIX:line="73" PREFIX:column="5">0x75</expr>, <expr PREFIX:line="73" PREFIX:column="11">0x08</expr>,                    <comment type="line" PREFIX:line="73" PREFIX:column="36">//     REPORT_SIZE (8)</comment>
+    <expr PREFIX:line="74" PREFIX:column="5">0x95</expr>, <expr PREFIX:line="74" PREFIX:column="11">0x03</expr>,                    <comment type="line" PREFIX:line="74" PREFIX:column="36">//     REPORT_COUNT (3)</comment>
+    <expr PREFIX:line="75" PREFIX:column="5">0x81</expr>, <expr PREFIX:line="75" PREFIX:column="11">0x06</expr>,                    <comment type="line" PREFIX:line="75" PREFIX:column="36">//     INPUT (Data,Var,Rel)</comment>
+    <expr PREFIX:line="76" PREFIX:column="5">0xc0</expr>,                          <comment type="line" PREFIX:line="76" PREFIX:column="36">//   END_COLLECTION</comment>
+    <expr PREFIX:line="77" PREFIX:column="5">0xc0</expr>,                          <comment type="line" PREFIX:line="77" PREFIX:column="36">// END_COLLECTION</comment>
+
+	<comment type="line" PREFIX:line="79" PREFIX:column="9">//	Keyboard</comment>
+    <expr PREFIX:line="80" PREFIX:column="5">0x05</expr>, <expr PREFIX:line="80" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="80" PREFIX:column="36">// USAGE_PAGE (Generic Desktop)	// 47</comment>
+    <expr PREFIX:line="81" PREFIX:column="5">0x09</expr>, <expr PREFIX:line="81" PREFIX:column="11">0x06</expr>,                    <comment type="line" PREFIX:line="81" PREFIX:column="36">// USAGE (Keyboard)</comment>
+    <expr PREFIX:line="82" PREFIX:column="5">0xa1</expr>, <expr PREFIX:line="82" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="82" PREFIX:column="36">// COLLECTION (Application)</comment>
+    <expr PREFIX:line="83" PREFIX:column="5">0x85</expr>, <expr PREFIX:line="83" PREFIX:column="11">0x02</expr>,                    <comment type="line" PREFIX:line="83" PREFIX:column="36">//   REPORT_ID (2)</comment>
+    <expr PREFIX:line="84" PREFIX:column="5">0x05</expr>, <expr PREFIX:line="84" PREFIX:column="11">0x07</expr>,                    <comment type="line" PREFIX:line="84" PREFIX:column="36">//   USAGE_PAGE (Keyboard)</comment>
+   
+	<expr PREFIX:line="86" PREFIX:column="9">0x19</expr>, <expr PREFIX:line="86" PREFIX:column="15">0xe0</expr>,                    <comment type="line" PREFIX:line="86" PREFIX:column="40">//   USAGE_MINIMUM (Keyboard LeftControl)</comment>
+    <expr PREFIX:line="87" PREFIX:column="5">0x29</expr>, <expr PREFIX:line="87" PREFIX:column="11">0xe7</expr>,                    <comment type="line" PREFIX:line="87" PREFIX:column="36">//   USAGE_MAXIMUM (Keyboard Right GUI)</comment>
+    <expr PREFIX:line="88" PREFIX:column="5">0x15</expr>, <expr PREFIX:line="88" PREFIX:column="11">0x00</expr>,                    <comment type="line" PREFIX:line="88" PREFIX:column="36">//   LOGICAL_MINIMUM (0)</comment>
+    <expr PREFIX:line="89" PREFIX:column="5">0x25</expr>, <expr PREFIX:line="89" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="89" PREFIX:column="36">//   LOGICAL_MAXIMUM (1)</comment>
+    <expr PREFIX:line="90" PREFIX:column="5">0x75</expr>, <expr PREFIX:line="90" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="90" PREFIX:column="36">//   REPORT_SIZE (1)</comment>
+    
+	<expr PREFIX:line="92" PREFIX:column="9">0x95</expr>, <expr PREFIX:line="92" PREFIX:column="15">0x08</expr>,                    <comment type="line" PREFIX:line="92" PREFIX:column="40">//   REPORT_COUNT (8)</comment>
+    <expr PREFIX:line="93" PREFIX:column="5">0x81</expr>, <expr PREFIX:line="93" PREFIX:column="11">0x02</expr>,                    <comment type="line" PREFIX:line="93" PREFIX:column="36">//   INPUT (Data,Var,Abs)</comment>
+    <expr PREFIX:line="94" PREFIX:column="5">0x95</expr>, <expr PREFIX:line="94" PREFIX:column="11">0x01</expr>,                    <comment type="line" PREFIX:line="94" PREFIX:column="36">//   REPORT_COUNT (1)</comment>
+    <expr PREFIX:line="95" PREFIX:column="5">0x75</expr>, <expr PREFIX:line="95" PREFIX:column="11">0x08</expr>,                    <comment type="line" PREFIX:line="95" PREFIX:column="36">//   REPORT_SIZE (8)</comment>
+    <expr PREFIX:line="96" PREFIX:column="5">0x81</expr>, <expr PREFIX:line="96" PREFIX:column="11">0x03</expr>,                    <comment type="line" PREFIX:line="96" PREFIX:column="36">//   INPUT (Cnst,Var,Abs)</comment>
+    
+	<expr PREFIX:line="98" PREFIX:column="9">0x95</expr>, <expr PREFIX:line="98" PREFIX:column="15">0x06</expr>,                    <comment type="line" PREFIX:line="98" PREFIX:column="40">//   REPORT_COUNT (6)</comment>
+    <expr PREFIX:line="99" PREFIX:column="5">0x75</expr>, <expr PREFIX:line="99" PREFIX:column="11">0x08</expr>,                    <comment type="line" PREFIX:line="99" PREFIX:column="36">//   REPORT_SIZE (8)</comment>
+    <expr PREFIX:line="100" PREFIX:column="5">0x15</expr>, <expr PREFIX:line="100" PREFIX:column="11">0x00</expr>,                    <comment type="line" PREFIX:line="100" PREFIX:column="36">//   LOGICAL_MINIMUM (0)</comment>
+    <expr PREFIX:line="101" PREFIX:column="5">0x25</expr>, <expr PREFIX:line="101" PREFIX:column="11">0x65</expr>,                    <comment type="line" PREFIX:line="101" PREFIX:column="36">//   LOGICAL_MAXIMUM (101)</comment>
+    <expr PREFIX:line="102" PREFIX:column="5">0x05</expr>, <expr PREFIX:line="102" PREFIX:column="11">0x07</expr>,                    <comment type="line" PREFIX:line="102" PREFIX:column="36">//   USAGE_PAGE (Keyboard)</comment>
+    
+	<expr PREFIX:line="104" PREFIX:column="9">0x19</expr>, <expr PREFIX:line="104" PREFIX:column="15">0x00</expr>,                    <comment type="line" PREFIX:line="104" PREFIX:column="40">//   USAGE_MINIMUM (Reserved (no event indicated))</comment>
+    <expr PREFIX:line="105" PREFIX:column="5">0x29</expr>, <expr PREFIX:line="105" PREFIX:column="11">0x65</expr>,                    <comment type="line" PREFIX:line="105" PREFIX:column="36">//   USAGE_MAXIMUM (Keyboard Application)</comment>
+    <expr PREFIX:line="106" PREFIX:column="5">0x81</expr>, <expr PREFIX:line="106" PREFIX:column="11">0x00</expr>,                    <comment type="line" PREFIX:line="106" PREFIX:column="36">//   INPUT (Data,Ary,Abs)</comment>
+    <expr PREFIX:line="107" PREFIX:column="5">0xc0</expr>,                          <comment type="line" PREFIX:line="107" PREFIX:column="36">// END_COLLECTION</comment>
+
+<cpp:if PREFIX:line="109" PREFIX:column="1">#<cpp:directive PREFIX:line="109" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="109" PREFIX:column="5">RAWHID_ENABLED</name></expr></cpp:if>
+	<comment type="line" PREFIX:line="110" PREFIX:column="9">//	RAW HID</comment>
+	<expr PREFIX:line="111" PREFIX:column="9">0x06</expr>, <expr><call><name PREFIX:line="111" PREFIX:column="15">LSB</name><argument_list PREFIX:line="111" PREFIX:column="18">(<argument><expr><name PREFIX:line="111" PREFIX:column="19">RAWHID_USAGE_PAGE</name></expr></argument>)</argument_list></call></expr>, <expr><call><name PREFIX:line="111" PREFIX:column="39">MSB</name><argument_list PREFIX:line="111" PREFIX:column="42">(<argument><expr><name PREFIX:line="111" PREFIX:column="43">RAWHID_USAGE_PAGE</name></expr></argument>)</argument_list></call></expr>,	<comment type="line" PREFIX:line="111" PREFIX:column="65">// 30</comment>
+	<expr PREFIX:line="112" PREFIX:column="9">0x0A</expr>, <expr><call><name PREFIX:line="112" PREFIX:column="15">LSB</name><argument_list PREFIX:line="112" PREFIX:column="18">(<argument><expr><name PREFIX:line="112" PREFIX:column="19">RAWHID_USAGE</name></expr></argument>)</argument_list></call></expr>, <expr><call><name PREFIX:line="112" PREFIX:column="34">MSB</name><argument_list PREFIX:line="112" PREFIX:column="37">(<argument><expr><name PREFIX:line="112" PREFIX:column="38">RAWHID_USAGE</name></expr></argument>)</argument_list></call></expr>,
+
+	<expr PREFIX:line="114" PREFIX:column="9">0xA1</expr>, <expr PREFIX:line="114" PREFIX:column="15">0x01</expr>,				<comment type="line" PREFIX:line="114" PREFIX:column="49">// Collection 0x01</comment>
+    <expr PREFIX:line="115" PREFIX:column="5">0x85</expr>, <expr PREFIX:line="115" PREFIX:column="11">0x03</expr>,             <comment type="line" PREFIX:line="115" PREFIX:column="29">// REPORT_ID (3)</comment>
+	<expr PREFIX:line="116" PREFIX:column="9">0x75</expr>, <expr PREFIX:line="116" PREFIX:column="15">0x08</expr>,				<comment type="line" PREFIX:line="116" PREFIX:column="49">// report size = 8 bits</comment>
+	<expr PREFIX:line="117" PREFIX:column="9">0x15</expr>, <expr PREFIX:line="117" PREFIX:column="15">0x00</expr>,				<comment type="line" PREFIX:line="117" PREFIX:column="49">// logical minimum = 0</comment>
+	<expr PREFIX:line="118" PREFIX:column="9">0x26</expr>, <expr PREFIX:line="118" PREFIX:column="15">0xFF</expr>, <expr PREFIX:line="118" PREFIX:column="21">0x00</expr>,		<comment type="line" PREFIX:line="118" PREFIX:column="41">// logical maximum = 255</comment>
+
+	<expr PREFIX:line="120" PREFIX:column="9">0x95</expr>, <expr PREFIX:line="120" PREFIX:column="15">64</expr>,				<comment type="line" PREFIX:line="120" PREFIX:column="49">// report count TX</comment>
+	<expr PREFIX:line="121" PREFIX:column="9">0x09</expr>, <expr PREFIX:line="121" PREFIX:column="15">0x01</expr>,				<comment type="line" PREFIX:line="121" PREFIX:column="49">// usage</comment>
+	<expr PREFIX:line="122" PREFIX:column="9">0x81</expr>, <expr PREFIX:line="122" PREFIX:column="15">0x02</expr>,				<comment type="line" PREFIX:line="122" PREFIX:column="49">// Input (array)</comment>
+
+	<expr PREFIX:line="124" PREFIX:column="9">0x95</expr>, <expr PREFIX:line="124" PREFIX:column="15">64</expr>,				<comment type="line" PREFIX:line="124" PREFIX:column="49">// report count RX</comment>
+	<expr PREFIX:line="125" PREFIX:column="9">0x09</expr>, <expr PREFIX:line="125" PREFIX:column="15">0x02</expr>,				<comment type="line" PREFIX:line="125" PREFIX:column="49">// usage</comment>
+	<expr PREFIX:line="126" PREFIX:column="9">0x91</expr>, <expr PREFIX:line="126" PREFIX:column="15">0x02</expr>,				<comment type="line" PREFIX:line="126" PREFIX:column="49">// Output (array)</comment>
+	<expr PREFIX:line="127" PREFIX:column="9">0xC0</expr>					<comment type="line" PREFIX:line="127" PREFIX:column="49">// end collection</comment>
+<cpp:endif PREFIX:line="128" PREFIX:column="1">#<cpp:directive PREFIX:line="128" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+}</block></expr></init></decl>;</decl_stmt>
+
+  <decl_stmt><decl><type><name PREFIX:line="131" PREFIX:column="3">HIDDescriptor</name> <name PREFIX:line="131" PREFIX:column="17">_hidInterface</name></type> <name PREFIX:line="131" PREFIX:column="31">PROGMEM</name></decl>;</decl_stmt>
+ <decl_stmt><decl><type><name PREFIX:line="132" PREFIX:column="2">HIDDescriptor</name></type> <name PREFIX:line="132" PREFIX:column="16">_hidInterface</name> <init PREFIX:line="132" PREFIX:column="30">=
+<expr><block PREFIX:line="133" PREFIX:column="1">{
+	<expr><call><name PREFIX:line="134" PREFIX:column="9">D_INTERFACE</name><argument_list PREFIX:line="134" PREFIX:column="20">(<argument><expr><name PREFIX:line="134" PREFIX:column="21">HID_INTERFACE</name></expr></argument>,<argument><expr PREFIX:line="134" PREFIX:column="35">1</expr></argument>,<argument><expr PREFIX:line="134" PREFIX:column="37">3</expr></argument>,<argument><expr PREFIX:line="134" PREFIX:column="39">0</expr></argument>,<argument><expr PREFIX:line="134" PREFIX:column="41">0</expr></argument>)</argument_list></call></expr>,
+	<expr><call><name PREFIX:line="135" PREFIX:column="9">D_HIDREPORT</name><argument_list PREFIX:line="135" PREFIX:column="20">(<argument><expr><sizeof PREFIX:line="135" PREFIX:column="21">sizeof<argument_list PREFIX:line="135" PREFIX:column="27">(<argument><expr><name PREFIX:line="135" PREFIX:column="28">_hidReportDescriptor</name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>,
+	<macro><name PREFIX:line="136" PREFIX:column="9">D_ENDPOINT</name><argument_list PREFIX:line="136" PREFIX:column="19">(<argument PREFIX:line="136" PREFIX:column="20">USB_ENDPOINT_IN (HID_ENDPOINT_INT)</argument>,<argument PREFIX:line="136" PREFIX:column="55">USB_ENDPOINT_TYPE_INTERRUPT</argument>,<argument PREFIX:line="136" PREFIX:column="83">0x40</argument>,<argument PREFIX:line="136" PREFIX:column="88">0x01</argument>)</argument_list></macro>
+}</block></expr></init></decl>;</decl_stmt>
+
+<comment type="line" PREFIX:line="139" PREFIX:column="1">//================================================================================</comment>
+<comment type="line" PREFIX:line="140" PREFIX:column="1">//================================================================================</comment>
+<comment type="line" PREFIX:line="141" PREFIX:column="1">//	Driver</comment>
+
+<decl_stmt><decl><type><name PREFIX:line="143" PREFIX:column="1">u8</name></type> <name PREFIX:line="143" PREFIX:column="4">_hid_protocol</name> <init PREFIX:line="143" PREFIX:column="18">= <expr PREFIX:line="143" PREFIX:column="20">1</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="144" PREFIX:column="1">u8</name></type> <name PREFIX:line="144" PREFIX:column="4">_hid_idle</name> <init PREFIX:line="144" PREFIX:column="14">= <expr PREFIX:line="144" PREFIX:column="16">1</expr></init></decl>;</decl_stmt>
+
+<cpp:define PREFIX:line="146" PREFIX:column="1">#<cpp:directive PREFIX:line="146" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="146" PREFIX:column="9">WEAK</name></cpp:macro> <cpp:value PREFIX:line="146" PREFIX:column="14">__attribute__ ((weak))</cpp:value></cpp:define>
+
+<function><type><name PREFIX:line="148" PREFIX:column="1">int</name> <name PREFIX:line="148" PREFIX:column="5">WEAK</name></type> <name PREFIX:line="148" PREFIX:column="10">HID_GetInterface</name><parameter_list PREFIX:line="148" PREFIX:column="26">(<param><decl><type><name PREFIX:line="148" PREFIX:column="27">u8</name>*</type> <name PREFIX:line="148" PREFIX:column="31">interfaceNum</name></decl></param>)</parameter_list>
+<block PREFIX:line="149" PREFIX:column="1">{
+	<expr_stmt><expr><name><name PREFIX:line="150" PREFIX:column="9">interfaceNum</name><index PREFIX:line="150" PREFIX:column="21">[<expr PREFIX:line="150" PREFIX:column="22">0</expr>]</index></name> += 1</expr>;</expr_stmt>	<comment type="line" PREFIX:line="150" PREFIX:column="33">// uses 1</comment>
+	<return PREFIX:line="151" PREFIX:column="9">return <expr><call><name PREFIX:line="151" PREFIX:column="16">USB_SendControl</name><argument_list PREFIX:line="151" PREFIX:column="31">(<argument><expr><name PREFIX:line="151" PREFIX:column="32">TRANSFER_PGM</name></expr></argument>,<argument><expr PREFIX:line="151" PREFIX:column="45">&amp;<name PREFIX:line="151" PREFIX:column="46">_hidInterface</name></expr></argument>,<argument><expr><sizeof PREFIX:line="151" PREFIX:column="60">sizeof<argument_list PREFIX:line="151" PREFIX:column="66">(<argument><expr><name PREFIX:line="151" PREFIX:column="67">_hidInterface</name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="154" PREFIX:column="1">int</name> <name PREFIX:line="154" PREFIX:column="5">WEAK</name></type> <name PREFIX:line="154" PREFIX:column="10">HID_GetDescriptor</name><parameter_list PREFIX:line="154" PREFIX:column="27">(<param><decl><type><name PREFIX:line="154" PREFIX:column="28">int</name></type> <name PREFIX:line="154" PREFIX:column="32">i</name></decl></param>)</parameter_list>
+<block PREFIX:line="155" PREFIX:column="1">{
+	<return PREFIX:line="156" PREFIX:column="9">return <expr><call><name PREFIX:line="156" PREFIX:column="16">USB_SendControl</name><argument_list PREFIX:line="156" PREFIX:column="31">(<argument><expr><name PREFIX:line="156" PREFIX:column="32">TRANSFER_PGM</name></expr></argument>,<argument><expr><name PREFIX:line="156" PREFIX:column="45">_hidReportDescriptor</name></expr></argument>,<argument><expr><sizeof PREFIX:line="156" PREFIX:column="66">sizeof<argument_list PREFIX:line="156" PREFIX:column="72">(<argument><expr><name PREFIX:line="156" PREFIX:column="73">_hidReportDescriptor</name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="159" PREFIX:column="1">void</name> <name PREFIX:line="159" PREFIX:column="6">WEAK</name></type> <name PREFIX:line="159" PREFIX:column="11">HID_SendReport</name><parameter_list PREFIX:line="159" PREFIX:column="25">(<param><decl><type><name PREFIX:line="159" PREFIX:column="26">u8</name></type> <name PREFIX:line="159" PREFIX:column="29">id</name></decl></param>,  <param><decl><type><name PREFIX:line="159" PREFIX:column="34">void</name>*</type> <name PREFIX:line="159" PREFIX:column="40">data</name></decl></param>, <param><decl><type><name PREFIX:line="159" PREFIX:column="46">int</name></type> <name PREFIX:line="159" PREFIX:column="50">len</name></decl></param>)</parameter_list>
+<block PREFIX:line="160" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="161" PREFIX:column="9">USB_Send</name><argument_list PREFIX:line="161" PREFIX:column="17">(<argument><expr><name PREFIX:line="161" PREFIX:column="18">HID_TX</name></expr></argument>, <argument><expr PREFIX:line="161" PREFIX:column="26">&amp;<name PREFIX:line="161" PREFIX:column="27">id</name></expr></argument>, <argument><expr PREFIX:line="161" PREFIX:column="31">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="162" PREFIX:column="9">USB_Send</name><argument_list PREFIX:line="162" PREFIX:column="17">(<argument><expr><name PREFIX:line="162" PREFIX:column="18">HID_TX</name> | <name PREFIX:line="162" PREFIX:column="27">TRANSFER_RELEASE</name></expr></argument>,<argument><expr><name PREFIX:line="162" PREFIX:column="44">data</name></expr></argument>,<argument><expr><name PREFIX:line="162" PREFIX:column="49">len</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="165" PREFIX:column="1">bool</name> <name PREFIX:line="165" PREFIX:column="6">WEAK</name></type> <name PREFIX:line="165" PREFIX:column="11">HID_Setup</name><parameter_list PREFIX:line="165" PREFIX:column="20">(<param><decl><type><name PREFIX:line="165" PREFIX:column="21">Setup</name>&amp;</type> <name PREFIX:line="165" PREFIX:column="28">setup</name></decl></param>)</parameter_list>
+<block PREFIX:line="166" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="167" PREFIX:column="9">u8</name></type> <name PREFIX:line="167" PREFIX:column="12">r</name> <init PREFIX:line="167" PREFIX:column="14">= <expr><name><name PREFIX:line="167" PREFIX:column="16">setup</name>.<name PREFIX:line="167" PREFIX:column="22">bRequest</name></name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="168" PREFIX:column="9">u8</name></type> <name PREFIX:line="168" PREFIX:column="12">requestType</name> <init PREFIX:line="168" PREFIX:column="24">= <expr><name><name PREFIX:line="168" PREFIX:column="26">setup</name>.<name PREFIX:line="168" PREFIX:column="32">bmRequestType</name></name></expr></init></decl>;</decl_stmt>
+	<if PREFIX:line="169" PREFIX:column="9">if <condition PREFIX:line="169" PREFIX:column="12">(<expr><name PREFIX:line="169" PREFIX:column="13">REQUEST_DEVICETOHOST_CLASS_INTERFACE</name> == <name PREFIX:line="169" PREFIX:column="53">requestType</name></expr>)</condition><then PREFIX:line="169" PREFIX:column="65">
+	<block PREFIX:line="170" PREFIX:column="9">{
+		<if PREFIX:line="171" PREFIX:column="17">if <condition PREFIX:line="171" PREFIX:column="20">(<expr><name PREFIX:line="171" PREFIX:column="21">HID_GET_REPORT</name> == <name PREFIX:line="171" PREFIX:column="39">r</name></expr>)</condition><then PREFIX:line="171" PREFIX:column="41">
+		<block PREFIX:line="172" PREFIX:column="17">{
+			<comment type="line" PREFIX:line="173" PREFIX:column="25">//HID_GetReport();</comment>
+			<return PREFIX:line="174" PREFIX:column="25">return <expr PREFIX:line="174" PREFIX:column="32">true</expr>;</return>
+		}</block></then></if>
+		<if PREFIX:line="176" PREFIX:column="17">if <condition PREFIX:line="176" PREFIX:column="20">(<expr><name PREFIX:line="176" PREFIX:column="21">HID_GET_PROTOCOL</name> == <name PREFIX:line="176" PREFIX:column="41">r</name></expr>)</condition><then PREFIX:line="176" PREFIX:column="43">
+		<block PREFIX:line="177" PREFIX:column="17">{
+			<comment type="line" PREFIX:line="178" PREFIX:column="25">//Send8(_hid_protocol);	// TODO</comment>
+			<return PREFIX:line="179" PREFIX:column="25">return <expr PREFIX:line="179" PREFIX:column="32">true</expr>;</return>
+		}</block></then></if>
+	}</block></then></if>
+	
+	<if PREFIX:line="183" PREFIX:column="9">if <condition PREFIX:line="183" PREFIX:column="12">(<expr><name PREFIX:line="183" PREFIX:column="13">REQUEST_HOSTTODEVICE_CLASS_INTERFACE</name> == <name PREFIX:line="183" PREFIX:column="53">requestType</name></expr>)</condition><then PREFIX:line="183" PREFIX:column="65">
+	<block PREFIX:line="184" PREFIX:column="9">{
+		<if PREFIX:line="185" PREFIX:column="17">if <condition PREFIX:line="185" PREFIX:column="20">(<expr><name PREFIX:line="185" PREFIX:column="21">HID_SET_PROTOCOL</name> == <name PREFIX:line="185" PREFIX:column="41">r</name></expr>)</condition><then PREFIX:line="185" PREFIX:column="43">
+		<block PREFIX:line="186" PREFIX:column="17">{
+			<expr_stmt><expr><name PREFIX:line="187" PREFIX:column="25">_hid_protocol</name> = <name><name PREFIX:line="187" PREFIX:column="41">setup</name>.<name PREFIX:line="187" PREFIX:column="47">wValueL</name></name></expr>;</expr_stmt>
+			<return PREFIX:line="188" PREFIX:column="25">return <expr PREFIX:line="188" PREFIX:column="32">true</expr>;</return>
+		}</block></then></if>
+
+		<if PREFIX:line="191" PREFIX:column="17">if <condition PREFIX:line="191" PREFIX:column="20">(<expr><name PREFIX:line="191" PREFIX:column="21">HID_SET_IDLE</name> == <name PREFIX:line="191" PREFIX:column="37">r</name></expr>)</condition><then PREFIX:line="191" PREFIX:column="39">
+		<block PREFIX:line="192" PREFIX:column="17">{
+			<expr_stmt><expr><name PREFIX:line="193" PREFIX:column="25">_hid_idle</name> = <name><name PREFIX:line="193" PREFIX:column="37">setup</name>.<name PREFIX:line="193" PREFIX:column="43">wValueL</name></name></expr>;</expr_stmt>
+			<return PREFIX:line="194" PREFIX:column="25">return <expr PREFIX:line="194" PREFIX:column="32">true</expr>;</return>
+		}</block></then></if>
+	}</block></then></if>
+	<return PREFIX:line="197" PREFIX:column="9">return <expr PREFIX:line="197" PREFIX:column="16">false</expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="200" PREFIX:column="1">//================================================================================</comment>
+<comment type="line" PREFIX:line="201" PREFIX:column="1">//================================================================================</comment>
+<comment type="line" PREFIX:line="202" PREFIX:column="1">//	Mouse</comment>
+
+<constructor><name><name PREFIX:line="204" PREFIX:column="1">Mouse_</name>::<name PREFIX:line="204" PREFIX:column="9">Mouse_</name></name><parameter_list PREFIX:line="204" PREFIX:column="15">(<param><decl><type><name PREFIX:line="204" PREFIX:column="16">void</name></type></decl></param>)</parameter_list> <member_list PREFIX:line="204" PREFIX:column="22">: <call><name PREFIX:line="204" PREFIX:column="24">_buttons</name><argument_list PREFIX:line="204" PREFIX:column="32">(<argument><expr PREFIX:line="204" PREFIX:column="33">0</expr></argument>)</argument_list></call>
+</member_list><block PREFIX:line="205" PREFIX:column="1">{
+}</block></constructor>
+
+<function><type><name PREFIX:line="208" PREFIX:column="1">void</name></type> <name><name PREFIX:line="208" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="208" PREFIX:column="14">begin</name></name><parameter_list PREFIX:line="208" PREFIX:column="19">(<param><decl><type><name PREFIX:line="208" PREFIX:column="20">void</name></type></decl></param>)</parameter_list> 
+<block PREFIX:line="209" PREFIX:column="1">{
+}</block></function>
+
+<function><type><name PREFIX:line="212" PREFIX:column="1">void</name></type> <name><name PREFIX:line="212" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="212" PREFIX:column="14">end</name></name><parameter_list PREFIX:line="212" PREFIX:column="17">(<param><decl><type><name PREFIX:line="212" PREFIX:column="18">void</name></type></decl></param>)</parameter_list> 
+<block PREFIX:line="213" PREFIX:column="1">{
+}</block></function>
+
+<function><type><name PREFIX:line="216" PREFIX:column="1">void</name></type> <name><name PREFIX:line="216" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="216" PREFIX:column="14">click</name></name><parameter_list PREFIX:line="216" PREFIX:column="19">(<param><decl><type><name PREFIX:line="216" PREFIX:column="20">uint8_t</name></type> <name PREFIX:line="216" PREFIX:column="28">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="217" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="218" PREFIX:column="9">_buttons</name> = <name PREFIX:line="218" PREFIX:column="20">b</name></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="219" PREFIX:column="9">move</name><argument_list PREFIX:line="219" PREFIX:column="13">(<argument><expr PREFIX:line="219" PREFIX:column="14">0</expr></argument>,<argument><expr PREFIX:line="219" PREFIX:column="16">0</expr></argument>,<argument><expr PREFIX:line="219" PREFIX:column="18">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="220" PREFIX:column="9">_buttons</name> = 0</expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="221" PREFIX:column="9">move</name><argument_list PREFIX:line="221" PREFIX:column="13">(<argument><expr PREFIX:line="221" PREFIX:column="14">0</expr></argument>,<argument><expr PREFIX:line="221" PREFIX:column="16">0</expr></argument>,<argument><expr PREFIX:line="221" PREFIX:column="18">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="224" PREFIX:column="1">void</name></type> <name><name PREFIX:line="224" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="224" PREFIX:column="14">move</name></name><parameter_list PREFIX:line="224" PREFIX:column="18">(<param><decl><type><name PREFIX:line="224" PREFIX:column="19">signed</name> <name PREFIX:line="224" PREFIX:column="26">char</name></type> <name PREFIX:line="224" PREFIX:column="31">x</name></decl></param>, <param><decl><type><name PREFIX:line="224" PREFIX:column="34">signed</name> <name PREFIX:line="224" PREFIX:column="41">char</name></type> <name PREFIX:line="224" PREFIX:column="46">y</name></decl></param>, <param><decl><type><name PREFIX:line="224" PREFIX:column="49">signed</name> <name PREFIX:line="224" PREFIX:column="56">char</name></type> <name PREFIX:line="224" PREFIX:column="61">wheel</name></decl></param>)</parameter_list>
+<block PREFIX:line="225" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="226" PREFIX:column="9">u8</name></type> <name><name PREFIX:line="226" PREFIX:column="12">m</name><index PREFIX:line="226" PREFIX:column="13">[<expr PREFIX:line="226" PREFIX:column="14">4</expr>]</index></name></decl>;</decl_stmt>
+	<expr_stmt><expr><name><name PREFIX:line="227" PREFIX:column="9">m</name><index PREFIX:line="227" PREFIX:column="10">[<expr PREFIX:line="227" PREFIX:column="11">0</expr>]</index></name> = <name PREFIX:line="227" PREFIX:column="16">_buttons</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name><name PREFIX:line="228" PREFIX:column="9">m</name><index PREFIX:line="228" PREFIX:column="10">[<expr PREFIX:line="228" PREFIX:column="11">1</expr>]</index></name> = <name PREFIX:line="228" PREFIX:column="16">x</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name><name PREFIX:line="229" PREFIX:column="9">m</name><index PREFIX:line="229" PREFIX:column="10">[<expr PREFIX:line="229" PREFIX:column="11">2</expr>]</index></name> = <name PREFIX:line="229" PREFIX:column="16">y</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name><name PREFIX:line="230" PREFIX:column="9">m</name><index PREFIX:line="230" PREFIX:column="10">[<expr PREFIX:line="230" PREFIX:column="11">3</expr>]</index></name> = <name PREFIX:line="230" PREFIX:column="16">wheel</name></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="231" PREFIX:column="9">HID_SendReport</name><argument_list PREFIX:line="231" PREFIX:column="23">(<argument><expr PREFIX:line="231" PREFIX:column="24">1</expr></argument>,<argument><expr><name PREFIX:line="231" PREFIX:column="26">m</name></expr></argument>,<argument><expr PREFIX:line="231" PREFIX:column="28">4</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="234" PREFIX:column="1">void</name></type> <name><name PREFIX:line="234" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="234" PREFIX:column="14">buttons</name></name><parameter_list PREFIX:line="234" PREFIX:column="21">(<param><decl><type><name PREFIX:line="234" PREFIX:column="22">uint8_t</name></type> <name PREFIX:line="234" PREFIX:column="30">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="235" PREFIX:column="1">{
+	<if PREFIX:line="236" PREFIX:column="9">if <condition PREFIX:line="236" PREFIX:column="12">(<expr><name PREFIX:line="236" PREFIX:column="13">b</name> != <name PREFIX:line="236" PREFIX:column="18">_buttons</name></expr>)</condition><then PREFIX:line="236" PREFIX:column="27">
+	<block PREFIX:line="237" PREFIX:column="9">{
+		<expr_stmt><expr><name PREFIX:line="238" PREFIX:column="17">_buttons</name> = <name PREFIX:line="238" PREFIX:column="28">b</name></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="239" PREFIX:column="17">move</name><argument_list PREFIX:line="239" PREFIX:column="21">(<argument><expr PREFIX:line="239" PREFIX:column="22">0</expr></argument>,<argument><expr PREFIX:line="239" PREFIX:column="24">0</expr></argument>,<argument><expr PREFIX:line="239" PREFIX:column="26">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	}</block></then></if>
+}</block></function>
+
+<function><type><name PREFIX:line="243" PREFIX:column="1">void</name></type> <name><name PREFIX:line="243" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="243" PREFIX:column="14">press</name></name><parameter_list PREFIX:line="243" PREFIX:column="19">(<param><decl><type><name PREFIX:line="243" PREFIX:column="20">uint8_t</name></type> <name PREFIX:line="243" PREFIX:column="28">b</name></decl></param>)</parameter_list> 
+<block PREFIX:line="244" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="245" PREFIX:column="9">buttons</name><argument_list PREFIX:line="245" PREFIX:column="16">(<argument><expr><name PREFIX:line="245" PREFIX:column="17">_buttons</name> | <name PREFIX:line="245" PREFIX:column="28">b</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="248" PREFIX:column="1">void</name></type> <name><name PREFIX:line="248" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="248" PREFIX:column="14">release</name></name><parameter_list PREFIX:line="248" PREFIX:column="21">(<param><decl><type><name PREFIX:line="248" PREFIX:column="22">uint8_t</name></type> <name PREFIX:line="248" PREFIX:column="30">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="249" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="250" PREFIX:column="9">buttons</name><argument_list PREFIX:line="250" PREFIX:column="16">(<argument><expr><name PREFIX:line="250" PREFIX:column="17">_buttons</name> &amp; ~<name PREFIX:line="250" PREFIX:column="29">b</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="253" PREFIX:column="1">bool</name></type> <name><name PREFIX:line="253" PREFIX:column="6">Mouse_</name>::<name PREFIX:line="253" PREFIX:column="14">isPressed</name></name><parameter_list PREFIX:line="253" PREFIX:column="23">(<param><decl><type><name PREFIX:line="253" PREFIX:column="24">uint8_t</name></type> <name PREFIX:line="253" PREFIX:column="32">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="254" PREFIX:column="1">{
+	<if PREFIX:line="255" PREFIX:column="9">if <condition PREFIX:line="255" PREFIX:column="12">(<expr PREFIX:line="255" PREFIX:column="13">(<name PREFIX:line="255" PREFIX:column="14">b</name> &amp; <name PREFIX:line="255" PREFIX:column="18">_buttons</name>) &gt; 0</expr>)</condition><then PREFIX:line="255" PREFIX:column="32"> 
+		<return PREFIX:line="256" PREFIX:column="17">return <expr PREFIX:line="256" PREFIX:column="24">true</expr>;</return></then></if>
+	<return PREFIX:line="257" PREFIX:column="9">return <expr PREFIX:line="257" PREFIX:column="16">false</expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="260" PREFIX:column="1">//================================================================================</comment>
+<comment type="line" PREFIX:line="261" PREFIX:column="1">//================================================================================</comment>
+<comment type="line" PREFIX:line="262" PREFIX:column="1">//	Keyboard</comment>
+
+<constructor><name><name PREFIX:line="264" PREFIX:column="1">Keyboard_</name>::<name PREFIX:line="264" PREFIX:column="12">Keyboard_</name></name><parameter_list PREFIX:line="264" PREFIX:column="21">(<param><decl><type><name PREFIX:line="264" PREFIX:column="22">void</name></type></decl></param>)</parameter_list> 
+<block PREFIX:line="265" PREFIX:column="1">{
+}</block></constructor>
+
+<function><type><name PREFIX:line="268" PREFIX:column="1">void</name></type> <name><name PREFIX:line="268" PREFIX:column="6">Keyboard_</name>::<name PREFIX:line="268" PREFIX:column="17">begin</name></name><parameter_list PREFIX:line="268" PREFIX:column="22">(<param><decl><type><name PREFIX:line="268" PREFIX:column="23">void</name></type></decl></param>)</parameter_list> 
+<block PREFIX:line="269" PREFIX:column="1">{
+}</block></function>
+
+<function><type><name PREFIX:line="272" PREFIX:column="1">void</name></type> <name><name PREFIX:line="272" PREFIX:column="6">Keyboard_</name>::<name PREFIX:line="272" PREFIX:column="17">end</name></name><parameter_list PREFIX:line="272" PREFIX:column="20">(<param><decl><type><name PREFIX:line="272" PREFIX:column="21">void</name></type></decl></param>)</parameter_list> 
+<block PREFIX:line="273" PREFIX:column="1">{
+}</block></function>
+
+<function><type><name PREFIX:line="276" PREFIX:column="1">void</name></type> <name><name PREFIX:line="276" PREFIX:column="6">Keyboard_</name>::<name PREFIX:line="276" PREFIX:column="17">sendReport</name></name><parameter_list PREFIX:line="276" PREFIX:column="27">(<param><decl><type><name PREFIX:line="276" PREFIX:column="28">KeyReport</name>*</type> <name PREFIX:line="276" PREFIX:column="39">keys</name></decl></param>)</parameter_list>
+<block PREFIX:line="277" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="278" PREFIX:column="9">HID_SendReport</name><argument_list PREFIX:line="278" PREFIX:column="23">(<argument><expr PREFIX:line="278" PREFIX:column="24">2</expr></argument>,<argument><expr><name PREFIX:line="278" PREFIX:column="26">keys</name></expr></argument>,<argument><expr><sizeof PREFIX:line="278" PREFIX:column="31">sizeof<argument_list PREFIX:line="278" PREFIX:column="37">(<argument><expr><name PREFIX:line="278" PREFIX:column="38">KeyReport</name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+
+ <decl_stmt><decl><type><name PREFIX:line="282" PREFIX:column="2">uint8_t</name> <name PREFIX:line="282" PREFIX:column="10">_asciimap</name><index PREFIX:line="282" PREFIX:column="19">[<expr PREFIX:line="282" PREFIX:column="20">128</expr>]</index></type> <name PREFIX:line="282" PREFIX:column="25">PROGMEM</name></decl>;</decl_stmt>
+
+<cpp:define PREFIX:line="284" PREFIX:column="1">#<cpp:directive PREFIX:line="284" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="284" PREFIX:column="9">SHIFT</name></cpp:macro> <cpp:value PREFIX:line="284" PREFIX:column="15">0x80</cpp:value></cpp:define>
+ <decl_stmt><decl><type><name PREFIX:line="285" PREFIX:column="2">uint8_t</name></type> <name><name PREFIX:line="285" PREFIX:column="10">_asciimap</name><index PREFIX:line="285" PREFIX:column="19">[<expr PREFIX:line="285" PREFIX:column="20">128</expr>]</index></name> <init PREFIX:line="285" PREFIX:column="25">=
+<expr><block PREFIX:line="286" PREFIX:column="1">{
+	<expr PREFIX:line="287" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="287" PREFIX:column="27">// NUL</comment>
+	<expr PREFIX:line="288" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="288" PREFIX:column="27">// SOH</comment>
+	<expr PREFIX:line="289" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="289" PREFIX:column="27">// STX</comment>
+	<expr PREFIX:line="290" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="290" PREFIX:column="27">// ETX</comment>
+	<expr PREFIX:line="291" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="291" PREFIX:column="27">// EOT</comment>
+	<expr PREFIX:line="292" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="292" PREFIX:column="27">// ENQ</comment>
+	<expr PREFIX:line="293" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="293" PREFIX:column="27">// ACK  </comment>
+	<expr PREFIX:line="294" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="294" PREFIX:column="27">// BEL</comment>
+	<expr PREFIX:line="295" PREFIX:column="9">0x2a</expr>,			<comment type="line" PREFIX:line="295" PREFIX:column="33">// BS	Backspace</comment>
+	<expr PREFIX:line="296" PREFIX:column="9">0x2b</expr>,			<comment type="line" PREFIX:line="296" PREFIX:column="33">// TAB	Tab</comment>
+	<expr PREFIX:line="297" PREFIX:column="9">0x28</expr>,			<comment type="line" PREFIX:line="297" PREFIX:column="33">// LF	Enter</comment>
+	<expr PREFIX:line="298" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="298" PREFIX:column="27">// VT </comment>
+	<expr PREFIX:line="299" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="299" PREFIX:column="27">// FF </comment>
+	<expr PREFIX:line="300" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="300" PREFIX:column="27">// CR </comment>
+	<expr PREFIX:line="301" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="301" PREFIX:column="27">// SO </comment>
+	<expr PREFIX:line="302" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="302" PREFIX:column="27">// SI </comment>
+	<expr PREFIX:line="303" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="303" PREFIX:column="27">// DEL</comment>
+	<expr PREFIX:line="304" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="304" PREFIX:column="27">// DC1</comment>
+	<expr PREFIX:line="305" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="305" PREFIX:column="27">// DC2</comment>
+	<expr PREFIX:line="306" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="306" PREFIX:column="27">// DC3</comment>
+	<expr PREFIX:line="307" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="307" PREFIX:column="27">// DC4</comment>
+	<expr PREFIX:line="308" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="308" PREFIX:column="27">// NAK</comment>
+	<expr PREFIX:line="309" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="309" PREFIX:column="27">// SYN</comment>
+	<expr PREFIX:line="310" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="310" PREFIX:column="27">// ETB</comment>
+	<expr PREFIX:line="311" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="311" PREFIX:column="27">// CAN</comment>
+	<expr PREFIX:line="312" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="312" PREFIX:column="27">// EM </comment>
+	<expr PREFIX:line="313" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="313" PREFIX:column="27">// SUB</comment>
+	<expr PREFIX:line="314" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="314" PREFIX:column="27">// ESC</comment>
+	<expr PREFIX:line="315" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="315" PREFIX:column="27">// FS </comment>
+	<expr PREFIX:line="316" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="316" PREFIX:column="27">// GS </comment>
+	<expr PREFIX:line="317" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="317" PREFIX:column="27">// RS </comment>
+	<expr PREFIX:line="318" PREFIX:column="9">0x00</expr>,             <comment type="line" PREFIX:line="318" PREFIX:column="27">// US </comment>
+
+	<expr PREFIX:line="320" PREFIX:column="9">0x2c</expr>,		   <comment type="line" PREFIX:line="320" PREFIX:column="28">//  ' '</comment>
+	<expr PREFIX:line="321" PREFIX:column="9">0x1e|<name PREFIX:line="321" PREFIX:column="14">SHIFT</name></expr>,	   <comment type="line" PREFIX:line="321" PREFIX:column="28">// !</comment>
+	<expr PREFIX:line="322" PREFIX:column="9">0x34|<name PREFIX:line="322" PREFIX:column="14">SHIFT</name></expr>,	   <comment type="line" PREFIX:line="322" PREFIX:column="28">// "</comment>
+	<expr PREFIX:line="323" PREFIX:column="9">0x20|<name PREFIX:line="323" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="323" PREFIX:column="24">// #</comment>
+	<expr PREFIX:line="324" PREFIX:column="9">0x21|<name PREFIX:line="324" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="324" PREFIX:column="24">// $</comment>
+	<expr PREFIX:line="325" PREFIX:column="9">0x22|<name PREFIX:line="325" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="325" PREFIX:column="24">// %</comment>
+	<expr PREFIX:line="326" PREFIX:column="9">0x24|<name PREFIX:line="326" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="326" PREFIX:column="24">// &amp;</comment>
+	<expr PREFIX:line="327" PREFIX:column="9">0x34</expr>,          <comment type="line" PREFIX:line="327" PREFIX:column="24">// '</comment>
+	<expr PREFIX:line="328" PREFIX:column="9">0x26|<name PREFIX:line="328" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="328" PREFIX:column="24">// (</comment>
+	<expr PREFIX:line="329" PREFIX:column="9">0x27|<name PREFIX:line="329" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="329" PREFIX:column="24">// )</comment>
+	<expr PREFIX:line="330" PREFIX:column="9">0x25|<name PREFIX:line="330" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="330" PREFIX:column="24">// *</comment>
+	<expr PREFIX:line="331" PREFIX:column="9">0x2e|<name PREFIX:line="331" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="331" PREFIX:column="24">// +</comment>
+	<expr PREFIX:line="332" PREFIX:column="9">0x36</expr>,          <comment type="line" PREFIX:line="332" PREFIX:column="24">// ,</comment>
+	<expr PREFIX:line="333" PREFIX:column="9">0x2d</expr>,          <comment type="line" PREFIX:line="333" PREFIX:column="24">// -</comment>
+	<expr PREFIX:line="334" PREFIX:column="9">0x37</expr>,          <comment type="line" PREFIX:line="334" PREFIX:column="24">// .</comment>
+	<expr PREFIX:line="335" PREFIX:column="9">0x38</expr>,          <comment type="line" PREFIX:line="335" PREFIX:column="24">// /</comment>
+	<expr PREFIX:line="336" PREFIX:column="9">0x27</expr>,          <comment type="line" PREFIX:line="336" PREFIX:column="24">// 0</comment>
+	<expr PREFIX:line="337" PREFIX:column="9">0x1e</expr>,          <comment type="line" PREFIX:line="337" PREFIX:column="24">// 1</comment>
+	<expr PREFIX:line="338" PREFIX:column="9">0x1f</expr>,          <comment type="line" PREFIX:line="338" PREFIX:column="24">// 2</comment>
+	<expr PREFIX:line="339" PREFIX:column="9">0x20</expr>,          <comment type="line" PREFIX:line="339" PREFIX:column="24">// 3</comment>
+	<expr PREFIX:line="340" PREFIX:column="9">0x21</expr>,          <comment type="line" PREFIX:line="340" PREFIX:column="24">// 4</comment>
+	<expr PREFIX:line="341" PREFIX:column="9">0x22</expr>,          <comment type="line" PREFIX:line="341" PREFIX:column="24">// 5</comment>
+	<expr PREFIX:line="342" PREFIX:column="9">0x23</expr>,          <comment type="line" PREFIX:line="342" PREFIX:column="24">// 6</comment>
+	<expr PREFIX:line="343" PREFIX:column="9">0x24</expr>,          <comment type="line" PREFIX:line="343" PREFIX:column="24">// 7</comment>
+	<expr PREFIX:line="344" PREFIX:column="9">0x25</expr>,          <comment type="line" PREFIX:line="344" PREFIX:column="24">// 8</comment>
+	<expr PREFIX:line="345" PREFIX:column="9">0x26</expr>,          <comment type="line" PREFIX:line="345" PREFIX:column="24">// 9</comment>
+	<expr PREFIX:line="346" PREFIX:column="9">0x33|<name PREFIX:line="346" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="346" PREFIX:column="26">// :</comment>
+	<expr PREFIX:line="347" PREFIX:column="9">0x33</expr>,          <comment type="line" PREFIX:line="347" PREFIX:column="24">// ;</comment>
+	<expr PREFIX:line="348" PREFIX:column="9">0x36|<name PREFIX:line="348" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="348" PREFIX:column="26">// &lt;</comment>
+	<expr PREFIX:line="349" PREFIX:column="9">0x2e</expr>,          <comment type="line" PREFIX:line="349" PREFIX:column="24">// =</comment>
+	<expr PREFIX:line="350" PREFIX:column="9">0x37|<name PREFIX:line="350" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="350" PREFIX:column="26">// &gt;</comment>
+	<expr PREFIX:line="351" PREFIX:column="9">0x38|<name PREFIX:line="351" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="351" PREFIX:column="26">// ?</comment>
+	<expr PREFIX:line="352" PREFIX:column="9">0x1f|<name PREFIX:line="352" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="352" PREFIX:column="26">// @</comment>
+	<expr PREFIX:line="353" PREFIX:column="9">0x04|<name PREFIX:line="353" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="353" PREFIX:column="26">// A</comment>
+	<expr PREFIX:line="354" PREFIX:column="9">0x05|<name PREFIX:line="354" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="354" PREFIX:column="26">// B</comment>
+	<expr PREFIX:line="355" PREFIX:column="9">0x06|<name PREFIX:line="355" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="355" PREFIX:column="26">// C</comment>
+	<expr PREFIX:line="356" PREFIX:column="9">0x07|<name PREFIX:line="356" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="356" PREFIX:column="26">// D</comment>
+	<expr PREFIX:line="357" PREFIX:column="9">0x08|<name PREFIX:line="357" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="357" PREFIX:column="26">// E</comment>
+	<expr PREFIX:line="358" PREFIX:column="9">0x09|<name PREFIX:line="358" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="358" PREFIX:column="26">// F</comment>
+	<expr PREFIX:line="359" PREFIX:column="9">0x0a|<name PREFIX:line="359" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="359" PREFIX:column="26">// G</comment>
+	<expr PREFIX:line="360" PREFIX:column="9">0x0b|<name PREFIX:line="360" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="360" PREFIX:column="26">// H</comment>
+	<expr PREFIX:line="361" PREFIX:column="9">0x0c|<name PREFIX:line="361" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="361" PREFIX:column="26">// I</comment>
+	<expr PREFIX:line="362" PREFIX:column="9">0x0d|<name PREFIX:line="362" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="362" PREFIX:column="26">// J</comment>
+	<expr PREFIX:line="363" PREFIX:column="9">0x0e|<name PREFIX:line="363" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="363" PREFIX:column="26">// K</comment>
+	<expr PREFIX:line="364" PREFIX:column="9">0x0f|<name PREFIX:line="364" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="364" PREFIX:column="26">// L</comment>
+	<expr PREFIX:line="365" PREFIX:column="9">0x10|<name PREFIX:line="365" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="365" PREFIX:column="26">// M</comment>
+	<expr PREFIX:line="366" PREFIX:column="9">0x11|<name PREFIX:line="366" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="366" PREFIX:column="26">// N</comment>
+	<expr PREFIX:line="367" PREFIX:column="9">0x12|<name PREFIX:line="367" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="367" PREFIX:column="26">// O</comment>
+	<expr PREFIX:line="368" PREFIX:column="9">0x13|<name PREFIX:line="368" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="368" PREFIX:column="26">// P</comment>
+	<expr PREFIX:line="369" PREFIX:column="9">0x14|<name PREFIX:line="369" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="369" PREFIX:column="26">// Q</comment>
+	<expr PREFIX:line="370" PREFIX:column="9">0x15|<name PREFIX:line="370" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="370" PREFIX:column="26">// R</comment>
+	<expr PREFIX:line="371" PREFIX:column="9">0x16|<name PREFIX:line="371" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="371" PREFIX:column="26">// S</comment>
+	<expr PREFIX:line="372" PREFIX:column="9">0x17|<name PREFIX:line="372" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="372" PREFIX:column="26">// T</comment>
+	<expr PREFIX:line="373" PREFIX:column="9">0x18|<name PREFIX:line="373" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="373" PREFIX:column="26">// U</comment>
+	<expr PREFIX:line="374" PREFIX:column="9">0x19|<name PREFIX:line="374" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="374" PREFIX:column="26">// V</comment>
+	<expr PREFIX:line="375" PREFIX:column="9">0x1a|<name PREFIX:line="375" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="375" PREFIX:column="26">// W</comment>
+	<expr PREFIX:line="376" PREFIX:column="9">0x1b|<name PREFIX:line="376" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="376" PREFIX:column="26">// X</comment>
+	<expr PREFIX:line="377" PREFIX:column="9">0x1c|<name PREFIX:line="377" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="377" PREFIX:column="26">// Y</comment>
+	<expr PREFIX:line="378" PREFIX:column="9">0x1d|<name PREFIX:line="378" PREFIX:column="14">SHIFT</name></expr>,      <comment type="line" PREFIX:line="378" PREFIX:column="26">// Z</comment>
+	<expr PREFIX:line="379" PREFIX:column="9">0x2f</expr>,          <comment type="line" PREFIX:line="379" PREFIX:column="24">// [</comment>
+	<expr PREFIX:line="380" PREFIX:column="9">0x31</expr>,          <comment type="line" PREFIX:line="380" PREFIX:column="24">// bslash</comment>
+	<expr PREFIX:line="381" PREFIX:column="9">0x30</expr>,          <comment type="line" PREFIX:line="381" PREFIX:column="24">// ]</comment>
+	<expr PREFIX:line="382" PREFIX:column="9">0x23|<name PREFIX:line="382" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="382" PREFIX:column="24">// ^</comment>
+	<expr PREFIX:line="383" PREFIX:column="9">0x2d|<name PREFIX:line="383" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="383" PREFIX:column="24">// _</comment>
+	<expr PREFIX:line="384" PREFIX:column="9">0x35</expr>,          <comment type="line" PREFIX:line="384" PREFIX:column="24">// `</comment>
+	<expr PREFIX:line="385" PREFIX:column="9">0x04</expr>,          <comment type="line" PREFIX:line="385" PREFIX:column="24">// a</comment>
+	<expr PREFIX:line="386" PREFIX:column="9">0x05</expr>,          <comment type="line" PREFIX:line="386" PREFIX:column="24">// b</comment>
+	<expr PREFIX:line="387" PREFIX:column="9">0x06</expr>,          <comment type="line" PREFIX:line="387" PREFIX:column="24">// c</comment>
+	<expr PREFIX:line="388" PREFIX:column="9">0x07</expr>,          <comment type="line" PREFIX:line="388" PREFIX:column="24">// d</comment>
+	<expr PREFIX:line="389" PREFIX:column="9">0x08</expr>,          <comment type="line" PREFIX:line="389" PREFIX:column="24">// e</comment>
+	<expr PREFIX:line="390" PREFIX:column="9">0x09</expr>,          <comment type="line" PREFIX:line="390" PREFIX:column="24">// f</comment>
+	<expr PREFIX:line="391" PREFIX:column="9">0x0a</expr>,          <comment type="line" PREFIX:line="391" PREFIX:column="24">// g</comment>
+	<expr PREFIX:line="392" PREFIX:column="9">0x0b</expr>,          <comment type="line" PREFIX:line="392" PREFIX:column="24">// h</comment>
+	<expr PREFIX:line="393" PREFIX:column="9">0x0c</expr>,          <comment type="line" PREFIX:line="393" PREFIX:column="24">// i</comment>
+	<expr PREFIX:line="394" PREFIX:column="9">0x0d</expr>,          <comment type="line" PREFIX:line="394" PREFIX:column="24">// j</comment>
+	<expr PREFIX:line="395" PREFIX:column="9">0x0e</expr>,          <comment type="line" PREFIX:line="395" PREFIX:column="24">// k</comment>
+	<expr PREFIX:line="396" PREFIX:column="9">0x0f</expr>,          <comment type="line" PREFIX:line="396" PREFIX:column="24">// l</comment>
+	<expr PREFIX:line="397" PREFIX:column="9">0x10</expr>,          <comment type="line" PREFIX:line="397" PREFIX:column="24">// m</comment>
+	<expr PREFIX:line="398" PREFIX:column="9">0x11</expr>,          <comment type="line" PREFIX:line="398" PREFIX:column="24">// n</comment>
+	<expr PREFIX:line="399" PREFIX:column="9">0x12</expr>,          <comment type="line" PREFIX:line="399" PREFIX:column="24">// o</comment>
+	<expr PREFIX:line="400" PREFIX:column="9">0x13</expr>,          <comment type="line" PREFIX:line="400" PREFIX:column="24">// p</comment>
+	<expr PREFIX:line="401" PREFIX:column="9">0x14</expr>,          <comment type="line" PREFIX:line="401" PREFIX:column="24">// q</comment>
+	<expr PREFIX:line="402" PREFIX:column="9">0x15</expr>,          <comment type="line" PREFIX:line="402" PREFIX:column="24">// r</comment>
+	<expr PREFIX:line="403" PREFIX:column="9">0x16</expr>,          <comment type="line" PREFIX:line="403" PREFIX:column="24">// s</comment>
+	<expr PREFIX:line="404" PREFIX:column="9">0x17</expr>,          <comment type="line" PREFIX:line="404" PREFIX:column="24">// t</comment>
+	<expr PREFIX:line="405" PREFIX:column="9">0x18</expr>,          <comment type="line" PREFIX:line="405" PREFIX:column="24">// u</comment>
+	<expr PREFIX:line="406" PREFIX:column="9">0x19</expr>,          <comment type="line" PREFIX:line="406" PREFIX:column="24">// v</comment>
+	<expr PREFIX:line="407" PREFIX:column="9">0x1a</expr>,          <comment type="line" PREFIX:line="407" PREFIX:column="24">// w</comment>
+	<expr PREFIX:line="408" PREFIX:column="9">0x1b</expr>,          <comment type="line" PREFIX:line="408" PREFIX:column="24">// x</comment>
+	<expr PREFIX:line="409" PREFIX:column="9">0x1c</expr>,          <comment type="line" PREFIX:line="409" PREFIX:column="24">// y</comment>
+	<expr PREFIX:line="410" PREFIX:column="9">0x1d</expr>,          <comment type="line" PREFIX:line="410" PREFIX:column="24">// z</comment>
+	<expr PREFIX:line="411" PREFIX:column="9">0x2f|<name PREFIX:line="411" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="411" PREFIX:column="24">// </comment>
+	<expr PREFIX:line="412" PREFIX:column="9">0x31|<name PREFIX:line="412" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="412" PREFIX:column="24">// |</comment>
+	<expr PREFIX:line="413" PREFIX:column="9">0x30|<name PREFIX:line="413" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="413" PREFIX:column="24">// }</comment>
+	<expr PREFIX:line="414" PREFIX:column="9">0x35|<name PREFIX:line="414" PREFIX:column="14">SHIFT</name></expr>,    <comment type="line" PREFIX:line="414" PREFIX:column="24">// ~</comment>
+	<expr PREFIX:line="415" PREFIX:column="9">0</expr>				<comment type="line" PREFIX:line="415" PREFIX:column="41">// DEL</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+<function_decl><type><name PREFIX:line="418" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="418" PREFIX:column="9">USBPutChar</name><parameter_list PREFIX:line="418" PREFIX:column="19">(<param><decl><type><name PREFIX:line="418" PREFIX:column="20">uint8_t</name></type> <name PREFIX:line="418" PREFIX:column="28">c</name></decl></param>)</parameter_list>;</function_decl>
+
+<comment type="line" PREFIX:line="420" PREFIX:column="1">// press() adds the specified key (printing, non-printing, or modifier)</comment>
+<comment type="line" PREFIX:line="421" PREFIX:column="1">// to the persistent key report and sends the report.  Because of the way </comment>
+<comment type="line" PREFIX:line="422" PREFIX:column="1">// USB HID works, the host acts like the key remains pressed until we </comment>
+<comment type="line" PREFIX:line="423" PREFIX:column="1">// call release(), releaseAll(), or otherwise clear the report and resend.</comment>
+<function><type><name PREFIX:line="424" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="424" PREFIX:column="8">Keyboard_</name>::<name PREFIX:line="424" PREFIX:column="19">press</name></name><parameter_list PREFIX:line="424" PREFIX:column="24">(<param><decl><type><name PREFIX:line="424" PREFIX:column="25">uint8_t</name></type> <name PREFIX:line="424" PREFIX:column="33">k</name></decl></param>)</parameter_list> 
+<block PREFIX:line="425" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="426" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="426" PREFIX:column="17">i</name></decl>;</decl_stmt>
+	<if PREFIX:line="427" PREFIX:column="9">if <condition PREFIX:line="427" PREFIX:column="12">(<expr><name PREFIX:line="427" PREFIX:column="13">k</name> &gt;= 136</expr>)</condition><then PREFIX:line="427" PREFIX:column="22"> <block PREFIX:line="427" PREFIX:column="23">{			<comment type="line" PREFIX:line="427" PREFIX:column="41">// it's a non-printing key (not a modifier)</comment>
+		<expr_stmt><expr><name PREFIX:line="428" PREFIX:column="17">k</name> = <name PREFIX:line="428" PREFIX:column="21">k</name> - 136</expr>;</expr_stmt>
+	}</block></then> <else PREFIX:line="429" PREFIX:column="11">else <if PREFIX:line="429" PREFIX:column="16">if <condition PREFIX:line="429" PREFIX:column="19">(<expr><name PREFIX:line="429" PREFIX:column="20">k</name> &gt;= 128</expr>)</condition><then PREFIX:line="429" PREFIX:column="29"> <block PREFIX:line="429" PREFIX:column="30">{	<comment type="line" PREFIX:line="429" PREFIX:column="33">// it's a modifier key</comment>
+		<expr_stmt><expr><name><name PREFIX:line="430" PREFIX:column="17">_keyReport</name>.<name PREFIX:line="430" PREFIX:column="28">modifiers</name></name> |= (1&lt;&lt;(<name PREFIX:line="430" PREFIX:column="46">k</name>-128))</expr>;</expr_stmt>
+		<expr_stmt><expr><name PREFIX:line="431" PREFIX:column="17">k</name> = 0</expr>;</expr_stmt>
+	}</block></then> <else PREFIX:line="432" PREFIX:column="11">else <block PREFIX:line="432" PREFIX:column="16">{				<comment type="line" PREFIX:line="432" PREFIX:column="49">// it's a printing key</comment>
+		<expr_stmt><expr><name PREFIX:line="433" PREFIX:column="17">k</name> = <call><name PREFIX:line="433" PREFIX:column="21">pgm_read_byte</name><argument_list PREFIX:line="433" PREFIX:column="34">(<argument><expr><name PREFIX:line="433" PREFIX:column="35">_asciimap</name> + <name PREFIX:line="433" PREFIX:column="47">k</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<if PREFIX:line="434" PREFIX:column="17">if <condition PREFIX:line="434" PREFIX:column="20">(<expr PREFIX:line="434" PREFIX:column="21">!<name PREFIX:line="434" PREFIX:column="22">k</name></expr>)</condition><then PREFIX:line="434" PREFIX:column="24"> <block PREFIX:line="434" PREFIX:column="25">{
+			<expr_stmt><expr><call><name PREFIX:line="435" PREFIX:column="25">setWriteError</name><argument_list PREFIX:line="435" PREFIX:column="38">()</argument_list></call></expr>;</expr_stmt>
+			<return PREFIX:line="436" PREFIX:column="25">return <expr PREFIX:line="436" PREFIX:column="32">0</expr>;</return>
+		}</block></then></if>
+		<if PREFIX:line="438" PREFIX:column="17">if <condition PREFIX:line="438" PREFIX:column="20">(<expr><name PREFIX:line="438" PREFIX:column="21">k</name> &amp; 0x80</expr>)</condition><then PREFIX:line="438" PREFIX:column="30"> <block PREFIX:line="438" PREFIX:column="31">{						<comment type="line" PREFIX:line="438" PREFIX:column="73">// it's a capital letter or other character reached with shift</comment>
+			<expr_stmt><expr><name><name PREFIX:line="439" PREFIX:column="25">_keyReport</name>.<name PREFIX:line="439" PREFIX:column="36">modifiers</name></name> |= 0x02</expr>;</expr_stmt>	<comment type="line" PREFIX:line="439" PREFIX:column="57">// the left shift modifier</comment>
+			<expr_stmt><expr><name PREFIX:line="440" PREFIX:column="25">k</name> &amp;= 0x7F</expr>;</expr_stmt>
+		}</block></then></if>
+	}</block></else></if></else></if>
+	
+	<comment type="line" PREFIX:line="444" PREFIX:column="9">// Add k to the key report only if it's not already present</comment>
+	<comment type="line" PREFIX:line="445" PREFIX:column="9">// and if there is an empty slot.</comment>
+	<if PREFIX:line="446" PREFIX:column="9">if <condition PREFIX:line="446" PREFIX:column="12">(<expr><name><name PREFIX:line="446" PREFIX:column="13">_keyReport</name>.<name PREFIX:line="446" PREFIX:column="24">keys</name><index PREFIX:line="446" PREFIX:column="28">[<expr PREFIX:line="446" PREFIX:column="29">0</expr>]</index></name> != <name PREFIX:line="446" PREFIX:column="35">k</name> &amp;&amp; <name><name PREFIX:line="446" PREFIX:column="40">_keyReport</name>.<name PREFIX:line="446" PREFIX:column="51">keys</name><index PREFIX:line="446" PREFIX:column="55">[<expr PREFIX:line="446" PREFIX:column="56">1</expr>]</index></name> != <name PREFIX:line="446" PREFIX:column="62">k</name> &amp;&amp; 
+		<name><name PREFIX:line="447" PREFIX:column="17">_keyReport</name>.<name PREFIX:line="447" PREFIX:column="28">keys</name><index PREFIX:line="447" PREFIX:column="32">[<expr PREFIX:line="447" PREFIX:column="33">2</expr>]</index></name> != <name PREFIX:line="447" PREFIX:column="39">k</name> &amp;&amp; <name><name PREFIX:line="447" PREFIX:column="44">_keyReport</name>.<name PREFIX:line="447" PREFIX:column="55">keys</name><index PREFIX:line="447" PREFIX:column="59">[<expr PREFIX:line="447" PREFIX:column="60">3</expr>]</index></name> != <name PREFIX:line="447" PREFIX:column="66">k</name> &amp;&amp;
+		<name><name PREFIX:line="448" PREFIX:column="17">_keyReport</name>.<name PREFIX:line="448" PREFIX:column="28">keys</name><index PREFIX:line="448" PREFIX:column="32">[<expr PREFIX:line="448" PREFIX:column="33">4</expr>]</index></name> != <name PREFIX:line="448" PREFIX:column="39">k</name> &amp;&amp; <name><name PREFIX:line="448" PREFIX:column="44">_keyReport</name>.<name PREFIX:line="448" PREFIX:column="55">keys</name><index PREFIX:line="448" PREFIX:column="59">[<expr PREFIX:line="448" PREFIX:column="60">5</expr>]</index></name> != <name PREFIX:line="448" PREFIX:column="66">k</name></expr>)</condition><then PREFIX:line="448" PREFIX:column="68"> <block PREFIX:line="448" PREFIX:column="69">{
+		
+		<for PREFIX:line="450" PREFIX:column="17">for (<init><expr><name PREFIX:line="450" PREFIX:column="22">i</name>=0</expr>;</init> <condition><expr><name PREFIX:line="450" PREFIX:column="27">i</name>&lt;6</expr>;</condition> <incr><expr><name PREFIX:line="450" PREFIX:column="32">i</name>++</expr></incr>) <block PREFIX:line="450" PREFIX:column="37">{
+			<if PREFIX:line="451" PREFIX:column="25">if <condition PREFIX:line="451" PREFIX:column="28">(<expr><name><name PREFIX:line="451" PREFIX:column="29">_keyReport</name>.<name PREFIX:line="451" PREFIX:column="40">keys</name><index PREFIX:line="451" PREFIX:column="44">[<expr><name PREFIX:line="451" PREFIX:column="45">i</name></expr>]</index></name> == 0x00</expr>)</condition><then PREFIX:line="451" PREFIX:column="56"> <block PREFIX:line="451" PREFIX:column="57">{
+				<expr_stmt><expr><name><name PREFIX:line="452" PREFIX:column="33">_keyReport</name>.<name PREFIX:line="452" PREFIX:column="44">keys</name><index PREFIX:line="452" PREFIX:column="48">[<expr><name PREFIX:line="452" PREFIX:column="49">i</name></expr>]</index></name> = <name PREFIX:line="452" PREFIX:column="54">k</name></expr>;</expr_stmt>
+				<break PREFIX:line="453" PREFIX:column="33">break;</break>
+			}</block></then></if>
+		}</block></for>
+		<if PREFIX:line="456" PREFIX:column="17">if <condition PREFIX:line="456" PREFIX:column="20">(<expr><name PREFIX:line="456" PREFIX:column="21">i</name> == 6</expr>)</condition><then PREFIX:line="456" PREFIX:column="28"> <block PREFIX:line="456" PREFIX:column="29">{
+			<expr_stmt><expr><call><name PREFIX:line="457" PREFIX:column="25">setWriteError</name><argument_list PREFIX:line="457" PREFIX:column="38">()</argument_list></call></expr>;</expr_stmt>
+			<return PREFIX:line="458" PREFIX:column="25">return <expr PREFIX:line="458" PREFIX:column="32">0</expr>;</return>
+		}</block></then></if>	
+	}</block></then></if>
+	<expr_stmt><expr><call><name PREFIX:line="461" PREFIX:column="9">sendReport</name><argument_list PREFIX:line="461" PREFIX:column="19">(<argument><expr PREFIX:line="461" PREFIX:column="20">&amp;<name PREFIX:line="461" PREFIX:column="21">_keyReport</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="462" PREFIX:column="9">return <expr PREFIX:line="462" PREFIX:column="16">1</expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="465" PREFIX:column="1">// release() takes the specified key out of the persistent key report and</comment>
+<comment type="line" PREFIX:line="466" PREFIX:column="1">// sends the report.  This tells the OS the key is no longer pressed and that</comment>
+<comment type="line" PREFIX:line="467" PREFIX:column="1">// it shouldn't be repeated any more.</comment>
+<function><type><name PREFIX:line="468" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="468" PREFIX:column="8">Keyboard_</name>::<name PREFIX:line="468" PREFIX:column="19">release</name></name><parameter_list PREFIX:line="468" PREFIX:column="26">(<param><decl><type><name PREFIX:line="468" PREFIX:column="27">uint8_t</name></type> <name PREFIX:line="468" PREFIX:column="35">k</name></decl></param>)</parameter_list> 
+<block PREFIX:line="469" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="470" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="470" PREFIX:column="17">i</name></decl>;</decl_stmt>
+	<if PREFIX:line="471" PREFIX:column="9">if <condition PREFIX:line="471" PREFIX:column="12">(<expr><name PREFIX:line="471" PREFIX:column="13">k</name> &gt;= 136</expr>)</condition><then PREFIX:line="471" PREFIX:column="22"> <block PREFIX:line="471" PREFIX:column="23">{			<comment type="line" PREFIX:line="471" PREFIX:column="41">// it's a non-printing key (not a modifier)</comment>
+		<expr_stmt><expr><name PREFIX:line="472" PREFIX:column="17">k</name> = <name PREFIX:line="472" PREFIX:column="21">k</name> - 136</expr>;</expr_stmt>
+	}</block></then> <else PREFIX:line="473" PREFIX:column="11">else <if PREFIX:line="473" PREFIX:column="16">if <condition PREFIX:line="473" PREFIX:column="19">(<expr><name PREFIX:line="473" PREFIX:column="20">k</name> &gt;= 128</expr>)</condition><then PREFIX:line="473" PREFIX:column="29"> <block PREFIX:line="473" PREFIX:column="30">{	<comment type="line" PREFIX:line="473" PREFIX:column="33">// it's a modifier key</comment>
+		<expr_stmt><expr><name><name PREFIX:line="474" PREFIX:column="17">_keyReport</name>.<name PREFIX:line="474" PREFIX:column="28">modifiers</name></name> &amp;= ~(1&lt;&lt;(<name PREFIX:line="474" PREFIX:column="47">k</name>-128))</expr>;</expr_stmt>
+		<expr_stmt><expr><name PREFIX:line="475" PREFIX:column="17">k</name> = 0</expr>;</expr_stmt>
+	}</block></then> <else PREFIX:line="476" PREFIX:column="11">else <block PREFIX:line="476" PREFIX:column="16">{				<comment type="line" PREFIX:line="476" PREFIX:column="49">// it's a printing key</comment>
+		<expr_stmt><expr><name PREFIX:line="477" PREFIX:column="17">k</name> = <call><name PREFIX:line="477" PREFIX:column="21">pgm_read_byte</name><argument_list PREFIX:line="477" PREFIX:column="34">(<argument><expr><name PREFIX:line="477" PREFIX:column="35">_asciimap</name> + <name PREFIX:line="477" PREFIX:column="47">k</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<if PREFIX:line="478" PREFIX:column="17">if <condition PREFIX:line="478" PREFIX:column="20">(<expr PREFIX:line="478" PREFIX:column="21">!<name PREFIX:line="478" PREFIX:column="22">k</name></expr>)</condition><then PREFIX:line="478" PREFIX:column="24"> <block PREFIX:line="478" PREFIX:column="25">{
+			<return PREFIX:line="479" PREFIX:column="25">return <expr PREFIX:line="479" PREFIX:column="32">0</expr>;</return>
+		}</block></then></if>
+		<if PREFIX:line="481" PREFIX:column="17">if <condition PREFIX:line="481" PREFIX:column="20">(<expr><name PREFIX:line="481" PREFIX:column="21">k</name> &amp; 0x80</expr>)</condition><then PREFIX:line="481" PREFIX:column="30"> <block PREFIX:line="481" PREFIX:column="31">{							<comment type="line" PREFIX:line="481" PREFIX:column="81">// it's a capital letter or other character reached with shift</comment>
+			<expr_stmt><expr><name><name PREFIX:line="482" PREFIX:column="25">_keyReport</name>.<name PREFIX:line="482" PREFIX:column="36">modifiers</name></name> &amp;= ~(0x02)</expr>;</expr_stmt>	<comment type="line" PREFIX:line="482" PREFIX:column="65">// the left shift modifier</comment>
+			<expr_stmt><expr><name PREFIX:line="483" PREFIX:column="25">k</name> &amp;= 0x7F</expr>;</expr_stmt>
+		}</block></then></if>
+	}</block></else></if></else></if>
+	
+	<comment type="line" PREFIX:line="487" PREFIX:column="9">// Test the key report to see if k is present.  Clear it if it exists.</comment>
+	<comment type="line" PREFIX:line="488" PREFIX:column="9">// Check all positions in case the key is present more than once (which it shouldn't be)</comment>
+	<for PREFIX:line="489" PREFIX:column="9">for (<init><expr><name PREFIX:line="489" PREFIX:column="14">i</name>=0</expr>;</init> <condition><expr><name PREFIX:line="489" PREFIX:column="19">i</name>&lt;6</expr>;</condition> <incr><expr><name PREFIX:line="489" PREFIX:column="24">i</name>++</expr></incr>) <block PREFIX:line="489" PREFIX:column="29">{
+		<if PREFIX:line="490" PREFIX:column="17">if <condition PREFIX:line="490" PREFIX:column="20">(<expr PREFIX:line="490" PREFIX:column="21">0 != <name PREFIX:line="490" PREFIX:column="26">k</name> &amp;&amp; <name><name PREFIX:line="490" PREFIX:column="31">_keyReport</name>.<name PREFIX:line="490" PREFIX:column="42">keys</name><index PREFIX:line="490" PREFIX:column="46">[<expr><name PREFIX:line="490" PREFIX:column="47">i</name></expr>]</index></name> == <name PREFIX:line="490" PREFIX:column="53">k</name></expr>)</condition><then PREFIX:line="490" PREFIX:column="55"> <block PREFIX:line="490" PREFIX:column="56">{
+			<expr_stmt><expr><name><name PREFIX:line="491" PREFIX:column="25">_keyReport</name>.<name PREFIX:line="491" PREFIX:column="36">keys</name><index PREFIX:line="491" PREFIX:column="40">[<expr><name PREFIX:line="491" PREFIX:column="41">i</name></expr>]</index></name> = 0x00</expr>;</expr_stmt>
+		}</block></then></if>
+	}</block></for>
+
+	<expr_stmt><expr><call><name PREFIX:line="495" PREFIX:column="9">sendReport</name><argument_list PREFIX:line="495" PREFIX:column="19">(<argument><expr PREFIX:line="495" PREFIX:column="20">&amp;<name PREFIX:line="495" PREFIX:column="21">_keyReport</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="496" PREFIX:column="9">return <expr PREFIX:line="496" PREFIX:column="16">1</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="499" PREFIX:column="1">void</name></type> <name><name PREFIX:line="499" PREFIX:column="6">Keyboard_</name>::<name PREFIX:line="499" PREFIX:column="17">releaseAll</name></name><parameter_list PREFIX:line="499" PREFIX:column="27">(<param><decl><type><name PREFIX:line="499" PREFIX:column="28">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="500" PREFIX:column="1">{
+	<expr_stmt><expr><name><name PREFIX:line="501" PREFIX:column="9">_keyReport</name>.<name PREFIX:line="501" PREFIX:column="20">keys</name><index PREFIX:line="501" PREFIX:column="24">[<expr PREFIX:line="501" PREFIX:column="25">0</expr>]</index></name> = 0</expr>;</expr_stmt>
+	<expr_stmt><expr><name><name PREFIX:line="502" PREFIX:column="9">_keyReport</name>.<name PREFIX:line="502" PREFIX:column="20">keys</name><index PREFIX:line="502" PREFIX:column="24">[<expr PREFIX:line="502" PREFIX:column="25">1</expr>]</index></name> = 0</expr>;</expr_stmt>	
+	<expr_stmt><expr><name><name PREFIX:line="503" PREFIX:column="9">_keyReport</name>.<name PREFIX:line="503" PREFIX:column="20">keys</name><index PREFIX:line="503" PREFIX:column="24">[<expr PREFIX:line="503" PREFIX:column="25">2</expr>]</index></name> = 0</expr>;</expr_stmt>
+	<expr_stmt><expr><name><name PREFIX:line="504" PREFIX:column="9">_keyReport</name>.<name PREFIX:line="504" PREFIX:column="20">keys</name><index PREFIX:line="504" PREFIX:column="24">[<expr PREFIX:line="504" PREFIX:column="25">3</expr>]</index></name> = 0</expr>;</expr_stmt>	
+	<expr_stmt><expr><name><name PREFIX:line="505" PREFIX:column="9">_keyReport</name>.<name PREFIX:line="505" PREFIX:column="20">keys</name><index PREFIX:line="505" PREFIX:column="24">[<expr PREFIX:line="505" PREFIX:column="25">4</expr>]</index></name> = 0</expr>;</expr_stmt>
+	<expr_stmt><expr><name><name PREFIX:line="506" PREFIX:column="9">_keyReport</name>.<name PREFIX:line="506" PREFIX:column="20">keys</name><index PREFIX:line="506" PREFIX:column="24">[<expr PREFIX:line="506" PREFIX:column="25">5</expr>]</index></name> = 0</expr>;</expr_stmt>	
+	<expr_stmt><expr><name><name PREFIX:line="507" PREFIX:column="9">_keyReport</name>.<name PREFIX:line="507" PREFIX:column="20">modifiers</name></name> = 0</expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="508" PREFIX:column="9">sendReport</name><argument_list PREFIX:line="508" PREFIX:column="19">(<argument><expr PREFIX:line="508" PREFIX:column="20">&amp;<name PREFIX:line="508" PREFIX:column="21">_keyReport</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="511" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="511" PREFIX:column="8">Keyboard_</name>::<name PREFIX:line="511" PREFIX:column="19">write</name></name><parameter_list PREFIX:line="511" PREFIX:column="24">(<param><decl><type><name PREFIX:line="511" PREFIX:column="25">uint8_t</name></type> <name PREFIX:line="511" PREFIX:column="33">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="512" PREFIX:column="1">{	
+	<decl_stmt><decl><type><name PREFIX:line="513" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="513" PREFIX:column="17">p</name> <init PREFIX:line="513" PREFIX:column="19">= <expr><call><name PREFIX:line="513" PREFIX:column="21">press</name><argument_list PREFIX:line="513" PREFIX:column="26">(<argument><expr><name PREFIX:line="513" PREFIX:column="27">c</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>		<comment type="line" PREFIX:line="513" PREFIX:column="41">// Keydown</comment>
+	<decl_stmt><decl><type><name PREFIX:line="514" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="514" PREFIX:column="17">r</name> <init PREFIX:line="514" PREFIX:column="19">= <expr><call><name PREFIX:line="514" PREFIX:column="21">release</name><argument_list PREFIX:line="514" PREFIX:column="28">(<argument><expr><name PREFIX:line="514" PREFIX:column="29">c</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>		<comment type="line" PREFIX:line="514" PREFIX:column="41">// Keyup</comment>
+	<return PREFIX:line="515" PREFIX:column="9">return <expr PREFIX:line="515" PREFIX:column="16">(<name PREFIX:line="515" PREFIX:column="17">p</name>)</expr>;</return>					<comment type="line" PREFIX:line="515" PREFIX:column="57">// just return the result of press() since release() almost always returns 1</comment>
+}</block></function>
+
+<cpp:endif PREFIX:line="518" PREFIX:column="1">#<cpp:directive PREFIX:line="518" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:endif PREFIX:line="520" PREFIX:column="1">#<cpp:directive PREFIX:line="520" PREFIX:column="2">endif</cpp:directive></cpp:endif> <comment type="block" PREFIX:line="520" PREFIX:column="8">/* if defined(USBCON) */</comment>
+</unit>

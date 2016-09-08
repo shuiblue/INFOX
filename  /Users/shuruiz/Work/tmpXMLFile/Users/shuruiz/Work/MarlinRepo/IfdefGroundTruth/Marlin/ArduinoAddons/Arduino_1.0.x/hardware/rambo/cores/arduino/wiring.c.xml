@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/hardware/rambo/cores/arduino/wiring.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  wiring.c - Partial implementation of the Wiring API for the ATmega8.
+  Part of Arduino - http://www.arduino.cc/
+
+  Copyright (c) 2005-2006 David A. Mellis
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General
+  Public License along with this library; if not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  Boston, MA  02111-1307  USA
+
+  $Id$
+*/</comment>
+
+<cpp:include PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="25" PREFIX:column="10">"wiring_private.h"</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="27" PREFIX:column="1">// the prescaler is set so that timer0 ticks every 64 clock cycles, and the</comment>
+<comment type="line" PREFIX:line="28" PREFIX:column="1">// the overflow handler is called every 256 ticks.</comment>
+<cpp:define PREFIX:line="29" PREFIX:column="1">#<cpp:directive PREFIX:line="29" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="29" PREFIX:column="9">MICROSECONDS_PER_TIMER0_OVERFLOW</name></cpp:macro> <cpp:value PREFIX:line="29" PREFIX:column="42">(clockCyclesToMicroseconds(64 * 256))</cpp:value></cpp:define>
+
+<comment type="line" PREFIX:line="31" PREFIX:column="1">// the whole number of milliseconds per timer0 overflow</comment>
+<cpp:define PREFIX:line="32" PREFIX:column="1">#<cpp:directive PREFIX:line="32" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="32" PREFIX:column="9">MILLIS_INC</name></cpp:macro> <cpp:value PREFIX:line="32" PREFIX:column="20">(MICROSECONDS_PER_TIMER0_OVERFLOW / 1000)</cpp:value></cpp:define>
+
+<comment type="line" PREFIX:line="34" PREFIX:column="1">// the fractional number of milliseconds per timer0 overflow. we shift right</comment>
+<comment type="line" PREFIX:line="35" PREFIX:column="1">// by three to fit these numbers into a byte. (for the clock speeds we care</comment>
+<comment type="line" PREFIX:line="36" PREFIX:column="1">// about - 8 and 16 MHz - this doesn't lose precision.)</comment>
+<cpp:define PREFIX:line="37" PREFIX:column="1">#<cpp:directive PREFIX:line="37" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="37" PREFIX:column="9">FRACT_INC</name></cpp:macro> <cpp:value PREFIX:line="37" PREFIX:column="19">((MICROSECONDS_PER_TIMER0_OVERFLOW % 1000) &gt;&gt; 3)</cpp:value></cpp:define>
+<cpp:define PREFIX:line="38" PREFIX:column="1">#<cpp:directive PREFIX:line="38" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="38" PREFIX:column="9">FRACT_MAX</name></cpp:macro> <cpp:value PREFIX:line="38" PREFIX:column="19">(1000 &gt;&gt; 3)</cpp:value></cpp:define>
+
+<decl_stmt><decl><type><specifier PREFIX:line="40" PREFIX:column="1">volatile</specifier> <name PREFIX:line="40" PREFIX:column="10">unknowntype</name> <name PREFIX:line="40" PREFIX:column="22">long</name></type> <name PREFIX:line="40" PREFIX:column="27">timer0_overflow_count</name> <init PREFIX:line="40" PREFIX:column="49">= <expr PREFIX:line="40" PREFIX:column="51">0</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="41" PREFIX:column="1">volatile</specifier> <name PREFIX:line="41" PREFIX:column="10">unknowntype</name> <name PREFIX:line="41" PREFIX:column="22">long</name></type> <name PREFIX:line="41" PREFIX:column="27">timer0_millis</name> <init PREFIX:line="41" PREFIX:column="41">= <expr PREFIX:line="41" PREFIX:column="43">0</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="42" PREFIX:column="1">static</specifier> <name PREFIX:line="42" PREFIX:column="8">unknowntype</name> <name PREFIX:line="42" PREFIX:column="20">char</name></type> <name PREFIX:line="42" PREFIX:column="25">timer0_fract</name> <init PREFIX:line="42" PREFIX:column="38">= <expr PREFIX:line="42" PREFIX:column="40">0</expr></init></decl>;</decl_stmt>
+
+<cpp:if PREFIX:line="44" PREFIX:column="1">#<cpp:directive PREFIX:line="44" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="44" PREFIX:column="5">defined</name><argument_list PREFIX:line="44" PREFIX:column="12">(<argument><expr><name PREFIX:line="44" PREFIX:column="13">__AVR_ATtiny24__</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="44" PREFIX:column="34">defined</name><argument_list PREFIX:line="44" PREFIX:column="41">(<argument><expr><name PREFIX:line="44" PREFIX:column="42">__AVR_ATtiny44__</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="44" PREFIX:column="63">defined</name><argument_list PREFIX:line="44" PREFIX:column="70">(<argument><expr><name PREFIX:line="44" PREFIX:column="71">__AVR_ATtiny84__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<macro><name PREFIX:line="45" PREFIX:column="1">SIGNAL</name><argument_list PREFIX:line="45" PREFIX:column="7">(<argument PREFIX:line="45" PREFIX:column="8">TIM0_OVF_vect</argument>)</argument_list></macro>
+<cpp:else PREFIX:line="46" PREFIX:column="1">#<cpp:directive PREFIX:line="46" PREFIX:column="2">else</cpp:directive></cpp:else>
+<macro><name PREFIX:line="47" PREFIX:column="1">SIGNAL</name><argument_list PREFIX:line="47" PREFIX:column="7">(<argument PREFIX:line="47" PREFIX:column="8">TIMER0_OVF_vect</argument>)</argument_list></macro>
+<cpp:endif PREFIX:line="48" PREFIX:column="1">#<cpp:directive PREFIX:line="48" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<block PREFIX:line="49" PREFIX:column="1">{
+	<comment type="line" PREFIX:line="50" PREFIX:column="9">// copy these to local variables so they can be stored in registers</comment>
+	<comment type="line" PREFIX:line="51" PREFIX:column="9">// (volatile variables must be read from memory on every access)</comment>
+	<decl_stmt><decl><type><name PREFIX:line="52" PREFIX:column="9">unknowntype</name> <name PREFIX:line="52" PREFIX:column="21">long</name></type> <name PREFIX:line="52" PREFIX:column="26">m</name> <init PREFIX:line="52" PREFIX:column="28">= <expr><name PREFIX:line="52" PREFIX:column="30">timer0_millis</name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="53" PREFIX:column="9">unknowntype</name> <name PREFIX:line="53" PREFIX:column="21">char</name></type> <name PREFIX:line="53" PREFIX:column="26">f</name> <init PREFIX:line="53" PREFIX:column="28">= <expr><name PREFIX:line="53" PREFIX:column="30">timer0_fract</name></expr></init></decl>;</decl_stmt>
+
+	<expr_stmt><expr><name PREFIX:line="55" PREFIX:column="9">m</name> += <name PREFIX:line="55" PREFIX:column="14">MILLIS_INC</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="56" PREFIX:column="9">f</name> += <name PREFIX:line="56" PREFIX:column="14">FRACT_INC</name></expr>;</expr_stmt>
+	<if PREFIX:line="57" PREFIX:column="9">if <condition PREFIX:line="57" PREFIX:column="12">(<expr><name PREFIX:line="57" PREFIX:column="13">f</name> &gt;= <name PREFIX:line="57" PREFIX:column="18">FRACT_MAX</name></expr>)</condition><then PREFIX:line="57" PREFIX:column="28"> <block PREFIX:line="57" PREFIX:column="29">{
+		<expr_stmt><expr><name PREFIX:line="58" PREFIX:column="17">f</name> -= <name PREFIX:line="58" PREFIX:column="22">FRACT_MAX</name></expr>;</expr_stmt>
+		<expr_stmt><expr><name PREFIX:line="59" PREFIX:column="17">m</name> += 1</expr>;</expr_stmt>
+	}</block></then></if>
+
+	<expr_stmt><expr><name PREFIX:line="62" PREFIX:column="9">timer0_fract</name> = <name PREFIX:line="62" PREFIX:column="24">f</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="63" PREFIX:column="9">timer0_millis</name> = <name PREFIX:line="63" PREFIX:column="25">m</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="64" PREFIX:column="9">timer0_overflow_count</name>++</expr>;</expr_stmt>
+}</block>
+
+<function><type><name PREFIX:line="67" PREFIX:column="1">unknowntype</name> <name PREFIX:line="67" PREFIX:column="13">long</name></type> <name PREFIX:line="67" PREFIX:column="18">millis</name><parameter_list PREFIX:line="67" PREFIX:column="24">()</parameter_list>
+<block PREFIX:line="68" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="69" PREFIX:column="9">unknowntype</name> <name PREFIX:line="69" PREFIX:column="21">long</name></type> <name PREFIX:line="69" PREFIX:column="26">m</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="70" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="70" PREFIX:column="17">oldSREG</name> <init PREFIX:line="70" PREFIX:column="25">= <expr><name PREFIX:line="70" PREFIX:column="27">SREG</name></expr></init></decl>;</decl_stmt>
+
+	<comment type="line" PREFIX:line="72" PREFIX:column="9">// disable interrupts while we read timer0_millis or we might get an</comment>
+	<comment type="line" PREFIX:line="73" PREFIX:column="9">// inconsistent value (e.g. in the middle of a write to timer0_millis)</comment>
+	<expr_stmt><expr><call><name PREFIX:line="74" PREFIX:column="9">cli</name><argument_list PREFIX:line="74" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="75" PREFIX:column="9">m</name> = <name PREFIX:line="75" PREFIX:column="13">timer0_millis</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="76" PREFIX:column="9">SREG</name> = <name PREFIX:line="76" PREFIX:column="16">oldSREG</name></expr>;</expr_stmt>
+
+	<return PREFIX:line="78" PREFIX:column="9">return <expr><name PREFIX:line="78" PREFIX:column="16">m</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="81" PREFIX:column="1">unknowntype</name> <name PREFIX:line="81" PREFIX:column="13">long</name></type> <name PREFIX:line="81" PREFIX:column="18">micros</name><parameter_list PREFIX:line="81" PREFIX:column="24">()</parameter_list> <block PREFIX:line="81" PREFIX:column="27">{
+	<decl_stmt><decl><type><name PREFIX:line="82" PREFIX:column="9">unknowntype</name> <name PREFIX:line="82" PREFIX:column="21">long</name></type> <name PREFIX:line="82" PREFIX:column="26">m</name></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="83" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="83" PREFIX:column="17">oldSREG</name> <init PREFIX:line="83" PREFIX:column="25">= <expr><name PREFIX:line="83" PREFIX:column="27">SREG</name></expr></init>, <name PREFIX:line="83" PREFIX:column="33">t</name></decl>;</decl_stmt>
+	
+	<expr_stmt><expr><call><name PREFIX:line="85" PREFIX:column="9">cli</name><argument_list PREFIX:line="85" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="86" PREFIX:column="9">m</name> = <name PREFIX:line="86" PREFIX:column="13">timer0_overflow_count</name></expr>;</expr_stmt>
+<cpp:if PREFIX:line="87" PREFIX:column="1">#<cpp:directive PREFIX:line="87" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="87" PREFIX:column="5">defined</name><argument_list PREFIX:line="87" PREFIX:column="12">(<argument><expr><name PREFIX:line="87" PREFIX:column="13">TCNT0</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><name PREFIX:line="88" PREFIX:column="9">t</name> = <name PREFIX:line="88" PREFIX:column="13">TCNT0</name></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="89" PREFIX:column="1">#<cpp:directive PREFIX:line="89" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="89" PREFIX:column="7">defined</name><argument_list PREFIX:line="89" PREFIX:column="14">(<argument><expr><name PREFIX:line="89" PREFIX:column="15">TCNT0L</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<expr_stmt><expr><name PREFIX:line="90" PREFIX:column="9">t</name> = <name PREFIX:line="90" PREFIX:column="13">TCNT0L</name></expr>;</expr_stmt>
+<cpp:else PREFIX:line="91" PREFIX:column="1">#<cpp:directive PREFIX:line="91" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<cpp:error PREFIX:line="92" PREFIX:column="9">#<cpp:directive PREFIX:line="92" PREFIX:column="10">error</cpp:directive> TIMER 0 not defined</cpp:error>
+<cpp:endif PREFIX:line="93" PREFIX:column="1">#<cpp:directive PREFIX:line="93" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+  
+<cpp:ifdef PREFIX:line="96" PREFIX:column="1">#<cpp:directive PREFIX:line="96" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="96" PREFIX:column="8">TIFR0</name></cpp:ifdef>
+	<if PREFIX:line="97" PREFIX:column="9">if <condition PREFIX:line="97" PREFIX:column="12">(<expr PREFIX:line="97" PREFIX:column="13">(<name PREFIX:line="97" PREFIX:column="14">TIFR0</name> &amp; <call><name PREFIX:line="97" PREFIX:column="22">_BV</name><argument_list PREFIX:line="97" PREFIX:column="25">(<argument><expr><name PREFIX:line="97" PREFIX:column="26">TOV0</name></expr></argument>)</argument_list></call>) &amp;&amp; (<name PREFIX:line="97" PREFIX:column="37">t</name> &lt; 255)</expr>)</condition><then PREFIX:line="97" PREFIX:column="46">
+		<expr_stmt><expr><name PREFIX:line="98" PREFIX:column="17">m</name>++</expr>;</expr_stmt></then></if>
+<cpp:else PREFIX:line="99" PREFIX:column="1">#<cpp:directive PREFIX:line="99" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<if PREFIX:line="100" PREFIX:column="9">if <condition PREFIX:line="100" PREFIX:column="12">(<expr PREFIX:line="100" PREFIX:column="13">(<name PREFIX:line="100" PREFIX:column="14">TIFR</name> &amp; <call><name PREFIX:line="100" PREFIX:column="21">_BV</name><argument_list PREFIX:line="100" PREFIX:column="24">(<argument><expr><name PREFIX:line="100" PREFIX:column="25">TOV0</name></expr></argument>)</argument_list></call>) &amp;&amp; (<name PREFIX:line="100" PREFIX:column="36">t</name> &lt; 255)</expr>)</condition><then PREFIX:line="100" PREFIX:column="45">
+		<expr_stmt><expr><name PREFIX:line="101" PREFIX:column="17">m</name>++</expr>;</expr_stmt></then></if>
+<cpp:endif PREFIX:line="102" PREFIX:column="1">#<cpp:directive PREFIX:line="102" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<expr_stmt><expr><name PREFIX:line="104" PREFIX:column="9">SREG</name> = <name PREFIX:line="104" PREFIX:column="16">oldSREG</name></expr>;</expr_stmt>
+	
+	<return PREFIX:line="106" PREFIX:column="9">return <expr PREFIX:line="106" PREFIX:column="16">((<name PREFIX:line="106" PREFIX:column="18">m</name> &lt;&lt; 8) + <name PREFIX:line="106" PREFIX:column="28">t</name>) * (64 / <call><name PREFIX:line="106" PREFIX:column="39">clockCyclesPerMicrosecond</name><argument_list PREFIX:line="106" PREFIX:column="64">()</argument_list></call>)</expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="109" PREFIX:column="1">void</name></type> <name PREFIX:line="109" PREFIX:column="6">delay</name><parameter_list PREFIX:line="109" PREFIX:column="11">(<param><decl><type><name PREFIX:line="109" PREFIX:column="12">unknowntype</name> <name PREFIX:line="109" PREFIX:column="24">long</name></type> <name PREFIX:line="109" PREFIX:column="29">ms</name></decl></param>)</parameter_list>
+<block PREFIX:line="110" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="111" PREFIX:column="9">uint16_t</name></type> <name PREFIX:line="111" PREFIX:column="18">start</name> <init PREFIX:line="111" PREFIX:column="24">= <expr PREFIX:line="111" PREFIX:column="26">(<name PREFIX:line="111" PREFIX:column="27">uint16_t</name>)<call><name PREFIX:line="111" PREFIX:column="36">micros</name><argument_list PREFIX:line="111" PREFIX:column="42">()</argument_list></call></expr></init></decl>;</decl_stmt>
+
+	<while PREFIX:line="113" PREFIX:column="9">while <condition PREFIX:line="113" PREFIX:column="15">(<expr><name PREFIX:line="113" PREFIX:column="16">ms</name> &gt; 0</expr>)</condition> <block PREFIX:line="113" PREFIX:column="24">{
+		<if PREFIX:line="114" PREFIX:column="17">if <condition PREFIX:line="114" PREFIX:column="20">(<expr PREFIX:line="114" PREFIX:column="21">((<name PREFIX:line="114" PREFIX:column="23">uint16_t</name>)<call><name PREFIX:line="114" PREFIX:column="32">micros</name><argument_list PREFIX:line="114" PREFIX:column="38">()</argument_list></call> - <name PREFIX:line="114" PREFIX:column="43">start</name>) &gt;= 1000</expr>)</condition><then PREFIX:line="114" PREFIX:column="58"> <block PREFIX:line="114" PREFIX:column="59">{
+			<expr_stmt><expr><name PREFIX:line="115" PREFIX:column="25">ms</name>--</expr>;</expr_stmt>
+			<expr_stmt><expr><name PREFIX:line="116" PREFIX:column="25">start</name> += 1000</expr>;</expr_stmt>
+		}</block></then></if>
+	}</block></while>
+}</block></function>
+
+<comment type="block" PREFIX:line="121" PREFIX:column="1">/* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */</comment>
+<function><type><name PREFIX:line="122" PREFIX:column="1">void</name></type> <name PREFIX:line="122" PREFIX:column="6">delayMicroseconds</name><parameter_list PREFIX:line="122" PREFIX:column="23">(<param><decl><type><name PREFIX:line="122" PREFIX:column="24">unknowntype</name> <name PREFIX:line="122" PREFIX:column="36">int</name></type> <name PREFIX:line="122" PREFIX:column="40">us</name></decl></param>)</parameter_list>
+<block PREFIX:line="123" PREFIX:column="1">{
+	<comment type="line" PREFIX:line="124" PREFIX:column="9">// calling avrlib's delay_us() function with low values (e.g. 1 or</comment>
+	<comment type="line" PREFIX:line="125" PREFIX:column="9">// 2 microseconds) gives delays longer than desired.</comment>
+	<comment type="line" PREFIX:line="126" PREFIX:column="9">//delay_us(us);</comment>
+<cpp:if PREFIX:line="127" PREFIX:column="1">#<cpp:directive PREFIX:line="127" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="127" PREFIX:column="5">F_CPU</name> &gt;= 20000000L</expr></cpp:if>
+	<comment type="line" PREFIX:line="128" PREFIX:column="9">// for the 20 MHz clock on rare Arduino boards</comment>
+
+	<comment type="line" PREFIX:line="130" PREFIX:column="9">// for a one-microsecond delay, simply wait 2 cycle and return. The overhead</comment>
+	<comment type="line" PREFIX:line="131" PREFIX:column="9">// of the function call yields a delay of exactly a one microsecond.</comment>
+	<asm PREFIX:line="132" PREFIX:column="9">__asm__ <specifier PREFIX:line="132" PREFIX:column="17">__volatile__</specifier> (
+		"nop" "\n\t"
+		"nop");</asm> <comment type="line" PREFIX:line="134" PREFIX:column="25">//just waiting 2 cycle</comment>
+	<if PREFIX:line="135" PREFIX:column="9">if <condition PREFIX:line="135" PREFIX:column="12">(<expr PREFIX:line="135" PREFIX:column="13">--<name PREFIX:line="135" PREFIX:column="15">us</name> == 0</expr>)</condition><then PREFIX:line="135" PREFIX:column="23">
+		<return PREFIX:line="136" PREFIX:column="17">return;</return></then></if>
+
+	<comment type="line" PREFIX:line="138" PREFIX:column="9">// the following loop takes a 1/5 of a microsecond (4 cycles)</comment>
+	<comment type="line" PREFIX:line="139" PREFIX:column="9">// per iteration, so execute it five times for each microsecond of</comment>
+	<comment type="line" PREFIX:line="140" PREFIX:column="9">// delay requested.</comment>
+	<expr_stmt><expr><name PREFIX:line="141" PREFIX:column="9">us</name> = (<name PREFIX:line="141" PREFIX:column="15">us</name>&lt;&lt;2) + <name PREFIX:line="141" PREFIX:column="24">us</name></expr>;</expr_stmt> <comment type="line" PREFIX:line="141" PREFIX:column="28">// x5 us</comment>
+
+	<comment type="line" PREFIX:line="143" PREFIX:column="9">// account for the time taken in the preceeding commands.</comment>
+	<expr_stmt><expr><name PREFIX:line="144" PREFIX:column="9">us</name> -= 2</expr>;</expr_stmt>
+
+<cpp:elif PREFIX:line="146" PREFIX:column="1">#<cpp:directive PREFIX:line="146" PREFIX:column="2">elif</cpp:directive> <expr><name PREFIX:line="146" PREFIX:column="7">F_CPU</name> &gt;= 16000000L</expr></cpp:elif>
+	<comment type="line" PREFIX:line="147" PREFIX:column="9">// for the 16 MHz clock on most Arduino boards</comment>
+
+	<comment type="line" PREFIX:line="149" PREFIX:column="9">// for a one-microsecond delay, simply return.  the overhead</comment>
+	<comment type="line" PREFIX:line="150" PREFIX:column="9">// of the function call yields a delay of approximately 1 1/8 us.</comment>
+	<if PREFIX:line="151" PREFIX:column="9">if <condition PREFIX:line="151" PREFIX:column="12">(<expr PREFIX:line="151" PREFIX:column="13">--<name PREFIX:line="151" PREFIX:column="15">us</name> == 0</expr>)</condition><then PREFIX:line="151" PREFIX:column="23">
+		<return PREFIX:line="152" PREFIX:column="17">return;</return></then></if>
+
+	<comment type="line" PREFIX:line="154" PREFIX:column="9">// the following loop takes a quarter of a microsecond (4 cycles)</comment>
+	<comment type="line" PREFIX:line="155" PREFIX:column="9">// per iteration, so execute it four times for each microsecond of</comment>
+	<comment type="line" PREFIX:line="156" PREFIX:column="9">// delay requested.</comment>
+	<expr_stmt><expr><name PREFIX:line="157" PREFIX:column="9">us</name> &lt;&lt;= 2</expr>;</expr_stmt>
+
+	<comment type="line" PREFIX:line="159" PREFIX:column="9">// account for the time taken in the preceeding commands.</comment>
+	<expr_stmt><expr><name PREFIX:line="160" PREFIX:column="9">us</name> -= 2</expr>;</expr_stmt>
+<cpp:else PREFIX:line="161" PREFIX:column="1">#<cpp:directive PREFIX:line="161" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<comment type="line" PREFIX:line="162" PREFIX:column="9">// for the 8 MHz internal clock on the ATmega168</comment>
+
+	<comment type="line" PREFIX:line="164" PREFIX:column="9">// for a one- or two-microsecond delay, simply return.  the overhead of</comment>
+	<comment type="line" PREFIX:line="165" PREFIX:column="9">// the function calls takes more than two microseconds.  can't just</comment>
+	<comment type="line" PREFIX:line="166" PREFIX:column="9">// subtract two, since us is unknowntype; we'd overflow.</comment>
+	<if PREFIX:line="167" PREFIX:column="9">if <condition PREFIX:line="167" PREFIX:column="12">(<expr PREFIX:line="167" PREFIX:column="13">--<name PREFIX:line="167" PREFIX:column="15">us</name> == 0</expr>)</condition><then PREFIX:line="167" PREFIX:column="23">
+		<return PREFIX:line="168" PREFIX:column="17">return;</return></then></if>
+	<if PREFIX:line="169" PREFIX:column="9">if <condition PREFIX:line="169" PREFIX:column="12">(<expr PREFIX:line="169" PREFIX:column="13">--<name PREFIX:line="169" PREFIX:column="15">us</name> == 0</expr>)</condition><then PREFIX:line="169" PREFIX:column="23">
+		<return PREFIX:line="170" PREFIX:column="17">return;</return></then></if>
+
+	<comment type="line" PREFIX:line="172" PREFIX:column="9">// the following loop takes half of a microsecond (4 cycles)</comment>
+	<comment type="line" PREFIX:line="173" PREFIX:column="9">// per iteration, so execute it twice for each microsecond of</comment>
+	<comment type="line" PREFIX:line="174" PREFIX:column="9">// delay requested.</comment>
+	<expr_stmt><expr><name PREFIX:line="175" PREFIX:column="9">us</name> &lt;&lt;= 1</expr>;</expr_stmt>
+    
+	<comment type="line" PREFIX:line="177" PREFIX:column="9">// partially compensate for the time taken by the preceeding commands.</comment>
+	<comment type="line" PREFIX:line="178" PREFIX:column="9">// we can't subtract any more than this or we'd overflow w/ small delays.</comment>
+	<expr_stmt><expr><name PREFIX:line="179" PREFIX:column="9">us</name>--</expr>;</expr_stmt>
+<cpp:endif PREFIX:line="180" PREFIX:column="1">#<cpp:directive PREFIX:line="180" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<comment type="line" PREFIX:line="182" PREFIX:column="9">// busy wait</comment>
+	<asm PREFIX:line="183" PREFIX:column="9">__asm__ <specifier PREFIX:line="183" PREFIX:column="17">__volatile__</specifier> (
+		"1: sbiw %0,1" "\n\t" <comment type="line" PREFIX:line="184" PREFIX:column="39">// 2 cycles</comment>
+		"brne 1b" : "=w" (us) : "0" (us) <comment type="line" PREFIX:line="185" PREFIX:column="50">// 2 cycles</comment>
+	);</asm>
+}</block></function>
+
+<function><type><name PREFIX:line="189" PREFIX:column="1">void</name></type> <name PREFIX:line="189" PREFIX:column="6">init</name><parameter_list PREFIX:line="189" PREFIX:column="10">()</parameter_list>
+<block PREFIX:line="190" PREFIX:column="1">{
+	<comment type="line" PREFIX:line="191" PREFIX:column="9">// this needs to be called before setup() or some functions won't</comment>
+	<comment type="line" PREFIX:line="192" PREFIX:column="9">// work there</comment>
+	<expr_stmt><expr><call><name PREFIX:line="193" PREFIX:column="9">sei</name><argument_list PREFIX:line="193" PREFIX:column="12">()</argument_list></call></expr>;</expr_stmt>
+	
+	<comment type="line" PREFIX:line="195" PREFIX:column="9">// on the ATmega168, timer 0 is also used for fast hardware pwm</comment>
+	<comment type="line" PREFIX:line="196" PREFIX:column="9">// (using phase-correct PWM would mean that timer 0 overflowed half as often</comment>
+	<comment type="line" PREFIX:line="197" PREFIX:column="9">// resulting in different millis() behavior on the ATmega8 and ATmega168)</comment>
+<cpp:if PREFIX:line="198" PREFIX:column="1">#<cpp:directive PREFIX:line="198" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="198" PREFIX:column="5">defined</name><argument_list PREFIX:line="198" PREFIX:column="12">(<argument><expr><name PREFIX:line="198" PREFIX:column="13">TCCR0A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="198" PREFIX:column="24">defined</name><argument_list PREFIX:line="198" PREFIX:column="31">(<argument><expr><name PREFIX:line="198" PREFIX:column="32">WGM01</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="199" PREFIX:column="9">sbi</name><argument_list PREFIX:line="199" PREFIX:column="12">(<argument><expr><name PREFIX:line="199" PREFIX:column="13">TCCR0A</name></expr></argument>, <argument><expr><name PREFIX:line="199" PREFIX:column="21">WGM01</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="200" PREFIX:column="9">sbi</name><argument_list PREFIX:line="200" PREFIX:column="12">(<argument><expr><name PREFIX:line="200" PREFIX:column="13">TCCR0A</name></expr></argument>, <argument><expr><name PREFIX:line="200" PREFIX:column="21">WGM00</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="201" PREFIX:column="1">#<cpp:directive PREFIX:line="201" PREFIX:column="2">endif</cpp:directive></cpp:endif>  
+
+	<comment type="line" PREFIX:line="203" PREFIX:column="9">// set timer 0 prescale factor to 64</comment>
+<cpp:if PREFIX:line="204" PREFIX:column="1">#<cpp:directive PREFIX:line="204" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="204" PREFIX:column="5">defined</name><argument_list PREFIX:line="204" PREFIX:column="12">(<argument><expr><name PREFIX:line="204" PREFIX:column="13">__AVR_ATmega128__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<comment type="line" PREFIX:line="205" PREFIX:column="9">// CPU specific: different values for the ATmega128</comment>
+	<expr_stmt><expr><call><name PREFIX:line="206" PREFIX:column="9">sbi</name><argument_list PREFIX:line="206" PREFIX:column="12">(<argument><expr><name PREFIX:line="206" PREFIX:column="13">TCCR0</name></expr></argument>, <argument><expr><name PREFIX:line="206" PREFIX:column="20">CS02</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="207" PREFIX:column="1">#<cpp:directive PREFIX:line="207" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="207" PREFIX:column="7">defined</name><argument_list PREFIX:line="207" PREFIX:column="14">(<argument><expr><name PREFIX:line="207" PREFIX:column="15">TCCR0</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="207" PREFIX:column="25">defined</name><argument_list PREFIX:line="207" PREFIX:column="32">(<argument><expr><name PREFIX:line="207" PREFIX:column="33">CS01</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="207" PREFIX:column="42">defined</name><argument_list PREFIX:line="207" PREFIX:column="49">(<argument><expr><name PREFIX:line="207" PREFIX:column="50">CS00</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<comment type="line" PREFIX:line="208" PREFIX:column="9">// this combination is for the standard atmega8</comment>
+	<expr_stmt><expr><call><name PREFIX:line="209" PREFIX:column="9">sbi</name><argument_list PREFIX:line="209" PREFIX:column="12">(<argument><expr><name PREFIX:line="209" PREFIX:column="13">TCCR0</name></expr></argument>, <argument><expr><name PREFIX:line="209" PREFIX:column="20">CS01</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="210" PREFIX:column="9">sbi</name><argument_list PREFIX:line="210" PREFIX:column="12">(<argument><expr><name PREFIX:line="210" PREFIX:column="13">TCCR0</name></expr></argument>, <argument><expr><name PREFIX:line="210" PREFIX:column="20">CS00</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="211" PREFIX:column="1">#<cpp:directive PREFIX:line="211" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="211" PREFIX:column="7">defined</name><argument_list PREFIX:line="211" PREFIX:column="14">(<argument><expr><name PREFIX:line="211" PREFIX:column="15">TCCR0B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="211" PREFIX:column="26">defined</name><argument_list PREFIX:line="211" PREFIX:column="33">(<argument><expr><name PREFIX:line="211" PREFIX:column="34">CS01</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="211" PREFIX:column="43">defined</name><argument_list PREFIX:line="211" PREFIX:column="50">(<argument><expr><name PREFIX:line="211" PREFIX:column="51">CS00</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<comment type="line" PREFIX:line="212" PREFIX:column="9">// this combination is for the standard 168/328/1280/2560</comment>
+	<expr_stmt><expr><call><name PREFIX:line="213" PREFIX:column="9">sbi</name><argument_list PREFIX:line="213" PREFIX:column="12">(<argument><expr><name PREFIX:line="213" PREFIX:column="13">TCCR0B</name></expr></argument>, <argument><expr><name PREFIX:line="213" PREFIX:column="21">CS01</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="214" PREFIX:column="9">sbi</name><argument_list PREFIX:line="214" PREFIX:column="12">(<argument><expr><name PREFIX:line="214" PREFIX:column="13">TCCR0B</name></expr></argument>, <argument><expr><name PREFIX:line="214" PREFIX:column="21">CS00</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="215" PREFIX:column="1">#<cpp:directive PREFIX:line="215" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="215" PREFIX:column="7">defined</name><argument_list PREFIX:line="215" PREFIX:column="14">(<argument><expr><name PREFIX:line="215" PREFIX:column="15">TCCR0A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="215" PREFIX:column="26">defined</name><argument_list PREFIX:line="215" PREFIX:column="33">(<argument><expr><name PREFIX:line="215" PREFIX:column="34">CS01</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="215" PREFIX:column="43">defined</name><argument_list PREFIX:line="215" PREFIX:column="50">(<argument><expr><name PREFIX:line="215" PREFIX:column="51">CS00</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<comment type="line" PREFIX:line="216" PREFIX:column="9">// this combination is for the __AVR_ATmega645__ series</comment>
+	<expr_stmt><expr><call><name PREFIX:line="217" PREFIX:column="9">sbi</name><argument_list PREFIX:line="217" PREFIX:column="12">(<argument><expr><name PREFIX:line="217" PREFIX:column="13">TCCR0A</name></expr></argument>, <argument><expr><name PREFIX:line="217" PREFIX:column="21">CS01</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="218" PREFIX:column="9">sbi</name><argument_list PREFIX:line="218" PREFIX:column="12">(<argument><expr><name PREFIX:line="218" PREFIX:column="13">TCCR0A</name></expr></argument>, <argument><expr><name PREFIX:line="218" PREFIX:column="21">CS00</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:else PREFIX:line="219" PREFIX:column="1">#<cpp:directive PREFIX:line="219" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<cpp:error PREFIX:line="220" PREFIX:column="9">#<cpp:directive PREFIX:line="220" PREFIX:column="10">error</cpp:directive> Timer 0 prescale factor 64 not set correctly</cpp:error>
+<cpp:endif PREFIX:line="221" PREFIX:column="1">#<cpp:directive PREFIX:line="221" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<comment type="line" PREFIX:line="223" PREFIX:column="9">// enable timer 0 overflow interrupt</comment>
+<cpp:if PREFIX:line="224" PREFIX:column="1">#<cpp:directive PREFIX:line="224" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="224" PREFIX:column="5">defined</name><argument_list PREFIX:line="224" PREFIX:column="12">(<argument><expr><name PREFIX:line="224" PREFIX:column="13">TIMSK</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="224" PREFIX:column="23">defined</name><argument_list PREFIX:line="224" PREFIX:column="30">(<argument><expr><name PREFIX:line="224" PREFIX:column="31">TOIE0</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="225" PREFIX:column="9">sbi</name><argument_list PREFIX:line="225" PREFIX:column="12">(<argument><expr><name PREFIX:line="225" PREFIX:column="13">TIMSK</name></expr></argument>, <argument><expr><name PREFIX:line="225" PREFIX:column="20">TOIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="226" PREFIX:column="1">#<cpp:directive PREFIX:line="226" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="226" PREFIX:column="7">defined</name><argument_list PREFIX:line="226" PREFIX:column="14">(<argument><expr><name PREFIX:line="226" PREFIX:column="15">TIMSK0</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="226" PREFIX:column="26">defined</name><argument_list PREFIX:line="226" PREFIX:column="33">(<argument><expr><name PREFIX:line="226" PREFIX:column="34">TOIE0</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<expr_stmt><expr><call><name PREFIX:line="227" PREFIX:column="9">sbi</name><argument_list PREFIX:line="227" PREFIX:column="12">(<argument><expr><name PREFIX:line="227" PREFIX:column="13">TIMSK0</name></expr></argument>, <argument><expr><name PREFIX:line="227" PREFIX:column="21">TOIE0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:else PREFIX:line="228" PREFIX:column="1">#<cpp:directive PREFIX:line="228" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<cpp:error PREFIX:line="229" PREFIX:column="9">#<cpp:directive PREFIX:line="229" PREFIX:column="10">error</cpp:directive>	Timer 0 overflow interrupt not set correctly</cpp:error>
+<cpp:endif PREFIX:line="230" PREFIX:column="1">#<cpp:directive PREFIX:line="230" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<comment type="line" PREFIX:line="232" PREFIX:column="9">// timers 1 and 2 are used for phase-correct hardware pwm</comment>
+	<comment type="line" PREFIX:line="233" PREFIX:column="9">// this is better for motors as it ensures an even waveform</comment>
+	<comment type="line" PREFIX:line="234" PREFIX:column="9">// note, however, that fast pwm mode can achieve a frequency of up</comment>
+	<comment type="line" PREFIX:line="235" PREFIX:column="9">// 8 MHz (with a 16 MHz clock) at 50% duty cycle</comment>
+
+<cpp:if PREFIX:line="237" PREFIX:column="1">#<cpp:directive PREFIX:line="237" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="237" PREFIX:column="5">defined</name><argument_list PREFIX:line="237" PREFIX:column="12">(<argument><expr><name PREFIX:line="237" PREFIX:column="13">TCCR1B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="237" PREFIX:column="24">defined</name><argument_list PREFIX:line="237" PREFIX:column="31">(<argument><expr><name PREFIX:line="237" PREFIX:column="32">CS11</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="237" PREFIX:column="41">defined</name><argument_list PREFIX:line="237" PREFIX:column="48">(<argument><expr><name PREFIX:line="237" PREFIX:column="49">CS10</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><name PREFIX:line="238" PREFIX:column="9">TCCR1B</name> = 0</expr>;</expr_stmt>
+
+	<comment type="line" PREFIX:line="240" PREFIX:column="9">// set timer 1 prescale factor to 64</comment>
+	<expr_stmt><expr><call><name PREFIX:line="241" PREFIX:column="9">sbi</name><argument_list PREFIX:line="241" PREFIX:column="12">(<argument><expr><name PREFIX:line="241" PREFIX:column="13">TCCR1B</name></expr></argument>, <argument><expr><name PREFIX:line="241" PREFIX:column="21">CS11</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:if PREFIX:line="242" PREFIX:column="1">#<cpp:directive PREFIX:line="242" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="242" PREFIX:column="5">F_CPU</name> &gt;= 8000000L</expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="243" PREFIX:column="9">sbi</name><argument_list PREFIX:line="243" PREFIX:column="12">(<argument><expr><name PREFIX:line="243" PREFIX:column="13">TCCR1B</name></expr></argument>, <argument><expr><name PREFIX:line="243" PREFIX:column="21">CS10</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="244" PREFIX:column="1">#<cpp:directive PREFIX:line="244" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:elif PREFIX:line="245" PREFIX:column="1">#<cpp:directive PREFIX:line="245" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="245" PREFIX:column="7">defined</name><argument_list PREFIX:line="245" PREFIX:column="14">(<argument><expr><name PREFIX:line="245" PREFIX:column="15">TCCR1</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="245" PREFIX:column="25">defined</name><argument_list PREFIX:line="245" PREFIX:column="32">(<argument><expr><name PREFIX:line="245" PREFIX:column="33">CS11</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="245" PREFIX:column="42">defined</name><argument_list PREFIX:line="245" PREFIX:column="49">(<argument><expr><name PREFIX:line="245" PREFIX:column="50">CS10</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<expr_stmt><expr><call><name PREFIX:line="246" PREFIX:column="9">sbi</name><argument_list PREFIX:line="246" PREFIX:column="12">(<argument><expr><name PREFIX:line="246" PREFIX:column="13">TCCR1</name></expr></argument>, <argument><expr><name PREFIX:line="246" PREFIX:column="20">CS11</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:if PREFIX:line="247" PREFIX:column="1">#<cpp:directive PREFIX:line="247" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="247" PREFIX:column="5">F_CPU</name> &gt;= 8000000L</expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="248" PREFIX:column="9">sbi</name><argument_list PREFIX:line="248" PREFIX:column="12">(<argument><expr><name PREFIX:line="248" PREFIX:column="13">TCCR1</name></expr></argument>, <argument><expr><name PREFIX:line="248" PREFIX:column="20">CS10</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="249" PREFIX:column="1">#<cpp:directive PREFIX:line="249" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:endif PREFIX:line="250" PREFIX:column="1">#<cpp:directive PREFIX:line="250" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+	<comment type="line" PREFIX:line="251" PREFIX:column="9">// put timer 1 in 8-bit phase correct pwm mode</comment>
+<cpp:if PREFIX:line="252" PREFIX:column="1">#<cpp:directive PREFIX:line="252" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="252" PREFIX:column="5">defined</name><argument_list PREFIX:line="252" PREFIX:column="12">(<argument><expr><name PREFIX:line="252" PREFIX:column="13">TCCR1A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="252" PREFIX:column="24">defined</name><argument_list PREFIX:line="252" PREFIX:column="31">(<argument><expr><name PREFIX:line="252" PREFIX:column="32">WGM10</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="253" PREFIX:column="9">sbi</name><argument_list PREFIX:line="253" PREFIX:column="12">(<argument><expr><name PREFIX:line="253" PREFIX:column="13">TCCR1A</name></expr></argument>, <argument><expr><name PREFIX:line="253" PREFIX:column="21">WGM10</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="254" PREFIX:column="1">#<cpp:directive PREFIX:line="254" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="254" PREFIX:column="7">defined</name><argument_list PREFIX:line="254" PREFIX:column="14">(<argument><expr><name PREFIX:line="254" PREFIX:column="15">TCCR1</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<cpp:error PREFIX:line="255" PREFIX:column="9">#<cpp:directive PREFIX:line="255" PREFIX:column="10">warning</cpp:directive> this needs to be finished</cpp:error>
+<cpp:endif PREFIX:line="256" PREFIX:column="1">#<cpp:directive PREFIX:line="256" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<comment type="line" PREFIX:line="258" PREFIX:column="9">// set timer 2 prescale factor to 64</comment>
+<cpp:if PREFIX:line="259" PREFIX:column="1">#<cpp:directive PREFIX:line="259" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="259" PREFIX:column="5">defined</name><argument_list PREFIX:line="259" PREFIX:column="12">(<argument><expr><name PREFIX:line="259" PREFIX:column="13">TCCR2</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="259" PREFIX:column="23">defined</name><argument_list PREFIX:line="259" PREFIX:column="30">(<argument><expr><name PREFIX:line="259" PREFIX:column="31">CS22</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="260" PREFIX:column="9">sbi</name><argument_list PREFIX:line="260" PREFIX:column="12">(<argument><expr><name PREFIX:line="260" PREFIX:column="13">TCCR2</name></expr></argument>, <argument><expr><name PREFIX:line="260" PREFIX:column="20">CS22</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="261" PREFIX:column="1">#<cpp:directive PREFIX:line="261" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="261" PREFIX:column="7">defined</name><argument_list PREFIX:line="261" PREFIX:column="14">(<argument><expr><name PREFIX:line="261" PREFIX:column="15">TCCR2B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="261" PREFIX:column="26">defined</name><argument_list PREFIX:line="261" PREFIX:column="33">(<argument><expr><name PREFIX:line="261" PREFIX:column="34">CS22</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<expr_stmt><expr><call><name PREFIX:line="262" PREFIX:column="9">sbi</name><argument_list PREFIX:line="262" PREFIX:column="12">(<argument><expr><name PREFIX:line="262" PREFIX:column="13">TCCR2B</name></expr></argument>, <argument><expr><name PREFIX:line="262" PREFIX:column="21">CS22</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:else PREFIX:line="263" PREFIX:column="1">#<cpp:directive PREFIX:line="263" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<cpp:error PREFIX:line="264" PREFIX:column="9">#<cpp:directive PREFIX:line="264" PREFIX:column="10">warning</cpp:directive> Timer 2 not finished (may not be present on this CPU)</cpp:error>
+<cpp:endif PREFIX:line="265" PREFIX:column="1">#<cpp:directive PREFIX:line="265" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<comment type="line" PREFIX:line="267" PREFIX:column="9">// configure timer 2 for phase correct pwm (8-bit)</comment>
+<cpp:if PREFIX:line="268" PREFIX:column="1">#<cpp:directive PREFIX:line="268" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="268" PREFIX:column="5">defined</name><argument_list PREFIX:line="268" PREFIX:column="12">(<argument><expr><name PREFIX:line="268" PREFIX:column="13">TCCR2</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="268" PREFIX:column="23">defined</name><argument_list PREFIX:line="268" PREFIX:column="30">(<argument><expr><name PREFIX:line="268" PREFIX:column="31">WGM20</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="269" PREFIX:column="9">sbi</name><argument_list PREFIX:line="269" PREFIX:column="12">(<argument><expr><name PREFIX:line="269" PREFIX:column="13">TCCR2</name></expr></argument>, <argument><expr><name PREFIX:line="269" PREFIX:column="20">WGM20</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:elif PREFIX:line="270" PREFIX:column="1">#<cpp:directive PREFIX:line="270" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="270" PREFIX:column="7">defined</name><argument_list PREFIX:line="270" PREFIX:column="14">(<argument><expr><name PREFIX:line="270" PREFIX:column="15">TCCR2A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="270" PREFIX:column="26">defined</name><argument_list PREFIX:line="270" PREFIX:column="33">(<argument><expr><name PREFIX:line="270" PREFIX:column="34">WGM20</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<expr_stmt><expr><call><name PREFIX:line="271" PREFIX:column="9">sbi</name><argument_list PREFIX:line="271" PREFIX:column="12">(<argument><expr><name PREFIX:line="271" PREFIX:column="13">TCCR2A</name></expr></argument>, <argument><expr><name PREFIX:line="271" PREFIX:column="21">WGM20</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:else PREFIX:line="272" PREFIX:column="1">#<cpp:directive PREFIX:line="272" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<cpp:error PREFIX:line="273" PREFIX:column="9">#<cpp:directive PREFIX:line="273" PREFIX:column="10">warning</cpp:directive> Timer 2 not finished (may not be present on this CPU)</cpp:error>
+<cpp:endif PREFIX:line="274" PREFIX:column="1">#<cpp:directive PREFIX:line="274" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="276" PREFIX:column="1">#<cpp:directive PREFIX:line="276" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="276" PREFIX:column="5">defined</name><argument_list PREFIX:line="276" PREFIX:column="12">(<argument><expr><name PREFIX:line="276" PREFIX:column="13">TCCR3B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="276" PREFIX:column="24">defined</name><argument_list PREFIX:line="276" PREFIX:column="31">(<argument><expr><name PREFIX:line="276" PREFIX:column="32">CS31</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="276" PREFIX:column="41">defined</name><argument_list PREFIX:line="276" PREFIX:column="48">(<argument><expr><name PREFIX:line="276" PREFIX:column="49">WGM30</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="277" PREFIX:column="9">sbi</name><argument_list PREFIX:line="277" PREFIX:column="12">(<argument><expr><name PREFIX:line="277" PREFIX:column="13">TCCR3B</name></expr></argument>, <argument><expr><name PREFIX:line="277" PREFIX:column="21">CS31</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="277" PREFIX:column="41">// set timer 3 prescale factor to 64</comment>
+	<expr_stmt><expr><call><name PREFIX:line="278" PREFIX:column="9">sbi</name><argument_list PREFIX:line="278" PREFIX:column="12">(<argument><expr><name PREFIX:line="278" PREFIX:column="13">TCCR3B</name></expr></argument>, <argument><expr><name PREFIX:line="278" PREFIX:column="21">CS30</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="279" PREFIX:column="9">sbi</name><argument_list PREFIX:line="279" PREFIX:column="12">(<argument><expr><name PREFIX:line="279" PREFIX:column="13">TCCR3A</name></expr></argument>, <argument><expr><name PREFIX:line="279" PREFIX:column="21">WGM30</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="279" PREFIX:column="41">// put timer 3 in 8-bit phase correct pwm mode</comment>
+<cpp:endif PREFIX:line="280" PREFIX:column="1">#<cpp:directive PREFIX:line="280" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="282" PREFIX:column="1">#<cpp:directive PREFIX:line="282" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="282" PREFIX:column="5">defined</name><argument_list PREFIX:line="282" PREFIX:column="12">(<argument><expr><name PREFIX:line="282" PREFIX:column="13">TCCR4A</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="282" PREFIX:column="24">defined</name><argument_list PREFIX:line="282" PREFIX:column="31">(<argument><expr><name PREFIX:line="282" PREFIX:column="32">TCCR4B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="282" PREFIX:column="43">defined</name><argument_list PREFIX:line="282" PREFIX:column="50">(<argument><expr><name PREFIX:line="282" PREFIX:column="51">TCCR4D</name></expr></argument>)</argument_list></call></expr></cpp:if> <comment type="block" PREFIX:line="282" PREFIX:column="59">/* beginning of timer4 block for 32U4 and similar */</comment>
+	<expr_stmt><expr><call><name PREFIX:line="283" PREFIX:column="9">sbi</name><argument_list PREFIX:line="283" PREFIX:column="12">(<argument><expr><name PREFIX:line="283" PREFIX:column="13">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="283" PREFIX:column="21">CS42</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="283" PREFIX:column="41">// set timer4 prescale factor to 64</comment>
+	<expr_stmt><expr><call><name PREFIX:line="284" PREFIX:column="9">sbi</name><argument_list PREFIX:line="284" PREFIX:column="12">(<argument><expr><name PREFIX:line="284" PREFIX:column="13">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="284" PREFIX:column="21">CS41</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="285" PREFIX:column="9">sbi</name><argument_list PREFIX:line="285" PREFIX:column="12">(<argument><expr><name PREFIX:line="285" PREFIX:column="13">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="285" PREFIX:column="21">CS40</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="286" PREFIX:column="9">sbi</name><argument_list PREFIX:line="286" PREFIX:column="12">(<argument><expr><name PREFIX:line="286" PREFIX:column="13">TCCR4D</name></expr></argument>, <argument><expr><name PREFIX:line="286" PREFIX:column="21">WGM40</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="286" PREFIX:column="41">// put timer 4 in phase- and frequency-correct PWM mode	</comment>
+	<expr_stmt><expr><call><name PREFIX:line="287" PREFIX:column="9">sbi</name><argument_list PREFIX:line="287" PREFIX:column="12">(<argument><expr><name PREFIX:line="287" PREFIX:column="13">TCCR4A</name></expr></argument>, <argument><expr><name PREFIX:line="287" PREFIX:column="21">PWM4A</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="287" PREFIX:column="41">// enable PWM mode for comparator OCR4A</comment>
+	<expr_stmt><expr><call><name PREFIX:line="288" PREFIX:column="9">sbi</name><argument_list PREFIX:line="288" PREFIX:column="12">(<argument><expr><name PREFIX:line="288" PREFIX:column="13">TCCR4C</name></expr></argument>, <argument><expr><name PREFIX:line="288" PREFIX:column="21">PWM4D</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="288" PREFIX:column="41">// enable PWM mode for comparator OCR4D</comment>
+<cpp:else PREFIX:line="289" PREFIX:column="1">#<cpp:directive PREFIX:line="289" PREFIX:column="2">else</cpp:directive></cpp:else> <comment type="block" PREFIX:line="289" PREFIX:column="7">/* beginning of timer4 block for ATMEGA1280 and ATMEGA2560 */</comment>
+<cpp:if PREFIX:line="290" PREFIX:column="1">#<cpp:directive PREFIX:line="290" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="290" PREFIX:column="5">defined</name><argument_list PREFIX:line="290" PREFIX:column="12">(<argument><expr><name PREFIX:line="290" PREFIX:column="13">TCCR4B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="290" PREFIX:column="24">defined</name><argument_list PREFIX:line="290" PREFIX:column="31">(<argument><expr><name PREFIX:line="290" PREFIX:column="32">CS41</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="290" PREFIX:column="41">defined</name><argument_list PREFIX:line="290" PREFIX:column="48">(<argument><expr><name PREFIX:line="290" PREFIX:column="49">WGM40</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="291" PREFIX:column="9">sbi</name><argument_list PREFIX:line="291" PREFIX:column="12">(<argument><expr><name PREFIX:line="291" PREFIX:column="13">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="291" PREFIX:column="21">CS41</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="291" PREFIX:column="41">// set timer 4 prescale factor to 64</comment>
+	<expr_stmt><expr><call><name PREFIX:line="292" PREFIX:column="9">sbi</name><argument_list PREFIX:line="292" PREFIX:column="12">(<argument><expr><name PREFIX:line="292" PREFIX:column="13">TCCR4B</name></expr></argument>, <argument><expr><name PREFIX:line="292" PREFIX:column="21">CS40</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="293" PREFIX:column="9">sbi</name><argument_list PREFIX:line="293" PREFIX:column="12">(<argument><expr><name PREFIX:line="293" PREFIX:column="13">TCCR4A</name></expr></argument>, <argument><expr><name PREFIX:line="293" PREFIX:column="21">WGM40</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="293" PREFIX:column="41">// put timer 4 in 8-bit phase correct pwm mode</comment>
+<cpp:endif PREFIX:line="294" PREFIX:column="1">#<cpp:directive PREFIX:line="294" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:endif PREFIX:line="295" PREFIX:column="1">#<cpp:directive PREFIX:line="295" PREFIX:column="2">endif</cpp:directive></cpp:endif> <comment type="block" PREFIX:line="295" PREFIX:column="8">/* end timer4 block for ATMEGA1280/2560 and similar */</comment>	
+
+<cpp:if PREFIX:line="297" PREFIX:column="1">#<cpp:directive PREFIX:line="297" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="297" PREFIX:column="5">defined</name><argument_list PREFIX:line="297" PREFIX:column="12">(<argument><expr><name PREFIX:line="297" PREFIX:column="13">TCCR5B</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="297" PREFIX:column="24">defined</name><argument_list PREFIX:line="297" PREFIX:column="31">(<argument><expr><name PREFIX:line="297" PREFIX:column="32">CS51</name></expr></argument>)</argument_list></call> &amp;&amp; <call><name PREFIX:line="297" PREFIX:column="41">defined</name><argument_list PREFIX:line="297" PREFIX:column="48">(<argument><expr><name PREFIX:line="297" PREFIX:column="49">WGM50</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name PREFIX:line="298" PREFIX:column="9">sbi</name><argument_list PREFIX:line="298" PREFIX:column="12">(<argument><expr><name PREFIX:line="298" PREFIX:column="13">TCCR5B</name></expr></argument>, <argument><expr><name PREFIX:line="298" PREFIX:column="21">CS51</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="298" PREFIX:column="41">// set timer 5 prescale factor to 64</comment>
+	<expr_stmt><expr><call><name PREFIX:line="299" PREFIX:column="9">sbi</name><argument_list PREFIX:line="299" PREFIX:column="12">(<argument><expr><name PREFIX:line="299" PREFIX:column="13">TCCR5B</name></expr></argument>, <argument><expr><name PREFIX:line="299" PREFIX:column="21">CS50</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="300" PREFIX:column="9">sbi</name><argument_list PREFIX:line="300" PREFIX:column="12">(<argument><expr><name PREFIX:line="300" PREFIX:column="13">TCCR5A</name></expr></argument>, <argument><expr><name PREFIX:line="300" PREFIX:column="21">WGM50</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="300" PREFIX:column="41">// put timer 5 in 8-bit phase correct pwm mode</comment>
+<cpp:endif PREFIX:line="301" PREFIX:column="1">#<cpp:directive PREFIX:line="301" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:if PREFIX:line="303" PREFIX:column="1">#<cpp:directive PREFIX:line="303" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="303" PREFIX:column="5">defined</name><argument_list PREFIX:line="303" PREFIX:column="12">(<argument><expr><name PREFIX:line="303" PREFIX:column="13">ADCSRA</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<comment type="line" PREFIX:line="304" PREFIX:column="9">// set a2d prescale factor to 128</comment>
+	<comment type="line" PREFIX:line="305" PREFIX:column="9">// 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.</comment>
+	<comment type="line" PREFIX:line="306" PREFIX:column="9">// XXX: this will not work properly for other clock speeds, and</comment>
+	<comment type="line" PREFIX:line="307" PREFIX:column="9">// this code should use F_CPU to determine the prescale factor.</comment>
+	<expr_stmt><expr><call><name PREFIX:line="308" PREFIX:column="9">sbi</name><argument_list PREFIX:line="308" PREFIX:column="12">(<argument><expr><name PREFIX:line="308" PREFIX:column="13">ADCSRA</name></expr></argument>, <argument><expr><name PREFIX:line="308" PREFIX:column="21">ADPS2</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="309" PREFIX:column="9">sbi</name><argument_list PREFIX:line="309" PREFIX:column="12">(<argument><expr><name PREFIX:line="309" PREFIX:column="13">ADCSRA</name></expr></argument>, <argument><expr><name PREFIX:line="309" PREFIX:column="21">ADPS1</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="310" PREFIX:column="9">sbi</name><argument_list PREFIX:line="310" PREFIX:column="12">(<argument><expr><name PREFIX:line="310" PREFIX:column="13">ADCSRA</name></expr></argument>, <argument><expr><name PREFIX:line="310" PREFIX:column="21">ADPS0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+	<comment type="line" PREFIX:line="312" PREFIX:column="9">// enable a2d conversions</comment>
+	<expr_stmt><expr><call><name PREFIX:line="313" PREFIX:column="9">sbi</name><argument_list PREFIX:line="313" PREFIX:column="12">(<argument><expr><name PREFIX:line="313" PREFIX:column="13">ADCSRA</name></expr></argument>, <argument><expr><name PREFIX:line="313" PREFIX:column="21">ADEN</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="314" PREFIX:column="1">#<cpp:directive PREFIX:line="314" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<comment type="line" PREFIX:line="316" PREFIX:column="9">// the bootloader connects pins 0 and 1 to the USART; disconnect them</comment>
+	<comment type="line" PREFIX:line="317" PREFIX:column="9">// here so they can be used as normal digital i/o; they will be</comment>
+	<comment type="line" PREFIX:line="318" PREFIX:column="9">// reconnected in Serial.begin()</comment>
+<cpp:if PREFIX:line="319" PREFIX:column="1">#<cpp:directive PREFIX:line="319" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="319" PREFIX:column="5">defined</name><argument_list PREFIX:line="319" PREFIX:column="12">(<argument><expr><name PREFIX:line="319" PREFIX:column="13">UCSRB</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><name PREFIX:line="320" PREFIX:column="9">UCSRB</name> = 0</expr>;</expr_stmt>
+<cpp:elif PREFIX:line="321" PREFIX:column="1">#<cpp:directive PREFIX:line="321" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="321" PREFIX:column="7">defined</name><argument_list PREFIX:line="321" PREFIX:column="14">(<argument><expr><name PREFIX:line="321" PREFIX:column="15">UCSR0B</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<expr_stmt><expr><name PREFIX:line="322" PREFIX:column="9">UCSR0B</name> = 0</expr>;</expr_stmt>
+<cpp:endif PREFIX:line="323" PREFIX:column="1">#<cpp:directive PREFIX:line="323" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+}</block></function>
+</unit>

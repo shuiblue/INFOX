@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/Wire/Wire.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  TwoWire.cpp - TWI/I2C library for Wiring &amp; Arduino
+  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ 
+  Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
+*/</comment>
+
+<extern PREFIX:line="22" PREFIX:column="1">extern "C" <block PREFIX:line="22" PREFIX:column="12">{
+  <cpp:include PREFIX:line="23" PREFIX:column="3">#<cpp:directive PREFIX:line="23" PREFIX:column="4">include</cpp:directive> <cpp:file PREFIX:line="23" PREFIX:column="12">&lt;stdlib.h&gt;</cpp:file></cpp:include>
+  <cpp:include PREFIX:line="24" PREFIX:column="3">#<cpp:directive PREFIX:line="24" PREFIX:column="4">include</cpp:directive> <cpp:file PREFIX:line="24" PREFIX:column="12">&lt;string.h&gt;</cpp:file></cpp:include>
+  <cpp:include PREFIX:line="25" PREFIX:column="3">#<cpp:directive PREFIX:line="25" PREFIX:column="4">include</cpp:directive> <cpp:file PREFIX:line="25" PREFIX:column="12">&lt;inttypes.h&gt;</cpp:file></cpp:include>
+  <cpp:include PREFIX:line="26" PREFIX:column="3">#<cpp:directive PREFIX:line="26" PREFIX:column="4">include</cpp:directive> <cpp:file PREFIX:line="26" PREFIX:column="12">"twi.h"</cpp:file></cpp:include>
+}</block></extern>
+
+<cpp:include PREFIX:line="29" PREFIX:column="1">#<cpp:directive PREFIX:line="29" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="29" PREFIX:column="10">"Wire.h"</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="31" PREFIX:column="1">// Initialize Class Variables //////////////////////////////////////////////////</comment>
+
+<decl_stmt><decl><type><name PREFIX:line="33" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="33" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="33" PREFIX:column="18">rxBuffer</name><index PREFIX:line="33" PREFIX:column="26">[<expr><name PREFIX:line="33" PREFIX:column="27">BUFFER_LENGTH</name></expr>]</index></name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="34" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="34" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="34" PREFIX:column="18">rxBufferIndex</name></name> <init PREFIX:line="34" PREFIX:column="32">= <expr PREFIX:line="34" PREFIX:column="34">0</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="35" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="35" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="35" PREFIX:column="18">rxBufferLength</name></name> <init PREFIX:line="35" PREFIX:column="33">= <expr PREFIX:line="35" PREFIX:column="35">0</expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><name PREFIX:line="37" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="37" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="37" PREFIX:column="18">txAddress</name></name> <init PREFIX:line="37" PREFIX:column="28">= <expr PREFIX:line="37" PREFIX:column="30">0</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="38" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="38" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="38" PREFIX:column="18">txBuffer</name><index PREFIX:line="38" PREFIX:column="26">[<expr><name PREFIX:line="38" PREFIX:column="27">BUFFER_LENGTH</name></expr>]</index></name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="39" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="39" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="39" PREFIX:column="18">txBufferIndex</name></name> <init PREFIX:line="39" PREFIX:column="32">= <expr PREFIX:line="39" PREFIX:column="34">0</expr></init></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="40" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="40" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="40" PREFIX:column="18">txBufferLength</name></name> <init PREFIX:line="40" PREFIX:column="33">= <expr PREFIX:line="40" PREFIX:column="35">0</expr></init></decl>;</decl_stmt>
+
+<decl_stmt><decl><type><name PREFIX:line="42" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="42" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="42" PREFIX:column="18">transmitting</name></name> <init PREFIX:line="42" PREFIX:column="31">= <expr PREFIX:line="42" PREFIX:column="33">0</expr></init></decl>;</decl_stmt>
+<function_decl><type><name PREFIX:line="43" PREFIX:column="1">void</name></type> (*<name><name PREFIX:line="43" PREFIX:column="8">TwoWire</name>::<name PREFIX:line="43" PREFIX:column="17">user_onRequest</name></name>)<parameter_list PREFIX:line="43" PREFIX:column="32">(<param><decl><type><name PREFIX:line="43" PREFIX:column="33">void</name></type></decl></param>)</parameter_list>;</function_decl>
+<function_decl><type><name PREFIX:line="44" PREFIX:column="1">void</name></type> (*<name><name PREFIX:line="44" PREFIX:column="8">TwoWire</name>::<name PREFIX:line="44" PREFIX:column="17">user_onReceive</name></name>)<parameter_list PREFIX:line="44" PREFIX:column="32">(<param><decl><type><name PREFIX:line="44" PREFIX:column="33">int</name></type></decl></param>)</parameter_list>;</function_decl>
+
+<comment type="line" PREFIX:line="46" PREFIX:column="1">// Constructors ////////////////////////////////////////////////////////////////</comment>
+
+<constructor><name><name PREFIX:line="48" PREFIX:column="1">TwoWire</name>::<name PREFIX:line="48" PREFIX:column="10">TwoWire</name></name><parameter_list PREFIX:line="48" PREFIX:column="17">()</parameter_list>
+<block PREFIX:line="49" PREFIX:column="1">{
+}</block></constructor>
+
+<comment type="line" PREFIX:line="52" PREFIX:column="1">// Public Methods //////////////////////////////////////////////////////////////</comment>
+
+<function><type><name PREFIX:line="54" PREFIX:column="1">void</name></type> <name><name PREFIX:line="54" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="54" PREFIX:column="15">begin</name></name><parameter_list PREFIX:line="54" PREFIX:column="20">(<param><decl><type><name PREFIX:line="54" PREFIX:column="21">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="55" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="56" PREFIX:column="3">rxBufferIndex</name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="57" PREFIX:column="3">rxBufferLength</name> = 0</expr>;</expr_stmt>
+
+  <expr_stmt><expr><name PREFIX:line="59" PREFIX:column="3">txBufferIndex</name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="60" PREFIX:column="3">txBufferLength</name> = 0</expr>;</expr_stmt>
+
+  <expr_stmt><expr><call><name PREFIX:line="62" PREFIX:column="3">twi_init</name><argument_list PREFIX:line="62" PREFIX:column="11">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="65" PREFIX:column="1">void</name></type> <name><name PREFIX:line="65" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="65" PREFIX:column="15">begin</name></name><parameter_list PREFIX:line="65" PREFIX:column="20">(<param><decl><type><name PREFIX:line="65" PREFIX:column="21">uint8_t</name></type> <name PREFIX:line="65" PREFIX:column="29">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="66" PREFIX:column="1">{
+  <expr_stmt><expr><call><name PREFIX:line="67" PREFIX:column="3">twi_setAddress</name><argument_list PREFIX:line="67" PREFIX:column="17">(<argument><expr><name PREFIX:line="67" PREFIX:column="18">address</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="68" PREFIX:column="3">twi_attachSlaveTxEvent</name><argument_list PREFIX:line="68" PREFIX:column="25">(<argument><expr><name PREFIX:line="68" PREFIX:column="26">onRequestService</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="69" PREFIX:column="3">twi_attachSlaveRxEvent</name><argument_list PREFIX:line="69" PREFIX:column="25">(<argument><expr><name PREFIX:line="69" PREFIX:column="26">onReceiveService</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="70" PREFIX:column="3">begin</name><argument_list PREFIX:line="70" PREFIX:column="8">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="73" PREFIX:column="1">void</name></type> <name><name PREFIX:line="73" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="73" PREFIX:column="15">begin</name></name><parameter_list PREFIX:line="73" PREFIX:column="20">(<param><decl><type><name PREFIX:line="73" PREFIX:column="21">int</name></type> <name PREFIX:line="73" PREFIX:column="25">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="74" PREFIX:column="1">{
+  <expr_stmt><expr><call><name PREFIX:line="75" PREFIX:column="3">begin</name><argument_list PREFIX:line="75" PREFIX:column="8">(<argument><expr PREFIX:line="75" PREFIX:column="9">(<name PREFIX:line="75" PREFIX:column="10">uint8_t</name>)<name PREFIX:line="75" PREFIX:column="18">address</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="78" PREFIX:column="1">void</name></type> <name><name PREFIX:line="78" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="78" PREFIX:column="15">setClock</name></name><parameter_list PREFIX:line="78" PREFIX:column="23">(<param><decl><type><name PREFIX:line="78" PREFIX:column="24">uint32_t</name></type> <name PREFIX:line="78" PREFIX:column="33">frequency</name></decl></param>)</parameter_list>
+<block PREFIX:line="79" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="80" PREFIX:column="3">TWBR</name> = ((<name PREFIX:line="80" PREFIX:column="12">F_CPU</name> / <name PREFIX:line="80" PREFIX:column="20">frequency</name>) - 16) / 2</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="83" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="83" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="83" PREFIX:column="18">requestFrom</name></name><parameter_list PREFIX:line="83" PREFIX:column="29">(<param><decl><type><name PREFIX:line="83" PREFIX:column="30">uint8_t</name></type> <name PREFIX:line="83" PREFIX:column="38">address</name></decl></param>, <param><decl><type><name PREFIX:line="83" PREFIX:column="47">uint8_t</name></type> <name PREFIX:line="83" PREFIX:column="55">quantity</name></decl></param>, <param><decl><type><name PREFIX:line="83" PREFIX:column="65">uint8_t</name></type> <name PREFIX:line="83" PREFIX:column="73">sendStop</name></decl></param>)</parameter_list>
+<block PREFIX:line="84" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="85" PREFIX:column="3">// clamp to buffer length</comment>
+  <if PREFIX:line="86" PREFIX:column="3">if<condition PREFIX:line="86" PREFIX:column="5">(<expr><name PREFIX:line="86" PREFIX:column="6">quantity</name> &gt; <name PREFIX:line="86" PREFIX:column="17">BUFFER_LENGTH</name></expr>)</condition><then><block PREFIX:line="86" PREFIX:column="31">{
+    <expr_stmt><expr><name PREFIX:line="87" PREFIX:column="5">quantity</name> = <name PREFIX:line="87" PREFIX:column="16">BUFFER_LENGTH</name></expr>;</expr_stmt>
+  }</block></then></if>
+  <comment type="line" PREFIX:line="89" PREFIX:column="3">// perform blocking read into buffer</comment>
+  <decl_stmt><decl><type><name PREFIX:line="90" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="90" PREFIX:column="11">read</name> <init PREFIX:line="90" PREFIX:column="16">= <expr><call><name PREFIX:line="90" PREFIX:column="18">twi_readFrom</name><argument_list PREFIX:line="90" PREFIX:column="30">(<argument><expr><name PREFIX:line="90" PREFIX:column="31">address</name></expr></argument>, <argument><expr><name PREFIX:line="90" PREFIX:column="40">rxBuffer</name></expr></argument>, <argument><expr><name PREFIX:line="90" PREFIX:column="50">quantity</name></expr></argument>, <argument><expr><name PREFIX:line="90" PREFIX:column="60">sendStop</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <comment type="line" PREFIX:line="91" PREFIX:column="3">// set rx buffer iterator vars</comment>
+  <expr_stmt><expr><name PREFIX:line="92" PREFIX:column="3">rxBufferIndex</name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="93" PREFIX:column="3">rxBufferLength</name> = <name PREFIX:line="93" PREFIX:column="20">read</name></expr>;</expr_stmt>
+
+  <return PREFIX:line="95" PREFIX:column="3">return <expr><name PREFIX:line="95" PREFIX:column="10">read</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="98" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="98" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="98" PREFIX:column="18">requestFrom</name></name><parameter_list PREFIX:line="98" PREFIX:column="29">(<param><decl><type><name PREFIX:line="98" PREFIX:column="30">uint8_t</name></type> <name PREFIX:line="98" PREFIX:column="38">address</name></decl></param>, <param><decl><type><name PREFIX:line="98" PREFIX:column="47">uint8_t</name></type> <name PREFIX:line="98" PREFIX:column="55">quantity</name></decl></param>)</parameter_list>
+<block PREFIX:line="99" PREFIX:column="1">{
+  <return PREFIX:line="100" PREFIX:column="3">return <expr><call><name PREFIX:line="100" PREFIX:column="10">requestFrom</name><argument_list PREFIX:line="100" PREFIX:column="21">(<argument><expr PREFIX:line="100" PREFIX:column="22">(<name PREFIX:line="100" PREFIX:column="23">uint8_t</name>)<name PREFIX:line="100" PREFIX:column="31">address</name></expr></argument>, <argument><expr PREFIX:line="100" PREFIX:column="40">(<name PREFIX:line="100" PREFIX:column="41">uint8_t</name>)<name PREFIX:line="100" PREFIX:column="49">quantity</name></expr></argument>, <argument><expr PREFIX:line="100" PREFIX:column="59">(<name PREFIX:line="100" PREFIX:column="60">uint8_t</name>)true</expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="103" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="103" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="103" PREFIX:column="18">requestFrom</name></name><parameter_list PREFIX:line="103" PREFIX:column="29">(<param><decl><type><name PREFIX:line="103" PREFIX:column="30">int</name></type> <name PREFIX:line="103" PREFIX:column="34">address</name></decl></param>, <param><decl><type><name PREFIX:line="103" PREFIX:column="43">int</name></type> <name PREFIX:line="103" PREFIX:column="47">quantity</name></decl></param>)</parameter_list>
+<block PREFIX:line="104" PREFIX:column="1">{
+  <return PREFIX:line="105" PREFIX:column="3">return <expr><call><name PREFIX:line="105" PREFIX:column="10">requestFrom</name><argument_list PREFIX:line="105" PREFIX:column="21">(<argument><expr PREFIX:line="105" PREFIX:column="22">(<name PREFIX:line="105" PREFIX:column="23">uint8_t</name>)<name PREFIX:line="105" PREFIX:column="31">address</name></expr></argument>, <argument><expr PREFIX:line="105" PREFIX:column="40">(<name PREFIX:line="105" PREFIX:column="41">uint8_t</name>)<name PREFIX:line="105" PREFIX:column="49">quantity</name></expr></argument>, <argument><expr PREFIX:line="105" PREFIX:column="59">(<name PREFIX:line="105" PREFIX:column="60">uint8_t</name>)true</expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="108" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="108" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="108" PREFIX:column="18">requestFrom</name></name><parameter_list PREFIX:line="108" PREFIX:column="29">(<param><decl><type><name PREFIX:line="108" PREFIX:column="30">int</name></type> <name PREFIX:line="108" PREFIX:column="34">address</name></decl></param>, <param><decl><type><name PREFIX:line="108" PREFIX:column="43">int</name></type> <name PREFIX:line="108" PREFIX:column="47">quantity</name></decl></param>, <param><decl><type><name PREFIX:line="108" PREFIX:column="57">int</name></type> <name PREFIX:line="108" PREFIX:column="61">sendStop</name></decl></param>)</parameter_list>
+<block PREFIX:line="109" PREFIX:column="1">{
+  <return PREFIX:line="110" PREFIX:column="3">return <expr><call><name PREFIX:line="110" PREFIX:column="10">requestFrom</name><argument_list PREFIX:line="110" PREFIX:column="21">(<argument><expr PREFIX:line="110" PREFIX:column="22">(<name PREFIX:line="110" PREFIX:column="23">uint8_t</name>)<name PREFIX:line="110" PREFIX:column="31">address</name></expr></argument>, <argument><expr PREFIX:line="110" PREFIX:column="40">(<name PREFIX:line="110" PREFIX:column="41">uint8_t</name>)<name PREFIX:line="110" PREFIX:column="49">quantity</name></expr></argument>, <argument><expr PREFIX:line="110" PREFIX:column="59">(<name PREFIX:line="110" PREFIX:column="60">uint8_t</name>)<name PREFIX:line="110" PREFIX:column="68">sendStop</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="113" PREFIX:column="1">void</name></type> <name><name PREFIX:line="113" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="113" PREFIX:column="15">beginTransmission</name></name><parameter_list PREFIX:line="113" PREFIX:column="32">(<param><decl><type><name PREFIX:line="113" PREFIX:column="33">uint8_t</name></type> <name PREFIX:line="113" PREFIX:column="41">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="114" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="115" PREFIX:column="3">// indicate that we are transmitting</comment>
+  <expr_stmt><expr><name PREFIX:line="116" PREFIX:column="3">transmitting</name> = 1</expr>;</expr_stmt>
+  <comment type="line" PREFIX:line="117" PREFIX:column="3">// set address of targeted slave</comment>
+  <expr_stmt><expr><name PREFIX:line="118" PREFIX:column="3">txAddress</name> = <name PREFIX:line="118" PREFIX:column="15">address</name></expr>;</expr_stmt>
+  <comment type="line" PREFIX:line="119" PREFIX:column="3">// reset tx buffer iterator vars</comment>
+  <expr_stmt><expr><name PREFIX:line="120" PREFIX:column="3">txBufferIndex</name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="121" PREFIX:column="3">txBufferLength</name> = 0</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="124" PREFIX:column="1">void</name></type> <name><name PREFIX:line="124" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="124" PREFIX:column="15">beginTransmission</name></name><parameter_list PREFIX:line="124" PREFIX:column="32">(<param><decl><type><name PREFIX:line="124" PREFIX:column="33">int</name></type> <name PREFIX:line="124" PREFIX:column="37">address</name></decl></param>)</parameter_list>
+<block PREFIX:line="125" PREFIX:column="1">{
+  <expr_stmt><expr><call><name PREFIX:line="126" PREFIX:column="3">beginTransmission</name><argument_list PREFIX:line="126" PREFIX:column="20">(<argument><expr PREFIX:line="126" PREFIX:column="21">(<name PREFIX:line="126" PREFIX:column="22">uint8_t</name>)<name PREFIX:line="126" PREFIX:column="30">address</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<comment type="line" PREFIX:line="129" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="130" PREFIX:column="1">//	Originally, 'endTransmission' was an f(void) function.</comment>
+<comment type="line" PREFIX:line="131" PREFIX:column="1">//	It has been modified to take one parameter indicating</comment>
+<comment type="line" PREFIX:line="132" PREFIX:column="1">//	whether or not a STOP should be performed on the bus.</comment>
+<comment type="line" PREFIX:line="133" PREFIX:column="1">//	Calling endTransmission(false) allows a sketch to </comment>
+<comment type="line" PREFIX:line="134" PREFIX:column="1">//	perform a repeated start. </comment>
+<comment type="line" PREFIX:line="135" PREFIX:column="1">//</comment>
+<comment type="line" PREFIX:line="136" PREFIX:column="1">//	WARNING: Nothing in the library keeps track of whether</comment>
+<comment type="line" PREFIX:line="137" PREFIX:column="1">//	the bus tenure has been properly ended with a STOP. It</comment>
+<comment type="line" PREFIX:line="138" PREFIX:column="1">//	is very possible to leave the bus in a hung state if</comment>
+<comment type="line" PREFIX:line="139" PREFIX:column="1">//	no call to endTransmission(true) is made. Some I2C</comment>
+<comment type="line" PREFIX:line="140" PREFIX:column="1">//	devices will behave oddly if they do not see a STOP.</comment>
+<comment type="line" PREFIX:line="141" PREFIX:column="1">//</comment>
+<function><type><name PREFIX:line="142" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="142" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="142" PREFIX:column="18">endTransmission</name></name><parameter_list PREFIX:line="142" PREFIX:column="33">(<param><decl><type><name PREFIX:line="142" PREFIX:column="34">uint8_t</name></type> <name PREFIX:line="142" PREFIX:column="42">sendStop</name></decl></param>)</parameter_list>
+<block PREFIX:line="143" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="144" PREFIX:column="3">// transmit buffer (blocking)</comment>
+  <decl_stmt><decl><type><name PREFIX:line="145" PREFIX:column="3">int8_t</name></type> <name PREFIX:line="145" PREFIX:column="10">ret</name> <init PREFIX:line="145" PREFIX:column="14">= <expr><call><name PREFIX:line="145" PREFIX:column="16">twi_writeTo</name><argument_list PREFIX:line="145" PREFIX:column="27">(<argument><expr><name PREFIX:line="145" PREFIX:column="28">txAddress</name></expr></argument>, <argument><expr><name PREFIX:line="145" PREFIX:column="39">txBuffer</name></expr></argument>, <argument><expr><name PREFIX:line="145" PREFIX:column="49">txBufferLength</name></expr></argument>, <argument><expr PREFIX:line="145" PREFIX:column="65">1</expr></argument>, <argument><expr><name PREFIX:line="145" PREFIX:column="68">sendStop</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <comment type="line" PREFIX:line="146" PREFIX:column="3">// reset tx buffer iterator vars</comment>
+  <expr_stmt><expr><name PREFIX:line="147" PREFIX:column="3">txBufferIndex</name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="148" PREFIX:column="3">txBufferLength</name> = 0</expr>;</expr_stmt>
+  <comment type="line" PREFIX:line="149" PREFIX:column="3">// indicate that we are done transmitting</comment>
+  <expr_stmt><expr><name PREFIX:line="150" PREFIX:column="3">transmitting</name> = 0</expr>;</expr_stmt>
+  <return PREFIX:line="151" PREFIX:column="3">return <expr><name PREFIX:line="151" PREFIX:column="10">ret</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="154" PREFIX:column="1">//	This provides backwards compatibility with the original</comment>
+<comment type="line" PREFIX:line="155" PREFIX:column="1">//	definition, and expected behaviour, of endTransmission</comment>
+<comment type="line" PREFIX:line="156" PREFIX:column="1">//</comment>
+<function><type><name PREFIX:line="157" PREFIX:column="1">uint8_t</name></type> <name><name PREFIX:line="157" PREFIX:column="9">TwoWire</name>::<name PREFIX:line="157" PREFIX:column="18">endTransmission</name></name><parameter_list PREFIX:line="157" PREFIX:column="33">(<param><decl><type><name PREFIX:line="157" PREFIX:column="34">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="158" PREFIX:column="1">{
+  <return PREFIX:line="159" PREFIX:column="3">return <expr><call><name PREFIX:line="159" PREFIX:column="10">endTransmission</name><argument_list PREFIX:line="159" PREFIX:column="25">(<argument><expr PREFIX:line="159" PREFIX:column="26">true</expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="162" PREFIX:column="1">// must be called in:</comment>
+<comment type="line" PREFIX:line="163" PREFIX:column="1">// slave tx event callback</comment>
+<comment type="line" PREFIX:line="164" PREFIX:column="1">// or after beginTransmission(address)</comment>
+<function><type><name PREFIX:line="165" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="165" PREFIX:column="8">TwoWire</name>::<name PREFIX:line="165" PREFIX:column="17">write</name></name><parameter_list PREFIX:line="165" PREFIX:column="22">(<param><decl><type><name PREFIX:line="165" PREFIX:column="23">uint8_t</name></type> <name PREFIX:line="165" PREFIX:column="31">data</name></decl></param>)</parameter_list>
+<block PREFIX:line="166" PREFIX:column="1">{
+  <if PREFIX:line="167" PREFIX:column="3">if<condition PREFIX:line="167" PREFIX:column="5">(<expr><name PREFIX:line="167" PREFIX:column="6">transmitting</name></expr>)</condition><then><block PREFIX:line="167" PREFIX:column="19">{
+  <comment type="line" PREFIX:line="168" PREFIX:column="3">// in master transmitter mode</comment>
+    <comment type="line" PREFIX:line="169" PREFIX:column="5">// don't bother if buffer is full</comment>
+    <if PREFIX:line="170" PREFIX:column="5">if<condition PREFIX:line="170" PREFIX:column="7">(<expr><name PREFIX:line="170" PREFIX:column="8">txBufferLength</name> &gt;= <name PREFIX:line="170" PREFIX:column="26">BUFFER_LENGTH</name></expr>)</condition><then><block PREFIX:line="170" PREFIX:column="40">{
+      <expr_stmt><expr><call><name PREFIX:line="171" PREFIX:column="7">setWriteError</name><argument_list PREFIX:line="171" PREFIX:column="20">()</argument_list></call></expr>;</expr_stmt>
+      <return PREFIX:line="172" PREFIX:column="7">return <expr PREFIX:line="172" PREFIX:column="14">0</expr>;</return>
+    }</block></then></if>
+    <comment type="line" PREFIX:line="174" PREFIX:column="5">// put byte in tx buffer</comment>
+    <expr_stmt><expr><name><name PREFIX:line="175" PREFIX:column="5">txBuffer</name><index PREFIX:line="175" PREFIX:column="13">[<expr><name PREFIX:line="175" PREFIX:column="14">txBufferIndex</name></expr>]</index></name> = <name PREFIX:line="175" PREFIX:column="31">data</name></expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="176" PREFIX:column="5">++<name PREFIX:line="176" PREFIX:column="7">txBufferIndex</name></expr>;</expr_stmt>
+    <comment type="line" PREFIX:line="177" PREFIX:column="5">// update amount in buffer   </comment>
+    <expr_stmt><expr><name PREFIX:line="178" PREFIX:column="5">txBufferLength</name> = <name PREFIX:line="178" PREFIX:column="22">txBufferIndex</name></expr>;</expr_stmt>
+  }</block></then><else PREFIX:line="179" PREFIX:column="4">else<block PREFIX:line="179" PREFIX:column="8">{
+  <comment type="line" PREFIX:line="180" PREFIX:column="3">// in slave send mode</comment>
+    <comment type="line" PREFIX:line="181" PREFIX:column="5">// reply to master</comment>
+    <expr_stmt><expr><call><name PREFIX:line="182" PREFIX:column="5">twi_transmit</name><argument_list PREFIX:line="182" PREFIX:column="17">(<argument><expr PREFIX:line="182" PREFIX:column="18">&amp;<name PREFIX:line="182" PREFIX:column="19">data</name></expr></argument>, <argument><expr PREFIX:line="182" PREFIX:column="25">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></else></if>
+  <return PREFIX:line="184" PREFIX:column="3">return <expr PREFIX:line="184" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="187" PREFIX:column="1">// must be called in:</comment>
+<comment type="line" PREFIX:line="188" PREFIX:column="1">// slave tx event callback</comment>
+<comment type="line" PREFIX:line="189" PREFIX:column="1">// or after beginTransmission(address)</comment>
+<function><type><name PREFIX:line="190" PREFIX:column="1">size_t</name></type> <name><name PREFIX:line="190" PREFIX:column="8">TwoWire</name>::<name PREFIX:line="190" PREFIX:column="17">write</name></name><parameter_list PREFIX:line="190" PREFIX:column="22">( <param><decl><type><name PREFIX:line="190" PREFIX:column="24">uint8_t</name> *</type><name PREFIX:line="190" PREFIX:column="33">data</name></decl></param>, <param><decl><type><name PREFIX:line="190" PREFIX:column="39">size_t</name></type> <name PREFIX:line="190" PREFIX:column="46">quantity</name></decl></param>)</parameter_list>
+<block PREFIX:line="191" PREFIX:column="1">{
+  <if PREFIX:line="192" PREFIX:column="3">if<condition PREFIX:line="192" PREFIX:column="5">(<expr><name PREFIX:line="192" PREFIX:column="6">transmitting</name></expr>)</condition><then><block PREFIX:line="192" PREFIX:column="19">{
+  <comment type="line" PREFIX:line="193" PREFIX:column="3">// in master transmitter mode</comment>
+    <for PREFIX:line="194" PREFIX:column="5">for(<init><decl><type><name PREFIX:line="194" PREFIX:column="9">size_t</name></type> <name PREFIX:line="194" PREFIX:column="16">i</name> <init PREFIX:line="194" PREFIX:column="18">= <expr PREFIX:line="194" PREFIX:column="20">0</expr></init></decl>;</init> <condition><expr><name PREFIX:line="194" PREFIX:column="23">i</name> &lt; <name PREFIX:line="194" PREFIX:column="27">quantity</name></expr>;</condition> <incr><expr PREFIX:line="194" PREFIX:column="37">++<name PREFIX:line="194" PREFIX:column="39">i</name></expr></incr>)<block PREFIX:line="194" PREFIX:column="41">{
+      <expr_stmt><expr><call><name PREFIX:line="195" PREFIX:column="7">write</name><argument_list PREFIX:line="195" PREFIX:column="12">(<argument><expr><name><name PREFIX:line="195" PREFIX:column="13">data</name><index PREFIX:line="195" PREFIX:column="17">[<expr><name PREFIX:line="195" PREFIX:column="18">i</name></expr>]</index></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    }</block></for>
+  }</block></then><else PREFIX:line="197" PREFIX:column="4">else<block PREFIX:line="197" PREFIX:column="8">{
+  <comment type="line" PREFIX:line="198" PREFIX:column="3">// in slave send mode</comment>
+    <comment type="line" PREFIX:line="199" PREFIX:column="5">// reply to master</comment>
+    <expr_stmt><expr><call><name PREFIX:line="200" PREFIX:column="5">twi_transmit</name><argument_list PREFIX:line="200" PREFIX:column="17">(<argument><expr><name PREFIX:line="200" PREFIX:column="18">data</name></expr></argument>, <argument><expr><name PREFIX:line="200" PREFIX:column="24">quantity</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  }</block></else></if>
+  <return PREFIX:line="202" PREFIX:column="3">return <expr><name PREFIX:line="202" PREFIX:column="10">quantity</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="205" PREFIX:column="1">// must be called in:</comment>
+<comment type="line" PREFIX:line="206" PREFIX:column="1">// slave rx event callback</comment>
+<comment type="line" PREFIX:line="207" PREFIX:column="1">// or after requestFrom(address, numBytes)</comment>
+<function><type><name PREFIX:line="208" PREFIX:column="1">int</name></type> <name><name PREFIX:line="208" PREFIX:column="5">TwoWire</name>::<name PREFIX:line="208" PREFIX:column="14">available</name></name><parameter_list PREFIX:line="208" PREFIX:column="23">(<param><decl><type><name PREFIX:line="208" PREFIX:column="24">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="209" PREFIX:column="1">{
+  <return PREFIX:line="210" PREFIX:column="3">return <expr><name PREFIX:line="210" PREFIX:column="10">rxBufferLength</name> - <name PREFIX:line="210" PREFIX:column="27">rxBufferIndex</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="213" PREFIX:column="1">// must be called in:</comment>
+<comment type="line" PREFIX:line="214" PREFIX:column="1">// slave rx event callback</comment>
+<comment type="line" PREFIX:line="215" PREFIX:column="1">// or after requestFrom(address, numBytes)</comment>
+<function><type><name PREFIX:line="216" PREFIX:column="1">int</name></type> <name><name PREFIX:line="216" PREFIX:column="5">TwoWire</name>::<name PREFIX:line="216" PREFIX:column="14">read</name></name><parameter_list PREFIX:line="216" PREFIX:column="18">(<param><decl><type><name PREFIX:line="216" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="217" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="218" PREFIX:column="3">int</name></type> <name PREFIX:line="218" PREFIX:column="7">value</name> <init PREFIX:line="218" PREFIX:column="13">= <expr PREFIX:line="218" PREFIX:column="15">-1</expr></init></decl>;</decl_stmt>
+  
+  <comment type="line" PREFIX:line="220" PREFIX:column="3">// get each successive byte on each call</comment>
+  <if PREFIX:line="221" PREFIX:column="3">if<condition PREFIX:line="221" PREFIX:column="5">(<expr><name PREFIX:line="221" PREFIX:column="6">rxBufferIndex</name> &lt; <name PREFIX:line="221" PREFIX:column="22">rxBufferLength</name></expr>)</condition><then><block PREFIX:line="221" PREFIX:column="37">{
+    <expr_stmt><expr><name PREFIX:line="222" PREFIX:column="5">value</name> = <name><name PREFIX:line="222" PREFIX:column="13">rxBuffer</name><index PREFIX:line="222" PREFIX:column="21">[<expr><name PREFIX:line="222" PREFIX:column="22">rxBufferIndex</name></expr>]</index></name></expr>;</expr_stmt>
+    <expr_stmt><expr PREFIX:line="223" PREFIX:column="5">++<name PREFIX:line="223" PREFIX:column="7">rxBufferIndex</name></expr>;</expr_stmt>
+  }</block></then></if>
+
+  <return PREFIX:line="226" PREFIX:column="3">return <expr><name PREFIX:line="226" PREFIX:column="10">value</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="229" PREFIX:column="1">// must be called in:</comment>
+<comment type="line" PREFIX:line="230" PREFIX:column="1">// slave rx event callback</comment>
+<comment type="line" PREFIX:line="231" PREFIX:column="1">// or after requestFrom(address, numBytes)</comment>
+<function><type><name PREFIX:line="232" PREFIX:column="1">int</name></type> <name><name PREFIX:line="232" PREFIX:column="5">TwoWire</name>::<name PREFIX:line="232" PREFIX:column="14">peek</name></name><parameter_list PREFIX:line="232" PREFIX:column="18">(<param><decl><type><name PREFIX:line="232" PREFIX:column="19">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="233" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="234" PREFIX:column="3">int</name></type> <name PREFIX:line="234" PREFIX:column="7">value</name> <init PREFIX:line="234" PREFIX:column="13">= <expr PREFIX:line="234" PREFIX:column="15">-1</expr></init></decl>;</decl_stmt>
+  
+  <if PREFIX:line="236" PREFIX:column="3">if<condition PREFIX:line="236" PREFIX:column="5">(<expr><name PREFIX:line="236" PREFIX:column="6">rxBufferIndex</name> &lt; <name PREFIX:line="236" PREFIX:column="22">rxBufferLength</name></expr>)</condition><then><block PREFIX:line="236" PREFIX:column="37">{
+    <expr_stmt><expr><name PREFIX:line="237" PREFIX:column="5">value</name> = <name><name PREFIX:line="237" PREFIX:column="13">rxBuffer</name><index PREFIX:line="237" PREFIX:column="21">[<expr><name PREFIX:line="237" PREFIX:column="22">rxBufferIndex</name></expr>]</index></name></expr>;</expr_stmt>
+  }</block></then></if>
+
+  <return PREFIX:line="240" PREFIX:column="3">return <expr><name PREFIX:line="240" PREFIX:column="10">value</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="243" PREFIX:column="1">void</name></type> <name><name PREFIX:line="243" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="243" PREFIX:column="15">flush</name></name><parameter_list PREFIX:line="243" PREFIX:column="20">(<param><decl><type><name PREFIX:line="243" PREFIX:column="21">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="244" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="245" PREFIX:column="3">// XXX: to be implemented.</comment>
+}</block></function>
+
+<comment type="line" PREFIX:line="248" PREFIX:column="1">// behind the scenes function that is called when data is received</comment>
+<function><type><name PREFIX:line="249" PREFIX:column="1">void</name></type> <name><name PREFIX:line="249" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="249" PREFIX:column="15">onReceiveService</name></name><parameter_list PREFIX:line="249" PREFIX:column="31">(<param><decl><type><name PREFIX:line="249" PREFIX:column="32">uint8_t</name>*</type> <name PREFIX:line="249" PREFIX:column="41">inBytes</name></decl></param>, <param><decl><type><name PREFIX:line="249" PREFIX:column="50">int</name></type> <name PREFIX:line="249" PREFIX:column="54">numBytes</name></decl></param>)</parameter_list>
+<block PREFIX:line="250" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="251" PREFIX:column="3">// don't bother if user hasn't registered a callback</comment>
+  <if PREFIX:line="252" PREFIX:column="3">if<condition PREFIX:line="252" PREFIX:column="5">(<expr PREFIX:line="252" PREFIX:column="6">!<name PREFIX:line="252" PREFIX:column="7">user_onReceive</name></expr>)</condition><then><block PREFIX:line="252" PREFIX:column="22">{
+    <return PREFIX:line="253" PREFIX:column="5">return;</return>
+  }</block></then></if>
+  <comment type="line" PREFIX:line="255" PREFIX:column="3">// don't bother if rx buffer is in use by a master requestFrom() op</comment>
+  <comment type="line" PREFIX:line="256" PREFIX:column="3">// i know this drops data, but it allows for slight stupidity</comment>
+  <comment type="line" PREFIX:line="257" PREFIX:column="3">// meaning, they may not have read all the master requestFrom() data yet</comment>
+  <if PREFIX:line="258" PREFIX:column="3">if<condition PREFIX:line="258" PREFIX:column="5">(<expr><name PREFIX:line="258" PREFIX:column="6">rxBufferIndex</name> &lt; <name PREFIX:line="258" PREFIX:column="22">rxBufferLength</name></expr>)</condition><then><block PREFIX:line="258" PREFIX:column="37">{
+    <return PREFIX:line="259" PREFIX:column="5">return;</return>
+  }</block></then></if>
+  <comment type="line" PREFIX:line="261" PREFIX:column="3">// copy twi rx buffer into local read buffer</comment>
+  <comment type="line" PREFIX:line="262" PREFIX:column="3">// this enables new reads to happen in parallel</comment>
+  <for PREFIX:line="263" PREFIX:column="3">for(<init><decl><type><name PREFIX:line="263" PREFIX:column="7">uint8_t</name></type> <name PREFIX:line="263" PREFIX:column="15">i</name> <init PREFIX:line="263" PREFIX:column="17">= <expr PREFIX:line="263" PREFIX:column="19">0</expr></init></decl>;</init> <condition><expr><name PREFIX:line="263" PREFIX:column="22">i</name> &lt; <name PREFIX:line="263" PREFIX:column="26">numBytes</name></expr>;</condition> <incr><expr PREFIX:line="263" PREFIX:column="36">++<name PREFIX:line="263" PREFIX:column="38">i</name></expr></incr>)<block PREFIX:line="263" PREFIX:column="40">{
+    <expr_stmt><expr><name><name PREFIX:line="264" PREFIX:column="5">rxBuffer</name><index PREFIX:line="264" PREFIX:column="13">[<expr><name PREFIX:line="264" PREFIX:column="14">i</name></expr>]</index></name> = <name><name PREFIX:line="264" PREFIX:column="19">inBytes</name><index PREFIX:line="264" PREFIX:column="26">[<expr><name PREFIX:line="264" PREFIX:column="27">i</name></expr>]</index></name></expr>;</expr_stmt>    
+  }</block></for>
+  <comment type="line" PREFIX:line="266" PREFIX:column="3">// set rx iterator vars</comment>
+  <expr_stmt><expr><name PREFIX:line="267" PREFIX:column="3">rxBufferIndex</name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="268" PREFIX:column="3">rxBufferLength</name> = <name PREFIX:line="268" PREFIX:column="20">numBytes</name></expr>;</expr_stmt>
+  <comment type="line" PREFIX:line="269" PREFIX:column="3">// alert user program</comment>
+  <expr_stmt><expr><call><name PREFIX:line="270" PREFIX:column="3">user_onReceive</name><argument_list PREFIX:line="270" PREFIX:column="17">(<argument><expr><name PREFIX:line="270" PREFIX:column="18">numBytes</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<comment type="line" PREFIX:line="273" PREFIX:column="1">// behind the scenes function that is called when data is requested</comment>
+<function><type><name PREFIX:line="274" PREFIX:column="1">void</name></type> <name><name PREFIX:line="274" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="274" PREFIX:column="15">onRequestService</name></name><parameter_list PREFIX:line="274" PREFIX:column="31">(<param><decl><type><name PREFIX:line="274" PREFIX:column="32">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="275" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="276" PREFIX:column="3">// don't bother if user hasn't registered a callback</comment>
+  <if PREFIX:line="277" PREFIX:column="3">if<condition PREFIX:line="277" PREFIX:column="5">(<expr PREFIX:line="277" PREFIX:column="6">!<name PREFIX:line="277" PREFIX:column="7">user_onRequest</name></expr>)</condition><then><block PREFIX:line="277" PREFIX:column="22">{
+    <return PREFIX:line="278" PREFIX:column="5">return;</return>
+  }</block></then></if>
+  <comment type="line" PREFIX:line="280" PREFIX:column="3">// reset tx buffer iterator vars</comment>
+  <comment type="line" PREFIX:line="281" PREFIX:column="3">// !!! this will kill any pending pre-master sendTo() activity</comment>
+  <expr_stmt><expr><name PREFIX:line="282" PREFIX:column="3">txBufferIndex</name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="283" PREFIX:column="3">txBufferLength</name> = 0</expr>;</expr_stmt>
+  <comment type="line" PREFIX:line="284" PREFIX:column="3">// alert user program</comment>
+  <expr_stmt><expr><call><name PREFIX:line="285" PREFIX:column="3">user_onRequest</name><argument_list PREFIX:line="285" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<comment type="line" PREFIX:line="288" PREFIX:column="1">// sets function called on slave write</comment>
+<function><type><name PREFIX:line="289" PREFIX:column="1">void</name></type> <name><name PREFIX:line="289" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="289" PREFIX:column="15">onReceive</name></name><parameter_list PREFIX:line="289" PREFIX:column="24">( <param><function_decl><type><name PREFIX:line="289" PREFIX:column="26">void</name></type> (*<name PREFIX:line="289" PREFIX:column="33">function</name>)<parameter_list PREFIX:line="289" PREFIX:column="42">(<param><decl><type><name PREFIX:line="289" PREFIX:column="43">int</name></type></decl></param>)</parameter_list></function_decl></param> )</parameter_list>
+<block PREFIX:line="290" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="291" PREFIX:column="3">user_onReceive</name> = <name PREFIX:line="291" PREFIX:column="20">function</name></expr>;</expr_stmt>
+}</block></function>
+
+<comment type="line" PREFIX:line="294" PREFIX:column="1">// sets function called on slave read</comment>
+<function><type><name PREFIX:line="295" PREFIX:column="1">void</name></type> <name><name PREFIX:line="295" PREFIX:column="6">TwoWire</name>::<name PREFIX:line="295" PREFIX:column="15">onRequest</name></name><parameter_list PREFIX:line="295" PREFIX:column="24">( <param><function_decl><type><name PREFIX:line="295" PREFIX:column="26">void</name></type> (*<name PREFIX:line="295" PREFIX:column="33">function</name>)<parameter_list PREFIX:line="295" PREFIX:column="42">(<param><decl><type><name PREFIX:line="295" PREFIX:column="43">void</name></type></decl></param>)</parameter_list></function_decl></param> )</parameter_list>
+<block PREFIX:line="296" PREFIX:column="1">{
+  <expr_stmt><expr><name PREFIX:line="297" PREFIX:column="3">user_onRequest</name> = <name PREFIX:line="297" PREFIX:column="20">function</name></expr>;</expr_stmt>
+}</block></function>
+
+<comment type="line" PREFIX:line="300" PREFIX:column="1">// Preinstantiate Objects //////////////////////////////////////////////////////</comment>
+
+<decl_stmt><decl><type><name PREFIX:line="302" PREFIX:column="1">TwoWire</name></type> <name PREFIX:line="302" PREFIX:column="9">Wire</name> <init PREFIX:line="302" PREFIX:column="14">= <expr><call><name PREFIX:line="302" PREFIX:column="16">TwoWire</name><argument_list PREFIX:line="302" PREFIX:column="23">()</argument_list></call></expr></init></decl>;</decl_stmt>
+
+</unit>

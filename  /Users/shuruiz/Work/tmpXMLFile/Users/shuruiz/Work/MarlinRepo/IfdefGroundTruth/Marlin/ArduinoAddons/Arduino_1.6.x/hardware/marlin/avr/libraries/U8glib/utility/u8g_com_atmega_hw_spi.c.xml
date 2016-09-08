@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/libraries/U8glib/utility/u8g_com_atmega_hw_spi.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  
+  u8g_com_atmega_hw_spi.c
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2012, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  
+  Assumes, that 
+    MOSI is at PORTB, Pin 3
+  and
+    SCK is at PORTB, Pin 5
+
+  Update for ATOMIC operation done (01 Jun 2013)
+    U8G_ATOMIC_OR(ptr, val)
+    U8G_ATOMIC_AND(ptr, val)
+    U8G_ATOMIC_START()
+    U8G_ATOMIC_END()
+ 
+
+
+*/</comment>
+
+<cpp:include PREFIX:line="50" PREFIX:column="1">#<cpp:directive PREFIX:line="50" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="50" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+
+<cpp:if PREFIX:line="53" PREFIX:column="1">#<cpp:directive PREFIX:line="53" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="53" PREFIX:column="5">defined</name><argument_list PREFIX:line="53" PREFIX:column="12">(<argument><expr><name PREFIX:line="53" PREFIX:column="13">__AVR__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+<cpp:define PREFIX:line="54" PREFIX:column="1">#<cpp:directive PREFIX:line="54" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="54" PREFIX:column="9">U8G_ATMEGA_HW_SPI</name></cpp:macro></cpp:define>
+
+<comment type="block" PREFIX:line="56" PREFIX:column="1">/* remove the definition for attiny */</comment>
+<cpp:if PREFIX:line="57" PREFIX:column="1">#<cpp:directive PREFIX:line="57" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="57" PREFIX:column="5">__AVR_ARCH__</name> == 2</expr></cpp:if>
+<cpp:undef PREFIX:line="58" PREFIX:column="1">#<cpp:directive PREFIX:line="58" PREFIX:column="2">undef</cpp:directive> <name PREFIX:line="58" PREFIX:column="8">U8G_ATMEGA_HW_SPI</name></cpp:undef>
+<cpp:endif PREFIX:line="59" PREFIX:column="1">#<cpp:directive PREFIX:line="59" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:if PREFIX:line="60" PREFIX:column="1">#<cpp:directive PREFIX:line="60" PREFIX:column="2">if</cpp:directive> <expr><name PREFIX:line="60" PREFIX:column="5">__AVR_ARCH__</name> == 25</expr></cpp:if>
+<cpp:undef PREFIX:line="61" PREFIX:column="1">#<cpp:directive PREFIX:line="61" PREFIX:column="2">undef</cpp:directive> <name PREFIX:line="61" PREFIX:column="8">U8G_ATMEGA_HW_SPI</name></cpp:undef>
+<cpp:endif PREFIX:line="62" PREFIX:column="1">#<cpp:directive PREFIX:line="62" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+<cpp:endif PREFIX:line="63" PREFIX:column="1">#<cpp:directive PREFIX:line="63" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+<cpp:if PREFIX:line="66" PREFIX:column="1">#<cpp:directive PREFIX:line="66" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="66" PREFIX:column="5">defined</name><argument_list PREFIX:line="66" PREFIX:column="12">(<argument><expr><name PREFIX:line="66" PREFIX:column="13">U8G_ATMEGA_HW_SPI</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<cpp:include PREFIX:line="68" PREFIX:column="1">#<cpp:directive PREFIX:line="68" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="68" PREFIX:column="10">&lt;avr/interrupt.h&gt;</cpp:file></cpp:include>
+<cpp:include PREFIX:line="69" PREFIX:column="1">#<cpp:directive PREFIX:line="69" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="69" PREFIX:column="10">&lt;avr/io.h&gt;</cpp:file></cpp:include>
+
+
+<function><type><specifier PREFIX:line="72" PREFIX:column="1">static</specifier> <name PREFIX:line="72" PREFIX:column="8">uint8_t</name></type> <name PREFIX:line="72" PREFIX:column="16">u8g_atmega_spi_out</name><parameter_list PREFIX:line="72" PREFIX:column="34">(<param><decl><type><name PREFIX:line="72" PREFIX:column="35">uint8_t</name></type> <name PREFIX:line="72" PREFIX:column="43">data</name></decl></param>)</parameter_list>
+<block PREFIX:line="73" PREFIX:column="1">{
+  <comment type="block" PREFIX:line="74" PREFIX:column="3">/* unknowntype char x = 100; */</comment>
+  <comment type="block" PREFIX:line="75" PREFIX:column="3">/* send data */</comment>
+  <expr_stmt><expr><name PREFIX:line="76" PREFIX:column="3">SPDR</name> = <name PREFIX:line="76" PREFIX:column="10">data</name></expr>;</expr_stmt>
+  <comment type="block" PREFIX:line="77" PREFIX:column="3">/* wait for transmission */</comment>
+  <while PREFIX:line="78" PREFIX:column="3">while <condition PREFIX:line="78" PREFIX:column="9">(<expr PREFIX:line="78" PREFIX:column="10">!(<name PREFIX:line="78" PREFIX:column="12">SPSR</name> &amp; (1&lt;&lt;<name PREFIX:line="78" PREFIX:column="23">SPIF</name>))</expr>)</condition> 
+    <empty_stmt PREFIX:line="79" PREFIX:column="5">;</empty_stmt></while>
+  <comment type="block" PREFIX:line="80" PREFIX:column="3">/* clear the SPIF flag by reading SPDR */</comment>
+  <return PREFIX:line="81" PREFIX:column="3">return  <expr><name PREFIX:line="81" PREFIX:column="11">SPDR</name></expr>;</return>
+}</block></function>
+
+
+<function><type><name PREFIX:line="85" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="85" PREFIX:column="9">u8g_com_atmega_hw_spi_fn</name><parameter_list PREFIX:line="85" PREFIX:column="33">(<param><decl><type><name PREFIX:line="85" PREFIX:column="34">u8g_t</name> *</type><name PREFIX:line="85" PREFIX:column="41">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="46">uint8_t</name></type> <name PREFIX:line="85" PREFIX:column="54">msg</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="59">uint8_t</name></type> <name PREFIX:line="85" PREFIX:column="67">arg_val</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="76">void</name> *</type><name PREFIX:line="85" PREFIX:column="82">arg_ptr</name></decl></param>)</parameter_list>
+<block PREFIX:line="86" PREFIX:column="1">{
+  <switch PREFIX:line="87" PREFIX:column="3">switch<condition PREFIX:line="87" PREFIX:column="9">(<expr><name PREFIX:line="87" PREFIX:column="10">msg</name></expr>)</condition>
+  <block PREFIX:line="88" PREFIX:column="3">{
+    <case PREFIX:line="89" PREFIX:column="5">case <expr><name PREFIX:line="89" PREFIX:column="10">U8G_COM_MSG_STOP</name></expr>:
+      <break PREFIX:line="90" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="92" PREFIX:column="5">case <expr><name PREFIX:line="92" PREFIX:column="10">U8G_COM_MSG_INIT</name></expr>:
+
+      <expr_stmt><expr><call><name PREFIX:line="94" PREFIX:column="7">u8g_SetPIOutput</name><argument_list PREFIX:line="94" PREFIX:column="22">(<argument><expr><name PREFIX:line="94" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="94" PREFIX:column="28">U8G_PI_CS</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="95" PREFIX:column="7">u8g_SetPIOutput</name><argument_list PREFIX:line="95" PREFIX:column="22">(<argument><expr><name PREFIX:line="95" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="95" PREFIX:column="28">U8G_PI_A0</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="96" PREFIX:column="7">u8g_SetPIOutput</name><argument_list PREFIX:line="96" PREFIX:column="22">(<argument><expr><name PREFIX:line="96" PREFIX:column="23">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="96" PREFIX:column="28">U8G_PI_RESET</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      
+      <expr_stmt><expr><call><name PREFIX:line="98" PREFIX:column="7">U8G_ATOMIC_START</name><argument_list PREFIX:line="98" PREFIX:column="23">()</argument_list></call></expr>;</expr_stmt>
+      
+      <expr_stmt><expr><name PREFIX:line="100" PREFIX:column="7">DDRB</name> |= <call><name PREFIX:line="100" PREFIX:column="15">_BV</name><argument_list PREFIX:line="100" PREFIX:column="18">(<argument><expr PREFIX:line="100" PREFIX:column="19">3</expr></argument>)</argument_list></call></expr>;</expr_stmt>          <comment type="block" PREFIX:line="100" PREFIX:column="32">/* D0, MOSI */</comment>
+      <expr_stmt><expr><name PREFIX:line="101" PREFIX:column="7">DDRB</name> |= <call><name PREFIX:line="101" PREFIX:column="15">_BV</name><argument_list PREFIX:line="101" PREFIX:column="18">(<argument><expr PREFIX:line="101" PREFIX:column="19">5</expr></argument>)</argument_list></call></expr>;</expr_stmt>          <comment type="block" PREFIX:line="101" PREFIX:column="32">/* SCK */</comment>
+      <expr_stmt><expr><name PREFIX:line="102" PREFIX:column="7">DDRB</name> |= <call><name PREFIX:line="102" PREFIX:column="15">_BV</name><argument_list PREFIX:line="102" PREFIX:column="18">(<argument><expr PREFIX:line="102" PREFIX:column="19">2</expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="block" PREFIX:line="102" PREFIX:column="33">/* slave select */</comment>
+    
+      <expr_stmt><expr><name PREFIX:line="104" PREFIX:column="7">PORTB</name> &amp;= ~<call><name PREFIX:line="104" PREFIX:column="17">_BV</name><argument_list PREFIX:line="104" PREFIX:column="20">(<argument><expr PREFIX:line="104" PREFIX:column="21">3</expr></argument>)</argument_list></call></expr>;</expr_stmt>        <comment type="block" PREFIX:line="104" PREFIX:column="32">/* D0, MOSI = 0 */</comment>
+      <expr_stmt><expr><name PREFIX:line="105" PREFIX:column="7">PORTB</name> &amp;= ~<call><name PREFIX:line="105" PREFIX:column="17">_BV</name><argument_list PREFIX:line="105" PREFIX:column="20">(<argument><expr PREFIX:line="105" PREFIX:column="21">5</expr></argument>)</argument_list></call></expr>;</expr_stmt>        <comment type="block" PREFIX:line="105" PREFIX:column="32">/* SCK = 0 */</comment>
+      
+      <expr_stmt><expr><call><name PREFIX:line="107" PREFIX:column="7">U8G_ATOMIC_END</name><argument_list PREFIX:line="107" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt>
+      
+      <expr_stmt><expr><call><name PREFIX:line="109" PREFIX:column="7">u8g_SetPILevel</name><argument_list PREFIX:line="109" PREFIX:column="21">(<argument><expr><name PREFIX:line="109" PREFIX:column="22">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="109" PREFIX:column="27">U8G_PI_CS</name></expr></argument>, <argument><expr PREFIX:line="109" PREFIX:column="38">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+      <comment type="block" PREFIX:line="111" PREFIX:column="7">/*
+        SPR1 SPR0
+            0	0		fclk/4    x
+            0	1		fclk/16
+            1	0		fclk/64      
+            1	1		fclk/128
+      */</comment>
+      <expr_stmt><expr><name PREFIX:line="118" PREFIX:column="7">SPCR</name> = 0</expr>;</expr_stmt>
+      <expr_stmt><expr><name PREFIX:line="119" PREFIX:column="7">SPCR</name> =  (1&lt;&lt;<name PREFIX:line="119" PREFIX:column="19">SPE</name>) | (1&lt;&lt;<name PREFIX:line="119" PREFIX:column="30">MSTR</name>)|(0&lt;&lt;<name PREFIX:line="119" PREFIX:column="40">SPR1</name>)|(0&lt;&lt;<name PREFIX:line="119" PREFIX:column="50">SPR0</name>)|(0&lt;&lt;<name PREFIX:line="119" PREFIX:column="60">CPOL</name>)|(0&lt;&lt;<name PREFIX:line="119" PREFIX:column="70">CPHA</name>)</expr>;</expr_stmt>
+<cpp:ifdef PREFIX:line="120" PREFIX:column="1">#<cpp:directive PREFIX:line="120" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="120" PREFIX:column="8">U8G_HW_SPI_2X</name></cpp:ifdef>
+      <expr_stmt><expr><name PREFIX:line="121" PREFIX:column="7">SPSR</name> = (1 &lt;&lt; <name PREFIX:line="121" PREFIX:column="20">SPI2X</name>)</expr>;</expr_stmt>  <comment type="block" PREFIX:line="121" PREFIX:column="29">/* double speed, issue 89 */</comment>
+<cpp:endif PREFIX:line="122" PREFIX:column="1">#<cpp:directive PREFIX:line="122" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+      <break PREFIX:line="124" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="126" PREFIX:column="5">case <expr><name PREFIX:line="126" PREFIX:column="10">U8G_COM_MSG_ADDRESS</name></expr>:                     <comment type="block" PREFIX:line="126" PREFIX:column="51">/* define cmd (arg_val = 0) or data mode (arg_val = 1) */</comment>
+      <expr_stmt><expr><call><name PREFIX:line="127" PREFIX:column="7">u8g_SetPILevel</name><argument_list PREFIX:line="127" PREFIX:column="21">(<argument><expr><name PREFIX:line="127" PREFIX:column="22">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="127" PREFIX:column="27">U8G_PI_A0</name></expr></argument>, <argument><expr><name PREFIX:line="127" PREFIX:column="38">arg_val</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="128" PREFIX:column="7">break;</break>
+
+    </case><case PREFIX:line="130" PREFIX:column="5">case <expr><name PREFIX:line="130" PREFIX:column="10">U8G_COM_MSG_CHIP_SELECT</name></expr>:
+      
+      <if PREFIX:line="132" PREFIX:column="7">if <condition PREFIX:line="132" PREFIX:column="10">( <expr><name PREFIX:line="132" PREFIX:column="12">arg_val</name> == 0</expr> )</condition><then PREFIX:line="132" PREFIX:column="26">
+      <block PREFIX:line="133" PREFIX:column="7">{
+        <comment type="block" PREFIX:line="134" PREFIX:column="9">/* disable */</comment>
+        <expr_stmt><expr><call><name PREFIX:line="135" PREFIX:column="9">u8g_SetPILevel</name><argument_list PREFIX:line="135" PREFIX:column="23">(<argument><expr><name PREFIX:line="135" PREFIX:column="24">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="135" PREFIX:column="29">U8G_PI_CS</name></expr></argument>, <argument><expr PREFIX:line="135" PREFIX:column="40">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      }</block></then>
+      <else PREFIX:line="137" PREFIX:column="7">else
+      <block PREFIX:line="138" PREFIX:column="7">{
+        <expr_stmt><expr><name PREFIX:line="139" PREFIX:column="9">PORTB</name> &amp;= ~<call><name PREFIX:line="139" PREFIX:column="19">_BV</name><argument_list PREFIX:line="139" PREFIX:column="22">(<argument><expr PREFIX:line="139" PREFIX:column="23">5</expr></argument>)</argument_list></call></expr>;</expr_stmt>        <comment type="block" PREFIX:line="139" PREFIX:column="34">/* SCK = 0 */</comment>
+        <comment type="block" PREFIX:line="140" PREFIX:column="9">/* enable */</comment>
+        <expr_stmt><expr><call><name PREFIX:line="141" PREFIX:column="9">u8g_SetPILevel</name><argument_list PREFIX:line="141" PREFIX:column="23">(<argument><expr><name PREFIX:line="141" PREFIX:column="24">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="141" PREFIX:column="29">U8G_PI_CS</name></expr></argument>, <argument><expr PREFIX:line="141" PREFIX:column="40">0</expr></argument>)</argument_list></call></expr>;</expr_stmt> <comment type="block" PREFIX:line="141" PREFIX:column="44">/* CS = 0 (low active) */</comment>
+      }</block></else></if>
+      
+      <break PREFIX:line="144" PREFIX:column="7">break;</break>
+      
+    </case><case PREFIX:line="146" PREFIX:column="5">case <expr><name PREFIX:line="146" PREFIX:column="10">U8G_COM_MSG_RESET</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="147" PREFIX:column="7">u8g_SetPILevel</name><argument_list PREFIX:line="147" PREFIX:column="21">(<argument><expr><name PREFIX:line="147" PREFIX:column="22">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="147" PREFIX:column="27">U8G_PI_RESET</name></expr></argument>, <argument><expr><name PREFIX:line="147" PREFIX:column="41">arg_val</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="148" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="150" PREFIX:column="5">case <expr><name PREFIX:line="150" PREFIX:column="10">U8G_COM_MSG_WRITE_BYTE</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="151" PREFIX:column="7">u8g_atmega_spi_out</name><argument_list PREFIX:line="151" PREFIX:column="25">(<argument><expr><name PREFIX:line="151" PREFIX:column="26">arg_val</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="152" PREFIX:column="7">break;</break>
+    
+    </case><case PREFIX:line="154" PREFIX:column="5">case <expr><name PREFIX:line="154" PREFIX:column="10">U8G_COM_MSG_WRITE_SEQ</name></expr>:
+      <block PREFIX:line="155" PREFIX:column="7">{
+        <decl_stmt><decl><type><name PREFIX:line="156" PREFIX:column="9">register</name> <name PREFIX:line="156" PREFIX:column="18">uint8_t</name> *</type><name PREFIX:line="156" PREFIX:column="27">ptr</name> <init PREFIX:line="156" PREFIX:column="31">= <expr><name PREFIX:line="156" PREFIX:column="33">arg_ptr</name></expr></init></decl>;</decl_stmt>
+        <while PREFIX:line="157" PREFIX:column="9">while<condition PREFIX:line="157" PREFIX:column="14">( <expr><name PREFIX:line="157" PREFIX:column="16">arg_val</name> &gt; 0</expr> )</condition>
+        <block PREFIX:line="158" PREFIX:column="9">{
+          <expr_stmt><expr><call><name PREFIX:line="159" PREFIX:column="11">u8g_atmega_spi_out</name><argument_list PREFIX:line="159" PREFIX:column="29">(<argument><expr PREFIX:line="159" PREFIX:column="30">*<name PREFIX:line="159" PREFIX:column="31">ptr</name>++</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+          <expr_stmt><expr><name PREFIX:line="160" PREFIX:column="11">arg_val</name>--</expr>;</expr_stmt>
+        }</block></while>
+      }</block>
+      <break PREFIX:line="163" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="164" PREFIX:column="5">case <expr><name PREFIX:line="164" PREFIX:column="10">U8G_COM_MSG_WRITE_SEQ_P</name></expr>:
+      <block PREFIX:line="165" PREFIX:column="7">{
+        <decl_stmt><decl><type><name PREFIX:line="166" PREFIX:column="9">register</name> <name PREFIX:line="166" PREFIX:column="18">uint8_t</name> *</type><name PREFIX:line="166" PREFIX:column="27">ptr</name> <init PREFIX:line="166" PREFIX:column="31">= <expr><name PREFIX:line="166" PREFIX:column="33">arg_ptr</name></expr></init></decl>;</decl_stmt>
+        <while PREFIX:line="167" PREFIX:column="9">while<condition PREFIX:line="167" PREFIX:column="14">( <expr><name PREFIX:line="167" PREFIX:column="16">arg_val</name> &gt; 0</expr> )</condition>
+        <block PREFIX:line="168" PREFIX:column="9">{
+          <expr_stmt><expr><call><name PREFIX:line="169" PREFIX:column="11">u8g_atmega_spi_out</name><argument_list PREFIX:line="169" PREFIX:column="29">(<argument><expr><call><name PREFIX:line="169" PREFIX:column="30">u8g_pgm_read</name><argument_list PREFIX:line="169" PREFIX:column="42">(<argument><expr><name PREFIX:line="169" PREFIX:column="43">ptr</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+          <expr_stmt><expr><name PREFIX:line="170" PREFIX:column="11">ptr</name>++</expr>;</expr_stmt>
+          <expr_stmt><expr><name PREFIX:line="171" PREFIX:column="11">arg_val</name>--</expr>;</expr_stmt>
+        }</block></while>
+      }</block>
+      <break PREFIX:line="174" PREFIX:column="7">break;</break>
+  </case>}</block></switch>
+  <return PREFIX:line="176" PREFIX:column="3">return <expr PREFIX:line="176" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<cpp:else PREFIX:line="179" PREFIX:column="1">#<cpp:directive PREFIX:line="179" PREFIX:column="2">else</cpp:directive></cpp:else>
+
+<function><type><name PREFIX:line="181" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="181" PREFIX:column="9">u8g_com_atmega_hw_spi_fn</name><parameter_list PREFIX:line="181" PREFIX:column="33">(<param><decl><type><name PREFIX:line="181" PREFIX:column="34">u8g_t</name> *</type><name PREFIX:line="181" PREFIX:column="41">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="181" PREFIX:column="46">uint8_t</name></type> <name PREFIX:line="181" PREFIX:column="54">msg</name></decl></param>, <param><decl><type><name PREFIX:line="181" PREFIX:column="59">uint8_t</name></type> <name PREFIX:line="181" PREFIX:column="67">arg_val</name></decl></param>, <param><decl><type><name PREFIX:line="181" PREFIX:column="76">void</name> *</type><name PREFIX:line="181" PREFIX:column="82">arg_ptr</name></decl></param>)</parameter_list>
+<block PREFIX:line="182" PREFIX:column="1">{
+  <return PREFIX:line="183" PREFIX:column="3">return <expr PREFIX:line="183" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<cpp:endif PREFIX:line="186" PREFIX:column="1">#<cpp:directive PREFIX:line="186" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+
+</unit>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/libraries/U8glib/utility/u8g_page.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_page.c
+  
+  page helper functions, only called by the dev handler.
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  
+*/</comment>
+
+<cpp:include PREFIX:line="39" PREFIX:column="1">#<cpp:directive PREFIX:line="39" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="39" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<comment type="block" PREFIX:line="41" PREFIX:column="1">/*
+  setup page count structure
+  conditions: page_height &lt;= total_height
+*/</comment>
+<function><type><name PREFIX:line="45" PREFIX:column="1">void</name></type> <name PREFIX:line="45" PREFIX:column="6">u8g_page_Init</name><parameter_list PREFIX:line="45" PREFIX:column="19">(<param><decl><type><name PREFIX:line="45" PREFIX:column="20">u8g_page_t</name> *</type><name PREFIX:line="45" PREFIX:column="32">p</name></decl></param>, <param><decl><type><name PREFIX:line="45" PREFIX:column="35">u8g_uint_t</name></type> <name PREFIX:line="45" PREFIX:column="46">page_height</name></decl></param>, <param><decl><type><name PREFIX:line="45" PREFIX:column="59">u8g_uint_t</name></type> <name PREFIX:line="45" PREFIX:column="70">total_height</name></decl></param> )</parameter_list>
+<block PREFIX:line="46" PREFIX:column="1">{
+  <expr_stmt><expr><name><name PREFIX:line="47" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="47" PREFIX:column="6">page_height</name></name> = <name PREFIX:line="47" PREFIX:column="20">page_height</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="48" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="48" PREFIX:column="6">total_height</name></name> = <name PREFIX:line="48" PREFIX:column="21">total_height</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="49" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="49" PREFIX:column="6">page</name></name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="50" PREFIX:column="3">u8g_page_First</name><argument_list PREFIX:line="50" PREFIX:column="17">(<argument><expr><name PREFIX:line="50" PREFIX:column="18">p</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="53" PREFIX:column="1">void</name></type> <name PREFIX:line="53" PREFIX:column="6">u8g_page_First</name><parameter_list PREFIX:line="53" PREFIX:column="20">(<param><decl><type><name PREFIX:line="53" PREFIX:column="21">u8g_page_t</name> *</type><name PREFIX:line="53" PREFIX:column="33">p</name></decl></param>)</parameter_list>
+<block PREFIX:line="54" PREFIX:column="1">{
+  <expr_stmt><expr><name><name PREFIX:line="55" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="55" PREFIX:column="6">page_y0</name></name> = 0</expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="56" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="56" PREFIX:column="6">page_y1</name></name> = <name><name PREFIX:line="56" PREFIX:column="16">p</name>-&gt;<name PREFIX:line="56" PREFIX:column="19">page_height</name></name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="57" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="57" PREFIX:column="6">page_y1</name></name>--</expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="58" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="58" PREFIX:column="6">page</name></name> = 0</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="61" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="61" PREFIX:column="9">u8g_page_Next</name><parameter_list PREFIX:line="61" PREFIX:column="22">(<param><decl><type><name PREFIX:line="61" PREFIX:column="23">u8g_page_t</name> *</type> <name PREFIX:line="61" PREFIX:column="36">p</name></decl></param>)</parameter_list>
+<block PREFIX:line="62" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="63" PREFIX:column="3">register</name> <name PREFIX:line="63" PREFIX:column="12">u8g_uint_t</name></type> <name PREFIX:line="63" PREFIX:column="23">y1</name></decl>;</decl_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="64" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="64" PREFIX:column="6">page_y0</name></name> += <name><name PREFIX:line="64" PREFIX:column="17">p</name>-&gt;<name PREFIX:line="64" PREFIX:column="20">page_height</name></name></expr>;</expr_stmt>
+  <if PREFIX:line="65" PREFIX:column="3">if <condition PREFIX:line="65" PREFIX:column="6">( <expr><name><name PREFIX:line="65" PREFIX:column="8">p</name>-&gt;<name PREFIX:line="65" PREFIX:column="11">page_y0</name></name> &gt;= <name><name PREFIX:line="65" PREFIX:column="22">p</name>-&gt;<name PREFIX:line="65" PREFIX:column="25">total_height</name></name></expr> )</condition><then PREFIX:line="65" PREFIX:column="39">
+    <return PREFIX:line="66" PREFIX:column="5">return <expr PREFIX:line="66" PREFIX:column="12">0</expr>;</return></then></if>
+  <expr_stmt><expr><name><name PREFIX:line="67" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="67" PREFIX:column="6">page</name></name>++</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="68" PREFIX:column="3">y1</name> = <name><name PREFIX:line="68" PREFIX:column="8">p</name>-&gt;<name PREFIX:line="68" PREFIX:column="11">page_y1</name></name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="69" PREFIX:column="3">y1</name> += <name><name PREFIX:line="69" PREFIX:column="9">p</name>-&gt;<name PREFIX:line="69" PREFIX:column="12">page_height</name></name></expr>;</expr_stmt>
+  <if PREFIX:line="70" PREFIX:column="3">if <condition PREFIX:line="70" PREFIX:column="6">( <expr><name PREFIX:line="70" PREFIX:column="8">y1</name> &gt;= <name><name PREFIX:line="70" PREFIX:column="14">p</name>-&gt;<name PREFIX:line="70" PREFIX:column="17">total_height</name></name></expr> )</condition><then PREFIX:line="70" PREFIX:column="31">
+  <block PREFIX:line="71" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="72" PREFIX:column="5">y1</name> = <name><name PREFIX:line="72" PREFIX:column="10">p</name>-&gt;<name PREFIX:line="72" PREFIX:column="13">total_height</name></name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="73" PREFIX:column="5">y1</name>--</expr>;</expr_stmt>
+  }</block></then></if>
+  <expr_stmt><expr><name><name PREFIX:line="75" PREFIX:column="3">p</name>-&gt;<name PREFIX:line="75" PREFIX:column="6">page_y1</name></name> = <name PREFIX:line="75" PREFIX:column="16">y1</name></expr>;</expr_stmt>
+  
+  <return PREFIX:line="77" PREFIX:column="3">return <expr PREFIX:line="77" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+
+
+</unit>

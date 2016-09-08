@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/hardware/rambo/cores/arduino/main.cpp" PREFIX:tabs="8"><cpp:include PREFIX:line="1" PREFIX:column="1">#<cpp:directive PREFIX:line="1" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="1" PREFIX:column="10">&lt;Arduino.h&gt;</cpp:file></cpp:include>
+
+<function><type><name PREFIX:line="3" PREFIX:column="1">int</name></type> <name PREFIX:line="3" PREFIX:column="5">main</name><parameter_list PREFIX:line="3" PREFIX:column="9">(<param><decl><type><name PREFIX:line="3" PREFIX:column="10">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="4" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="5" PREFIX:column="9">init</name><argument_list PREFIX:line="5" PREFIX:column="13">()</argument_list></call></expr>;</expr_stmt>
+
+<cpp:if PREFIX:line="7" PREFIX:column="1">#<cpp:directive PREFIX:line="7" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="7" PREFIX:column="5">defined</name><argument_list PREFIX:line="7" PREFIX:column="12">(<argument><expr><name PREFIX:line="7" PREFIX:column="13">USBCON</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><call><name><name PREFIX:line="8" PREFIX:column="9">USBDevice</name>.<name PREFIX:line="8" PREFIX:column="19">attach</name></name><argument_list PREFIX:line="8" PREFIX:column="25">()</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="9" PREFIX:column="1">#<cpp:directive PREFIX:line="9" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+	
+	<expr_stmt><expr><call><name PREFIX:line="11" PREFIX:column="9">setup</name><argument_list PREFIX:line="11" PREFIX:column="14">()</argument_list></call></expr>;</expr_stmt>
+    
+	<for PREFIX:line="13" PREFIX:column="9">for (<init PREFIX:line="13" PREFIX:column="14">;</init><condition PREFIX:line="13" PREFIX:column="15">;</condition><incr/>) <block PREFIX:line="13" PREFIX:column="18">{
+		<expr_stmt><expr><call><name PREFIX:line="14" PREFIX:column="17">loop</name><argument_list PREFIX:line="14" PREFIX:column="21">()</argument_list></call></expr>;</expr_stmt>
+		<if PREFIX:line="15" PREFIX:column="17">if <condition PREFIX:line="15" PREFIX:column="20">(<expr><name PREFIX:line="15" PREFIX:column="21">serialEventRun</name></expr>)</condition><then PREFIX:line="15" PREFIX:column="36"> <expr_stmt><expr><call><name PREFIX:line="15" PREFIX:column="37">serialEventRun</name><argument_list PREFIX:line="15" PREFIX:column="51">()</argument_list></call></expr>;</expr_stmt></then></if>
+	}</block></for>
+        
+	<return PREFIX:line="18" PREFIX:column="9">return <expr PREFIX:line="18" PREFIX:column="16">0</expr>;</return>
+}</block></function>
+
+</unit>

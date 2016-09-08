@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.6.x/hardware/marlin/avr/cores/at90usb/WCharacter.h.cpp" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+ WCharacter.h - Character utility functions for Wiring &amp; Arduino
+ Copyright (c) 2010 Hernando Barragan.  All right reserved.
+ 
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ 
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */</comment>
+
+<cpp:ifndef PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">ifndef</cpp:directive> <name PREFIX:line="20" PREFIX:column="9">Character_h</name></cpp:ifndef>
+<cpp:define PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="21" PREFIX:column="9">Character_h</name></cpp:macro></cpp:define>
+
+<cpp:include PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="23" PREFIX:column="10">&lt;ctype.h&gt;</cpp:file></cpp:include>
+
+<comment type="line" PREFIX:line="25" PREFIX:column="1">// WCharacter.h prototypes</comment>
+<decl_stmt><decl><type><specifier PREFIX:line="26" PREFIX:column="1">inline</specifier> <name PREFIX:line="26" PREFIX:column="8">boolean</name></type> <name PREFIX:line="26" PREFIX:column="16">isAlphaNumeric</name><argument_list PREFIX:line="26" PREFIX:column="30">(<argument><expr><name PREFIX:line="26" PREFIX:column="31">int</name> <name PREFIX:line="26" PREFIX:column="35">c</name></expr></argument>)</argument_list> <name PREFIX:line="26" PREFIX:column="38">__attribute__</name><argument_list PREFIX:line="26" PREFIX:column="51">(<argument><expr PREFIX:line="26" PREFIX:column="52">(<name PREFIX:line="26" PREFIX:column="53">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="27" PREFIX:column="1">inline</specifier> <name PREFIX:line="27" PREFIX:column="8">boolean</name></type> <name PREFIX:line="27" PREFIX:column="16">isAlpha</name><argument_list PREFIX:line="27" PREFIX:column="23">(<argument><expr><name PREFIX:line="27" PREFIX:column="24">int</name> <name PREFIX:line="27" PREFIX:column="28">c</name></expr></argument>)</argument_list> <name PREFIX:line="27" PREFIX:column="31">__attribute__</name><argument_list PREFIX:line="27" PREFIX:column="44">(<argument><expr PREFIX:line="27" PREFIX:column="45">(<name PREFIX:line="27" PREFIX:column="46">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="28" PREFIX:column="1">inline</specifier> <name PREFIX:line="28" PREFIX:column="8">boolean</name></type> <name PREFIX:line="28" PREFIX:column="16">isAscii</name><argument_list PREFIX:line="28" PREFIX:column="23">(<argument><expr><name PREFIX:line="28" PREFIX:column="24">int</name> <name PREFIX:line="28" PREFIX:column="28">c</name></expr></argument>)</argument_list> <name PREFIX:line="28" PREFIX:column="31">__attribute__</name><argument_list PREFIX:line="28" PREFIX:column="44">(<argument><expr PREFIX:line="28" PREFIX:column="45">(<name PREFIX:line="28" PREFIX:column="46">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="29" PREFIX:column="1">inline</specifier> <name PREFIX:line="29" PREFIX:column="8">boolean</name></type> <name PREFIX:line="29" PREFIX:column="16">isWhitespace</name><argument_list PREFIX:line="29" PREFIX:column="28">(<argument><expr><name PREFIX:line="29" PREFIX:column="29">int</name> <name PREFIX:line="29" PREFIX:column="33">c</name></expr></argument>)</argument_list> <name PREFIX:line="29" PREFIX:column="36">__attribute__</name><argument_list PREFIX:line="29" PREFIX:column="49">(<argument><expr PREFIX:line="29" PREFIX:column="50">(<name PREFIX:line="29" PREFIX:column="51">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="30" PREFIX:column="1">inline</specifier> <name PREFIX:line="30" PREFIX:column="8">boolean</name></type> <name PREFIX:line="30" PREFIX:column="16">isControl</name><argument_list PREFIX:line="30" PREFIX:column="25">(<argument><expr><name PREFIX:line="30" PREFIX:column="26">int</name> <name PREFIX:line="30" PREFIX:column="30">c</name></expr></argument>)</argument_list> <name PREFIX:line="30" PREFIX:column="33">__attribute__</name><argument_list PREFIX:line="30" PREFIX:column="46">(<argument><expr PREFIX:line="30" PREFIX:column="47">(<name PREFIX:line="30" PREFIX:column="48">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="31" PREFIX:column="1">inline</specifier> <name PREFIX:line="31" PREFIX:column="8">boolean</name></type> <name PREFIX:line="31" PREFIX:column="16">isDigit</name><argument_list PREFIX:line="31" PREFIX:column="23">(<argument><expr><name PREFIX:line="31" PREFIX:column="24">int</name> <name PREFIX:line="31" PREFIX:column="28">c</name></expr></argument>)</argument_list> <name PREFIX:line="31" PREFIX:column="31">__attribute__</name><argument_list PREFIX:line="31" PREFIX:column="44">(<argument><expr PREFIX:line="31" PREFIX:column="45">(<name PREFIX:line="31" PREFIX:column="46">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="32" PREFIX:column="1">inline</specifier> <name PREFIX:line="32" PREFIX:column="8">boolean</name></type> <name PREFIX:line="32" PREFIX:column="16">isGraph</name><argument_list PREFIX:line="32" PREFIX:column="23">(<argument><expr><name PREFIX:line="32" PREFIX:column="24">int</name> <name PREFIX:line="32" PREFIX:column="28">c</name></expr></argument>)</argument_list> <name PREFIX:line="32" PREFIX:column="31">__attribute__</name><argument_list PREFIX:line="32" PREFIX:column="44">(<argument><expr PREFIX:line="32" PREFIX:column="45">(<name PREFIX:line="32" PREFIX:column="46">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="33" PREFIX:column="1">inline</specifier> <name PREFIX:line="33" PREFIX:column="8">boolean</name></type> <name PREFIX:line="33" PREFIX:column="16">isLowerCase</name><argument_list PREFIX:line="33" PREFIX:column="27">(<argument><expr><name PREFIX:line="33" PREFIX:column="28">int</name> <name PREFIX:line="33" PREFIX:column="32">c</name></expr></argument>)</argument_list> <name PREFIX:line="33" PREFIX:column="35">__attribute__</name><argument_list PREFIX:line="33" PREFIX:column="48">(<argument><expr PREFIX:line="33" PREFIX:column="49">(<name PREFIX:line="33" PREFIX:column="50">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="34" PREFIX:column="1">inline</specifier> <name PREFIX:line="34" PREFIX:column="8">boolean</name></type> <name PREFIX:line="34" PREFIX:column="16">isPrintable</name><argument_list PREFIX:line="34" PREFIX:column="27">(<argument><expr><name PREFIX:line="34" PREFIX:column="28">int</name> <name PREFIX:line="34" PREFIX:column="32">c</name></expr></argument>)</argument_list> <name PREFIX:line="34" PREFIX:column="35">__attribute__</name><argument_list PREFIX:line="34" PREFIX:column="48">(<argument><expr PREFIX:line="34" PREFIX:column="49">(<name PREFIX:line="34" PREFIX:column="50">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="35" PREFIX:column="1">inline</specifier> <name PREFIX:line="35" PREFIX:column="8">boolean</name></type> <name PREFIX:line="35" PREFIX:column="16">isPunct</name><argument_list PREFIX:line="35" PREFIX:column="23">(<argument><expr><name PREFIX:line="35" PREFIX:column="24">int</name> <name PREFIX:line="35" PREFIX:column="28">c</name></expr></argument>)</argument_list> <name PREFIX:line="35" PREFIX:column="31">__attribute__</name><argument_list PREFIX:line="35" PREFIX:column="44">(<argument><expr PREFIX:line="35" PREFIX:column="45">(<name PREFIX:line="35" PREFIX:column="46">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="36" PREFIX:column="1">inline</specifier> <name PREFIX:line="36" PREFIX:column="8">boolean</name></type> <name PREFIX:line="36" PREFIX:column="16">isSpace</name><argument_list PREFIX:line="36" PREFIX:column="23">(<argument><expr><name PREFIX:line="36" PREFIX:column="24">int</name> <name PREFIX:line="36" PREFIX:column="28">c</name></expr></argument>)</argument_list> <name PREFIX:line="36" PREFIX:column="31">__attribute__</name><argument_list PREFIX:line="36" PREFIX:column="44">(<argument><expr PREFIX:line="36" PREFIX:column="45">(<name PREFIX:line="36" PREFIX:column="46">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="37" PREFIX:column="1">inline</specifier> <name PREFIX:line="37" PREFIX:column="8">boolean</name></type> <name PREFIX:line="37" PREFIX:column="16">isUpperCase</name><argument_list PREFIX:line="37" PREFIX:column="27">(<argument><expr><name PREFIX:line="37" PREFIX:column="28">int</name> <name PREFIX:line="37" PREFIX:column="32">c</name></expr></argument>)</argument_list> <name PREFIX:line="37" PREFIX:column="35">__attribute__</name><argument_list PREFIX:line="37" PREFIX:column="48">(<argument><expr PREFIX:line="37" PREFIX:column="49">(<name PREFIX:line="37" PREFIX:column="50">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="38" PREFIX:column="1">inline</specifier> <name PREFIX:line="38" PREFIX:column="8">boolean</name></type> <name PREFIX:line="38" PREFIX:column="16">isHexadecimalDigit</name><argument_list PREFIX:line="38" PREFIX:column="34">(<argument><expr><name PREFIX:line="38" PREFIX:column="35">int</name> <name PREFIX:line="38" PREFIX:column="39">c</name></expr></argument>)</argument_list> <name PREFIX:line="38" PREFIX:column="42">__attribute__</name><argument_list PREFIX:line="38" PREFIX:column="55">(<argument><expr PREFIX:line="38" PREFIX:column="56">(<name PREFIX:line="38" PREFIX:column="57">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="39" PREFIX:column="1">inline</specifier> <name PREFIX:line="39" PREFIX:column="8">int</name></type> <name PREFIX:line="39" PREFIX:column="12">toAscii</name><argument_list PREFIX:line="39" PREFIX:column="19">(<argument><expr><name PREFIX:line="39" PREFIX:column="20">int</name> <name PREFIX:line="39" PREFIX:column="24">c</name></expr></argument>)</argument_list> <name PREFIX:line="39" PREFIX:column="27">__attribute__</name><argument_list PREFIX:line="39" PREFIX:column="40">(<argument><expr PREFIX:line="39" PREFIX:column="41">(<name PREFIX:line="39" PREFIX:column="42">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="40" PREFIX:column="1">inline</specifier> <name PREFIX:line="40" PREFIX:column="8">int</name></type> <name PREFIX:line="40" PREFIX:column="12">toLowerCase</name><argument_list PREFIX:line="40" PREFIX:column="23">(<argument><expr><name PREFIX:line="40" PREFIX:column="24">int</name> <name PREFIX:line="40" PREFIX:column="28">c</name></expr></argument>)</argument_list> <name PREFIX:line="40" PREFIX:column="31">__attribute__</name><argument_list PREFIX:line="40" PREFIX:column="44">(<argument><expr PREFIX:line="40" PREFIX:column="45">(<name PREFIX:line="40" PREFIX:column="46">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+<decl_stmt><decl><type><specifier PREFIX:line="41" PREFIX:column="1">inline</specifier> <name PREFIX:line="41" PREFIX:column="8">int</name></type> <name PREFIX:line="41" PREFIX:column="12">toUpperCase</name><argument_list PREFIX:line="41" PREFIX:column="23">(<argument><expr><name PREFIX:line="41" PREFIX:column="24">int</name> <name PREFIX:line="41" PREFIX:column="28">c</name></expr></argument>)</argument_list><name PREFIX:line="41" PREFIX:column="30">__attribute__</name><argument_list PREFIX:line="41" PREFIX:column="43">(<argument><expr PREFIX:line="41" PREFIX:column="44">(<name PREFIX:line="41" PREFIX:column="45">always_inline</name>)</expr></argument>)</argument_list></decl>;</decl_stmt>
+
+
+<comment type="line" PREFIX:line="44" PREFIX:column="1">// Checks for an alphanumeric character. </comment>
+<comment type="line" PREFIX:line="45" PREFIX:column="1">// It is equivalent to (isalpha(c) || isdigit(c)).</comment>
+<function><type><specifier PREFIX:line="46" PREFIX:column="1">inline</specifier> <name PREFIX:line="46" PREFIX:column="8">boolean</name></type> <name PREFIX:line="46" PREFIX:column="16">isAlphaNumeric</name><parameter_list PREFIX:line="46" PREFIX:column="30">(<param><decl><type><name PREFIX:line="46" PREFIX:column="31">int</name></type> <name PREFIX:line="46" PREFIX:column="35">c</name></decl></param>)</parameter_list> 
+<block PREFIX:line="47" PREFIX:column="1">{
+  <return PREFIX:line="48" PREFIX:column="3">return <expr PREFIX:line="48" PREFIX:column="10">( <call><name PREFIX:line="48" PREFIX:column="12">isalnum</name><argument_list PREFIX:line="48" PREFIX:column="19">(<argument><expr><name PREFIX:line="48" PREFIX:column="20">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="52" PREFIX:column="1">// Checks for an alphabetic character. </comment>
+<comment type="line" PREFIX:line="53" PREFIX:column="1">// It is equivalent to (isupper(c) || islower(c)).</comment>
+<function><type><specifier PREFIX:line="54" PREFIX:column="1">inline</specifier> <name PREFIX:line="54" PREFIX:column="8">boolean</name></type> <name PREFIX:line="54" PREFIX:column="16">isAlpha</name><parameter_list PREFIX:line="54" PREFIX:column="23">(<param><decl><type><name PREFIX:line="54" PREFIX:column="24">int</name></type> <name PREFIX:line="54" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="55" PREFIX:column="1">{
+  <return PREFIX:line="56" PREFIX:column="3">return <expr PREFIX:line="56" PREFIX:column="10">( <call><name PREFIX:line="56" PREFIX:column="12">isalpha</name><argument_list PREFIX:line="56" PREFIX:column="19">(<argument><expr><name PREFIX:line="56" PREFIX:column="20">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="60" PREFIX:column="1">// Checks whether c is a 7-bit unknowntype char value </comment>
+<comment type="line" PREFIX:line="61" PREFIX:column="1">// that fits into the ASCII character set.</comment>
+<function><type><specifier PREFIX:line="62" PREFIX:column="1">inline</specifier> <name PREFIX:line="62" PREFIX:column="8">boolean</name></type> <name PREFIX:line="62" PREFIX:column="16">isAscii</name><parameter_list PREFIX:line="62" PREFIX:column="23">(<param><decl><type><name PREFIX:line="62" PREFIX:column="24">int</name></type> <name PREFIX:line="62" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="63" PREFIX:column="1">{
+  <return PREFIX:line="64" PREFIX:column="3">return <expr PREFIX:line="64" PREFIX:column="10">( <call><name PREFIX:line="64" PREFIX:column="12">isascii</name> <argument_list PREFIX:line="64" PREFIX:column="20">(<argument><expr><name PREFIX:line="64" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="68" PREFIX:column="1">// Checks for a blank character, that is, a space or a tab.</comment>
+<function><type><specifier PREFIX:line="69" PREFIX:column="1">inline</specifier> <name PREFIX:line="69" PREFIX:column="8">boolean</name></type> <name PREFIX:line="69" PREFIX:column="16">isWhitespace</name><parameter_list PREFIX:line="69" PREFIX:column="28">(<param><decl><type><name PREFIX:line="69" PREFIX:column="29">int</name></type> <name PREFIX:line="69" PREFIX:column="33">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="70" PREFIX:column="1">{
+  <return PREFIX:line="71" PREFIX:column="3">return <expr PREFIX:line="71" PREFIX:column="10">( <call><name PREFIX:line="71" PREFIX:column="12">isblank</name> <argument_list PREFIX:line="71" PREFIX:column="20">(<argument><expr><name PREFIX:line="71" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="75" PREFIX:column="1">// Checks for a control character.</comment>
+<function><type><specifier PREFIX:line="76" PREFIX:column="1">inline</specifier> <name PREFIX:line="76" PREFIX:column="8">boolean</name></type> <name PREFIX:line="76" PREFIX:column="16">isControl</name><parameter_list PREFIX:line="76" PREFIX:column="25">(<param><decl><type><name PREFIX:line="76" PREFIX:column="26">int</name></type> <name PREFIX:line="76" PREFIX:column="30">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="77" PREFIX:column="1">{
+  <return PREFIX:line="78" PREFIX:column="3">return <expr PREFIX:line="78" PREFIX:column="10">( <call><name PREFIX:line="78" PREFIX:column="12">iscntrl</name> <argument_list PREFIX:line="78" PREFIX:column="20">(<argument><expr><name PREFIX:line="78" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="82" PREFIX:column="1">// Checks for a digit (0 through 9).</comment>
+<function><type><specifier PREFIX:line="83" PREFIX:column="1">inline</specifier> <name PREFIX:line="83" PREFIX:column="8">boolean</name></type> <name PREFIX:line="83" PREFIX:column="16">isDigit</name><parameter_list PREFIX:line="83" PREFIX:column="23">(<param><decl><type><name PREFIX:line="83" PREFIX:column="24">int</name></type> <name PREFIX:line="83" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="84" PREFIX:column="1">{
+  <return PREFIX:line="85" PREFIX:column="3">return <expr PREFIX:line="85" PREFIX:column="10">( <call><name PREFIX:line="85" PREFIX:column="12">isdigit</name> <argument_list PREFIX:line="85" PREFIX:column="20">(<argument><expr><name PREFIX:line="85" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="89" PREFIX:column="1">// Checks for any printable character except space.</comment>
+<function><type><specifier PREFIX:line="90" PREFIX:column="1">inline</specifier> <name PREFIX:line="90" PREFIX:column="8">boolean</name></type> <name PREFIX:line="90" PREFIX:column="16">isGraph</name><parameter_list PREFIX:line="90" PREFIX:column="23">(<param><decl><type><name PREFIX:line="90" PREFIX:column="24">int</name></type> <name PREFIX:line="90" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="91" PREFIX:column="1">{
+  <return PREFIX:line="92" PREFIX:column="3">return <expr PREFIX:line="92" PREFIX:column="10">( <call><name PREFIX:line="92" PREFIX:column="12">isgraph</name> <argument_list PREFIX:line="92" PREFIX:column="20">(<argument><expr><name PREFIX:line="92" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="96" PREFIX:column="1">// Checks for a lower-case character.</comment>
+<function><type><specifier PREFIX:line="97" PREFIX:column="1">inline</specifier> <name PREFIX:line="97" PREFIX:column="8">boolean</name></type> <name PREFIX:line="97" PREFIX:column="16">isLowerCase</name><parameter_list PREFIX:line="97" PREFIX:column="27">(<param><decl><type><name PREFIX:line="97" PREFIX:column="28">int</name></type> <name PREFIX:line="97" PREFIX:column="32">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="98" PREFIX:column="1">{
+  <return PREFIX:line="99" PREFIX:column="3">return <expr PREFIX:line="99" PREFIX:column="10">(<call><name PREFIX:line="99" PREFIX:column="11">islower</name> <argument_list PREFIX:line="99" PREFIX:column="19">(<argument><expr><name PREFIX:line="99" PREFIX:column="20">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="103" PREFIX:column="1">// Checks for any printable character including space.</comment>
+<function><type><specifier PREFIX:line="104" PREFIX:column="1">inline</specifier> <name PREFIX:line="104" PREFIX:column="8">boolean</name></type> <name PREFIX:line="104" PREFIX:column="16">isPrintable</name><parameter_list PREFIX:line="104" PREFIX:column="27">(<param><decl><type><name PREFIX:line="104" PREFIX:column="28">int</name></type> <name PREFIX:line="104" PREFIX:column="32">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="105" PREFIX:column="1">{
+  <return PREFIX:line="106" PREFIX:column="3">return <expr PREFIX:line="106" PREFIX:column="10">( <call><name PREFIX:line="106" PREFIX:column="12">isprint</name> <argument_list PREFIX:line="106" PREFIX:column="20">(<argument><expr><name PREFIX:line="106" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="110" PREFIX:column="1">// Checks for any printable character which is not a space </comment>
+<comment type="line" PREFIX:line="111" PREFIX:column="1">// or an alphanumeric character.</comment>
+<function><type><specifier PREFIX:line="112" PREFIX:column="1">inline</specifier> <name PREFIX:line="112" PREFIX:column="8">boolean</name></type> <name PREFIX:line="112" PREFIX:column="16">isPunct</name><parameter_list PREFIX:line="112" PREFIX:column="23">(<param><decl><type><name PREFIX:line="112" PREFIX:column="24">int</name></type> <name PREFIX:line="112" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="113" PREFIX:column="1">{
+  <return PREFIX:line="114" PREFIX:column="3">return <expr PREFIX:line="114" PREFIX:column="10">( <call><name PREFIX:line="114" PREFIX:column="12">ispunct</name> <argument_list PREFIX:line="114" PREFIX:column="20">(<argument><expr><name PREFIX:line="114" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="118" PREFIX:column="1">// Checks for white-space characters. For the avr-libc library, </comment>
+<comment type="line" PREFIX:line="119" PREFIX:column="1">// these are: space, formfeed ('\f'), newline ('\n'), carriage </comment>
+<comment type="line" PREFIX:line="120" PREFIX:column="1">// return ('\r'), horizontal tab ('\t'), and vertical tab ('\v').</comment>
+<function><type><specifier PREFIX:line="121" PREFIX:column="1">inline</specifier> <name PREFIX:line="121" PREFIX:column="8">boolean</name></type> <name PREFIX:line="121" PREFIX:column="16">isSpace</name><parameter_list PREFIX:line="121" PREFIX:column="23">(<param><decl><type><name PREFIX:line="121" PREFIX:column="24">int</name></type> <name PREFIX:line="121" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="122" PREFIX:column="1">{
+  <return PREFIX:line="123" PREFIX:column="3">return <expr PREFIX:line="123" PREFIX:column="10">( <call><name PREFIX:line="123" PREFIX:column="12">isspace</name> <argument_list PREFIX:line="123" PREFIX:column="20">(<argument><expr><name PREFIX:line="123" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="127" PREFIX:column="1">// Checks for an uppercase letter.</comment>
+<function><type><specifier PREFIX:line="128" PREFIX:column="1">inline</specifier> <name PREFIX:line="128" PREFIX:column="8">boolean</name></type> <name PREFIX:line="128" PREFIX:column="16">isUpperCase</name><parameter_list PREFIX:line="128" PREFIX:column="27">(<param><decl><type><name PREFIX:line="128" PREFIX:column="28">int</name></type> <name PREFIX:line="128" PREFIX:column="32">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="129" PREFIX:column="1">{
+  <return PREFIX:line="130" PREFIX:column="3">return <expr PREFIX:line="130" PREFIX:column="10">( <call><name PREFIX:line="130" PREFIX:column="12">isupper</name> <argument_list PREFIX:line="130" PREFIX:column="20">(<argument><expr><name PREFIX:line="130" PREFIX:column="21">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="134" PREFIX:column="1">// Checks for a hexadecimal digits, i.e. one of 0 1 2 3 4 5 6 7 </comment>
+<comment type="line" PREFIX:line="135" PREFIX:column="1">// 8 9 a b c d e f A B C D E F.</comment>
+<function><type><specifier PREFIX:line="136" PREFIX:column="1">inline</specifier> <name PREFIX:line="136" PREFIX:column="8">boolean</name></type> <name PREFIX:line="136" PREFIX:column="16">isHexadecimalDigit</name><parameter_list PREFIX:line="136" PREFIX:column="34">(<param><decl><type><name PREFIX:line="136" PREFIX:column="35">int</name></type> <name PREFIX:line="136" PREFIX:column="39">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="137" PREFIX:column="1">{
+  <return PREFIX:line="138" PREFIX:column="3">return <expr PREFIX:line="138" PREFIX:column="10">( <call><name PREFIX:line="138" PREFIX:column="12">isxdigit</name> <argument_list PREFIX:line="138" PREFIX:column="21">(<argument><expr><name PREFIX:line="138" PREFIX:column="22">c</name></expr></argument>)</argument_list></call> == 0 ? false : true)</expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="142" PREFIX:column="1">// Converts c to a 7-bit unknowntype char value that fits into the </comment>
+<comment type="line" PREFIX:line="143" PREFIX:column="1">// ASCII character set, by clearing the high-order bits.</comment>
+<function><type><specifier PREFIX:line="144" PREFIX:column="1">inline</specifier> <name PREFIX:line="144" PREFIX:column="8">int</name></type> <name PREFIX:line="144" PREFIX:column="12">toAscii</name><parameter_list PREFIX:line="144" PREFIX:column="19">(<param><decl><type><name PREFIX:line="144" PREFIX:column="20">int</name></type> <name PREFIX:line="144" PREFIX:column="24">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="145" PREFIX:column="1">{
+  <return PREFIX:line="146" PREFIX:column="3">return <expr><call><name PREFIX:line="146" PREFIX:column="10">toascii</name> <argument_list PREFIX:line="146" PREFIX:column="18">(<argument><expr><name PREFIX:line="146" PREFIX:column="19">c</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="150" PREFIX:column="1">// Warning:</comment>
+<comment type="line" PREFIX:line="151" PREFIX:column="1">// Many people will be unhappy if you use this function. </comment>
+<comment type="line" PREFIX:line="152" PREFIX:column="1">// This function will convert accented letters into random </comment>
+<comment type="line" PREFIX:line="153" PREFIX:column="1">// characters.</comment>
+
+<comment type="line" PREFIX:line="155" PREFIX:column="1">// Converts the letter c to lower case, if possible.</comment>
+<function><type><specifier PREFIX:line="156" PREFIX:column="1">inline</specifier> <name PREFIX:line="156" PREFIX:column="8">int</name></type> <name PREFIX:line="156" PREFIX:column="12">toLowerCase</name><parameter_list PREFIX:line="156" PREFIX:column="23">(<param><decl><type><name PREFIX:line="156" PREFIX:column="24">int</name></type> <name PREFIX:line="156" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="157" PREFIX:column="1">{
+  <return PREFIX:line="158" PREFIX:column="3">return <expr><call><name PREFIX:line="158" PREFIX:column="10">tolower</name> <argument_list PREFIX:line="158" PREFIX:column="18">(<argument><expr><name PREFIX:line="158" PREFIX:column="19">c</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+
+<comment type="line" PREFIX:line="162" PREFIX:column="1">// Converts the letter c to upper case, if possible.</comment>
+<function><type><specifier PREFIX:line="163" PREFIX:column="1">inline</specifier> <name PREFIX:line="163" PREFIX:column="8">int</name></type> <name PREFIX:line="163" PREFIX:column="12">toUpperCase</name><parameter_list PREFIX:line="163" PREFIX:column="23">(<param><decl><type><name PREFIX:line="163" PREFIX:column="24">int</name></type> <name PREFIX:line="163" PREFIX:column="28">c</name></decl></param>)</parameter_list>
+<block PREFIX:line="164" PREFIX:column="1">{
+  <return PREFIX:line="165" PREFIX:column="3">return <expr><call><name PREFIX:line="165" PREFIX:column="10">toupper</name> <argument_list PREFIX:line="165" PREFIX:column="18">(<argument><expr><name PREFIX:line="165" PREFIX:column="19">c</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<cpp:endif PREFIX:line="168" PREFIX:column="1">#<cpp:directive PREFIX:line="168" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+</unit>

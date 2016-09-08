@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/libraries/U8glib/utility/u8g_pbxh16.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_pbxh16.c
+  
+  x lines per page, horizontal, 16 bits per pixel (hi color modes)
+  
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2013, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+
+struct _u8g_pb_t
+{
+  u8g_page_t p;
+  u8g_uint_t width;
+  void *buf;
+};
+typedef struct _u8g_pb_t u8g_pb_t;
+
+
+uint8_t u8g_index_color_xh16_buf[2*WIDTH*PAGE_HEIGHT] U8G_NOCOMMON ; 
+u8g_pb_t u8g_index_color_xh16_pb = { {PAGE_HEIGHT, HEIGHT, 0, 0, 0},  WIDTH, u8g_index_color_xh16_buf}; 
+u8g_dev_t name = { dev_fn, &amp;u8g_index_color_xh16_pb , com_fn }
+
+*/</comment>
+
+<cpp:include PREFIX:line="52" PREFIX:column="1">#<cpp:directive PREFIX:line="52" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="52" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<comment type="block" PREFIX:line="54" PREFIX:column="1">/*
+#define WIDTH_BITS 7
+#define WIDTH (1&lt;&lt;WIDTH_BITS)
+#define PAGE_HEIGHT_BITS 3
+#define PAGE_HEIGHT (1&lt;&lt;PAGE_HEIGHT_BITS)
+*/</comment>
+
+<function><type><name PREFIX:line="61" PREFIX:column="1">void</name></type> <name PREFIX:line="61" PREFIX:column="6">u8g_pbxh16_Clear</name><parameter_list PREFIX:line="61" PREFIX:column="22">(<param><decl><type><name PREFIX:line="61" PREFIX:column="23">u8g_pb_t</name> *</type><name PREFIX:line="61" PREFIX:column="33">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="62" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="63" PREFIX:column="3">uint8_t</name> *</type><name PREFIX:line="63" PREFIX:column="12">ptr</name> <init PREFIX:line="63" PREFIX:column="16">= <expr PREFIX:line="63" PREFIX:column="18">(<name PREFIX:line="63" PREFIX:column="19">uint8_t</name> *)<name><name PREFIX:line="63" PREFIX:column="29">b</name>-&gt;<name PREFIX:line="63" PREFIX:column="32">buf</name></name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="64" PREFIX:column="3">uint8_t</name> *</type><name PREFIX:line="64" PREFIX:column="12">end_ptr</name> <init PREFIX:line="64" PREFIX:column="20">= <expr><name PREFIX:line="64" PREFIX:column="22">ptr</name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="65" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="65" PREFIX:column="11">cnt</name> <init PREFIX:line="65" PREFIX:column="15">= <expr><name><name PREFIX:line="65" PREFIX:column="17">b</name>-&gt;<name PREFIX:line="65" PREFIX:column="20">p</name>.<name PREFIX:line="65" PREFIX:column="22">page_height</name></name></expr></init></decl>;</decl_stmt>
+  <do PREFIX:line="66" PREFIX:column="3">do
+  <block PREFIX:line="67" PREFIX:column="3">{
+    <expr_stmt><expr><name PREFIX:line="68" PREFIX:column="5">end_ptr</name> += <name><name PREFIX:line="68" PREFIX:column="16">b</name>-&gt;<name PREFIX:line="68" PREFIX:column="19">width</name></name>*2</expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="69" PREFIX:column="5">cnt</name>--</expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="70" PREFIX:column="10">( <expr><name PREFIX:line="70" PREFIX:column="12">cnt</name> &gt; 0</expr> )</condition>;</do>
+  <do PREFIX:line="71" PREFIX:column="3">do
+  <block PREFIX:line="72" PREFIX:column="3">{
+    <expr_stmt><expr PREFIX:line="73" PREFIX:column="5">*<name PREFIX:line="73" PREFIX:column="6">ptr</name>++ = 0</expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="74" PREFIX:column="10">( <expr><name PREFIX:line="74" PREFIX:column="12">ptr</name> != <name PREFIX:line="74" PREFIX:column="19">end_ptr</name></expr> )</condition>;</do>
+}</block></function>
+
+
+<function><type><name PREFIX:line="78" PREFIX:column="1">void</name></type> <name PREFIX:line="78" PREFIX:column="6">u8g_pbxh16_Init</name><parameter_list PREFIX:line="78" PREFIX:column="21">(<param><decl><type><name PREFIX:line="78" PREFIX:column="22">u8g_pb_t</name> *</type><name PREFIX:line="78" PREFIX:column="32">b</name></decl></param>, <param><decl><type><name PREFIX:line="78" PREFIX:column="35">void</name> *</type><name PREFIX:line="78" PREFIX:column="41">buf</name></decl></param>, <param><decl><type><name PREFIX:line="78" PREFIX:column="46">u8g_uint_t</name></type> <name PREFIX:line="78" PREFIX:column="57">width</name></decl></param>)</parameter_list>
+<block PREFIX:line="79" PREFIX:column="1">{
+  <expr_stmt><expr><name><name PREFIX:line="80" PREFIX:column="3">b</name>-&gt;<name PREFIX:line="80" PREFIX:column="6">buf</name></name> = <name PREFIX:line="80" PREFIX:column="12">buf</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="81" PREFIX:column="3">b</name>-&gt;<name PREFIX:line="81" PREFIX:column="6">width</name></name> = <name PREFIX:line="81" PREFIX:column="14">width</name></expr>;</expr_stmt>
+  <expr_stmt><expr><call><name PREFIX:line="82" PREFIX:column="3">u8g_pbxh16_Clear</name><argument_list PREFIX:line="82" PREFIX:column="19">(<argument><expr><name PREFIX:line="82" PREFIX:column="20">b</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="85" PREFIX:column="1">static</specifier> <name PREFIX:line="85" PREFIX:column="8">void</name></type> <name PREFIX:line="85" PREFIX:column="13">u8g_pbxh16_set_pixel</name><parameter_list PREFIX:line="85" PREFIX:column="33">(<param><decl><type><name PREFIX:line="85" PREFIX:column="34">u8g_pb_t</name> *</type><name PREFIX:line="85" PREFIX:column="44">b</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="47">u8g_uint_t</name></type> <name PREFIX:line="85" PREFIX:column="58">x</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="61">u8g_uint_t</name></type> <name PREFIX:line="85" PREFIX:column="72">y</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="75">uint8_t</name></type> <name PREFIX:line="85" PREFIX:column="83">low</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="88">uint8_t</name></type> <name PREFIX:line="85" PREFIX:column="96">high</name></decl></param>)</parameter_list>
+<block PREFIX:line="86" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="87" PREFIX:column="3">uint16_t</name></type> <name PREFIX:line="87" PREFIX:column="12">tmp</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="88" PREFIX:column="3">uint8_t</name> *</type><name PREFIX:line="88" PREFIX:column="12">ptr</name> <init PREFIX:line="88" PREFIX:column="16">= <expr><name><name PREFIX:line="88" PREFIX:column="18">b</name>-&gt;<name PREFIX:line="88" PREFIX:column="21">buf</name></name></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="89" PREFIX:column="3">y</name> -= <name><name PREFIX:line="89" PREFIX:column="8">b</name>-&gt;<name PREFIX:line="89" PREFIX:column="11">p</name>.<name PREFIX:line="89" PREFIX:column="13">page_y0</name></name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="90" PREFIX:column="3">tmp</name> = <name PREFIX:line="90" PREFIX:column="9">y</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="91" PREFIX:column="3">tmp</name> *= <name><name PREFIX:line="91" PREFIX:column="10">b</name>-&gt;<name PREFIX:line="91" PREFIX:column="13">width</name></name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="92" PREFIX:column="3">tmp</name> += <name PREFIX:line="92" PREFIX:column="10">x</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="93" PREFIX:column="3">tmp</name> &lt;&lt;= 1</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="94" PREFIX:column="3">ptr</name> += <name PREFIX:line="94" PREFIX:column="10">tmp</name></expr>;</expr_stmt>
+  <expr_stmt><expr PREFIX:line="95" PREFIX:column="3">*<name PREFIX:line="95" PREFIX:column="4">ptr</name> = <name PREFIX:line="95" PREFIX:column="10">low</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="96" PREFIX:column="3">ptr</name>++</expr>;</expr_stmt>
+  <expr_stmt><expr PREFIX:line="97" PREFIX:column="3">*<name PREFIX:line="97" PREFIX:column="4">ptr</name> = <name PREFIX:line="97" PREFIX:column="10">high</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="100" PREFIX:column="1">void</name></type> <name PREFIX:line="100" PREFIX:column="6">u8g_pbxh16_SetPixel</name><parameter_list PREFIX:line="100" PREFIX:column="25">(<param><decl><type><name PREFIX:line="100" PREFIX:column="26">u8g_pb_t</name> *</type><name PREFIX:line="100" PREFIX:column="36">b</name></decl></param>,  <param><decl><type><name PREFIX:line="100" PREFIX:column="40">u8g_dev_arg_pixel_t</name> *</type>  <name PREFIX:line="100" PREFIX:column="63">arg_pixel</name></decl></param>)</parameter_list>
+<block PREFIX:line="101" PREFIX:column="1">{
+  <if PREFIX:line="102" PREFIX:column="3">if <condition PREFIX:line="102" PREFIX:column="6">( <expr><name><name PREFIX:line="102" PREFIX:column="8">arg_pixel</name>-&gt;<name PREFIX:line="102" PREFIX:column="19">y</name></name> &lt; <name><name PREFIX:line="102" PREFIX:column="23">b</name>-&gt;<name PREFIX:line="102" PREFIX:column="26">p</name>.<name PREFIX:line="102" PREFIX:column="28">page_y0</name></name></expr> )</condition><then PREFIX:line="102" PREFIX:column="37">
+    <return PREFIX:line="103" PREFIX:column="5">return;</return></then></if>
+  <if PREFIX:line="104" PREFIX:column="3">if <condition PREFIX:line="104" PREFIX:column="6">( <expr><name><name PREFIX:line="104" PREFIX:column="8">arg_pixel</name>-&gt;<name PREFIX:line="104" PREFIX:column="19">y</name></name> &gt; <name><name PREFIX:line="104" PREFIX:column="23">b</name>-&gt;<name PREFIX:line="104" PREFIX:column="26">p</name>.<name PREFIX:line="104" PREFIX:column="28">page_y1</name></name></expr> )</condition><then PREFIX:line="104" PREFIX:column="37">
+    <return PREFIX:line="105" PREFIX:column="5">return;</return></then></if>
+  <if PREFIX:line="106" PREFIX:column="3">if <condition PREFIX:line="106" PREFIX:column="6">( <expr><name><name PREFIX:line="106" PREFIX:column="8">arg_pixel</name>-&gt;<name PREFIX:line="106" PREFIX:column="19">x</name></name> &gt;= <name><name PREFIX:line="106" PREFIX:column="24">b</name>-&gt;<name PREFIX:line="106" PREFIX:column="27">width</name></name></expr> )</condition><then PREFIX:line="106" PREFIX:column="34">
+    <return PREFIX:line="107" PREFIX:column="5">return;</return></then></if>
+  <expr_stmt><expr><call><name PREFIX:line="108" PREFIX:column="3">u8g_pbxh16_set_pixel</name><argument_list PREFIX:line="108" PREFIX:column="23">(<argument><expr><name PREFIX:line="108" PREFIX:column="24">b</name></expr></argument>, <argument><expr><name><name PREFIX:line="108" PREFIX:column="27">arg_pixel</name>-&gt;<name PREFIX:line="108" PREFIX:column="38">x</name></name></expr></argument>, <argument><expr><name><name PREFIX:line="108" PREFIX:column="41">arg_pixel</name>-&gt;<name PREFIX:line="108" PREFIX:column="52">y</name></name></expr></argument>, <argument><expr><name><name PREFIX:line="108" PREFIX:column="55">arg_pixel</name>-&gt;<name PREFIX:line="108" PREFIX:column="66">color</name></name></expr></argument>, <argument><expr><name><name PREFIX:line="108" PREFIX:column="73">arg_pixel</name>-&gt;<name PREFIX:line="108" PREFIX:column="84">hi_color</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+}</block></function>
+
+
+<function><type><name PREFIX:line="112" PREFIX:column="1">void</name></type> <name PREFIX:line="112" PREFIX:column="6">u8g_pbxh16_Set8Pixel</name><parameter_list PREFIX:line="112" PREFIX:column="26">(<param><decl><type><name PREFIX:line="112" PREFIX:column="27">u8g_pb_t</name> *</type><name PREFIX:line="112" PREFIX:column="37">b</name></decl></param>, <param><decl><type><name PREFIX:line="112" PREFIX:column="40">u8g_dev_arg_pixel_t</name> *</type><name PREFIX:line="112" PREFIX:column="61">arg_pixel</name></decl></param>)</parameter_list>
+<block PREFIX:line="113" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="114" PREFIX:column="3">register</name> <name PREFIX:line="114" PREFIX:column="12">uint8_t</name></type> <name PREFIX:line="114" PREFIX:column="20">pixel</name> <init PREFIX:line="114" PREFIX:column="26">= <expr><name><name PREFIX:line="114" PREFIX:column="28">arg_pixel</name>-&gt;<name PREFIX:line="114" PREFIX:column="39">pixel</name></name></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="115" PREFIX:column="3">u8g_uint_t</name></type> <name PREFIX:line="115" PREFIX:column="14">dx</name> <init PREFIX:line="115" PREFIX:column="17">= <expr PREFIX:line="115" PREFIX:column="19">0</expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="116" PREFIX:column="3">u8g_uint_t</name></type> <name PREFIX:line="116" PREFIX:column="14">dy</name> <init PREFIX:line="116" PREFIX:column="17">= <expr PREFIX:line="116" PREFIX:column="19">0</expr></init></decl>;</decl_stmt>
+  
+  <switch PREFIX:line="118" PREFIX:column="3">switch<condition PREFIX:line="118" PREFIX:column="9">( <expr><name><name PREFIX:line="118" PREFIX:column="11">arg_pixel</name>-&gt;<name PREFIX:line="118" PREFIX:column="22">dir</name></name></expr> )</condition>
+  <block PREFIX:line="119" PREFIX:column="3">{
+    <case PREFIX:line="120" PREFIX:column="5">case <expr PREFIX:line="120" PREFIX:column="10">0</expr>: <expr_stmt><expr><name PREFIX:line="120" PREFIX:column="13">dx</name>++</expr>;</expr_stmt> <break PREFIX:line="120" PREFIX:column="19">break;</break>
+    </case><case PREFIX:line="121" PREFIX:column="5">case <expr PREFIX:line="121" PREFIX:column="10">1</expr>: <expr_stmt><expr><name PREFIX:line="121" PREFIX:column="13">dy</name>++</expr>;</expr_stmt> <break PREFIX:line="121" PREFIX:column="19">break;</break>
+    </case><case PREFIX:line="122" PREFIX:column="5">case <expr PREFIX:line="122" PREFIX:column="10">2</expr>: <expr_stmt><expr><name PREFIX:line="122" PREFIX:column="13">dx</name>--</expr>;</expr_stmt> <break PREFIX:line="122" PREFIX:column="19">break;</break>
+    </case><case PREFIX:line="123" PREFIX:column="5">case <expr PREFIX:line="123" PREFIX:column="10">3</expr>: <expr_stmt><expr><name PREFIX:line="123" PREFIX:column="13">dy</name>--</expr>;</expr_stmt> <break PREFIX:line="123" PREFIX:column="19">break;</break>
+  </case>}</block></switch>
+  
+  <do PREFIX:line="126" PREFIX:column="3">do
+  <block PREFIX:line="127" PREFIX:column="3">{
+    <if PREFIX:line="128" PREFIX:column="5">if <condition PREFIX:line="128" PREFIX:column="8">( <expr><name PREFIX:line="128" PREFIX:column="10">pixel</name> &amp; 128</expr> )</condition><then PREFIX:line="128" PREFIX:column="23">
+      <expr_stmt><expr><call><name PREFIX:line="129" PREFIX:column="7">u8g_pbxh16_SetPixel</name><argument_list PREFIX:line="129" PREFIX:column="26">(<argument><expr><name PREFIX:line="129" PREFIX:column="27">b</name></expr></argument>, <argument><expr><name PREFIX:line="129" PREFIX:column="30">arg_pixel</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></then></if>
+    <expr_stmt><expr><name><name PREFIX:line="130" PREFIX:column="5">arg_pixel</name>-&gt;<name PREFIX:line="130" PREFIX:column="16">x</name></name> += <name PREFIX:line="130" PREFIX:column="21">dx</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name><name PREFIX:line="131" PREFIX:column="5">arg_pixel</name>-&gt;<name PREFIX:line="131" PREFIX:column="16">y</name></name> += <name PREFIX:line="131" PREFIX:column="21">dy</name></expr>;</expr_stmt>
+    <expr_stmt><expr><name PREFIX:line="132" PREFIX:column="5">pixel</name> &lt;&lt;= 1</expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="133" PREFIX:column="10">( <expr><name PREFIX:line="133" PREFIX:column="12">pixel</name> != 0</expr>  )</condition>;</do>  
+}</block></function>
+
+
+<function><type><name PREFIX:line="137" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="137" PREFIX:column="9">u8g_dev_pbxh16_base_fn</name><parameter_list PREFIX:line="137" PREFIX:column="31">(<param><decl><type><name PREFIX:line="137" PREFIX:column="32">u8g_t</name> *</type><name PREFIX:line="137" PREFIX:column="39">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="137" PREFIX:column="44">u8g_dev_t</name> *</type><name PREFIX:line="137" PREFIX:column="55">dev</name></decl></param>, <param><decl><type><name PREFIX:line="137" PREFIX:column="60">uint8_t</name></type> <name PREFIX:line="137" PREFIX:column="68">msg</name></decl></param>, <param><decl><type><name PREFIX:line="137" PREFIX:column="73">void</name> *</type><name PREFIX:line="137" PREFIX:column="79">arg</name></decl></param>)</parameter_list>
+<block PREFIX:line="138" PREFIX:column="1">{
+  <decl_stmt><decl><type><name PREFIX:line="139" PREFIX:column="3">u8g_pb_t</name> *</type><name PREFIX:line="139" PREFIX:column="13">pb</name> <init PREFIX:line="139" PREFIX:column="16">= <expr><call PREFIX:line="139" PREFIX:column="18">(<name PREFIX:line="139" PREFIX:column="19">u8g_pb_t</name> *)<argument_list PREFIX:line="139" PREFIX:column="30">(<argument><expr><name><name PREFIX:line="139" PREFIX:column="31">dev</name>-&gt;<name PREFIX:line="139" PREFIX:column="36">dev_mem</name></name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+  <switch PREFIX:line="140" PREFIX:column="3">switch<condition PREFIX:line="140" PREFIX:column="9">(<expr><name PREFIX:line="140" PREFIX:column="10">msg</name></expr>)</condition>
+  <block PREFIX:line="141" PREFIX:column="3">{
+    <case PREFIX:line="142" PREFIX:column="5">case <expr><name PREFIX:line="142" PREFIX:column="10">U8G_DEV_MSG_SET_8PIXEL</name></expr>:
+      <if PREFIX:line="143" PREFIX:column="7">if <condition PREFIX:line="143" PREFIX:column="10">( <expr><call><name PREFIX:line="143" PREFIX:column="12">u8g_pb_Is8PixelVisible</name><argument_list PREFIX:line="143" PREFIX:column="34">(<argument><expr><name PREFIX:line="143" PREFIX:column="35">pb</name></expr></argument>, <argument><expr PREFIX:line="143" PREFIX:column="39">(<name PREFIX:line="143" PREFIX:column="40">u8g_dev_arg_pixel_t</name> *)<name PREFIX:line="143" PREFIX:column="62">arg</name></expr></argument>)</argument_list></call></expr> )</condition><then PREFIX:line="143" PREFIX:column="68">
+        <expr_stmt><expr><call><name PREFIX:line="144" PREFIX:column="9">u8g_pbxh16_Set8Pixel</name><argument_list PREFIX:line="144" PREFIX:column="29">(<argument><expr><name PREFIX:line="144" PREFIX:column="30">pb</name></expr></argument>, <argument><expr PREFIX:line="144" PREFIX:column="34">(<name PREFIX:line="144" PREFIX:column="35">u8g_dev_arg_pixel_t</name> *)<name PREFIX:line="144" PREFIX:column="57">arg</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></then></if>
+      <break PREFIX:line="145" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="146" PREFIX:column="5">case <expr><name PREFIX:line="146" PREFIX:column="10">U8G_DEV_MSG_SET_PIXEL</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="147" PREFIX:column="7">u8g_pbxh16_SetPixel</name><argument_list PREFIX:line="147" PREFIX:column="26">(<argument><expr><name PREFIX:line="147" PREFIX:column="27">pb</name></expr></argument>, <argument><expr PREFIX:line="147" PREFIX:column="31">(<name PREFIX:line="147" PREFIX:column="32">u8g_dev_arg_pixel_t</name> *)<name PREFIX:line="147" PREFIX:column="54">arg</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="148" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="149" PREFIX:column="5">case <expr><name PREFIX:line="149" PREFIX:column="10">U8G_DEV_MSG_INIT</name></expr>:
+      <break PREFIX:line="150" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="151" PREFIX:column="5">case <expr><name PREFIX:line="151" PREFIX:column="10">U8G_DEV_MSG_STOP</name></expr>:
+      <break PREFIX:line="152" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="153" PREFIX:column="5">case <expr><name PREFIX:line="153" PREFIX:column="10">U8G_DEV_MSG_PAGE_FIRST</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="154" PREFIX:column="7">u8g_pbxh16_Clear</name><argument_list PREFIX:line="154" PREFIX:column="23">(<argument><expr><name PREFIX:line="154" PREFIX:column="24">pb</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <expr_stmt><expr><call><name PREFIX:line="155" PREFIX:column="7">u8g_page_First</name><argument_list PREFIX:line="155" PREFIX:column="21">(<argument><expr PREFIX:line="155" PREFIX:column="22">&amp;(<name><name PREFIX:line="155" PREFIX:column="24">pb</name>-&gt;<name PREFIX:line="155" PREFIX:column="28">p</name></name>)</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="156" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="157" PREFIX:column="5">case <expr><name PREFIX:line="157" PREFIX:column="10">U8G_DEV_MSG_PAGE_NEXT</name></expr>:
+      <if PREFIX:line="158" PREFIX:column="7">if <condition PREFIX:line="158" PREFIX:column="10">( <expr><call><name PREFIX:line="158" PREFIX:column="12">u8g_page_Next</name><argument_list PREFIX:line="158" PREFIX:column="25">(<argument><expr PREFIX:line="158" PREFIX:column="26">&amp;(<name><name PREFIX:line="158" PREFIX:column="28">pb</name>-&gt;<name PREFIX:line="158" PREFIX:column="32">p</name></name>)</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="158" PREFIX:column="42">
+        <return PREFIX:line="159" PREFIX:column="9">return <expr PREFIX:line="159" PREFIX:column="16">0</expr>;</return></then></if>
+      <expr_stmt><expr><call><name PREFIX:line="160" PREFIX:column="7">u8g_pbxh16_Clear</name><argument_list PREFIX:line="160" PREFIX:column="23">(<argument><expr><name PREFIX:line="160" PREFIX:column="24">pb</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="161" PREFIX:column="7">break;</break>
+<cpp:ifdef PREFIX:line="162" PREFIX:column="1">#<cpp:directive PREFIX:line="162" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="162" PREFIX:column="8">U8G_DEV_MSG_IS_BBX_INTERSECTION</name></cpp:ifdef>
+    </case><case PREFIX:line="163" PREFIX:column="5">case <expr><name PREFIX:line="163" PREFIX:column="10">U8G_DEV_MSG_IS_BBX_INTERSECTION</name></expr>:
+      <return PREFIX:line="164" PREFIX:column="7">return <expr><call><name PREFIX:line="164" PREFIX:column="14">u8g_pb_IsIntersection</name><argument_list PREFIX:line="164" PREFIX:column="35">(<argument><expr><name PREFIX:line="164" PREFIX:column="36">pb</name></expr></argument>, <argument><expr PREFIX:line="164" PREFIX:column="40">(<name PREFIX:line="164" PREFIX:column="41">u8g_dev_arg_bbx_t</name> *)<name PREFIX:line="164" PREFIX:column="61">arg</name></expr></argument>)</argument_list></call></expr>;</return>
+<cpp:endif PREFIX:line="165" PREFIX:column="1">#<cpp:directive PREFIX:line="165" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+    </case><case PREFIX:line="166" PREFIX:column="5">case <expr><name PREFIX:line="166" PREFIX:column="10">U8G_DEV_MSG_GET_PAGE_BOX</name></expr>:
+      <expr_stmt><expr><call><name PREFIX:line="167" PREFIX:column="7">u8g_pb_GetPageBox</name><argument_list PREFIX:line="167" PREFIX:column="24">(<argument><expr><name PREFIX:line="167" PREFIX:column="25">pb</name></expr></argument>, <argument><expr PREFIX:line="167" PREFIX:column="29">(<name PREFIX:line="167" PREFIX:column="30">u8g_box_t</name> *)<name PREFIX:line="167" PREFIX:column="42">arg</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+      <break PREFIX:line="168" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="169" PREFIX:column="5">case <expr><name PREFIX:line="169" PREFIX:column="10">U8G_DEV_MSG_GET_WIDTH</name></expr>:
+      <expr_stmt><expr PREFIX:line="170" PREFIX:column="7">*((<name PREFIX:line="170" PREFIX:column="10">u8g_uint_t</name> *)<name PREFIX:line="170" PREFIX:column="23">arg</name>) = <name><name PREFIX:line="170" PREFIX:column="30">pb</name>-&gt;<name PREFIX:line="170" PREFIX:column="34">width</name></name></expr>;</expr_stmt>
+      <break PREFIX:line="171" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="172" PREFIX:column="5">case <expr><name PREFIX:line="172" PREFIX:column="10">U8G_DEV_MSG_GET_HEIGHT</name></expr>:
+      <expr_stmt><expr PREFIX:line="173" PREFIX:column="7">*((<name PREFIX:line="173" PREFIX:column="10">u8g_uint_t</name> *)<name PREFIX:line="173" PREFIX:column="23">arg</name>) = <name><name PREFIX:line="173" PREFIX:column="30">pb</name>-&gt;<name PREFIX:line="173" PREFIX:column="34">p</name>.<name PREFIX:line="173" PREFIX:column="36">total_height</name></name></expr>;</expr_stmt>
+      <break PREFIX:line="174" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="175" PREFIX:column="5">case <expr><name PREFIX:line="175" PREFIX:column="10">U8G_DEV_MSG_SET_COLOR_ENTRY</name></expr>:
+      <break PREFIX:line="176" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="177" PREFIX:column="5">case <expr><name PREFIX:line="177" PREFIX:column="10">U8G_DEV_MSG_SET_XY_CB</name></expr>:
+      <break PREFIX:line="178" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="179" PREFIX:column="5">case <expr><name PREFIX:line="179" PREFIX:column="10">U8G_DEV_MSG_GET_MODE</name></expr>:
+      <return PREFIX:line="180" PREFIX:column="7">return <expr><name PREFIX:line="180" PREFIX:column="14">U8G_MODE_HICOLOR</name></expr>;</return>
+  </case>}</block></switch>
+  <return PREFIX:line="182" PREFIX:column="3">return <expr PREFIX:line="182" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+</unit>

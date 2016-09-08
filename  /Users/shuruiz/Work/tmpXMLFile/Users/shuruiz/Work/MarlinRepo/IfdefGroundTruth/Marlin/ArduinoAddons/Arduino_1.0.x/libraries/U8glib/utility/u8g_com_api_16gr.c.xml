@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/libraries/U8glib/utility/u8g_com_api_16gr.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_com_api_16gr.c
+  
+  Extension of the com api for devices with 16 graylevels (4 bit per pixel).
+  This should fit to the 8h and 16h architectures (pb8v1, pb8v2, pb16v1, pb16v2), 
+  mainly intended for SSD OLEDs
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  
+*/</comment>
+
+<cpp:include PREFIX:line="41" PREFIX:column="1">#<cpp:directive PREFIX:line="41" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="41" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<comment type="block" PREFIX:line="43" PREFIX:column="1">/* interpret b as a monochrome bit pattern, write value 15 for high bit and value 0 for a low bit */</comment>
+<comment type="block" PREFIX:line="44" PREFIX:column="1">/* topbit (msb) is sent last */</comment>
+<comment type="block" PREFIX:line="45" PREFIX:column="1">/* example: b = 0x083 will send 0xff, 0x00, 0x00, 0xf0 */</comment>
+<function><type><name PREFIX:line="46" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="46" PREFIX:column="9">u8g_WriteByteBWTo16GrDevice</name><parameter_list PREFIX:line="46" PREFIX:column="36">(<param><decl><type><name PREFIX:line="46" PREFIX:column="37">u8g_t</name> *</type><name PREFIX:line="46" PREFIX:column="44">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="46" PREFIX:column="49">u8g_dev_t</name> *</type><name PREFIX:line="46" PREFIX:column="60">dev</name></decl></param>, <param><decl><type><name PREFIX:line="46" PREFIX:column="65">uint8_t</name></type> <name PREFIX:line="46" PREFIX:column="73">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="47" PREFIX:column="1">{
+  <decl_stmt><decl><type><specifier PREFIX:line="48" PREFIX:column="3">static</specifier> <name PREFIX:line="48" PREFIX:column="10">uint8_t</name></type> <name><name PREFIX:line="48" PREFIX:column="18">buf</name><index PREFIX:line="48" PREFIX:column="21">[<expr PREFIX:line="48" PREFIX:column="22">4</expr>]</index></name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><specifier PREFIX:line="49" PREFIX:column="3">static</specifier> <name PREFIX:line="49" PREFIX:column="10">uint8_t</name></type> <name><name PREFIX:line="49" PREFIX:column="18">map</name><index PREFIX:line="49" PREFIX:column="21">[<expr PREFIX:line="49" PREFIX:column="22">4</expr>]</index></name> <init PREFIX:line="49" PREFIX:column="25">= <expr><block PREFIX:line="49" PREFIX:column="27">{ <expr PREFIX:line="49" PREFIX:column="29">0</expr>, <expr PREFIX:line="49" PREFIX:column="32">0x00f</expr>, <expr PREFIX:line="49" PREFIX:column="39">0x0f0</expr>, <expr PREFIX:line="49" PREFIX:column="46">0x0ff</expr> }</block></expr></init></decl>;</decl_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="50" PREFIX:column="3">buf</name> <index PREFIX:line="50" PREFIX:column="7">[<expr PREFIX:line="50" PREFIX:column="8">3</expr>]</index></name> = <name><name PREFIX:line="50" PREFIX:column="13">map</name><index PREFIX:line="50" PREFIX:column="16">[<expr><name PREFIX:line="50" PREFIX:column="17">b</name> &amp; 3</expr>]</index></name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="51" PREFIX:column="3">b</name>&gt;&gt;=2</expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="52" PREFIX:column="3">buf</name> <index PREFIX:line="52" PREFIX:column="7">[<expr PREFIX:line="52" PREFIX:column="8">2</expr>]</index></name> = <name><name PREFIX:line="52" PREFIX:column="13">map</name><index PREFIX:line="52" PREFIX:column="16">[<expr><name PREFIX:line="52" PREFIX:column="17">b</name> &amp; 3</expr>]</index></name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="53" PREFIX:column="3">b</name>&gt;&gt;=2</expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="54" PREFIX:column="3">buf</name> <index PREFIX:line="54" PREFIX:column="7">[<expr PREFIX:line="54" PREFIX:column="8">1</expr>]</index></name> = <name><name PREFIX:line="54" PREFIX:column="13">map</name><index PREFIX:line="54" PREFIX:column="16">[<expr><name PREFIX:line="54" PREFIX:column="17">b</name> &amp; 3</expr>]</index></name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="55" PREFIX:column="3">b</name>&gt;&gt;=2</expr>;</expr_stmt>
+  <expr_stmt><expr><name><name PREFIX:line="56" PREFIX:column="3">buf</name> <index PREFIX:line="56" PREFIX:column="7">[<expr PREFIX:line="56" PREFIX:column="8">0</expr>]</index></name> = <name><name PREFIX:line="56" PREFIX:column="13">map</name><index PREFIX:line="56" PREFIX:column="16">[<expr><name PREFIX:line="56" PREFIX:column="17">b</name> &amp; 3</expr>]</index></name></expr>;</expr_stmt>
+  <return PREFIX:line="57" PREFIX:column="3">return <expr><call><name><name PREFIX:line="57" PREFIX:column="10">dev</name>-&gt;<name PREFIX:line="57" PREFIX:column="15">com_fn</name></name><argument_list PREFIX:line="57" PREFIX:column="21">(<argument><expr><name PREFIX:line="57" PREFIX:column="22">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="57" PREFIX:column="27">U8G_COM_MSG_WRITE_SEQ</name></expr></argument>, <argument><expr PREFIX:line="57" PREFIX:column="50">4</expr></argument>, <argument><expr><name PREFIX:line="57" PREFIX:column="53">buf</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="60" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="60" PREFIX:column="9">u8g_WriteSequenceBWTo16GrDevice</name><parameter_list PREFIX:line="60" PREFIX:column="40">(<param><decl><type><name PREFIX:line="60" PREFIX:column="41">u8g_t</name> *</type><name PREFIX:line="60" PREFIX:column="48">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="60" PREFIX:column="53">u8g_dev_t</name> *</type><name PREFIX:line="60" PREFIX:column="64">dev</name></decl></param>, <param><decl><type><name PREFIX:line="60" PREFIX:column="69">uint8_t</name></type> <name PREFIX:line="60" PREFIX:column="77">cnt</name></decl></param>, <param><decl><type><name PREFIX:line="60" PREFIX:column="82">uint8_t</name> *</type><name PREFIX:line="60" PREFIX:column="91">ptr</name></decl></param>)</parameter_list>
+<block PREFIX:line="61" PREFIX:column="1">{
+  <do PREFIX:line="62" PREFIX:column="3">do
+  <block PREFIX:line="63" PREFIX:column="3">{
+    <if PREFIX:line="64" PREFIX:column="5">if <condition PREFIX:line="64" PREFIX:column="8">( <expr><call><name PREFIX:line="64" PREFIX:column="10">u8g_WriteByteBWTo16GrDevice</name><argument_list PREFIX:line="64" PREFIX:column="37">(<argument><expr><name PREFIX:line="64" PREFIX:column="38">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="64" PREFIX:column="43">dev</name></expr></argument>, <argument><expr PREFIX:line="64" PREFIX:column="48">*<name PREFIX:line="64" PREFIX:column="49">ptr</name>++</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="64" PREFIX:column="62">
+      <return PREFIX:line="65" PREFIX:column="7">return <expr PREFIX:line="65" PREFIX:column="14">0</expr>;</return></then></if>
+    <expr_stmt><expr><name PREFIX:line="66" PREFIX:column="5">cnt</name>--</expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="67" PREFIX:column="10">( <expr><name PREFIX:line="67" PREFIX:column="12">cnt</name> != 0</expr> )</condition>;</do>
+  <return PREFIX:line="68" PREFIX:column="3">return <expr PREFIX:line="68" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+
+<comment type="block" PREFIX:line="71" PREFIX:column="1">/* interpret b as a 4L bit pattern, write values 0x000, 0x004, 0x008, 0x00c */</comment>
+<function><type><name PREFIX:line="72" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="72" PREFIX:column="9">u8g_WriteByte4LTo16GrDevice</name><parameter_list PREFIX:line="72" PREFIX:column="36">(<param><decl><type><name PREFIX:line="72" PREFIX:column="37">u8g_t</name> *</type><name PREFIX:line="72" PREFIX:column="44">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="72" PREFIX:column="49">u8g_dev_t</name> *</type><name PREFIX:line="72" PREFIX:column="60">dev</name></decl></param>, <param><decl><type><name PREFIX:line="72" PREFIX:column="65">uint8_t</name></type> <name PREFIX:line="72" PREFIX:column="73">b</name></decl></param>)</parameter_list>
+<block PREFIX:line="73" PREFIX:column="1">{
+  <comment type="line" PREFIX:line="74" PREFIX:column="3">//static uint8_t map[16] = { 0x000, 0x004, 0x008, 0x00c, 0x040, 0x044, 0x048, 0x04c, 0x080, 0x084, 0x088, 0x08c, 0x0c0, 0x0c4, 0x0c8, 0x0cc};</comment>
+  <comment type="line" PREFIX:line="75" PREFIX:column="3">//static uint8_t map[16] = { 0x000, 0x004, 0x00a, 0x00f, 0x040, 0x044, 0x04a, 0x04f, 0x0a0, 0x0a4, 0x0aa, 0x0af, 0x0f0, 0x0f4, 0x0fa, 0x0ff};</comment>
+  <decl_stmt><decl><type><specifier PREFIX:line="76" PREFIX:column="3">static</specifier> <name PREFIX:line="76" PREFIX:column="10">uint8_t</name></type> <name><name PREFIX:line="76" PREFIX:column="18">map</name><index PREFIX:line="76" PREFIX:column="21">[<expr PREFIX:line="76" PREFIX:column="22">16</expr>]</index></name> <init PREFIX:line="76" PREFIX:column="26">= <expr><block PREFIX:line="76" PREFIX:column="28">{ <expr PREFIX:line="76" PREFIX:column="30">0x000</expr>, <expr PREFIX:line="76" PREFIX:column="37">0x040</expr>, <expr PREFIX:line="76" PREFIX:column="44">0x0a0</expr>, <expr PREFIX:line="76" PREFIX:column="51">0x0f0</expr>, <expr PREFIX:line="76" PREFIX:column="58">0x004</expr>, <expr PREFIX:line="76" PREFIX:column="65">0x044</expr>, <expr PREFIX:line="76" PREFIX:column="72">0x0a4</expr>, <expr PREFIX:line="76" PREFIX:column="79">0x0f4</expr>, <expr PREFIX:line="76" PREFIX:column="86">0x00a</expr>, <expr PREFIX:line="76" PREFIX:column="93">0x04a</expr>, <expr PREFIX:line="76" PREFIX:column="100">0x0aa</expr>, <expr PREFIX:line="76" PREFIX:column="107">0x0fa</expr>, <expr PREFIX:line="76" PREFIX:column="114">0x00f</expr>, <expr PREFIX:line="76" PREFIX:column="121">0x04f</expr>, <expr PREFIX:line="76" PREFIX:column="128">0x0af</expr>, <expr PREFIX:line="76" PREFIX:column="135">0x0ff</expr>}</block></expr></init></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="77" PREFIX:column="3">uint8_t</name></type> <name PREFIX:line="77" PREFIX:column="11">bb</name></decl>;</decl_stmt>
+  <expr_stmt><expr><name PREFIX:line="78" PREFIX:column="3">bb</name> = <name PREFIX:line="78" PREFIX:column="8">b</name></expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="79" PREFIX:column="3">bb</name> &amp;= 15</expr>;</expr_stmt>
+  <expr_stmt><expr><name PREFIX:line="80" PREFIX:column="3">b</name>&gt;&gt;=4</expr>;</expr_stmt>
+  <expr_stmt><expr><call><name><name PREFIX:line="81" PREFIX:column="3">dev</name>-&gt;<name PREFIX:line="81" PREFIX:column="8">com_fn</name></name><argument_list PREFIX:line="81" PREFIX:column="14">(<argument><expr><name PREFIX:line="81" PREFIX:column="15">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="81" PREFIX:column="20">U8G_COM_MSG_WRITE_BYTE</name></expr></argument>, <argument><expr><name><name PREFIX:line="81" PREFIX:column="44">map</name><index PREFIX:line="81" PREFIX:column="47">[<expr><name PREFIX:line="81" PREFIX:column="48">bb</name></expr>]</index></name></expr></argument>, <argument><expr><name PREFIX:line="81" PREFIX:column="53">NULL</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+  <return PREFIX:line="82" PREFIX:column="3">return <expr><call><name><name PREFIX:line="82" PREFIX:column="10">dev</name>-&gt;<name PREFIX:line="82" PREFIX:column="15">com_fn</name></name><argument_list PREFIX:line="82" PREFIX:column="21">(<argument><expr><name PREFIX:line="82" PREFIX:column="22">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="82" PREFIX:column="27">U8G_COM_MSG_WRITE_BYTE</name></expr></argument>, <argument><expr><name><name PREFIX:line="82" PREFIX:column="51">map</name><index PREFIX:line="82" PREFIX:column="54">[<expr><name PREFIX:line="82" PREFIX:column="55">b</name></expr>]</index></name></expr></argument>, <argument><expr><name PREFIX:line="82" PREFIX:column="59">NULL</name></expr></argument>)</argument_list></call></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="85" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="85" PREFIX:column="9">u8g_WriteSequence4LTo16GrDevice</name><parameter_list PREFIX:line="85" PREFIX:column="40">(<param><decl><type><name PREFIX:line="85" PREFIX:column="41">u8g_t</name> *</type><name PREFIX:line="85" PREFIX:column="48">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="53">u8g_dev_t</name> *</type><name PREFIX:line="85" PREFIX:column="64">dev</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="69">uint8_t</name></type> <name PREFIX:line="85" PREFIX:column="77">cnt</name></decl></param>, <param><decl><type><name PREFIX:line="85" PREFIX:column="82">uint8_t</name> *</type><name PREFIX:line="85" PREFIX:column="91">ptr</name></decl></param>)</parameter_list>
+<block PREFIX:line="86" PREFIX:column="1">{
+  <do PREFIX:line="87" PREFIX:column="3">do
+  <block PREFIX:line="88" PREFIX:column="3">{
+    <if PREFIX:line="89" PREFIX:column="5">if <condition PREFIX:line="89" PREFIX:column="8">( <expr><call><name PREFIX:line="89" PREFIX:column="10">u8g_WriteByte4LTo16GrDevice</name><argument_list PREFIX:line="89" PREFIX:column="37">(<argument><expr><name PREFIX:line="89" PREFIX:column="38">u8g</name></expr></argument>, <argument><expr><name PREFIX:line="89" PREFIX:column="43">dev</name></expr></argument>, <argument><expr PREFIX:line="89" PREFIX:column="48">*<name PREFIX:line="89" PREFIX:column="49">ptr</name>++</expr></argument>)</argument_list></call> == 0</expr> )</condition><then PREFIX:line="89" PREFIX:column="62">
+      <return PREFIX:line="90" PREFIX:column="7">return <expr PREFIX:line="90" PREFIX:column="14">0</expr>;</return></then></if>
+    <expr_stmt><expr><name PREFIX:line="91" PREFIX:column="5">cnt</name>--</expr>;</expr_stmt>
+  }</block> while<condition PREFIX:line="92" PREFIX:column="10">( <expr><name PREFIX:line="92" PREFIX:column="12">cnt</name> != 0</expr> )</condition>;</do>
+  <return PREFIX:line="93" PREFIX:column="3">return <expr PREFIX:line="93" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+</unit>

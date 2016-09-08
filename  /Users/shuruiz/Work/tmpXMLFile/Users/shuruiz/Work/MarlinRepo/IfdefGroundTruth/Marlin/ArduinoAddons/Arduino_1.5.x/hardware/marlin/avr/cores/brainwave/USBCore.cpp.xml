@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C++" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/cores/brainwave/USBCore.cpp" PREFIX:tabs="8" PREFIX:line="1" PREFIX:column="1">
+
+<comment type="block" PREFIX:line="3" PREFIX:column="1">/* Copyright (c) 2010, Peter Barrett  
+**  
+** Permission to use, copy, modify, and/or distribute this software for  
+** any purpose with or without fee is hereby granted, provided that the  
+** above copyright notice and this permission notice appear in all copies.  
+** 
+** THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL  
+** WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED  
+** WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR  
+** BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES  
+** OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
+** WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,  
+** ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS  
+** SOFTWARE.  
+*/</comment>
+
+<cpp:include PREFIX:line="19" PREFIX:column="1">#<cpp:directive PREFIX:line="19" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="19" PREFIX:column="10">"Platform.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="20" PREFIX:column="1">#<cpp:directive PREFIX:line="20" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="20" PREFIX:column="10">"USBAPI.h"</cpp:file></cpp:include>
+<cpp:include PREFIX:line="21" PREFIX:column="1">#<cpp:directive PREFIX:line="21" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="21" PREFIX:column="10">"USBDesc.h"</cpp:file></cpp:include>
+
+<cpp:if PREFIX:line="23" PREFIX:column="1">#<cpp:directive PREFIX:line="23" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="23" PREFIX:column="5">defined</name><argument_list PREFIX:line="23" PREFIX:column="12">(<argument><expr><name PREFIX:line="23" PREFIX:column="13">USBCON</name></expr></argument>)</argument_list></call></expr></cpp:if>
+
+<cpp:define PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="25" PREFIX:column="9">EP_TYPE_CONTROL</name></cpp:macro>				<cpp:value PREFIX:line="25" PREFIX:column="49">0x00</cpp:value></cpp:define>
+<cpp:define PREFIX:line="26" PREFIX:column="1">#<cpp:directive PREFIX:line="26" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="26" PREFIX:column="9">EP_TYPE_BULK_IN</name></cpp:macro>				<cpp:value PREFIX:line="26" PREFIX:column="49">0x81</cpp:value></cpp:define>
+<cpp:define PREFIX:line="27" PREFIX:column="1">#<cpp:directive PREFIX:line="27" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="27" PREFIX:column="9">EP_TYPE_BULK_OUT</name></cpp:macro>			<cpp:value PREFIX:line="27" PREFIX:column="49">0x80</cpp:value></cpp:define>
+<cpp:define PREFIX:line="28" PREFIX:column="1">#<cpp:directive PREFIX:line="28" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="28" PREFIX:column="9">EP_TYPE_INTERRUPT_IN</name></cpp:macro>		<cpp:value PREFIX:line="28" PREFIX:column="41">0xC1</cpp:value></cpp:define>
+<cpp:define PREFIX:line="29" PREFIX:column="1">#<cpp:directive PREFIX:line="29" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="29" PREFIX:column="9">EP_TYPE_INTERRUPT_OUT</name></cpp:macro>		<cpp:value PREFIX:line="29" PREFIX:column="41">0xC0</cpp:value></cpp:define>
+<cpp:define PREFIX:line="30" PREFIX:column="1">#<cpp:directive PREFIX:line="30" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="30" PREFIX:column="9">EP_TYPE_ISOCHRONOUS_IN</name></cpp:macro>		<cpp:value PREFIX:line="30" PREFIX:column="41">0x41</cpp:value></cpp:define>
+<cpp:define PREFIX:line="31" PREFIX:column="1">#<cpp:directive PREFIX:line="31" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="31" PREFIX:column="9">EP_TYPE_ISOCHRONOUS_OUT</name></cpp:macro>		<cpp:value PREFIX:line="31" PREFIX:column="41">0x40</cpp:value></cpp:define>
+
+<comment type="block" format="doxygen" PREFIX:line="33" PREFIX:column="1">/** Pulse generation counters to keep track of the number of milliseconds remaining for each pulse type */</comment>
+<cpp:define PREFIX:line="34" PREFIX:column="1">#<cpp:directive PREFIX:line="34" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="34" PREFIX:column="9">TX_RX_LED_PULSE_MS</name></cpp:macro> <cpp:value PREFIX:line="34" PREFIX:column="28">100</cpp:value></cpp:define>
+<decl_stmt><decl><type><specifier PREFIX:line="35" PREFIX:column="1">volatile</specifier> <name PREFIX:line="35" PREFIX:column="10">u8</name></type> <name PREFIX:line="35" PREFIX:column="13">TxLEDPulse</name></decl>;</decl_stmt> <comment type="block" format="doxygen" PREFIX:line="35" PREFIX:column="25">/**&lt; Milliseconds remaining for data Tx LED pulse */</comment>
+<decl_stmt><decl><type><specifier PREFIX:line="36" PREFIX:column="1">volatile</specifier> <name PREFIX:line="36" PREFIX:column="10">u8</name></type> <name PREFIX:line="36" PREFIX:column="13">RxLEDPulse</name></decl>;</decl_stmt> <comment type="block" format="doxygen" PREFIX:line="36" PREFIX:column="25">/**&lt; Milliseconds remaining for data Rx LED pulse */</comment>
+
+<comment type="line" PREFIX:line="38" PREFIX:column="1">//==================================================================</comment>
+<comment type="line" PREFIX:line="39" PREFIX:column="1">//==================================================================</comment>
+
+  <decl_stmt><decl><type><name PREFIX:line="41" PREFIX:column="3">u16</name> <name PREFIX:line="41" PREFIX:column="7">STRING_LANGUAGE</name><index PREFIX:line="41" PREFIX:column="22">[]</index></type> <name PREFIX:line="41" PREFIX:column="25">PROGMEM</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="42" PREFIX:column="3">u16</name> <name PREFIX:line="42" PREFIX:column="7">STRING_IPRODUCT</name><index PREFIX:line="42" PREFIX:column="22">[]</index></type> <name PREFIX:line="42" PREFIX:column="25">PROGMEM</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="43" PREFIX:column="3">u16</name> <name PREFIX:line="43" PREFIX:column="7">STRING_IMANUFACTURER</name><index PREFIX:line="43" PREFIX:column="27">[]</index></type> <name PREFIX:line="43" PREFIX:column="30">PROGMEM</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="44" PREFIX:column="3">DeviceDescriptor</name> <name PREFIX:line="44" PREFIX:column="20">USB_DeviceDescriptor</name></type> <name PREFIX:line="44" PREFIX:column="41">PROGMEM</name></decl>;</decl_stmt>
+  <decl_stmt><decl><type><name PREFIX:line="45" PREFIX:column="3">DeviceDescriptor</name> <name PREFIX:line="45" PREFIX:column="20">USB_DeviceDescriptorA</name></type> <name PREFIX:line="45" PREFIX:column="42">PROGMEM</name></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="47" PREFIX:column="2">u16</name></type> <name><name PREFIX:line="47" PREFIX:column="6">STRING_LANGUAGE</name><index PREFIX:line="47" PREFIX:column="21">[<expr PREFIX:line="47" PREFIX:column="22">2</expr>]</index></name> <init PREFIX:line="47" PREFIX:column="25">= <expr><block PREFIX:line="47" PREFIX:column="27">{
+	<expr PREFIX:line="48" PREFIX:column="9">(3&lt;&lt;8) | (2+2)</expr>,
+	<expr PREFIX:line="49" PREFIX:column="9">0x0409</expr>	<comment type="line" PREFIX:line="49" PREFIX:column="17">// English</comment>
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="52" PREFIX:column="2">u16</name></type> <name><name PREFIX:line="52" PREFIX:column="6">STRING_IPRODUCT</name><index PREFIX:line="52" PREFIX:column="21">[<expr PREFIX:line="52" PREFIX:column="22">17</expr>]</index></name> <init PREFIX:line="52" PREFIX:column="26">= <expr><block PREFIX:line="52" PREFIX:column="28">{
+	<expr PREFIX:line="53" PREFIX:column="9">(3&lt;&lt;8) | (2+2*16)</expr>,
+	<expr PREFIX:line="54" PREFIX:column="9">'B'</expr>,<expr PREFIX:line="54" PREFIX:column="13">'r'</expr>,<expr PREFIX:line="54" PREFIX:column="17">'a'</expr>,<expr PREFIX:line="54" PREFIX:column="21">'i'</expr>,<expr PREFIX:line="54" PREFIX:column="25">'n'</expr>,<expr PREFIX:line="54" PREFIX:column="29">'w'</expr>,<expr PREFIX:line="54" PREFIX:column="33">'a'</expr>,<expr PREFIX:line="54" PREFIX:column="37">'v'</expr>,<expr PREFIX:line="54" PREFIX:column="41">'e'</expr>,<expr PREFIX:line="54" PREFIX:column="45">' '</expr>,<expr PREFIX:line="54" PREFIX:column="49">' '</expr>,<expr PREFIX:line="54" PREFIX:column="53">' '</expr>,<expr PREFIX:line="54" PREFIX:column="57">' '</expr>,<expr PREFIX:line="54" PREFIX:column="61">' '</expr>,<expr PREFIX:line="54" PREFIX:column="65">' '</expr>,<expr PREFIX:line="54" PREFIX:column="69">' '</expr>
+}</block></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="57" PREFIX:column="2">u16</name></type> <name><name PREFIX:line="57" PREFIX:column="6">STRING_IMANUFACTURER</name><index PREFIX:line="57" PREFIX:column="26">[<expr PREFIX:line="57" PREFIX:column="27">12</expr>]</index></name> <init PREFIX:line="57" PREFIX:column="31">= <expr><block PREFIX:line="57" PREFIX:column="33">{
+	<expr PREFIX:line="58" PREFIX:column="9">(3&lt;&lt;8) | (2+2*11)</expr>,
+	<expr PREFIX:line="59" PREFIX:column="9">'M'</expr>,<expr PREFIX:line="59" PREFIX:column="13">'e'</expr>,<expr PREFIX:line="59" PREFIX:column="17">'t'</expr>,<expr PREFIX:line="59" PREFIX:column="21">'r'</expr>,<expr PREFIX:line="59" PREFIX:column="25">'i'</expr>,<expr PREFIX:line="59" PREFIX:column="29">'x'</expr>,<expr PREFIX:line="59" PREFIX:column="33">' '</expr>,<expr PREFIX:line="59" PREFIX:column="37">' '</expr>,<expr PREFIX:line="59" PREFIX:column="41">' '</expr>,<expr PREFIX:line="59" PREFIX:column="45">' '</expr>,<expr PREFIX:line="59" PREFIX:column="49">' '</expr>
+}</block></expr></init></decl>;</decl_stmt>
+
+<cpp:ifdef PREFIX:line="62" PREFIX:column="1">#<cpp:directive PREFIX:line="62" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="62" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+<cpp:define PREFIX:line="63" PREFIX:column="1">#<cpp:directive PREFIX:line="63" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="63" PREFIX:column="9">DEVICE_CLASS</name></cpp:macro> <cpp:value PREFIX:line="63" PREFIX:column="22">0x02</cpp:value></cpp:define>
+<cpp:else PREFIX:line="64" PREFIX:column="1">#<cpp:directive PREFIX:line="64" PREFIX:column="2">else</cpp:directive></cpp:else>
+<cpp:define PREFIX:line="65" PREFIX:column="1">#<cpp:directive PREFIX:line="65" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="65" PREFIX:column="9">DEVICE_CLASS</name></cpp:macro> <cpp:value PREFIX:line="65" PREFIX:column="22">0x00</cpp:value></cpp:define>
+<cpp:endif PREFIX:line="66" PREFIX:column="1">#<cpp:directive PREFIX:line="66" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<comment type="line" PREFIX:line="68" PREFIX:column="1">//	DEVICE DESCRIPTOR</comment>
+ <decl_stmt><decl><type><name PREFIX:line="69" PREFIX:column="2">DeviceDescriptor</name></type> <name PREFIX:line="69" PREFIX:column="19">USB_DeviceDescriptor</name> <init PREFIX:line="69" PREFIX:column="40">=
+	<expr><call><name PREFIX:line="70" PREFIX:column="9">D_DEVICE</name><argument_list PREFIX:line="70" PREFIX:column="17">(<argument><expr PREFIX:line="70" PREFIX:column="18">0x00</expr></argument>,<argument><expr PREFIX:line="70" PREFIX:column="23">0x00</expr></argument>,<argument><expr PREFIX:line="70" PREFIX:column="28">0x00</expr></argument>,<argument><expr PREFIX:line="70" PREFIX:column="33">64</expr></argument>,<argument><expr><name PREFIX:line="70" PREFIX:column="36">USB_VID</name></expr></argument>,<argument><expr><name PREFIX:line="70" PREFIX:column="44">USB_PID</name></expr></argument>,<argument><expr PREFIX:line="70" PREFIX:column="52">0x100</expr></argument>,<argument><expr><name PREFIX:line="70" PREFIX:column="58">IMANUFACTURER</name></expr></argument>,<argument><expr><name PREFIX:line="70" PREFIX:column="72">IPRODUCT</name></expr></argument>,<argument><expr PREFIX:line="70" PREFIX:column="81">0</expr></argument>,<argument><expr PREFIX:line="70" PREFIX:column="83">1</expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+
+ <decl_stmt><decl><type><name PREFIX:line="72" PREFIX:column="2">DeviceDescriptor</name></type> <name PREFIX:line="72" PREFIX:column="19">USB_DeviceDescriptorA</name> <init PREFIX:line="72" PREFIX:column="41">=
+	<expr><call><name PREFIX:line="73" PREFIX:column="9">D_DEVICE</name><argument_list PREFIX:line="73" PREFIX:column="17">(<argument><expr><name PREFIX:line="73" PREFIX:column="18">DEVICE_CLASS</name></expr></argument>,<argument><expr PREFIX:line="73" PREFIX:column="31">0x00</expr></argument>,<argument><expr PREFIX:line="73" PREFIX:column="36">0x00</expr></argument>,<argument><expr PREFIX:line="73" PREFIX:column="41">64</expr></argument>,<argument><expr><name PREFIX:line="73" PREFIX:column="44">USB_VID</name></expr></argument>,<argument><expr><name PREFIX:line="73" PREFIX:column="52">USB_PID</name></expr></argument>,<argument><expr PREFIX:line="73" PREFIX:column="60">0x100</expr></argument>,<argument><expr><name PREFIX:line="73" PREFIX:column="66">IMANUFACTURER</name></expr></argument>,<argument><expr><name PREFIX:line="73" PREFIX:column="80">IPRODUCT</name></expr></argument>,<argument><expr PREFIX:line="73" PREFIX:column="89">0</expr></argument>,<argument><expr PREFIX:line="73" PREFIX:column="91">1</expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+
+<comment type="line" PREFIX:line="75" PREFIX:column="1">//==================================================================</comment>
+<comment type="line" PREFIX:line="76" PREFIX:column="1">//==================================================================</comment>
+
+<decl_stmt><decl><type><specifier PREFIX:line="78" PREFIX:column="1">volatile</specifier> <name PREFIX:line="78" PREFIX:column="10">u8</name></type> <name PREFIX:line="78" PREFIX:column="13">_usbConfiguration</name> <init PREFIX:line="78" PREFIX:column="31">= <expr PREFIX:line="78" PREFIX:column="33">0</expr></init></decl>;</decl_stmt>
+
+<function><type><specifier PREFIX:line="80" PREFIX:column="1">static</specifier> <specifier PREFIX:line="80" PREFIX:column="8">inline</specifier> <name PREFIX:line="80" PREFIX:column="15">void</name></type> <name PREFIX:line="80" PREFIX:column="20">WaitIN</name><parameter_list PREFIX:line="80" PREFIX:column="26">(<param><decl><type><name PREFIX:line="80" PREFIX:column="27">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="81" PREFIX:column="1">{
+	<while PREFIX:line="82" PREFIX:column="9">while <condition PREFIX:line="82" PREFIX:column="15">(<expr PREFIX:line="82" PREFIX:column="16">!(<name PREFIX:line="82" PREFIX:column="18">UEINTX</name> &amp; (1&lt;&lt;<name PREFIX:line="82" PREFIX:column="31">TXINI</name>))</expr>)</condition><empty_stmt PREFIX:line="82" PREFIX:column="39">;</empty_stmt></while>
+}</block></function>
+
+<function><type><specifier PREFIX:line="85" PREFIX:column="1">static</specifier> <specifier PREFIX:line="85" PREFIX:column="8">inline</specifier> <name PREFIX:line="85" PREFIX:column="15">void</name></type> <name PREFIX:line="85" PREFIX:column="20">ClearIN</name><parameter_list PREFIX:line="85" PREFIX:column="27">(<param><decl><type><name PREFIX:line="85" PREFIX:column="28">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="86" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="87" PREFIX:column="9">UEINTX</name> = ~(1&lt;&lt;<name PREFIX:line="87" PREFIX:column="23">TXINI</name>)</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="90" PREFIX:column="1">static</specifier> <specifier PREFIX:line="90" PREFIX:column="8">inline</specifier> <name PREFIX:line="90" PREFIX:column="15">void</name></type> <name PREFIX:line="90" PREFIX:column="20">WaitOUT</name><parameter_list PREFIX:line="90" PREFIX:column="27">(<param><decl><type><name PREFIX:line="90" PREFIX:column="28">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="91" PREFIX:column="1">{
+	<while PREFIX:line="92" PREFIX:column="9">while <condition PREFIX:line="92" PREFIX:column="15">(<expr PREFIX:line="92" PREFIX:column="16">!(<name PREFIX:line="92" PREFIX:column="18">UEINTX</name> &amp; (1&lt;&lt;<name PREFIX:line="92" PREFIX:column="31">RXOUTI</name>))</expr>)</condition>
+		<empty_stmt PREFIX:line="93" PREFIX:column="17">;</empty_stmt></while>
+}</block></function>
+
+<function><type><specifier PREFIX:line="96" PREFIX:column="1">static</specifier> <specifier PREFIX:line="96" PREFIX:column="8">inline</specifier> <name PREFIX:line="96" PREFIX:column="15">u8</name></type> <name PREFIX:line="96" PREFIX:column="18">WaitForINOrOUT</name><parameter_list PREFIX:line="96" PREFIX:column="32">()</parameter_list>
+<block PREFIX:line="97" PREFIX:column="1">{
+	<while PREFIX:line="98" PREFIX:column="9">while <condition PREFIX:line="98" PREFIX:column="15">(<expr PREFIX:line="98" PREFIX:column="16">!(<name PREFIX:line="98" PREFIX:column="18">UEINTX</name> &amp; ((1&lt;&lt;<name PREFIX:line="98" PREFIX:column="32">TXINI</name>)|(1&lt;&lt;<name PREFIX:line="98" PREFIX:column="43">RXOUTI</name>)))</expr>)</condition>
+		<empty_stmt PREFIX:line="99" PREFIX:column="17">;</empty_stmt></while>
+	<return PREFIX:line="100" PREFIX:column="9">return <expr PREFIX:line="100" PREFIX:column="16">(<name PREFIX:line="100" PREFIX:column="17">UEINTX</name> &amp; (1&lt;&lt;<name PREFIX:line="100" PREFIX:column="30">RXOUTI</name>)) == 0</expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="103" PREFIX:column="1">static</specifier> <specifier PREFIX:line="103" PREFIX:column="8">inline</specifier> <name PREFIX:line="103" PREFIX:column="15">void</name></type> <name PREFIX:line="103" PREFIX:column="20">ClearOUT</name><parameter_list PREFIX:line="103" PREFIX:column="28">(<param><decl><type><name PREFIX:line="103" PREFIX:column="29">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="104" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="105" PREFIX:column="9">UEINTX</name> = ~(1&lt;&lt;<name PREFIX:line="105" PREFIX:column="23">RXOUTI</name>)</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="108" PREFIX:column="1">void</name></type> <name PREFIX:line="108" PREFIX:column="6">Recv</name><parameter_list PREFIX:line="108" PREFIX:column="10">(<param><decl><type><specifier PREFIX:line="108" PREFIX:column="11">volatile</specifier> <name PREFIX:line="108" PREFIX:column="20">u8</name>*</type> <name PREFIX:line="108" PREFIX:column="24">data</name></decl></param>, <param><decl><type><name PREFIX:line="108" PREFIX:column="30">u8</name></type> <name PREFIX:line="108" PREFIX:column="33">count</name></decl></param>)</parameter_list>
+<block PREFIX:line="109" PREFIX:column="1">{
+	<while PREFIX:line="110" PREFIX:column="9">while <condition PREFIX:line="110" PREFIX:column="15">(<expr><name PREFIX:line="110" PREFIX:column="16">count</name>--</expr>)</condition>
+		<expr_stmt><expr PREFIX:line="111" PREFIX:column="17">*<name PREFIX:line="111" PREFIX:column="18">data</name>++ = <name PREFIX:line="111" PREFIX:column="27">UEDATX</name></expr>;</expr_stmt></while>
+	
+	<expr_stmt><expr><name PREFIX:line="113" PREFIX:column="9">RXLED1</name></expr>;</expr_stmt>					<comment type="line" PREFIX:line="113" PREFIX:column="49">// light the RX LED</comment>
+	<expr_stmt><expr><name PREFIX:line="114" PREFIX:column="9">RxLEDPulse</name> = <name PREFIX:line="114" PREFIX:column="22">TX_RX_LED_PULSE_MS</name></expr>;</expr_stmt>	
+}</block></function>
+
+<function><type><specifier PREFIX:line="117" PREFIX:column="1">static</specifier> <specifier PREFIX:line="117" PREFIX:column="8">inline</specifier> <name PREFIX:line="117" PREFIX:column="15">u8</name></type> <name PREFIX:line="117" PREFIX:column="18">Recv8</name><parameter_list PREFIX:line="117" PREFIX:column="23">()</parameter_list>
+<block PREFIX:line="118" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="119" PREFIX:column="9">RXLED1</name></expr>;</expr_stmt>					<comment type="line" PREFIX:line="119" PREFIX:column="49">// light the RX LED</comment>
+	<expr_stmt><expr><name PREFIX:line="120" PREFIX:column="9">RxLEDPulse</name> = <name PREFIX:line="120" PREFIX:column="22">TX_RX_LED_PULSE_MS</name></expr>;</expr_stmt>
+
+	<return PREFIX:line="122" PREFIX:column="9">return <expr><name PREFIX:line="122" PREFIX:column="16">UEDATX</name></expr>;</return>	
+}</block></function>
+
+<function><type><specifier PREFIX:line="125" PREFIX:column="1">static</specifier> <specifier PREFIX:line="125" PREFIX:column="8">inline</specifier> <name PREFIX:line="125" PREFIX:column="15">void</name></type> <name PREFIX:line="125" PREFIX:column="20">Send8</name><parameter_list PREFIX:line="125" PREFIX:column="25">(<param><decl><type><name PREFIX:line="125" PREFIX:column="26">u8</name></type> <name PREFIX:line="125" PREFIX:column="29">d</name></decl></param>)</parameter_list>
+<block PREFIX:line="126" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="127" PREFIX:column="9">UEDATX</name> = <name PREFIX:line="127" PREFIX:column="18">d</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="130" PREFIX:column="1">static</specifier> <specifier PREFIX:line="130" PREFIX:column="8">inline</specifier> <name PREFIX:line="130" PREFIX:column="15">void</name></type> <name PREFIX:line="130" PREFIX:column="20">SetEP</name><parameter_list PREFIX:line="130" PREFIX:column="25">(<param><decl><type><name PREFIX:line="130" PREFIX:column="26">u8</name></type> <name PREFIX:line="130" PREFIX:column="29">ep</name></decl></param>)</parameter_list>
+<block PREFIX:line="131" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="132" PREFIX:column="9">UENUM</name> = <name PREFIX:line="132" PREFIX:column="17">ep</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="135" PREFIX:column="1">static</specifier> <specifier PREFIX:line="135" PREFIX:column="8">inline</specifier> <name PREFIX:line="135" PREFIX:column="15">u8</name></type> <name PREFIX:line="135" PREFIX:column="18">FifoByteCount</name><parameter_list PREFIX:line="135" PREFIX:column="31">()</parameter_list>
+<block PREFIX:line="136" PREFIX:column="1">{
+	<return PREFIX:line="137" PREFIX:column="9">return <expr><name PREFIX:line="137" PREFIX:column="16">UEBCLX</name></expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="140" PREFIX:column="1">static</specifier> <specifier PREFIX:line="140" PREFIX:column="8">inline</specifier> <name PREFIX:line="140" PREFIX:column="15">u8</name></type> <name PREFIX:line="140" PREFIX:column="18">ReceivedSetupInt</name><parameter_list PREFIX:line="140" PREFIX:column="34">()</parameter_list>
+<block PREFIX:line="141" PREFIX:column="1">{
+	<return PREFIX:line="142" PREFIX:column="9">return <expr><name PREFIX:line="142" PREFIX:column="16">UEINTX</name> &amp; (1&lt;&lt;<name PREFIX:line="142" PREFIX:column="29">RXSTPI</name>)</expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="145" PREFIX:column="1">static</specifier> <specifier PREFIX:line="145" PREFIX:column="8">inline</specifier> <name PREFIX:line="145" PREFIX:column="15">void</name></type> <name PREFIX:line="145" PREFIX:column="20">ClearSetupInt</name><parameter_list PREFIX:line="145" PREFIX:column="33">()</parameter_list>
+<block PREFIX:line="146" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="147" PREFIX:column="9">UEINTX</name> = ~((1&lt;&lt;<name PREFIX:line="147" PREFIX:column="24">RXSTPI</name>) | (1&lt;&lt;<name PREFIX:line="147" PREFIX:column="38">RXOUTI</name>) | (1&lt;&lt;<name PREFIX:line="147" PREFIX:column="52">TXINI</name>))</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="150" PREFIX:column="1">static</specifier> <specifier PREFIX:line="150" PREFIX:column="8">inline</specifier> <name PREFIX:line="150" PREFIX:column="15">void</name></type> <name PREFIX:line="150" PREFIX:column="20">Stall</name><parameter_list PREFIX:line="150" PREFIX:column="25">()</parameter_list>
+<block PREFIX:line="151" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="152" PREFIX:column="9">UECONX</name> = (1&lt;&lt;<name PREFIX:line="152" PREFIX:column="22">STALLRQ</name>) | (1&lt;&lt;<name PREFIX:line="152" PREFIX:column="37">EPEN</name>)</expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="155" PREFIX:column="1">static</specifier> <specifier PREFIX:line="155" PREFIX:column="8">inline</specifier> <name PREFIX:line="155" PREFIX:column="15">u8</name></type> <name PREFIX:line="155" PREFIX:column="18">ReadWriteAllowed</name><parameter_list PREFIX:line="155" PREFIX:column="34">()</parameter_list>
+<block PREFIX:line="156" PREFIX:column="1">{
+	<return PREFIX:line="157" PREFIX:column="9">return <expr><name PREFIX:line="157" PREFIX:column="16">UEINTX</name> &amp; (1&lt;&lt;<name PREFIX:line="157" PREFIX:column="29">RWAL</name>)</expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="160" PREFIX:column="1">static</specifier> <specifier PREFIX:line="160" PREFIX:column="8">inline</specifier> <name PREFIX:line="160" PREFIX:column="15">u8</name></type> <name PREFIX:line="160" PREFIX:column="18">Stalled</name><parameter_list PREFIX:line="160" PREFIX:column="25">()</parameter_list>
+<block PREFIX:line="161" PREFIX:column="1">{
+	<return PREFIX:line="162" PREFIX:column="9">return <expr><name PREFIX:line="162" PREFIX:column="16">UEINTX</name> &amp; (1&lt;&lt;<name PREFIX:line="162" PREFIX:column="29">STALLEDI</name>)</expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="165" PREFIX:column="1">static</specifier> <specifier PREFIX:line="165" PREFIX:column="8">inline</specifier> <name PREFIX:line="165" PREFIX:column="15">u8</name></type> <name PREFIX:line="165" PREFIX:column="18">FifoFree</name><parameter_list PREFIX:line="165" PREFIX:column="26">()</parameter_list>
+<block PREFIX:line="166" PREFIX:column="1">{
+	<return PREFIX:line="167" PREFIX:column="9">return <expr><name PREFIX:line="167" PREFIX:column="16">UEINTX</name> &amp; (1&lt;&lt;<name PREFIX:line="167" PREFIX:column="29">FIFOCON</name>)</expr>;</return>
+}</block></function>
+
+<function><type><specifier PREFIX:line="170" PREFIX:column="1">static</specifier> <specifier PREFIX:line="170" PREFIX:column="8">inline</specifier> <name PREFIX:line="170" PREFIX:column="15">void</name></type> <name PREFIX:line="170" PREFIX:column="20">ReleaseRX</name><parameter_list PREFIX:line="170" PREFIX:column="29">()</parameter_list>
+<block PREFIX:line="171" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="172" PREFIX:column="9">UEINTX</name> = 0x6B</expr>;</expr_stmt>	<comment type="line" PREFIX:line="172" PREFIX:column="25">// FIFOCON=0 NAKINI=1 RWAL=1 NAKOUTI=0 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=1</comment>
+}</block></function>
+
+<function><type><specifier PREFIX:line="175" PREFIX:column="1">static</specifier> <specifier PREFIX:line="175" PREFIX:column="8">inline</specifier> <name PREFIX:line="175" PREFIX:column="15">void</name></type> <name PREFIX:line="175" PREFIX:column="20">ReleaseTX</name><parameter_list PREFIX:line="175" PREFIX:column="29">()</parameter_list>
+<block PREFIX:line="176" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="177" PREFIX:column="9">UEINTX</name> = 0x3A</expr>;</expr_stmt>	<comment type="line" PREFIX:line="177" PREFIX:column="25">// FIFOCON=0 NAKINI=0 RWAL=1 NAKOUTI=1 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=0</comment>
+}</block></function>
+
+<function><type><specifier PREFIX:line="180" PREFIX:column="1">static</specifier> <specifier PREFIX:line="180" PREFIX:column="8">inline</specifier> <name PREFIX:line="180" PREFIX:column="15">u8</name></type> <name PREFIX:line="180" PREFIX:column="18">FrameNumber</name><parameter_list PREFIX:line="180" PREFIX:column="29">()</parameter_list>
+<block PREFIX:line="181" PREFIX:column="1">{
+	<return PREFIX:line="182" PREFIX:column="9">return <expr><name PREFIX:line="182" PREFIX:column="16">UDFNUML</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="185" PREFIX:column="1">//==================================================================</comment>
+<comment type="line" PREFIX:line="186" PREFIX:column="1">//==================================================================</comment>
+
+<function><type><name PREFIX:line="188" PREFIX:column="1">u8</name></type> <name PREFIX:line="188" PREFIX:column="4">USBGetConfiguration</name><parameter_list PREFIX:line="188" PREFIX:column="23">(<param><decl><type><name PREFIX:line="188" PREFIX:column="24">void</name></type></decl></param>)</parameter_list>
+<block PREFIX:line="189" PREFIX:column="1">{
+	<return PREFIX:line="190" PREFIX:column="9">return <expr><name PREFIX:line="190" PREFIX:column="16">_usbConfiguration</name></expr>;</return>
+}</block></function>
+
+<cpp:define PREFIX:line="193" PREFIX:column="1">#<cpp:directive PREFIX:line="193" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="193" PREFIX:column="9">USB_RECV_TIMEOUT</name></cpp:macro></cpp:define>
+<class PREFIX:line="194" PREFIX:column="1">class <name PREFIX:line="194" PREFIX:column="7">LockEP</name>
+<block PREFIX:line="195" PREFIX:column="1">{<private type="default" PREFIX:line="195" PREFIX:column="2">
+	<decl_stmt><decl><type><name PREFIX:line="196" PREFIX:column="9">u8</name></type> <name PREFIX:line="196" PREFIX:column="12">_sreg</name></decl>;</decl_stmt>
+</private><public PREFIX:line="197" PREFIX:column="1">public:
+	<constructor><name PREFIX:line="198" PREFIX:column="9">LockEP</name><parameter_list PREFIX:line="198" PREFIX:column="15">(<param><decl><type><name PREFIX:line="198" PREFIX:column="16">u8</name></type> <name PREFIX:line="198" PREFIX:column="19">ep</name></decl></param>)</parameter_list> <member_list PREFIX:line="198" PREFIX:column="23">: <call><name PREFIX:line="198" PREFIX:column="25">_sreg</name><argument_list PREFIX:line="198" PREFIX:column="30">(<argument><expr><name PREFIX:line="198" PREFIX:column="31">SREG</name></expr></argument>)</argument_list></call>
+	</member_list><block PREFIX:line="199" PREFIX:column="9">{
+		<expr_stmt><expr><call><name PREFIX:line="200" PREFIX:column="17">cli</name><argument_list PREFIX:line="200" PREFIX:column="20">()</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="201" PREFIX:column="17">SetEP</name><argument_list PREFIX:line="201" PREFIX:column="22">(<argument><expr><name PREFIX:line="201" PREFIX:column="23">ep</name> &amp; 7</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	}</block></constructor>
+	<destructor><name PREFIX:line="203" PREFIX:column="9">~<name PREFIX:line="203" PREFIX:column="10">LockEP</name></name><parameter_list PREFIX:line="203" PREFIX:column="16">()</parameter_list>
+	<block PREFIX:line="204" PREFIX:column="9">{
+		<expr_stmt><expr><name PREFIX:line="205" PREFIX:column="17">SREG</name> = <name PREFIX:line="205" PREFIX:column="24">_sreg</name></expr>;</expr_stmt>
+	}</block></destructor>
+</public>}</block>;</class>
+
+<comment type="line" PREFIX:line="209" PREFIX:column="1">//	Number of bytes, assumes a rx endpoint</comment>
+<function><type><name PREFIX:line="210" PREFIX:column="1">u8</name></type> <name PREFIX:line="210" PREFIX:column="4">USB_Available</name><parameter_list PREFIX:line="210" PREFIX:column="17">(<param><decl><type><name PREFIX:line="210" PREFIX:column="18">u8</name></type> <name PREFIX:line="210" PREFIX:column="21">ep</name></decl></param>)</parameter_list>
+<block PREFIX:line="211" PREFIX:column="1">{
+	<function_decl><type><name PREFIX:line="212" PREFIX:column="9">LockEP</name></type> <name PREFIX:line="212" PREFIX:column="16">lock</name><parameter_list PREFIX:line="212" PREFIX:column="20">(<param><decl><type><name PREFIX:line="212" PREFIX:column="21">ep</name></type></decl></param>)</parameter_list>;</function_decl>
+	<return PREFIX:line="213" PREFIX:column="9">return <expr><call><name PREFIX:line="213" PREFIX:column="16">FifoByteCount</name><argument_list PREFIX:line="213" PREFIX:column="29">()</argument_list></call></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="216" PREFIX:column="1">//	Non Blocking receive</comment>
+<comment type="line" PREFIX:line="217" PREFIX:column="1">//	Return number of bytes read</comment>
+<function><type><name PREFIX:line="218" PREFIX:column="1">int</name></type> <name PREFIX:line="218" PREFIX:column="5">USB_Recv</name><parameter_list PREFIX:line="218" PREFIX:column="13">(<param><decl><type><name PREFIX:line="218" PREFIX:column="14">u8</name></type> <name PREFIX:line="218" PREFIX:column="17">ep</name></decl></param>, <param><decl><type><name PREFIX:line="218" PREFIX:column="21">void</name>*</type> <name PREFIX:line="218" PREFIX:column="27">d</name></decl></param>, <param><decl><type><name PREFIX:line="218" PREFIX:column="30">int</name></type> <name PREFIX:line="218" PREFIX:column="34">len</name></decl></param>)</parameter_list>
+<block PREFIX:line="219" PREFIX:column="1">{
+	<if PREFIX:line="220" PREFIX:column="9">if <condition PREFIX:line="220" PREFIX:column="12">(<expr PREFIX:line="220" PREFIX:column="13">!<name PREFIX:line="220" PREFIX:column="14">_usbConfiguration</name> || <name PREFIX:line="220" PREFIX:column="35">len</name> &lt; 0</expr>)</condition><then PREFIX:line="220" PREFIX:column="43">
+		<return PREFIX:line="221" PREFIX:column="17">return <expr PREFIX:line="221" PREFIX:column="24">-1</expr>;</return></then></if>
+	
+	<function_decl><type><name PREFIX:line="223" PREFIX:column="9">LockEP</name></type> <name PREFIX:line="223" PREFIX:column="16">lock</name><parameter_list PREFIX:line="223" PREFIX:column="20">(<param><decl><type><name PREFIX:line="223" PREFIX:column="21">ep</name></type></decl></param>)</parameter_list>;</function_decl>
+	<decl_stmt><decl><type><name PREFIX:line="224" PREFIX:column="9">u8</name></type> <name PREFIX:line="224" PREFIX:column="12">n</name> <init PREFIX:line="224" PREFIX:column="14">= <expr><call><name PREFIX:line="224" PREFIX:column="16">FifoByteCount</name><argument_list PREFIX:line="224" PREFIX:column="29">()</argument_list></call></expr></init></decl>;</decl_stmt>
+	<expr_stmt><expr><name PREFIX:line="225" PREFIX:column="9">len</name> = <call><name PREFIX:line="225" PREFIX:column="15">min</name><argument_list PREFIX:line="225" PREFIX:column="18">(<argument><expr><name PREFIX:line="225" PREFIX:column="19">n</name></expr></argument>,<argument><expr><name PREFIX:line="225" PREFIX:column="21">len</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="226" PREFIX:column="9">n</name> = <name PREFIX:line="226" PREFIX:column="13">len</name></expr>;</expr_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="227" PREFIX:column="9">u8</name>*</type> <name PREFIX:line="227" PREFIX:column="13">dst</name> <init PREFIX:line="227" PREFIX:column="17">= <expr PREFIX:line="227" PREFIX:column="19">(<name PREFIX:line="227" PREFIX:column="20">u8</name>*)<name PREFIX:line="227" PREFIX:column="24">d</name></expr></init></decl>;</decl_stmt>
+	<while PREFIX:line="228" PREFIX:column="9">while <condition PREFIX:line="228" PREFIX:column="15">(<expr><name PREFIX:line="228" PREFIX:column="16">n</name>--</expr>)</condition>
+		<expr_stmt><expr PREFIX:line="229" PREFIX:column="17">*<name PREFIX:line="229" PREFIX:column="18">dst</name>++ = <call><name PREFIX:line="229" PREFIX:column="26">Recv8</name><argument_list PREFIX:line="229" PREFIX:column="31">()</argument_list></call></expr>;</expr_stmt></while>
+	<if PREFIX:line="230" PREFIX:column="9">if <condition PREFIX:line="230" PREFIX:column="12">(<expr><name PREFIX:line="230" PREFIX:column="13">len</name> &amp;&amp; !<call><name PREFIX:line="230" PREFIX:column="21">FifoByteCount</name><argument_list PREFIX:line="230" PREFIX:column="34">()</argument_list></call></expr>)</condition><then PREFIX:line="230" PREFIX:column="37">	<comment type="line" PREFIX:line="230" PREFIX:column="41">// release empty buffer</comment>
+		<expr_stmt><expr><call><name PREFIX:line="231" PREFIX:column="17">ReleaseRX</name><argument_list PREFIX:line="231" PREFIX:column="26">()</argument_list></call></expr>;</expr_stmt></then></if>
+	
+	<return PREFIX:line="233" PREFIX:column="9">return <expr><name PREFIX:line="233" PREFIX:column="16">len</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="236" PREFIX:column="1">//	Recv 1 byte if ready</comment>
+<function><type><name PREFIX:line="237" PREFIX:column="1">int</name></type> <name PREFIX:line="237" PREFIX:column="5">USB_Recv</name><parameter_list PREFIX:line="237" PREFIX:column="13">(<param><decl><type><name PREFIX:line="237" PREFIX:column="14">u8</name></type> <name PREFIX:line="237" PREFIX:column="17">ep</name></decl></param>)</parameter_list>
+<block PREFIX:line="238" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="239" PREFIX:column="9">u8</name></type> <name PREFIX:line="239" PREFIX:column="12">c</name></decl>;</decl_stmt>
+	<if PREFIX:line="240" PREFIX:column="9">if <condition PREFIX:line="240" PREFIX:column="12">(<expr><call><name PREFIX:line="240" PREFIX:column="13">USB_Recv</name><argument_list PREFIX:line="240" PREFIX:column="21">(<argument><expr><name PREFIX:line="240" PREFIX:column="22">ep</name></expr></argument>,<argument><expr PREFIX:line="240" PREFIX:column="25">&amp;<name PREFIX:line="240" PREFIX:column="26">c</name></expr></argument>,<argument><expr PREFIX:line="240" PREFIX:column="28">1</expr></argument>)</argument_list></call> != 1</expr>)</condition><then PREFIX:line="240" PREFIX:column="36">
+		<return PREFIX:line="241" PREFIX:column="17">return <expr PREFIX:line="241" PREFIX:column="24">-1</expr>;</return></then></if>
+	<return PREFIX:line="242" PREFIX:column="9">return <expr><name PREFIX:line="242" PREFIX:column="16">c</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="245" PREFIX:column="1">//	Space in send EP</comment>
+<function><type><name PREFIX:line="246" PREFIX:column="1">u8</name></type> <name PREFIX:line="246" PREFIX:column="4">USB_SendSpace</name><parameter_list PREFIX:line="246" PREFIX:column="17">(<param><decl><type><name PREFIX:line="246" PREFIX:column="18">u8</name></type> <name PREFIX:line="246" PREFIX:column="21">ep</name></decl></param>)</parameter_list>
+<block PREFIX:line="247" PREFIX:column="1">{
+	<function_decl><type><name PREFIX:line="248" PREFIX:column="9">LockEP</name></type> <name PREFIX:line="248" PREFIX:column="16">lock</name><parameter_list PREFIX:line="248" PREFIX:column="20">(<param><decl><type><name PREFIX:line="248" PREFIX:column="21">ep</name></type></decl></param>)</parameter_list>;</function_decl>
+	<if PREFIX:line="249" PREFIX:column="9">if <condition PREFIX:line="249" PREFIX:column="12">(<expr PREFIX:line="249" PREFIX:column="13">!<call><name PREFIX:line="249" PREFIX:column="14">ReadWriteAllowed</name><argument_list PREFIX:line="249" PREFIX:column="30">()</argument_list></call></expr>)</condition><then PREFIX:line="249" PREFIX:column="33">
+		<return PREFIX:line="250" PREFIX:column="17">return <expr PREFIX:line="250" PREFIX:column="24">0</expr>;</return></then></if>
+	<return PREFIX:line="251" PREFIX:column="9">return <expr PREFIX:line="251" PREFIX:column="16">64 - <call><name PREFIX:line="251" PREFIX:column="21">FifoByteCount</name><argument_list PREFIX:line="251" PREFIX:column="34">()</argument_list></call></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="254" PREFIX:column="1">//	Blocking Send of data to an endpoint</comment>
+<function><type><name PREFIX:line="255" PREFIX:column="1">int</name></type> <name PREFIX:line="255" PREFIX:column="5">USB_Send</name><parameter_list PREFIX:line="255" PREFIX:column="13">(<param><decl><type><name PREFIX:line="255" PREFIX:column="14">u8</name></type> <name PREFIX:line="255" PREFIX:column="17">ep</name></decl></param>,  <param><decl><type><name PREFIX:line="255" PREFIX:column="22">void</name>*</type> <name PREFIX:line="255" PREFIX:column="28">d</name></decl></param>, <param><decl><type><name PREFIX:line="255" PREFIX:column="31">int</name></type> <name PREFIX:line="255" PREFIX:column="35">len</name></decl></param>)</parameter_list>
+<block PREFIX:line="256" PREFIX:column="1">{
+	<if PREFIX:line="257" PREFIX:column="9">if <condition PREFIX:line="257" PREFIX:column="12">(<expr PREFIX:line="257" PREFIX:column="13">!<name PREFIX:line="257" PREFIX:column="14">_usbConfiguration</name></expr>)</condition><then PREFIX:line="257" PREFIX:column="32">
+		<return PREFIX:line="258" PREFIX:column="17">return <expr PREFIX:line="258" PREFIX:column="24">-1</expr>;</return></then></if>
+
+	<decl_stmt><decl><type><name PREFIX:line="260" PREFIX:column="9">int</name></type> <name PREFIX:line="260" PREFIX:column="13">r</name> <init PREFIX:line="260" PREFIX:column="15">= <expr><name PREFIX:line="260" PREFIX:column="17">len</name></expr></init></decl>;</decl_stmt>
+	 <decl_stmt><decl><type><name PREFIX:line="261" PREFIX:column="10">u8</name>*</type> <name PREFIX:line="261" PREFIX:column="14">data</name> <init PREFIX:line="261" PREFIX:column="19">= <expr PREFIX:line="261" PREFIX:column="21">( <name PREFIX:line="261" PREFIX:column="23">u8</name>*)<name PREFIX:line="261" PREFIX:column="27">d</name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="262" PREFIX:column="9">u8</name></type> <name PREFIX:line="262" PREFIX:column="12">zero</name> <init PREFIX:line="262" PREFIX:column="17">= <expr><name PREFIX:line="262" PREFIX:column="19">ep</name> &amp; <name PREFIX:line="262" PREFIX:column="24">TRANSFER_ZERO</name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="263" PREFIX:column="9">u8</name></type> <name PREFIX:line="263" PREFIX:column="12">timeout</name> <init PREFIX:line="263" PREFIX:column="20">= <expr PREFIX:line="263" PREFIX:column="22">250</expr></init></decl>;</decl_stmt>		<comment type="line" PREFIX:line="263" PREFIX:column="41">// 250ms timeout on send? TODO</comment>
+	<while PREFIX:line="264" PREFIX:column="9">while <condition PREFIX:line="264" PREFIX:column="15">(<expr><name PREFIX:line="264" PREFIX:column="16">len</name></expr>)</condition>
+	<block PREFIX:line="265" PREFIX:column="9">{
+		<decl_stmt><decl><type><name PREFIX:line="266" PREFIX:column="17">u8</name></type> <name PREFIX:line="266" PREFIX:column="20">n</name> <init PREFIX:line="266" PREFIX:column="22">= <expr><call><name PREFIX:line="266" PREFIX:column="24">USB_SendSpace</name><argument_list PREFIX:line="266" PREFIX:column="37">(<argument><expr><name PREFIX:line="266" PREFIX:column="38">ep</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+		<if PREFIX:line="267" PREFIX:column="17">if <condition PREFIX:line="267" PREFIX:column="20">(<expr><name PREFIX:line="267" PREFIX:column="21">n</name> == 0</expr>)</condition><then PREFIX:line="267" PREFIX:column="28">
+		<block PREFIX:line="268" PREFIX:column="17">{
+			<if PREFIX:line="269" PREFIX:column="25">if <condition PREFIX:line="269" PREFIX:column="28">(<expr PREFIX:line="269" PREFIX:column="29">!(--<name PREFIX:line="269" PREFIX:column="33">timeout</name>)</expr>)</condition><then PREFIX:line="269" PREFIX:column="42">
+				<return PREFIX:line="270" PREFIX:column="33">return <expr PREFIX:line="270" PREFIX:column="40">-1</expr>;</return></then></if>
+			<expr_stmt><expr><call><name PREFIX:line="271" PREFIX:column="25">delay</name><argument_list PREFIX:line="271" PREFIX:column="30">(<argument><expr PREFIX:line="271" PREFIX:column="31">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+			<continue PREFIX:line="272" PREFIX:column="25">continue;</continue>
+		}</block></then></if>
+
+		<if PREFIX:line="275" PREFIX:column="17">if <condition PREFIX:line="275" PREFIX:column="20">(<expr><name PREFIX:line="275" PREFIX:column="21">n</name> &gt; <name PREFIX:line="275" PREFIX:column="25">len</name></expr>)</condition><then PREFIX:line="275" PREFIX:column="29">
+			<expr_stmt><expr><name PREFIX:line="276" PREFIX:column="25">n</name> = <name PREFIX:line="276" PREFIX:column="29">len</name></expr>;</expr_stmt></then></if>
+		<expr_stmt><expr><name PREFIX:line="277" PREFIX:column="17">len</name> -= <name PREFIX:line="277" PREFIX:column="24">n</name></expr>;</expr_stmt>
+		<block PREFIX:line="278" PREFIX:column="17">{
+			<function_decl><type><name PREFIX:line="279" PREFIX:column="25">LockEP</name></type> <name PREFIX:line="279" PREFIX:column="32">lock</name><parameter_list PREFIX:line="279" PREFIX:column="36">(<param><decl><type><name PREFIX:line="279" PREFIX:column="37">ep</name></type></decl></param>)</parameter_list>;</function_decl>
+			<if PREFIX:line="280" PREFIX:column="25">if <condition PREFIX:line="280" PREFIX:column="28">(<expr><name PREFIX:line="280" PREFIX:column="29">ep</name> &amp; <name PREFIX:line="280" PREFIX:column="34">TRANSFER_ZERO</name></expr>)</condition><then PREFIX:line="280" PREFIX:column="48">
+			<block PREFIX:line="281" PREFIX:column="25">{
+				<while PREFIX:line="282" PREFIX:column="33">while <condition PREFIX:line="282" PREFIX:column="39">(<expr><name PREFIX:line="282" PREFIX:column="40">n</name>--</expr>)</condition>
+					<expr_stmt><expr><call><name PREFIX:line="283" PREFIX:column="41">Send8</name><argument_list PREFIX:line="283" PREFIX:column="46">(<argument><expr PREFIX:line="283" PREFIX:column="47">0</expr></argument>)</argument_list></call></expr>;</expr_stmt></while>
+			}</block></then>
+			<else PREFIX:line="285" PREFIX:column="25">else <if PREFIX:line="285" PREFIX:column="30">if <condition PREFIX:line="285" PREFIX:column="33">(<expr><name PREFIX:line="285" PREFIX:column="34">ep</name> &amp; <name PREFIX:line="285" PREFIX:column="39">TRANSFER_PGM</name></expr>)</condition><then PREFIX:line="285" PREFIX:column="52">
+			<block PREFIX:line="286" PREFIX:column="25">{
+				<while PREFIX:line="287" PREFIX:column="33">while <condition PREFIX:line="287" PREFIX:column="39">(<expr><name PREFIX:line="287" PREFIX:column="40">n</name>--</expr>)</condition>
+					<expr_stmt><expr><call><name PREFIX:line="288" PREFIX:column="41">Send8</name><argument_list PREFIX:line="288" PREFIX:column="46">(<argument><expr><call><name PREFIX:line="288" PREFIX:column="47">pgm_read_byte</name><argument_list PREFIX:line="288" PREFIX:column="60">(<argument><expr><name PREFIX:line="288" PREFIX:column="61">data</name>++</expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr>;</expr_stmt></while>
+			}</block></then>
+			<else PREFIX:line="290" PREFIX:column="25">else
+			<block PREFIX:line="291" PREFIX:column="25">{
+				<while PREFIX:line="292" PREFIX:column="33">while <condition PREFIX:line="292" PREFIX:column="39">(<expr><name PREFIX:line="292" PREFIX:column="40">n</name>--</expr>)</condition>
+					<expr_stmt><expr><call><name PREFIX:line="293" PREFIX:column="41">Send8</name><argument_list PREFIX:line="293" PREFIX:column="46">(<argument><expr PREFIX:line="293" PREFIX:column="47">*<name PREFIX:line="293" PREFIX:column="48">data</name>++</expr></argument>)</argument_list></call></expr>;</expr_stmt></while>
+			}</block></else></if></else></if>
+			<if PREFIX:line="295" PREFIX:column="25">if <condition PREFIX:line="295" PREFIX:column="28">(<expr PREFIX:line="295" PREFIX:column="29">!<call><name PREFIX:line="295" PREFIX:column="30">ReadWriteAllowed</name><argument_list PREFIX:line="295" PREFIX:column="46">()</argument_list></call> || ((<name PREFIX:line="295" PREFIX:column="54">len</name> == 0) &amp;&amp; (<name PREFIX:line="295" PREFIX:column="68">ep</name> &amp; <name PREFIX:line="295" PREFIX:column="73">TRANSFER_RELEASE</name>))</expr>)</condition><then PREFIX:line="295" PREFIX:column="92">	<comment type="line" PREFIX:line="295" PREFIX:column="97">// Release full buffer</comment>
+				<expr_stmt><expr><call><name PREFIX:line="296" PREFIX:column="33">ReleaseTX</name><argument_list PREFIX:line="296" PREFIX:column="42">()</argument_list></call></expr>;</expr_stmt></then></if>
+		}</block>
+	}</block></while>
+	<expr_stmt><expr><name PREFIX:line="299" PREFIX:column="9">TXLED1</name></expr>;</expr_stmt>					<comment type="line" PREFIX:line="299" PREFIX:column="49">// light the TX LED</comment>
+	<expr_stmt><expr><name PREFIX:line="300" PREFIX:column="9">TxLEDPulse</name> = <name PREFIX:line="300" PREFIX:column="22">TX_RX_LED_PULSE_MS</name></expr>;</expr_stmt>
+	<return PREFIX:line="301" PREFIX:column="9">return <expr><name PREFIX:line="301" PREFIX:column="16">r</name></expr>;</return>
+}</block></function>
+
+  <decl_stmt><decl><type><name PREFIX:line="304" PREFIX:column="3">u8</name> <name PREFIX:line="304" PREFIX:column="6">_initEndpoints</name><index PREFIX:line="304" PREFIX:column="20">[]</index></type> <name PREFIX:line="304" PREFIX:column="23">PROGMEM</name></decl>;</decl_stmt>
+ <decl_stmt><decl><type><name PREFIX:line="305" PREFIX:column="2">u8</name></type> <name><name PREFIX:line="305" PREFIX:column="5">_initEndpoints</name><index PREFIX:line="305" PREFIX:column="19">[]</index></name> <init PREFIX:line="305" PREFIX:column="22">= 
+<expr><block PREFIX:line="306" PREFIX:column="1">{
+	<expr PREFIX:line="307" PREFIX:column="9">0</expr>,
+	
+<cpp:ifdef PREFIX:line="309" PREFIX:column="1">#<cpp:directive PREFIX:line="309" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="309" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+	<expr><name PREFIX:line="310" PREFIX:column="9">EP_TYPE_INTERRUPT_IN</name></expr>,		<comment type="line" PREFIX:line="310" PREFIX:column="41">// CDC_ENDPOINT_ACM</comment>
+	<expr><name PREFIX:line="311" PREFIX:column="9">EP_TYPE_BULK_OUT</name></expr>,			<comment type="line" PREFIX:line="311" PREFIX:column="49">// CDC_ENDPOINT_OUT</comment>
+	<expr><name PREFIX:line="312" PREFIX:column="9">EP_TYPE_BULK_IN</name></expr>,			<comment type="line" PREFIX:line="312" PREFIX:column="49">// CDC_ENDPOINT_IN</comment>
+<cpp:endif PREFIX:line="313" PREFIX:column="1">#<cpp:directive PREFIX:line="313" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:ifdef PREFIX:line="315" PREFIX:column="1">#<cpp:directive PREFIX:line="315" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="315" PREFIX:column="8">HID_ENABLED</name></cpp:ifdef>
+	<expr><name PREFIX:line="316" PREFIX:column="9">EP_TYPE_INTERRUPT_IN</name></expr>		<comment type="line" PREFIX:line="316" PREFIX:column="41">// HID_ENDPOINT_INT</comment>
+<cpp:endif PREFIX:line="317" PREFIX:column="1">#<cpp:directive PREFIX:line="317" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+}</block></expr></init></decl>;</decl_stmt>
+
+<cpp:define PREFIX:line="320" PREFIX:column="1">#<cpp:directive PREFIX:line="320" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="320" PREFIX:column="9">EP_SINGLE_64</name></cpp:macro> <cpp:value PREFIX:line="320" PREFIX:column="22">0x32</cpp:value></cpp:define>	<comment type="line" PREFIX:line="320" PREFIX:column="33">// EP0</comment>
+<cpp:define PREFIX:line="321" PREFIX:column="1">#<cpp:directive PREFIX:line="321" PREFIX:column="2">define</cpp:directive> <cpp:macro><name PREFIX:line="321" PREFIX:column="9">EP_DOUBLE_64</name></cpp:macro> <cpp:value PREFIX:line="321" PREFIX:column="22">0x36</cpp:value></cpp:define>	<comment type="line" PREFIX:line="321" PREFIX:column="33">// Other endpoints</comment>
+
+<function><type><specifier PREFIX:line="323" PREFIX:column="1">static</specifier>
+<name PREFIX:line="324" PREFIX:column="1">void</name></type> <name PREFIX:line="324" PREFIX:column="6">InitEP</name><parameter_list PREFIX:line="324" PREFIX:column="12">(<param><decl><type><name PREFIX:line="324" PREFIX:column="13">u8</name></type> <name PREFIX:line="324" PREFIX:column="16">index</name></decl></param>, <param><decl><type><name PREFIX:line="324" PREFIX:column="23">u8</name></type> <name PREFIX:line="324" PREFIX:column="26">type</name></decl></param>, <param><decl><type><name PREFIX:line="324" PREFIX:column="32">u8</name></type> <name PREFIX:line="324" PREFIX:column="35">size</name></decl></param>)</parameter_list>
+<block PREFIX:line="325" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="326" PREFIX:column="9">UENUM</name> = <name PREFIX:line="326" PREFIX:column="17">index</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="327" PREFIX:column="9">UECONX</name> = 1</expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="328" PREFIX:column="9">UECFG0X</name> = <name PREFIX:line="328" PREFIX:column="19">type</name></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="329" PREFIX:column="9">UECFG1X</name> = <name PREFIX:line="329" PREFIX:column="19">size</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="332" PREFIX:column="1">static</specifier>
+<name PREFIX:line="333" PREFIX:column="1">void</name></type> <name PREFIX:line="333" PREFIX:column="6">InitEndpoints</name><parameter_list PREFIX:line="333" PREFIX:column="19">()</parameter_list>
+<block PREFIX:line="334" PREFIX:column="1">{
+	<for PREFIX:line="335" PREFIX:column="9">for (<init><decl><type><name PREFIX:line="335" PREFIX:column="14">u8</name></type> <name PREFIX:line="335" PREFIX:column="17">i</name> <init PREFIX:line="335" PREFIX:column="19">= <expr PREFIX:line="335" PREFIX:column="21">1</expr></init></decl>;</init> <condition><expr><name PREFIX:line="335" PREFIX:column="24">i</name> &lt; <sizeof PREFIX:line="335" PREFIX:column="28">sizeof<argument_list PREFIX:line="335" PREFIX:column="34">(<argument><expr><name PREFIX:line="335" PREFIX:column="35">_initEndpoints</name></expr></argument>)</argument_list></sizeof></expr>;</condition> <incr><expr><name PREFIX:line="335" PREFIX:column="52">i</name>++</expr></incr>)
+	<block PREFIX:line="336" PREFIX:column="9">{
+		<expr_stmt><expr><name PREFIX:line="337" PREFIX:column="17">UENUM</name> = <name PREFIX:line="337" PREFIX:column="25">i</name></expr>;</expr_stmt>
+		<expr_stmt><expr><name PREFIX:line="338" PREFIX:column="17">UECONX</name> = 1</expr>;</expr_stmt>
+		<expr_stmt><expr><name PREFIX:line="339" PREFIX:column="17">UECFG0X</name> = <call><name PREFIX:line="339" PREFIX:column="27">pgm_read_byte</name><argument_list PREFIX:line="339" PREFIX:column="40">(<argument><expr><name PREFIX:line="339" PREFIX:column="41">_initEndpoints</name>+<name PREFIX:line="339" PREFIX:column="56">i</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><name PREFIX:line="340" PREFIX:column="17">UECFG1X</name> = <name PREFIX:line="340" PREFIX:column="27">EP_DOUBLE_64</name></expr>;</expr_stmt>
+	}</block></for>
+	<expr_stmt><expr><name PREFIX:line="342" PREFIX:column="9">UERST</name> = 0x7E</expr>;</expr_stmt>	<comment type="line" PREFIX:line="342" PREFIX:column="25">// And reset them</comment>
+	<expr_stmt><expr><name PREFIX:line="343" PREFIX:column="9">UERST</name> = 0</expr>;</expr_stmt>
+}</block></function>
+
+<comment type="line" PREFIX:line="346" PREFIX:column="1">//	Handle CLASS_INTERFACE requests</comment>
+<function><type><specifier PREFIX:line="347" PREFIX:column="1">static</specifier>
+<name PREFIX:line="348" PREFIX:column="1">bool</name></type> <name PREFIX:line="348" PREFIX:column="6">ClassInterfaceRequest</name><parameter_list PREFIX:line="348" PREFIX:column="27">(<param><decl><type><name PREFIX:line="348" PREFIX:column="28">Setup</name>&amp;</type> <name PREFIX:line="348" PREFIX:column="35">setup</name></decl></param>)</parameter_list>
+<block PREFIX:line="349" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="350" PREFIX:column="9">u8</name></type> <name PREFIX:line="350" PREFIX:column="12">i</name> <init PREFIX:line="350" PREFIX:column="14">= <expr><name><name PREFIX:line="350" PREFIX:column="16">setup</name>.<name PREFIX:line="350" PREFIX:column="22">wIndex</name></name></expr></init></decl>;</decl_stmt>
+
+<cpp:ifdef PREFIX:line="352" PREFIX:column="1">#<cpp:directive PREFIX:line="352" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="352" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+	<if PREFIX:line="353" PREFIX:column="9">if <condition PREFIX:line="353" PREFIX:column="12">(<expr><name PREFIX:line="353" PREFIX:column="13">CDC_ACM_INTERFACE</name> == <name PREFIX:line="353" PREFIX:column="34">i</name></expr>)</condition><then PREFIX:line="353" PREFIX:column="36">
+		<return PREFIX:line="354" PREFIX:column="17">return <expr><call><name PREFIX:line="354" PREFIX:column="24">CDC_Setup</name><argument_list PREFIX:line="354" PREFIX:column="33">(<argument><expr><name PREFIX:line="354" PREFIX:column="34">setup</name></expr></argument>)</argument_list></call></expr>;</return></then></if>
+<cpp:endif PREFIX:line="355" PREFIX:column="1">#<cpp:directive PREFIX:line="355" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:ifdef PREFIX:line="357" PREFIX:column="1">#<cpp:directive PREFIX:line="357" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="357" PREFIX:column="8">HID_ENABLED</name></cpp:ifdef>
+	<if PREFIX:line="358" PREFIX:column="9">if <condition PREFIX:line="358" PREFIX:column="12">(<expr><name PREFIX:line="358" PREFIX:column="13">HID_INTERFACE</name> == <name PREFIX:line="358" PREFIX:column="30">i</name></expr>)</condition><then PREFIX:line="358" PREFIX:column="32">
+		<return PREFIX:line="359" PREFIX:column="17">return <expr><call><name PREFIX:line="359" PREFIX:column="24">HID_Setup</name><argument_list PREFIX:line="359" PREFIX:column="33">(<argument><expr><name PREFIX:line="359" PREFIX:column="34">setup</name></expr></argument>)</argument_list></call></expr>;</return></then></if>
+<cpp:endif PREFIX:line="360" PREFIX:column="1">#<cpp:directive PREFIX:line="360" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+	<return PREFIX:line="361" PREFIX:column="9">return <expr PREFIX:line="361" PREFIX:column="16">false</expr>;</return>
+}</block></function>
+
+<decl_stmt><decl><type><name PREFIX:line="364" PREFIX:column="1">int</name></type> <name PREFIX:line="364" PREFIX:column="5">_cmark</name></decl>;</decl_stmt>
+<decl_stmt><decl><type><name PREFIX:line="365" PREFIX:column="1">int</name></type> <name PREFIX:line="365" PREFIX:column="5">_cend</name></decl>;</decl_stmt>
+<function><type><name PREFIX:line="366" PREFIX:column="1">void</name></type> <name PREFIX:line="366" PREFIX:column="6">InitControl</name><parameter_list PREFIX:line="366" PREFIX:column="17">(<param><decl><type><name PREFIX:line="366" PREFIX:column="18">int</name></type> <name PREFIX:line="366" PREFIX:column="22">end</name></decl></param>)</parameter_list>
+<block PREFIX:line="367" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="368" PREFIX:column="9">SetEP</name><argument_list PREFIX:line="368" PREFIX:column="14">(<argument><expr PREFIX:line="368" PREFIX:column="15">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="369" PREFIX:column="9">_cmark</name> = 0</expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="370" PREFIX:column="9">_cend</name> = <name PREFIX:line="370" PREFIX:column="17">end</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><specifier PREFIX:line="373" PREFIX:column="1">static</specifier>
+<name PREFIX:line="374" PREFIX:column="1">bool</name></type> <name PREFIX:line="374" PREFIX:column="6">SendControl</name><parameter_list PREFIX:line="374" PREFIX:column="17">(<param><decl><type><name PREFIX:line="374" PREFIX:column="18">u8</name></type> <name PREFIX:line="374" PREFIX:column="21">d</name></decl></param>)</parameter_list>
+<block PREFIX:line="375" PREFIX:column="1">{
+	<if PREFIX:line="376" PREFIX:column="9">if <condition PREFIX:line="376" PREFIX:column="12">(<expr><name PREFIX:line="376" PREFIX:column="13">_cmark</name> &lt; <name PREFIX:line="376" PREFIX:column="22">_cend</name></expr>)</condition><then PREFIX:line="376" PREFIX:column="28">
+	<block PREFIX:line="377" PREFIX:column="9">{
+		<if PREFIX:line="378" PREFIX:column="17">if <condition PREFIX:line="378" PREFIX:column="20">(<expr PREFIX:line="378" PREFIX:column="21">!<call><name PREFIX:line="378" PREFIX:column="22">WaitForINOrOUT</name><argument_list PREFIX:line="378" PREFIX:column="36">()</argument_list></call></expr>)</condition><then PREFIX:line="378" PREFIX:column="39">
+			<return PREFIX:line="379" PREFIX:column="25">return <expr PREFIX:line="379" PREFIX:column="32">false</expr>;</return></then></if>
+		<expr_stmt><expr><call><name PREFIX:line="380" PREFIX:column="17">Send8</name><argument_list PREFIX:line="380" PREFIX:column="22">(<argument><expr><name PREFIX:line="380" PREFIX:column="23">d</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<if PREFIX:line="381" PREFIX:column="17">if <condition PREFIX:line="381" PREFIX:column="20">(<expr PREFIX:line="381" PREFIX:column="21">!((<name PREFIX:line="381" PREFIX:column="24">_cmark</name> + 1) &amp; 0x3F)</expr>)</condition><then PREFIX:line="381" PREFIX:column="44">
+			<expr_stmt><expr><call><name PREFIX:line="382" PREFIX:column="25">ClearIN</name><argument_list PREFIX:line="382" PREFIX:column="32">()</argument_list></call></expr>;</expr_stmt></then></if>	<comment type="line" PREFIX:line="382" PREFIX:column="41">// Fifo is full, release this packet</comment>
+	}</block></then></if>
+	<expr_stmt><expr><name PREFIX:line="384" PREFIX:column="9">_cmark</name>++</expr>;</expr_stmt>
+	<return PREFIX:line="385" PREFIX:column="9">return <expr PREFIX:line="385" PREFIX:column="16">true</expr>;</return>
+}</block></function><empty_stmt PREFIX:line="386" PREFIX:column="2">;</empty_stmt>
+
+<comment type="line" PREFIX:line="388" PREFIX:column="1">//	Clipped by _cmark/_cend</comment>
+<function><type><name PREFIX:line="389" PREFIX:column="1">int</name></type> <name PREFIX:line="389" PREFIX:column="5">USB_SendControl</name><parameter_list PREFIX:line="389" PREFIX:column="20">(<param><decl><type><name PREFIX:line="389" PREFIX:column="21">u8</name></type> <name PREFIX:line="389" PREFIX:column="24">flags</name></decl></param>,  <param><decl><type><name PREFIX:line="389" PREFIX:column="32">void</name>*</type> <name PREFIX:line="389" PREFIX:column="38">d</name></decl></param>, <param><decl><type><name PREFIX:line="389" PREFIX:column="41">int</name></type> <name PREFIX:line="389" PREFIX:column="45">len</name></decl></param>)</parameter_list>
+<block PREFIX:line="390" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="391" PREFIX:column="9">int</name></type> <name PREFIX:line="391" PREFIX:column="13">sent</name> <init PREFIX:line="391" PREFIX:column="18">= <expr><name PREFIX:line="391" PREFIX:column="20">len</name></expr></init></decl>;</decl_stmt>
+	 <decl_stmt><decl><type><name PREFIX:line="392" PREFIX:column="10">u8</name>*</type> <name PREFIX:line="392" PREFIX:column="14">data</name> <init PREFIX:line="392" PREFIX:column="19">= <expr PREFIX:line="392" PREFIX:column="21">( <name PREFIX:line="392" PREFIX:column="23">u8</name>*)<name PREFIX:line="392" PREFIX:column="27">d</name></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="393" PREFIX:column="9">bool</name></type> <name PREFIX:line="393" PREFIX:column="14">pgm</name> <init PREFIX:line="393" PREFIX:column="18">= <expr><name PREFIX:line="393" PREFIX:column="20">flags</name> &amp; <name PREFIX:line="393" PREFIX:column="28">TRANSFER_PGM</name></expr></init></decl>;</decl_stmt>
+	<while PREFIX:line="394" PREFIX:column="9">while <condition PREFIX:line="394" PREFIX:column="15">(<expr><name PREFIX:line="394" PREFIX:column="16">len</name>--</expr>)</condition>
+	<block PREFIX:line="395" PREFIX:column="9">{
+		<decl_stmt><decl><type><name PREFIX:line="396" PREFIX:column="17">u8</name></type> <name PREFIX:line="396" PREFIX:column="20">c</name> <init PREFIX:line="396" PREFIX:column="22">= <expr><name PREFIX:line="396" PREFIX:column="24">pgm</name> ? <call><name PREFIX:line="396" PREFIX:column="30">pgm_read_byte</name><argument_list PREFIX:line="396" PREFIX:column="43">(<argument><expr><name PREFIX:line="396" PREFIX:column="44">data</name>++</expr></argument>)</argument_list></call> : *<name PREFIX:line="396" PREFIX:column="55">data</name>++</expr></init></decl>;</decl_stmt>
+		<if PREFIX:line="397" PREFIX:column="17">if <condition PREFIX:line="397" PREFIX:column="20">(<expr PREFIX:line="397" PREFIX:column="21">!<call><name PREFIX:line="397" PREFIX:column="22">SendControl</name><argument_list PREFIX:line="397" PREFIX:column="33">(<argument><expr><name PREFIX:line="397" PREFIX:column="34">c</name></expr></argument>)</argument_list></call></expr>)</condition><then PREFIX:line="397" PREFIX:column="37">
+			<return PREFIX:line="398" PREFIX:column="25">return <expr PREFIX:line="398" PREFIX:column="32">-1</expr>;</return></then></if>
+	}</block></while>
+	<return PREFIX:line="400" PREFIX:column="9">return <expr><name PREFIX:line="400" PREFIX:column="16">sent</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="403" PREFIX:column="1">//	Does not timeout or cross fifo boundaries</comment>
+<comment type="line" PREFIX:line="404" PREFIX:column="1">//	Will only work for transfers &lt;= 64 bytes</comment>
+<comment type="line" PREFIX:line="405" PREFIX:column="1">//	TODO</comment>
+<function><type><name PREFIX:line="406" PREFIX:column="1">int</name></type> <name PREFIX:line="406" PREFIX:column="5">USB_RecvControl</name><parameter_list PREFIX:line="406" PREFIX:column="20">(<param><decl><type><name PREFIX:line="406" PREFIX:column="21">void</name>*</type> <name PREFIX:line="406" PREFIX:column="27">d</name></decl></param>, <param><decl><type><name PREFIX:line="406" PREFIX:column="30">int</name></type> <name PREFIX:line="406" PREFIX:column="34">len</name></decl></param>)</parameter_list>
+<block PREFIX:line="407" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="408" PREFIX:column="9">WaitOUT</name><argument_list PREFIX:line="408" PREFIX:column="16">()</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="409" PREFIX:column="9">Recv</name><argument_list PREFIX:line="409" PREFIX:column="13">(<argument><expr PREFIX:line="409" PREFIX:column="14">(<name PREFIX:line="409" PREFIX:column="15">u8</name>*)<name PREFIX:line="409" PREFIX:column="19">d</name></expr></argument>,<argument><expr><name PREFIX:line="409" PREFIX:column="21">len</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="410" PREFIX:column="9">ClearOUT</name><argument_list PREFIX:line="410" PREFIX:column="17">()</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="411" PREFIX:column="9">return <expr><name PREFIX:line="411" PREFIX:column="16">len</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="414" PREFIX:column="1">int</name></type> <name PREFIX:line="414" PREFIX:column="5">SendInterfaces</name><parameter_list PREFIX:line="414" PREFIX:column="19">()</parameter_list>
+<block PREFIX:line="415" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="416" PREFIX:column="9">int</name></type> <name PREFIX:line="416" PREFIX:column="13">total</name> <init PREFIX:line="416" PREFIX:column="19">= <expr PREFIX:line="416" PREFIX:column="21">0</expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="417" PREFIX:column="9">u8</name></type> <name PREFIX:line="417" PREFIX:column="12">interfaces</name> <init PREFIX:line="417" PREFIX:column="23">= <expr PREFIX:line="417" PREFIX:column="25">0</expr></init></decl>;</decl_stmt>
+
+<cpp:ifdef PREFIX:line="419" PREFIX:column="1">#<cpp:directive PREFIX:line="419" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="419" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+	<expr_stmt><expr><name PREFIX:line="420" PREFIX:column="9">total</name> = <call><name PREFIX:line="420" PREFIX:column="17">CDC_GetInterface</name><argument_list PREFIX:line="420" PREFIX:column="33">(<argument><expr PREFIX:line="420" PREFIX:column="34">&amp;<name PREFIX:line="420" PREFIX:column="35">interfaces</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="421" PREFIX:column="1">#<cpp:directive PREFIX:line="421" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+<cpp:ifdef PREFIX:line="423" PREFIX:column="1">#<cpp:directive PREFIX:line="423" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="423" PREFIX:column="8">HID_ENABLED</name></cpp:ifdef>
+	<expr_stmt><expr><name PREFIX:line="424" PREFIX:column="9">total</name> += <call><name PREFIX:line="424" PREFIX:column="18">HID_GetInterface</name><argument_list PREFIX:line="424" PREFIX:column="34">(<argument><expr PREFIX:line="424" PREFIX:column="35">&amp;<name PREFIX:line="424" PREFIX:column="36">interfaces</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:endif PREFIX:line="425" PREFIX:column="1">#<cpp:directive PREFIX:line="425" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<return PREFIX:line="427" PREFIX:column="9">return <expr><name PREFIX:line="427" PREFIX:column="16">interfaces</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="430" PREFIX:column="1">//	Construct a dynamic configuration descriptor</comment>
+<comment type="line" PREFIX:line="431" PREFIX:column="1">//	This really needs dynamic endpoint allocation etc</comment>
+<comment type="line" PREFIX:line="432" PREFIX:column="1">//	TODO</comment>
+<function><type><specifier PREFIX:line="433" PREFIX:column="1">static</specifier>
+<name PREFIX:line="434" PREFIX:column="1">bool</name></type> <name PREFIX:line="434" PREFIX:column="6">SendConfiguration</name><parameter_list PREFIX:line="434" PREFIX:column="23">(<param><decl><type><name PREFIX:line="434" PREFIX:column="24">int</name></type> <name PREFIX:line="434" PREFIX:column="28">maxlen</name></decl></param>)</parameter_list>
+<block PREFIX:line="435" PREFIX:column="1">{
+	<comment type="line" PREFIX:line="436" PREFIX:column="9">//	Count and measure interfaces</comment>
+	<expr_stmt><expr><call><name PREFIX:line="437" PREFIX:column="9">InitControl</name><argument_list PREFIX:line="437" PREFIX:column="20">(<argument><expr PREFIX:line="437" PREFIX:column="21">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>	
+	<decl_stmt><decl><type><name PREFIX:line="438" PREFIX:column="9">int</name></type> <name PREFIX:line="438" PREFIX:column="13">interfaces</name> <init PREFIX:line="438" PREFIX:column="24">= <expr><call><name PREFIX:line="438" PREFIX:column="26">SendInterfaces</name><argument_list PREFIX:line="438" PREFIX:column="40">()</argument_list></call></expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="439" PREFIX:column="9">ConfigDescriptor</name></type> <name PREFIX:line="439" PREFIX:column="26">config</name> <init PREFIX:line="439" PREFIX:column="33">= <expr><call><name PREFIX:line="439" PREFIX:column="35">D_CONFIG</name><argument_list PREFIX:line="439" PREFIX:column="43">(<argument><expr><name PREFIX:line="439" PREFIX:column="44">_cmark</name> + <sizeof PREFIX:line="439" PREFIX:column="53">sizeof<argument_list PREFIX:line="439" PREFIX:column="59">(<argument><expr><name PREFIX:line="439" PREFIX:column="60">ConfigDescriptor</name></expr></argument>)</argument_list></sizeof></expr></argument>,<argument><expr><name PREFIX:line="439" PREFIX:column="78">interfaces</name></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+
+	<comment type="line" PREFIX:line="441" PREFIX:column="9">//	Now send them</comment>
+	<expr_stmt><expr><call><name PREFIX:line="442" PREFIX:column="9">InitControl</name><argument_list PREFIX:line="442" PREFIX:column="20">(<argument><expr><name PREFIX:line="442" PREFIX:column="21">maxlen</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="443" PREFIX:column="9">USB_SendControl</name><argument_list PREFIX:line="443" PREFIX:column="24">(<argument><expr PREFIX:line="443" PREFIX:column="25">0</expr></argument>,<argument><expr PREFIX:line="443" PREFIX:column="27">&amp;<name PREFIX:line="443" PREFIX:column="28">config</name></expr></argument>,<argument><expr><sizeof PREFIX:line="443" PREFIX:column="35">sizeof<argument_list PREFIX:line="443" PREFIX:column="41">(<argument><expr><name PREFIX:line="443" PREFIX:column="42">ConfigDescriptor</name></expr></argument>)</argument_list></sizeof></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="444" PREFIX:column="9">SendInterfaces</name><argument_list PREFIX:line="444" PREFIX:column="23">()</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="445" PREFIX:column="9">return <expr PREFIX:line="445" PREFIX:column="16">true</expr>;</return>
+}</block></function>
+
+<decl_stmt><decl><type><name PREFIX:line="448" PREFIX:column="1">u8</name></type> <name PREFIX:line="448" PREFIX:column="4">_cdcComposite</name> <init PREFIX:line="448" PREFIX:column="18">= <expr PREFIX:line="448" PREFIX:column="20">0</expr></init></decl>;</decl_stmt>
+
+<function><type><specifier PREFIX:line="450" PREFIX:column="1">static</specifier>
+<name PREFIX:line="451" PREFIX:column="1">bool</name></type> <name PREFIX:line="451" PREFIX:column="6">SendDescriptor</name><parameter_list PREFIX:line="451" PREFIX:column="20">(<param><decl><type><name PREFIX:line="451" PREFIX:column="21">Setup</name>&amp;</type> <name PREFIX:line="451" PREFIX:column="28">setup</name></decl></param>)</parameter_list>
+<block PREFIX:line="452" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="453" PREFIX:column="9">u8</name></type> <name PREFIX:line="453" PREFIX:column="12">t</name> <init PREFIX:line="453" PREFIX:column="14">= <expr><name><name PREFIX:line="453" PREFIX:column="16">setup</name>.<name PREFIX:line="453" PREFIX:column="22">wValueH</name></name></expr></init></decl>;</decl_stmt>
+	<if PREFIX:line="454" PREFIX:column="9">if <condition PREFIX:line="454" PREFIX:column="12">(<expr><name PREFIX:line="454" PREFIX:column="13">USB_CONFIGURATION_DESCRIPTOR_TYPE</name> == <name PREFIX:line="454" PREFIX:column="50">t</name></expr>)</condition><then PREFIX:line="454" PREFIX:column="52">
+		<return PREFIX:line="455" PREFIX:column="17">return <expr><call><name PREFIX:line="455" PREFIX:column="24">SendConfiguration</name><argument_list PREFIX:line="455" PREFIX:column="41">(<argument><expr><name><name PREFIX:line="455" PREFIX:column="42">setup</name>.<name PREFIX:line="455" PREFIX:column="48">wLength</name></name></expr></argument>)</argument_list></call></expr>;</return></then></if>
+
+	<expr_stmt><expr><call><name PREFIX:line="457" PREFIX:column="9">InitControl</name><argument_list PREFIX:line="457" PREFIX:column="20">(<argument><expr><name><name PREFIX:line="457" PREFIX:column="21">setup</name>.<name PREFIX:line="457" PREFIX:column="27">wLength</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+<cpp:ifdef PREFIX:line="458" PREFIX:column="1">#<cpp:directive PREFIX:line="458" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="458" PREFIX:column="8">HID_ENABLED</name></cpp:ifdef>
+	<if PREFIX:line="459" PREFIX:column="9">if <condition PREFIX:line="459" PREFIX:column="12">(<expr><name PREFIX:line="459" PREFIX:column="13">HID_REPORT_DESCRIPTOR_TYPE</name> == <name PREFIX:line="459" PREFIX:column="43">t</name></expr>)</condition><then PREFIX:line="459" PREFIX:column="45">
+		<return PREFIX:line="460" PREFIX:column="17">return <expr><call><name PREFIX:line="460" PREFIX:column="24">HID_GetDescriptor</name><argument_list PREFIX:line="460" PREFIX:column="41">(<argument><expr><name PREFIX:line="460" PREFIX:column="42">t</name></expr></argument>)</argument_list></call></expr>;</return></then></if>
+<cpp:endif PREFIX:line="461" PREFIX:column="1">#<cpp:directive PREFIX:line="461" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+
+	<decl_stmt><decl><type><name PREFIX:line="463" PREFIX:column="9">u8</name></type> <name PREFIX:line="463" PREFIX:column="12">desc_length</name> <init PREFIX:line="463" PREFIX:column="24">= <expr PREFIX:line="463" PREFIX:column="26">0</expr></init></decl>;</decl_stmt>
+	 <decl_stmt><decl><type><name PREFIX:line="464" PREFIX:column="10">u8</name>*</type> <name PREFIX:line="464" PREFIX:column="14">desc_addr</name> <init PREFIX:line="464" PREFIX:column="24">= <expr PREFIX:line="464" PREFIX:column="26">0</expr></init></decl>;</decl_stmt>
+	<if PREFIX:line="465" PREFIX:column="9">if <condition PREFIX:line="465" PREFIX:column="12">(<expr><name PREFIX:line="465" PREFIX:column="13">USB_DEVICE_DESCRIPTOR_TYPE</name> == <name PREFIX:line="465" PREFIX:column="43">t</name></expr>)</condition><then PREFIX:line="465" PREFIX:column="45">
+	<block PREFIX:line="466" PREFIX:column="9">{
+		<if PREFIX:line="467" PREFIX:column="17">if <condition PREFIX:line="467" PREFIX:column="20">(<expr><name><name PREFIX:line="467" PREFIX:column="21">setup</name>.<name PREFIX:line="467" PREFIX:column="27">wLength</name></name> == 8</expr>)</condition><then PREFIX:line="467" PREFIX:column="40">
+			<expr_stmt><expr><name PREFIX:line="468" PREFIX:column="25">_cdcComposite</name> = 1</expr>;</expr_stmt></then></if>
+		<expr_stmt><expr><name PREFIX:line="469" PREFIX:column="17">desc_addr</name> = <name PREFIX:line="469" PREFIX:column="29">_cdcComposite</name> ?  ( <name PREFIX:line="469" PREFIX:column="48">u8</name>*)&amp;<name PREFIX:line="469" PREFIX:column="53">USB_DeviceDescriptorA</name> : ( <name PREFIX:line="469" PREFIX:column="79">u8</name>*)&amp;<name PREFIX:line="469" PREFIX:column="84">USB_DeviceDescriptor</name></expr>;</expr_stmt>
+	}</block></then>
+	<else PREFIX:line="471" PREFIX:column="9">else <if PREFIX:line="471" PREFIX:column="14">if <condition PREFIX:line="471" PREFIX:column="17">(<expr><name PREFIX:line="471" PREFIX:column="18">USB_STRING_DESCRIPTOR_TYPE</name> == <name PREFIX:line="471" PREFIX:column="48">t</name></expr>)</condition><then PREFIX:line="471" PREFIX:column="50">
+	<block PREFIX:line="472" PREFIX:column="9">{
+		<if PREFIX:line="473" PREFIX:column="17">if <condition PREFIX:line="473" PREFIX:column="20">(<expr><name><name PREFIX:line="473" PREFIX:column="21">setup</name>.<name PREFIX:line="473" PREFIX:column="27">wValueL</name></name> == 0</expr>)</condition><then PREFIX:line="473" PREFIX:column="40">
+			<expr_stmt><expr><name PREFIX:line="474" PREFIX:column="25">desc_addr</name> = ( <name PREFIX:line="474" PREFIX:column="39">u8</name>*)&amp;<name PREFIX:line="474" PREFIX:column="44">STRING_LANGUAGE</name></expr>;</expr_stmt></then>
+		<else PREFIX:line="475" PREFIX:column="17">else <if PREFIX:line="475" PREFIX:column="22">if <condition PREFIX:line="475" PREFIX:column="25">(<expr><name><name PREFIX:line="475" PREFIX:column="26">setup</name>.<name PREFIX:line="475" PREFIX:column="32">wValueL</name></name> == <name PREFIX:line="475" PREFIX:column="43">IPRODUCT</name></expr>)</condition><then PREFIX:line="475" PREFIX:column="52"> 
+			<expr_stmt><expr><name PREFIX:line="476" PREFIX:column="25">desc_addr</name> = ( <name PREFIX:line="476" PREFIX:column="39">u8</name>*)&amp;<name PREFIX:line="476" PREFIX:column="44">STRING_IPRODUCT</name></expr>;</expr_stmt></then>
+		<else PREFIX:line="477" PREFIX:column="17">else <if PREFIX:line="477" PREFIX:column="22">if <condition PREFIX:line="477" PREFIX:column="25">(<expr><name><name PREFIX:line="477" PREFIX:column="26">setup</name>.<name PREFIX:line="477" PREFIX:column="32">wValueL</name></name> == <name PREFIX:line="477" PREFIX:column="43">IMANUFACTURER</name></expr>)</condition><then PREFIX:line="477" PREFIX:column="57">
+			<expr_stmt><expr><name PREFIX:line="478" PREFIX:column="25">desc_addr</name> = ( <name PREFIX:line="478" PREFIX:column="39">u8</name>*)&amp;<name PREFIX:line="478" PREFIX:column="44">STRING_IMANUFACTURER</name></expr>;</expr_stmt></then>
+		<else PREFIX:line="479" PREFIX:column="17">else
+			<return PREFIX:line="480" PREFIX:column="25">return <expr PREFIX:line="480" PREFIX:column="32">false</expr>;</return></else></if></else></if></else></if>
+	}</block></then></if></else></if>
+
+	<if PREFIX:line="483" PREFIX:column="9">if <condition PREFIX:line="483" PREFIX:column="12">(<expr><name PREFIX:line="483" PREFIX:column="13">desc_addr</name> == 0</expr>)</condition><then PREFIX:line="483" PREFIX:column="28">
+		<return PREFIX:line="484" PREFIX:column="17">return <expr PREFIX:line="484" PREFIX:column="24">false</expr>;</return></then></if>
+	<if PREFIX:line="485" PREFIX:column="9">if <condition PREFIX:line="485" PREFIX:column="12">(<expr><name PREFIX:line="485" PREFIX:column="13">desc_length</name> == 0</expr>)</condition><then PREFIX:line="485" PREFIX:column="30">
+		<expr_stmt><expr><name PREFIX:line="486" PREFIX:column="17">desc_length</name> = <call><name PREFIX:line="486" PREFIX:column="31">pgm_read_byte</name><argument_list PREFIX:line="486" PREFIX:column="44">(<argument><expr><name PREFIX:line="486" PREFIX:column="45">desc_addr</name></expr></argument>)</argument_list></call></expr>;</expr_stmt></then></if>
+
+	<expr_stmt><expr><call><name PREFIX:line="488" PREFIX:column="9">USB_SendControl</name><argument_list PREFIX:line="488" PREFIX:column="24">(<argument><expr><name PREFIX:line="488" PREFIX:column="25">TRANSFER_PGM</name></expr></argument>,<argument><expr><name PREFIX:line="488" PREFIX:column="38">desc_addr</name></expr></argument>,<argument><expr><name PREFIX:line="488" PREFIX:column="48">desc_length</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="489" PREFIX:column="9">return <expr PREFIX:line="489" PREFIX:column="16">true</expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="492" PREFIX:column="1">//	Endpoint 0 interrupt</comment>
+<macro><name PREFIX:line="493" PREFIX:column="1">ISR</name><argument_list PREFIX:line="493" PREFIX:column="4">(<argument PREFIX:line="493" PREFIX:column="5">USB_COM_vect</argument>)</argument_list></macro>
+<block PREFIX:line="494" PREFIX:column="1">{
+    <expr_stmt><expr><call><name PREFIX:line="495" PREFIX:column="5">SetEP</name><argument_list PREFIX:line="495" PREFIX:column="10">(<argument><expr PREFIX:line="495" PREFIX:column="11">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<if PREFIX:line="496" PREFIX:column="9">if <condition PREFIX:line="496" PREFIX:column="12">(<expr PREFIX:line="496" PREFIX:column="13">!<call><name PREFIX:line="496" PREFIX:column="14">ReceivedSetupInt</name><argument_list PREFIX:line="496" PREFIX:column="30">()</argument_list></call></expr>)</condition><then PREFIX:line="496" PREFIX:column="33">
+		<return PREFIX:line="497" PREFIX:column="17">return;</return></then></if>
+
+	<decl_stmt><decl><type><name PREFIX:line="499" PREFIX:column="9">Setup</name></type> <name PREFIX:line="499" PREFIX:column="15">setup</name></decl>;</decl_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="500" PREFIX:column="9">Recv</name><argument_list PREFIX:line="500" PREFIX:column="13">(<argument><expr PREFIX:line="500" PREFIX:column="14">(<name PREFIX:line="500" PREFIX:column="15">u8</name>*)&amp;<name PREFIX:line="500" PREFIX:column="20">setup</name></expr></argument>,<argument><expr PREFIX:line="500" PREFIX:column="26">8</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="501" PREFIX:column="9">ClearSetupInt</name><argument_list PREFIX:line="501" PREFIX:column="22">()</argument_list></call></expr>;</expr_stmt>
+
+	<decl_stmt><decl><type><name PREFIX:line="503" PREFIX:column="9">u8</name></type> <name PREFIX:line="503" PREFIX:column="12">requestType</name> <init PREFIX:line="503" PREFIX:column="24">= <expr><name><name PREFIX:line="503" PREFIX:column="26">setup</name>.<name PREFIX:line="503" PREFIX:column="32">bmRequestType</name></name></expr></init></decl>;</decl_stmt>
+	<if PREFIX:line="504" PREFIX:column="9">if <condition PREFIX:line="504" PREFIX:column="12">(<expr><name PREFIX:line="504" PREFIX:column="13">requestType</name> &amp; <name PREFIX:line="504" PREFIX:column="27">REQUEST_DEVICETOHOST</name></expr>)</condition><then PREFIX:line="504" PREFIX:column="48">
+		<expr_stmt><expr><call><name PREFIX:line="505" PREFIX:column="17">WaitIN</name><argument_list PREFIX:line="505" PREFIX:column="23">()</argument_list></call></expr>;</expr_stmt></then>
+	<else PREFIX:line="506" PREFIX:column="9">else
+		<expr_stmt><expr><call><name PREFIX:line="507" PREFIX:column="17">ClearIN</name><argument_list PREFIX:line="507" PREFIX:column="24">()</argument_list></call></expr>;</expr_stmt></else></if>
+
+    <decl_stmt><decl><type><name PREFIX:line="509" PREFIX:column="5">bool</name></type> <name PREFIX:line="509" PREFIX:column="10">ok</name> <init PREFIX:line="509" PREFIX:column="13">= <expr PREFIX:line="509" PREFIX:column="15">true</expr></init></decl>;</decl_stmt>
+	<if PREFIX:line="510" PREFIX:column="9">if <condition PREFIX:line="510" PREFIX:column="12">(<expr><name PREFIX:line="510" PREFIX:column="13">REQUEST_STANDARD</name> == (<name PREFIX:line="510" PREFIX:column="34">requestType</name> &amp; <name PREFIX:line="510" PREFIX:column="48">REQUEST_TYPE</name>)</expr>)</condition><then PREFIX:line="510" PREFIX:column="62">
+	<block PREFIX:line="511" PREFIX:column="9">{
+		<comment type="line" PREFIX:line="512" PREFIX:column="17">//	Standard Requests</comment>
+		<decl_stmt><decl><type><name PREFIX:line="513" PREFIX:column="17">u8</name></type> <name PREFIX:line="513" PREFIX:column="20">r</name> <init PREFIX:line="513" PREFIX:column="22">= <expr><name><name PREFIX:line="513" PREFIX:column="24">setup</name>.<name PREFIX:line="513" PREFIX:column="30">bRequest</name></name></expr></init></decl>;</decl_stmt>
+		<if PREFIX:line="514" PREFIX:column="17">if <condition PREFIX:line="514" PREFIX:column="20">(<expr><name PREFIX:line="514" PREFIX:column="21">GET_STATUS</name> == <name PREFIX:line="514" PREFIX:column="35">r</name></expr>)</condition><then PREFIX:line="514" PREFIX:column="37">
+		<block PREFIX:line="515" PREFIX:column="17">{
+			<expr_stmt><expr><call><name PREFIX:line="516" PREFIX:column="25">Send8</name><argument_list PREFIX:line="516" PREFIX:column="30">(<argument><expr PREFIX:line="516" PREFIX:column="31">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="516" PREFIX:column="49">// TODO</comment>
+			<expr_stmt><expr><call><name PREFIX:line="517" PREFIX:column="25">Send8</name><argument_list PREFIX:line="517" PREFIX:column="30">(<argument><expr PREFIX:line="517" PREFIX:column="31">0</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		}</block></then>
+		<else PREFIX:line="519" PREFIX:column="17">else <if PREFIX:line="519" PREFIX:column="22">if <condition PREFIX:line="519" PREFIX:column="25">(<expr><name PREFIX:line="519" PREFIX:column="26">CLEAR_FEATURE</name> == <name PREFIX:line="519" PREFIX:column="43">r</name></expr>)</condition><then PREFIX:line="519" PREFIX:column="45">
+		<block PREFIX:line="520" PREFIX:column="17">{
+		}</block></then>
+		<else PREFIX:line="522" PREFIX:column="17">else <if PREFIX:line="522" PREFIX:column="22">if <condition PREFIX:line="522" PREFIX:column="25">(<expr><name PREFIX:line="522" PREFIX:column="26">SET_FEATURE</name> == <name PREFIX:line="522" PREFIX:column="41">r</name></expr>)</condition><then PREFIX:line="522" PREFIX:column="43">
+		<block PREFIX:line="523" PREFIX:column="17">{
+		}</block></then>
+		<else PREFIX:line="525" PREFIX:column="17">else <if PREFIX:line="525" PREFIX:column="22">if <condition PREFIX:line="525" PREFIX:column="25">(<expr><name PREFIX:line="525" PREFIX:column="26">SET_ADDRESS</name> == <name PREFIX:line="525" PREFIX:column="41">r</name></expr>)</condition><then PREFIX:line="525" PREFIX:column="43">
+		<block PREFIX:line="526" PREFIX:column="17">{
+			<expr_stmt><expr><call><name PREFIX:line="527" PREFIX:column="25">WaitIN</name><argument_list PREFIX:line="527" PREFIX:column="31">()</argument_list></call></expr>;</expr_stmt>
+			<expr_stmt><expr><name PREFIX:line="528" PREFIX:column="25">UDADDR</name> = <name><name PREFIX:line="528" PREFIX:column="34">setup</name>.<name PREFIX:line="528" PREFIX:column="40">wValueL</name></name> | (1&lt;&lt;<name PREFIX:line="528" PREFIX:column="54">ADDEN</name>)</expr>;</expr_stmt>
+		}</block></then>
+		<else PREFIX:line="530" PREFIX:column="17">else <if PREFIX:line="530" PREFIX:column="22">if <condition PREFIX:line="530" PREFIX:column="25">(<expr><name PREFIX:line="530" PREFIX:column="26">GET_DESCRIPTOR</name> == <name PREFIX:line="530" PREFIX:column="44">r</name></expr>)</condition><then PREFIX:line="530" PREFIX:column="46">
+		<block PREFIX:line="531" PREFIX:column="17">{
+			<expr_stmt><expr><name PREFIX:line="532" PREFIX:column="25">ok</name> = <call><name PREFIX:line="532" PREFIX:column="30">SendDescriptor</name><argument_list PREFIX:line="532" PREFIX:column="44">(<argument><expr><name PREFIX:line="532" PREFIX:column="45">setup</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		}</block></then>
+		<else PREFIX:line="534" PREFIX:column="17">else <if PREFIX:line="534" PREFIX:column="22">if <condition PREFIX:line="534" PREFIX:column="25">(<expr><name PREFIX:line="534" PREFIX:column="26">SET_DESCRIPTOR</name> == <name PREFIX:line="534" PREFIX:column="44">r</name></expr>)</condition><then PREFIX:line="534" PREFIX:column="46">
+		<block PREFIX:line="535" PREFIX:column="17">{
+			<expr_stmt><expr><name PREFIX:line="536" PREFIX:column="25">ok</name> = false</expr>;</expr_stmt>
+		}</block></then>
+		<else PREFIX:line="538" PREFIX:column="17">else <if PREFIX:line="538" PREFIX:column="22">if <condition PREFIX:line="538" PREFIX:column="25">(<expr><name PREFIX:line="538" PREFIX:column="26">GET_CONFIGURATION</name> == <name PREFIX:line="538" PREFIX:column="47">r</name></expr>)</condition><then PREFIX:line="538" PREFIX:column="49">
+		<block PREFIX:line="539" PREFIX:column="17">{
+			<expr_stmt><expr><call><name PREFIX:line="540" PREFIX:column="25">Send8</name><argument_list PREFIX:line="540" PREFIX:column="30">(<argument><expr PREFIX:line="540" PREFIX:column="31">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		}</block></then>
+		<else PREFIX:line="542" PREFIX:column="17">else <if PREFIX:line="542" PREFIX:column="22">if <condition PREFIX:line="542" PREFIX:column="25">(<expr><name PREFIX:line="542" PREFIX:column="26">SET_CONFIGURATION</name> == <name PREFIX:line="542" PREFIX:column="47">r</name></expr>)</condition><then PREFIX:line="542" PREFIX:column="49">
+		<block PREFIX:line="543" PREFIX:column="17">{
+			<if PREFIX:line="544" PREFIX:column="25">if <condition PREFIX:line="544" PREFIX:column="28">(<expr><name PREFIX:line="544" PREFIX:column="29">REQUEST_DEVICE</name> == (<name PREFIX:line="544" PREFIX:column="48">requestType</name> &amp; <name PREFIX:line="544" PREFIX:column="62">REQUEST_RECIPIENT</name>)</expr>)</condition><then PREFIX:line="544" PREFIX:column="81">
+			<block PREFIX:line="545" PREFIX:column="25">{
+				<expr_stmt><expr><call><name PREFIX:line="546" PREFIX:column="33">InitEndpoints</name><argument_list PREFIX:line="546" PREFIX:column="46">()</argument_list></call></expr>;</expr_stmt>
+				<expr_stmt><expr><name PREFIX:line="547" PREFIX:column="33">_usbConfiguration</name> = <name><name PREFIX:line="547" PREFIX:column="53">setup</name>.<name PREFIX:line="547" PREFIX:column="59">wValueL</name></name></expr>;</expr_stmt>
+			}</block></then> <else PREFIX:line="548" PREFIX:column="27">else
+				<expr_stmt><expr><name PREFIX:line="549" PREFIX:column="33">ok</name> = false</expr>;</expr_stmt></else></if>
+		}</block></then>
+		<else PREFIX:line="551" PREFIX:column="17">else <if PREFIX:line="551" PREFIX:column="22">if <condition PREFIX:line="551" PREFIX:column="25">(<expr><name PREFIX:line="551" PREFIX:column="26">GET_INTERFACE</name> == <name PREFIX:line="551" PREFIX:column="43">r</name></expr>)</condition><then PREFIX:line="551" PREFIX:column="45">
+		<block PREFIX:line="552" PREFIX:column="17">{
+		}</block></then>
+		<else PREFIX:line="554" PREFIX:column="17">else <if PREFIX:line="554" PREFIX:column="22">if <condition PREFIX:line="554" PREFIX:column="25">(<expr><name PREFIX:line="554" PREFIX:column="26">SET_INTERFACE</name> == <name PREFIX:line="554" PREFIX:column="43">r</name></expr>)</condition><then PREFIX:line="554" PREFIX:column="45">
+		<block PREFIX:line="555" PREFIX:column="17">{
+		}</block></then></if></else></if></else></if></else></if></else></if></else></if></else></if></else></if></else></if></else></if>
+	}</block></then>
+	<else PREFIX:line="558" PREFIX:column="9">else
+	<block PREFIX:line="559" PREFIX:column="9">{
+		<expr_stmt><expr><call><name PREFIX:line="560" PREFIX:column="17">InitControl</name><argument_list PREFIX:line="560" PREFIX:column="28">(<argument><expr><name><name PREFIX:line="560" PREFIX:column="29">setup</name>.<name PREFIX:line="560" PREFIX:column="35">wLength</name></name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		<comment type="line" PREFIX:line="560" PREFIX:column="57">//	Max length of transfer</comment>
+		<expr_stmt><expr><name PREFIX:line="561" PREFIX:column="17">ok</name> = <call><name PREFIX:line="561" PREFIX:column="22">ClassInterfaceRequest</name><argument_list PREFIX:line="561" PREFIX:column="43">(<argument><expr><name PREFIX:line="561" PREFIX:column="44">setup</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	}</block></else></if>
+
+	<if PREFIX:line="564" PREFIX:column="9">if <condition PREFIX:line="564" PREFIX:column="12">(<expr><name PREFIX:line="564" PREFIX:column="13">ok</name></expr>)</condition><then PREFIX:line="564" PREFIX:column="16">
+		<expr_stmt><expr><call><name PREFIX:line="565" PREFIX:column="17">ClearIN</name><argument_list PREFIX:line="565" PREFIX:column="24">()</argument_list></call></expr>;</expr_stmt></then>
+	<else PREFIX:line="566" PREFIX:column="9">else
+	<block PREFIX:line="567" PREFIX:column="9">{
+		<expr_stmt><expr><call><name PREFIX:line="568" PREFIX:column="17">Stall</name><argument_list PREFIX:line="568" PREFIX:column="22">()</argument_list></call></expr>;</expr_stmt>
+	}</block></else></if>
+}</block>
+
+<function><type><name PREFIX:line="572" PREFIX:column="1">void</name></type> <name PREFIX:line="572" PREFIX:column="6">USB_Flush</name><parameter_list PREFIX:line="572" PREFIX:column="15">(<param><decl><type><name PREFIX:line="572" PREFIX:column="16">u8</name></type> <name PREFIX:line="572" PREFIX:column="19">ep</name></decl></param>)</parameter_list>
+<block PREFIX:line="573" PREFIX:column="1">{
+	<expr_stmt><expr><call><name PREFIX:line="574" PREFIX:column="9">SetEP</name><argument_list PREFIX:line="574" PREFIX:column="14">(<argument><expr><name PREFIX:line="574" PREFIX:column="15">ep</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<if PREFIX:line="575" PREFIX:column="9">if <condition PREFIX:line="575" PREFIX:column="12">(<expr><call><name PREFIX:line="575" PREFIX:column="13">FifoByteCount</name><argument_list PREFIX:line="575" PREFIX:column="26">()</argument_list></call></expr>)</condition><then PREFIX:line="575" PREFIX:column="29">
+		<expr_stmt><expr><call><name PREFIX:line="576" PREFIX:column="17">ReleaseTX</name><argument_list PREFIX:line="576" PREFIX:column="26">()</argument_list></call></expr>;</expr_stmt></then></if>
+}</block></function>
+
+<comment type="line" PREFIX:line="579" PREFIX:column="1">//	General interrupt</comment>
+<macro><name PREFIX:line="580" PREFIX:column="1">ISR</name><argument_list PREFIX:line="580" PREFIX:column="4">(<argument PREFIX:line="580" PREFIX:column="5">USB_GEN_vect</argument>)</argument_list></macro>
+<block PREFIX:line="581" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="582" PREFIX:column="9">u8</name></type> <name PREFIX:line="582" PREFIX:column="12">udint</name> <init PREFIX:line="582" PREFIX:column="18">= <expr><name PREFIX:line="582" PREFIX:column="20">UDINT</name></expr></init></decl>;</decl_stmt>
+	<expr_stmt><expr><name PREFIX:line="583" PREFIX:column="9">UDINT</name> = 0</expr>;</expr_stmt>
+
+	<comment type="line" PREFIX:line="585" PREFIX:column="9">//	End of Reset</comment>
+	<if PREFIX:line="586" PREFIX:column="9">if <condition PREFIX:line="586" PREFIX:column="12">(<expr><name PREFIX:line="586" PREFIX:column="13">udint</name> &amp; (1&lt;&lt;<name PREFIX:line="586" PREFIX:column="25">EORSTI</name>)</expr>)</condition><then PREFIX:line="586" PREFIX:column="33">
+	<block PREFIX:line="587" PREFIX:column="9">{
+		<expr_stmt><expr><call><name PREFIX:line="588" PREFIX:column="17">InitEP</name><argument_list PREFIX:line="588" PREFIX:column="23">(<argument><expr PREFIX:line="588" PREFIX:column="24">0</expr></argument>,<argument><expr><name PREFIX:line="588" PREFIX:column="26">EP_TYPE_CONTROL</name></expr></argument>,<argument><expr><name PREFIX:line="588" PREFIX:column="42">EP_SINGLE_64</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>	<comment type="line" PREFIX:line="588" PREFIX:column="57">// init ep0</comment>
+		<expr_stmt><expr><name PREFIX:line="589" PREFIX:column="17">_usbConfiguration</name> = 0</expr>;</expr_stmt>			<comment type="line" PREFIX:line="589" PREFIX:column="57">// not configured yet</comment>
+		<expr_stmt><expr><name PREFIX:line="590" PREFIX:column="17">UEIENX</name> = 1 &lt;&lt; <name PREFIX:line="590" PREFIX:column="31">RXSTPE</name></expr>;</expr_stmt>			<comment type="line" PREFIX:line="590" PREFIX:column="57">// Enable interrupts for ep0</comment>
+	}</block></then></if>
+
+	<comment type="line" PREFIX:line="593" PREFIX:column="9">//	Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too</comment>
+	<if PREFIX:line="594" PREFIX:column="9">if <condition PREFIX:line="594" PREFIX:column="12">(<expr><name PREFIX:line="594" PREFIX:column="13">udint</name> &amp; (1&lt;&lt;<name PREFIX:line="594" PREFIX:column="25">SOFI</name>)</expr>)</condition><then PREFIX:line="594" PREFIX:column="31">
+	<block PREFIX:line="595" PREFIX:column="9">{
+<cpp:ifdef PREFIX:line="596" PREFIX:column="1">#<cpp:directive PREFIX:line="596" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="596" PREFIX:column="8">CDC_ENABLED</name></cpp:ifdef>
+		<expr_stmt><expr><call><name PREFIX:line="597" PREFIX:column="17">USB_Flush</name><argument_list PREFIX:line="597" PREFIX:column="26">(<argument><expr><name PREFIX:line="597" PREFIX:column="27">CDC_TX</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>				<comment type="line" PREFIX:line="597" PREFIX:column="65">// Send a tx frame if found</comment>
+		<while PREFIX:line="598" PREFIX:column="17">while <condition PREFIX:line="598" PREFIX:column="23">(<expr><call><name PREFIX:line="598" PREFIX:column="24">USB_Available</name><argument_list PREFIX:line="598" PREFIX:column="37">(<argument><expr><name PREFIX:line="598" PREFIX:column="38">CDC_RX</name></expr></argument>)</argument_list></call></expr>)</condition>	<comment type="line" PREFIX:line="598" PREFIX:column="49">// Handle received bytes (if any)</comment>
+			<expr_stmt><expr><call><name><name PREFIX:line="599" PREFIX:column="25">Serial</name>.<name PREFIX:line="599" PREFIX:column="32">accept</name></name><argument_list PREFIX:line="599" PREFIX:column="38">()</argument_list></call></expr>;</expr_stmt></while>
+<cpp:endif PREFIX:line="600" PREFIX:column="1">#<cpp:directive PREFIX:line="600" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+		
+		<comment type="line" PREFIX:line="602" PREFIX:column="17">// check whether the one-shot period has elapsed.  if so, turn off the LED</comment>
+		<if PREFIX:line="603" PREFIX:column="17">if <condition PREFIX:line="603" PREFIX:column="20">(<expr><name PREFIX:line="603" PREFIX:column="21">TxLEDPulse</name> &amp;&amp; !(--<name PREFIX:line="603" PREFIX:column="39">TxLEDPulse</name>)</expr>)</condition><then PREFIX:line="603" PREFIX:column="51">
+			<expr_stmt><expr><name PREFIX:line="604" PREFIX:column="25">TXLED0</name></expr>;</expr_stmt></then></if>
+		<if PREFIX:line="605" PREFIX:column="17">if <condition PREFIX:line="605" PREFIX:column="20">(<expr><name PREFIX:line="605" PREFIX:column="21">RxLEDPulse</name> &amp;&amp; !(--<name PREFIX:line="605" PREFIX:column="39">RxLEDPulse</name>)</expr>)</condition><then PREFIX:line="605" PREFIX:column="51">
+			<expr_stmt><expr><name PREFIX:line="606" PREFIX:column="25">RXLED0</name></expr>;</expr_stmt></then></if>
+	}</block></then></if>
+}</block>
+
+<comment type="line" PREFIX:line="610" PREFIX:column="1">//	VBUS or counting frames</comment>
+<comment type="line" PREFIX:line="611" PREFIX:column="1">//	Any frame counting?</comment>
+<function><type><name PREFIX:line="612" PREFIX:column="1">u8</name></type> <name PREFIX:line="612" PREFIX:column="4">USBConnected</name><parameter_list PREFIX:line="612" PREFIX:column="16">()</parameter_list>
+<block PREFIX:line="613" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="614" PREFIX:column="9">u8</name></type> <name PREFIX:line="614" PREFIX:column="12">f</name> <init PREFIX:line="614" PREFIX:column="14">= <expr><name PREFIX:line="614" PREFIX:column="16">UDFNUML</name></expr></init></decl>;</decl_stmt>
+	<expr_stmt><expr><call><name PREFIX:line="615" PREFIX:column="9">delay</name><argument_list PREFIX:line="615" PREFIX:column="14">(<argument><expr PREFIX:line="615" PREFIX:column="15">3</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	<return PREFIX:line="616" PREFIX:column="9">return <expr><name PREFIX:line="616" PREFIX:column="16">f</name> != <name PREFIX:line="616" PREFIX:column="21">UDFNUML</name></expr>;</return>
+}</block></function>
+
+<comment type="line" PREFIX:line="619" PREFIX:column="1">//=======================================================================</comment>
+<comment type="line" PREFIX:line="620" PREFIX:column="1">//=======================================================================</comment>
+
+<decl_stmt><decl><type><name PREFIX:line="622" PREFIX:column="1">USBDevice_</name></type> <name PREFIX:line="622" PREFIX:column="12">USBDevice</name></decl>;</decl_stmt>
+
+<constructor><name><name PREFIX:line="624" PREFIX:column="1">USBDevice_</name>::<name PREFIX:line="624" PREFIX:column="13">USBDevice_</name></name><parameter_list PREFIX:line="624" PREFIX:column="23">()</parameter_list>
+<block PREFIX:line="625" PREFIX:column="1">{
+}</block></constructor>
+
+<function><type><name PREFIX:line="628" PREFIX:column="1">void</name></type> <name><name PREFIX:line="628" PREFIX:column="6">USBDevice_</name>::<name PREFIX:line="628" PREFIX:column="18">attach</name></name><parameter_list PREFIX:line="628" PREFIX:column="24">()</parameter_list>
+<block PREFIX:line="629" PREFIX:column="1">{
+	<expr_stmt><expr><name PREFIX:line="630" PREFIX:column="9">_usbConfiguration</name> = 0</expr>;</expr_stmt>
+	<expr_stmt><expr><name PREFIX:line="631" PREFIX:column="9">UHWCON</name> = 0x01</expr>;</expr_stmt>						<comment type="line" PREFIX:line="631" PREFIX:column="65">// power internal reg</comment>
+	<expr_stmt><expr><name PREFIX:line="632" PREFIX:column="9">USBCON</name> = (1&lt;&lt;<name PREFIX:line="632" PREFIX:column="22">USBE</name>)|(1&lt;&lt;<name PREFIX:line="632" PREFIX:column="32">FRZCLK</name>)</expr>;</expr_stmt>		<comment type="line" PREFIX:line="632" PREFIX:column="49">// clock frozen, usb enabled</comment>
+<cpp:if PREFIX:line="633" PREFIX:column="1">#<cpp:directive PREFIX:line="633" PREFIX:column="2">if</cpp:directive> <expr><call><name PREFIX:line="633" PREFIX:column="5">defined</name><argument_list PREFIX:line="633" PREFIX:column="12">(<argument><expr><name PREFIX:line="633" PREFIX:column="13">__AVR_AT90USB646__</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="633" PREFIX:column="36">defined</name><argument_list PREFIX:line="633" PREFIX:column="43">(<argument><expr><name PREFIX:line="633" PREFIX:column="44">__AVR_AT90USB647__</name></expr></argument>)</argument_list></call></expr></cpp:if>
+	<expr_stmt><expr><name PREFIX:line="634" PREFIX:column="9">PLLCSR</name> = 0x1A</expr>;</expr_stmt>						<comment type="line" PREFIX:line="634" PREFIX:column="65">// Need 16 MHz xtal</comment>
+<cpp:elif PREFIX:line="635" PREFIX:column="1">#<cpp:directive PREFIX:line="635" PREFIX:column="2">elif</cpp:directive> <expr><call><name PREFIX:line="635" PREFIX:column="7">defined</name><argument_list PREFIX:line="635" PREFIX:column="14">(<argument><expr><name PREFIX:line="635" PREFIX:column="15">__AVR_AT90USB1286__</name></expr></argument>)</argument_list></call> || <call><name PREFIX:line="635" PREFIX:column="39">defined</name><argument_list PREFIX:line="635" PREFIX:column="46">(<argument><expr><name PREFIX:line="635" PREFIX:column="47">__AVR_AT90USB1287__</name></expr></argument>)</argument_list></call></expr></cpp:elif>
+	<expr_stmt><expr><name PREFIX:line="636" PREFIX:column="9">PLLCSR</name> = 0x16</expr>;</expr_stmt>						<comment type="line" PREFIX:line="636" PREFIX:column="65">// Need 16 MHz xtal</comment>
+<cpp:else PREFIX:line="637" PREFIX:column="1">#<cpp:directive PREFIX:line="637" PREFIX:column="2">else</cpp:directive></cpp:else>
+	<expr_stmt><expr><name PREFIX:line="638" PREFIX:column="9">PLLCSR</name> = 0x12</expr>;</expr_stmt>						<comment type="line" PREFIX:line="638" PREFIX:column="65">// Need 16 MHz xtal</comment>
+<cpp:endif PREFIX:line="639" PREFIX:column="1">#<cpp:directive PREFIX:line="639" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+	<while PREFIX:line="640" PREFIX:column="9">while <condition PREFIX:line="640" PREFIX:column="15">(<expr PREFIX:line="640" PREFIX:column="16">!(<name PREFIX:line="640" PREFIX:column="18">PLLCSR</name> &amp; (1&lt;&lt;<name PREFIX:line="640" PREFIX:column="31">PLOCK</name>))</expr>)</condition>		<comment type="line" PREFIX:line="640" PREFIX:column="49">// wait for lock pll</comment>
+		<empty_stmt PREFIX:line="641" PREFIX:column="17">;</empty_stmt></while>
+
+	<comment type="line" PREFIX:line="643" PREFIX:column="9">// Some tests on specific versions of macosx (10.7.3), reported some</comment>
+	<comment type="line" PREFIX:line="644" PREFIX:column="9">// strange behaviuors when the board is reset using the serial</comment>
+	<comment type="line" PREFIX:line="645" PREFIX:column="9">// port touch at 1200 bps. This delay fixes this behaviour.</comment>
+	<expr_stmt><expr><call><name PREFIX:line="646" PREFIX:column="9">delay</name><argument_list PREFIX:line="646" PREFIX:column="14">(<argument><expr PREFIX:line="646" PREFIX:column="15">1</expr></argument>)</argument_list></call></expr>;</expr_stmt>
+
+	<expr_stmt><expr><name PREFIX:line="648" PREFIX:column="9">USBCON</name> = ((1&lt;&lt;<name PREFIX:line="648" PREFIX:column="23">USBE</name>)|(1&lt;&lt;<name PREFIX:line="648" PREFIX:column="33">OTGPADE</name>))</expr>;</expr_stmt>	<comment type="line" PREFIX:line="648" PREFIX:column="49">// start USB clock</comment>
+	<expr_stmt><expr><name PREFIX:line="649" PREFIX:column="9">UDIEN</name> = (1&lt;&lt;<name PREFIX:line="649" PREFIX:column="21">EORSTE</name>)|(1&lt;&lt;<name PREFIX:line="649" PREFIX:column="33">SOFE</name>)</expr>;</expr_stmt>		<comment type="line" PREFIX:line="649" PREFIX:column="49">// Enable interrupts for EOR (End of Reset) and SOF (start of frame)</comment>
+	<expr_stmt><expr><name PREFIX:line="650" PREFIX:column="9">UDCON</name> = 0</expr>;</expr_stmt>							<comment type="line" PREFIX:line="650" PREFIX:column="73">// enable attach resistor</comment>
+	
+	<expr_stmt><expr><name PREFIX:line="652" PREFIX:column="9">TX_RX_LED_INIT</name></expr>;</expr_stmt>
+}</block></function>
+
+<function><type><name PREFIX:line="655" PREFIX:column="1">void</name></type> <name><name PREFIX:line="655" PREFIX:column="6">USBDevice_</name>::<name PREFIX:line="655" PREFIX:column="18">detach</name></name><parameter_list PREFIX:line="655" PREFIX:column="24">()</parameter_list>
+<block PREFIX:line="656" PREFIX:column="1">{
+}</block></function>
+
+<comment type="line" PREFIX:line="659" PREFIX:column="1">//	Check for interrupts</comment>
+<comment type="line" PREFIX:line="660" PREFIX:column="1">//	TODO: VBUS detection</comment>
+<function><type><name PREFIX:line="661" PREFIX:column="1">bool</name></type> <name><name PREFIX:line="661" PREFIX:column="6">USBDevice_</name>::<name PREFIX:line="661" PREFIX:column="18">configured</name></name><parameter_list PREFIX:line="661" PREFIX:column="28">()</parameter_list>
+<block PREFIX:line="662" PREFIX:column="1">{
+	<return PREFIX:line="663" PREFIX:column="9">return <expr><name PREFIX:line="663" PREFIX:column="16">_usbConfiguration</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="666" PREFIX:column="1">void</name></type> <name><name PREFIX:line="666" PREFIX:column="6">USBDevice_</name>::<name PREFIX:line="666" PREFIX:column="18">poll</name></name><parameter_list PREFIX:line="666" PREFIX:column="22">()</parameter_list>
+<block PREFIX:line="667" PREFIX:column="1">{
+}</block></function>
+
+<cpp:endif PREFIX:line="670" PREFIX:column="1">#<cpp:directive PREFIX:line="670" PREFIX:column="2">endif</cpp:directive></cpp:endif> <comment type="block" PREFIX:line="670" PREFIX:column="8">/* if defined(USBCON) */</comment>
+</unit>

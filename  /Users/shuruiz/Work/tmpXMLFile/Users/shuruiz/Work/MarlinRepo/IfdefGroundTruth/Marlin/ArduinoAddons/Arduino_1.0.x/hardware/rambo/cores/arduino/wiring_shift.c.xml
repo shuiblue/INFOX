@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.0.x/hardware/rambo/cores/arduino/wiring_shift.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+  wiring_shift.c - shiftOut() function
+  Part of Arduino - http://www.arduino.cc/
+
+  Copyright (c) 2005-2006 David A. Mellis
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General
+  Public License along with this library; if not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  Boston, MA  02111-1307  USA
+
+  $Id: wiring.c 248 2007-02-03 15:36:30Z mellis $
+*/</comment>
+
+<cpp:include PREFIX:line="25" PREFIX:column="1">#<cpp:directive PREFIX:line="25" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="25" PREFIX:column="10">"wiring_private.h"</cpp:file></cpp:include>
+
+<function><type><name PREFIX:line="27" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="27" PREFIX:column="9">shiftIn</name><parameter_list PREFIX:line="27" PREFIX:column="16">(<param><decl><type><name PREFIX:line="27" PREFIX:column="17">uint8_t</name></type> <name PREFIX:line="27" PREFIX:column="25">dataPin</name></decl></param>, <param><decl><type><name PREFIX:line="27" PREFIX:column="34">uint8_t</name></type> <name PREFIX:line="27" PREFIX:column="42">clockPin</name></decl></param>, <param><decl><type><name PREFIX:line="27" PREFIX:column="52">uint8_t</name></type> <name PREFIX:line="27" PREFIX:column="60">bitOrder</name></decl></param>)</parameter_list> <block PREFIX:line="27" PREFIX:column="70">{
+	<decl_stmt><decl><type><name PREFIX:line="28" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="28" PREFIX:column="17">value</name> <init PREFIX:line="28" PREFIX:column="23">= <expr PREFIX:line="28" PREFIX:column="25">0</expr></init></decl>;</decl_stmt>
+	<decl_stmt><decl><type><name PREFIX:line="29" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="29" PREFIX:column="17">i</name></decl>;</decl_stmt>
+
+	<for PREFIX:line="31" PREFIX:column="9">for (<init><expr><name PREFIX:line="31" PREFIX:column="14">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="31" PREFIX:column="21">i</name> &lt; 8</expr>;</condition> <incr><expr PREFIX:line="31" PREFIX:column="28">++<name PREFIX:line="31" PREFIX:column="30">i</name></expr></incr>) <block PREFIX:line="31" PREFIX:column="33">{
+		<expr_stmt><expr><call><name PREFIX:line="32" PREFIX:column="17">digitalWrite</name><argument_list PREFIX:line="32" PREFIX:column="29">(<argument><expr><name PREFIX:line="32" PREFIX:column="30">clockPin</name></expr></argument>, <argument><expr><name PREFIX:line="32" PREFIX:column="40">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<if PREFIX:line="33" PREFIX:column="17">if <condition PREFIX:line="33" PREFIX:column="20">(<expr><name PREFIX:line="33" PREFIX:column="21">bitOrder</name> == <name PREFIX:line="33" PREFIX:column="33">LSBFIRST</name></expr>)</condition><then PREFIX:line="33" PREFIX:column="42">
+			<expr_stmt><expr><name PREFIX:line="34" PREFIX:column="25">value</name> |= <call><name PREFIX:line="34" PREFIX:column="34">digitalRead</name><argument_list PREFIX:line="34" PREFIX:column="45">(<argument><expr><name PREFIX:line="34" PREFIX:column="46">dataPin</name></expr></argument>)</argument_list></call> &lt;&lt; <name PREFIX:line="34" PREFIX:column="58">i</name></expr>;</expr_stmt></then>
+		<else PREFIX:line="35" PREFIX:column="17">else
+			<expr_stmt><expr><name PREFIX:line="36" PREFIX:column="25">value</name> |= <call><name PREFIX:line="36" PREFIX:column="34">digitalRead</name><argument_list PREFIX:line="36" PREFIX:column="45">(<argument><expr><name PREFIX:line="36" PREFIX:column="46">dataPin</name></expr></argument>)</argument_list></call> &lt;&lt; (7 - <name PREFIX:line="36" PREFIX:column="63">i</name>)</expr>;</expr_stmt></else></if>
+		<expr_stmt><expr><call><name PREFIX:line="37" PREFIX:column="17">digitalWrite</name><argument_list PREFIX:line="37" PREFIX:column="29">(<argument><expr><name PREFIX:line="37" PREFIX:column="30">clockPin</name></expr></argument>, <argument><expr><name PREFIX:line="37" PREFIX:column="40">LOW</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+	}</block></for>
+	<return PREFIX:line="39" PREFIX:column="9">return <expr><name PREFIX:line="39" PREFIX:column="16">value</name></expr>;</return>
+}</block></function>
+
+<function><type><name PREFIX:line="42" PREFIX:column="1">void</name></type> <name PREFIX:line="42" PREFIX:column="6">shiftOut</name><parameter_list PREFIX:line="42" PREFIX:column="14">(<param><decl><type><name PREFIX:line="42" PREFIX:column="15">uint8_t</name></type> <name PREFIX:line="42" PREFIX:column="23">dataPin</name></decl></param>, <param><decl><type><name PREFIX:line="42" PREFIX:column="32">uint8_t</name></type> <name PREFIX:line="42" PREFIX:column="40">clockPin</name></decl></param>, <param><decl><type><name PREFIX:line="42" PREFIX:column="50">uint8_t</name></type> <name PREFIX:line="42" PREFIX:column="58">bitOrder</name></decl></param>, <param><decl><type><name PREFIX:line="42" PREFIX:column="68">uint8_t</name></type> <name PREFIX:line="42" PREFIX:column="76">val</name></decl></param>)</parameter_list>
+<block PREFIX:line="43" PREFIX:column="1">{
+	<decl_stmt><decl><type><name PREFIX:line="44" PREFIX:column="9">uint8_t</name></type> <name PREFIX:line="44" PREFIX:column="17">i</name></decl>;</decl_stmt>
+
+	<for PREFIX:line="46" PREFIX:column="9">for (<init><expr><name PREFIX:line="46" PREFIX:column="14">i</name> = 0</expr>;</init> <condition><expr><name PREFIX:line="46" PREFIX:column="21">i</name> &lt; 8</expr>;</condition> <incr><expr><name PREFIX:line="46" PREFIX:column="28">i</name>++</expr></incr>)  <block PREFIX:line="46" PREFIX:column="34">{
+		<if PREFIX:line="47" PREFIX:column="17">if <condition PREFIX:line="47" PREFIX:column="20">(<expr><name PREFIX:line="47" PREFIX:column="21">bitOrder</name> == <name PREFIX:line="47" PREFIX:column="33">LSBFIRST</name></expr>)</condition><then PREFIX:line="47" PREFIX:column="42">
+			<expr_stmt><expr><call><name PREFIX:line="48" PREFIX:column="25">digitalWrite</name><argument_list PREFIX:line="48" PREFIX:column="37">(<argument><expr><name PREFIX:line="48" PREFIX:column="38">dataPin</name></expr></argument>, <argument><expr PREFIX:line="48" PREFIX:column="47">!!(<name PREFIX:line="48" PREFIX:column="50">val</name> &amp; (1 &lt;&lt; <name PREFIX:line="48" PREFIX:column="62">i</name>))</expr></argument>)</argument_list></call></expr>;</expr_stmt></then>
+		<else PREFIX:line="49" PREFIX:column="17">else	
+			<expr_stmt><expr><call><name PREFIX:line="50" PREFIX:column="25">digitalWrite</name><argument_list PREFIX:line="50" PREFIX:column="37">(<argument><expr><name PREFIX:line="50" PREFIX:column="38">dataPin</name></expr></argument>, <argument><expr PREFIX:line="50" PREFIX:column="47">!!(<name PREFIX:line="50" PREFIX:column="50">val</name> &amp; (1 &lt;&lt; (7 - <name PREFIX:line="50" PREFIX:column="67">i</name>)))</expr></argument>)</argument_list></call></expr>;</expr_stmt></else></if>
+			
+		<expr_stmt><expr><call><name PREFIX:line="52" PREFIX:column="17">digitalWrite</name><argument_list PREFIX:line="52" PREFIX:column="29">(<argument><expr><name PREFIX:line="52" PREFIX:column="30">clockPin</name></expr></argument>, <argument><expr><name PREFIX:line="52" PREFIX:column="40">HIGH</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+		<expr_stmt><expr><call><name PREFIX:line="53" PREFIX:column="17">digitalWrite</name><argument_list PREFIX:line="53" PREFIX:column="29">(<argument><expr><name PREFIX:line="53" PREFIX:column="30">clockPin</name></expr></argument>, <argument><expr><name PREFIX:line="53" PREFIX:column="40">LOW</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>		
+	}</block></for>
+}</block></function>
+</unit>

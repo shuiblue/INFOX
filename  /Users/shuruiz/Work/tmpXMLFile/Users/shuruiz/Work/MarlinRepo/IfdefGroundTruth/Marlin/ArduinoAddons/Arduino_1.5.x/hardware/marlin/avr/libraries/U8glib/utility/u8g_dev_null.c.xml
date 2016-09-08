@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.sdml.info/srcML/src" xmlns:cpp="http://www.sdml.info/srcML/cpp" xmlns:PREFIX="http://www.sdml.info/srcML/position" language="C" filename=" /Users/shuruiz/Work/tmpXMLFile//Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/Marlin/ArduinoAddons/Arduino_1.5.x/hardware/marlin/avr/libraries/U8glib/utility/u8g_dev_null.c" PREFIX:tabs="8"><comment type="block" PREFIX:line="1" PREFIX:column="1">/*
+
+  u8g_dev_null.c
+
+  Universal 8bit Graphics Library
+  
+  Copyright (c) 2011, olikraus@gmail.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, 
+  are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this list 
+    of conditions and the following disclaimer.
+    
+  * Redistributions in binary form must reproduce the above copyright notice, this 
+    list of conditions and the following disclaimer in the documentation and/or other 
+    materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  
+  
+*/</comment>
+
+<cpp:include PREFIX:line="37" PREFIX:column="1">#<cpp:directive PREFIX:line="37" PREFIX:column="2">include</cpp:directive> <cpp:file PREFIX:line="37" PREFIX:column="10">"u8g.h"</cpp:file></cpp:include>
+
+<function><type><name PREFIX:line="39" PREFIX:column="1">uint8_t</name></type> <name PREFIX:line="39" PREFIX:column="9">u8g_dev_null</name><parameter_list PREFIX:line="39" PREFIX:column="21">(<param><decl><type><name PREFIX:line="39" PREFIX:column="22">u8g_t</name> *</type><name PREFIX:line="39" PREFIX:column="29">u8g</name></decl></param>, <param><decl><type><name PREFIX:line="39" PREFIX:column="34">u8g_dev_t</name> *</type><name PREFIX:line="39" PREFIX:column="45">dev</name></decl></param>, <param><decl><type><name PREFIX:line="39" PREFIX:column="50">uint8_t</name></type> <name PREFIX:line="39" PREFIX:column="58">msg</name></decl></param>, <param><decl><type><name PREFIX:line="39" PREFIX:column="63">void</name> *</type><name PREFIX:line="39" PREFIX:column="69">arg</name></decl></param>)</parameter_list>
+<block PREFIX:line="40" PREFIX:column="1">{
+  <switch PREFIX:line="41" PREFIX:column="3">switch<condition PREFIX:line="41" PREFIX:column="9">(<expr><name PREFIX:line="41" PREFIX:column="10">msg</name></expr>)</condition>
+  <block PREFIX:line="42" PREFIX:column="3">{
+    <case PREFIX:line="43" PREFIX:column="5">case <expr><name PREFIX:line="43" PREFIX:column="10">U8G_DEV_MSG_SET_8PIXEL</name></expr>:                <comment type="block" PREFIX:line="43" PREFIX:column="49">/* most often used command */</comment>
+      <break PREFIX:line="44" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="45" PREFIX:column="5">case <expr><name PREFIX:line="45" PREFIX:column="10">U8G_DEV_MSG_SET_PIXEL</name></expr>:
+      <break PREFIX:line="46" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="47" PREFIX:column="5">case <expr><name PREFIX:line="47" PREFIX:column="10">U8G_DEV_MSG_INIT</name></expr>:
+      <break PREFIX:line="48" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="49" PREFIX:column="5">case <expr><name PREFIX:line="49" PREFIX:column="10">U8G_DEV_MSG_STOP</name></expr>:
+      <break PREFIX:line="50" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="51" PREFIX:column="5">case <expr><name PREFIX:line="51" PREFIX:column="10">U8G_DEV_MSG_PAGE_FIRST</name></expr>:
+      <break PREFIX:line="52" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="53" PREFIX:column="5">case <expr><name PREFIX:line="53" PREFIX:column="10">U8G_DEV_MSG_PAGE_NEXT</name></expr>:
+      <break PREFIX:line="54" PREFIX:column="7">break;</break>
+<cpp:ifdef PREFIX:line="55" PREFIX:column="1">#<cpp:directive PREFIX:line="55" PREFIX:column="2">ifdef</cpp:directive> <name PREFIX:line="55" PREFIX:column="8">U8G_DEV_MSG_IS_BBX_INTERSECTION</name></cpp:ifdef>
+    </case><case PREFIX:line="56" PREFIX:column="5">case <expr><name PREFIX:line="56" PREFIX:column="10">U8G_DEV_MSG_IS_BBX_INTERSECTION</name></expr>:
+      <return PREFIX:line="57" PREFIX:column="7">return <expr PREFIX:line="57" PREFIX:column="14">1</expr>;</return>
+<cpp:endif PREFIX:line="58" PREFIX:column="1">#<cpp:directive PREFIX:line="58" PREFIX:column="2">endif</cpp:directive></cpp:endif>
+    </case><case PREFIX:line="59" PREFIX:column="5">case <expr><name PREFIX:line="59" PREFIX:column="10">U8G_DEV_MSG_GET_PAGE_BOX</name></expr>:
+      <break PREFIX:line="60" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="61" PREFIX:column="5">case <expr><name PREFIX:line="61" PREFIX:column="10">U8G_DEV_MSG_SET_COLOR_INDEX</name></expr>:
+      <break PREFIX:line="62" PREFIX:column="7">break;</break>
+    </case><case PREFIX:line="63" PREFIX:column="5">case <expr><name PREFIX:line="63" PREFIX:column="10">U8G_DEV_MSG_SET_XY_CB</name></expr>:
+      <break PREFIX:line="64" PREFIX:column="7">break;</break>
+  </case>}</block></switch>
+  <return PREFIX:line="66" PREFIX:column="3">return <expr PREFIX:line="66" PREFIX:column="10">1</expr>;</return>
+}</block></function>
+</unit>

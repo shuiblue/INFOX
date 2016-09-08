@@ -28,7 +28,8 @@ public class Main {
     * numOfCuts: This is the number of edge-cutting of Community Detection algorithm.
     * */
     static String DIR = "C:\\Users\\shuruiz\\Documents\\components\\rel\\mcs.mpss\\";
-    static GroundTruth GROUNDTRUTH = REAL;
+    static GroundTruth GROUNDTRUTH = IFDEF;
+            //= REAL;
     static int numOfCuts = 10;
 
     /**
@@ -68,7 +69,7 @@ public class Main {
             }
         } else if (GROUNDTRUTH == REAL) {
             new File(analysisDir).mkdir();
-            analyzeRepo.analyzeRepository(sourcecodeDir, numOfCuts, re);
+            analyzeRepo.analyzeRepository(sourcecodeDir,analysisDir, numOfCuts, re);
         }
     }
 }
