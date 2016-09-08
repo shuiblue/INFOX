@@ -29,6 +29,13 @@ public class R_CommunityDetection {
     static final String FS = File.separator;
 //    double[][] shortestPathMatrix;
 
+    /**
+     * This methods
+     * @param fileDir
+     * @param numOfcut
+     * @param re
+     * @return
+     */
     public int detectingCommunitiesWithIgraph(String fileDir, int numOfcut, Rengine re) {
         modularityArray = new ArrayList<>();
         checkedEdges = new HashMap<>();
@@ -37,8 +44,7 @@ public class R_CommunityDetection {
         forkAddedNode = new HashSet<>();
         modularityMap = new HashMap<>();
         this.re = re;
-        //------------------------WINDOWS!!!!!!!!!!-------------------------
-        // this line costs me a whole night!!!!!!
+        //------------------------WINDOWS!!!!!!!!!!------------------------
 //        re.eval(".libPaths('C:/Users/shuruizDocuments/R/win-library/3.3/rJava/jri/x64)");
         re.eval(".libPaths('C:/Users/shuruiz/Documents/R/win-library/3.3')");
         re.eval("library(igraph)");
