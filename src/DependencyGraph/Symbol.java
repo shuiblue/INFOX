@@ -4,6 +4,10 @@ package DependencyGraph;
  * Created by shuruiz on 8/29/16.
  */
 public class Symbol {
+    public String getType() {
+        return type;
+    }
+
     String type;
     String name;
     String tag;

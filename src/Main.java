@@ -1,4 +1,5 @@
 import DependencyGraph.AnalyzingRepository;
+import Util.GetForkAddedCode;
 import Util.GroundTruth;
 import Util.ProcessingText;
 import org.rosuda.JRI.Rengine;
@@ -27,13 +28,25 @@ public class Main {
     * GROUNDTRUTH: REAL / IFDEF
     * numOfCuts: This is the number of edge-cutting of Community Detection algorithm.
     * */
-    static String DIR = "C:\\Users\\shuruiz\\Documents\\components\\rel\\mcs.mpss\\";
+//    static String DIR = "C:\\Users\\shuruiz\\Documents\\components\\rel\\mcs.mpss\\";
+
+    static String projectPath = "/Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/";
+    static String repo = "Marlin";
     static GroundTruth GROUNDTRUTH = IFDEF;
-            //= REAL;
+
+//    static GroundTruth GROUNDTRUTH = REAL;
+//    static String repo = "Email";
+
+    //= REAL;
     static int numOfCuts = 10;
+
+
+    // need to be set by developer
+    static int numOfTargetMacro = 2;
 
     /**
      * Main method for testing the INFOX method
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -47,29 +60,35 @@ public class Main {
         }
 
         /* testCase specifys the repository that need to be parsed.      */
-        String testCase = "test\\Email";
 
-        sourcecodeDir = DIR + testCase + FS;
-        analysisDir = sourcecodeDir + analysisDirName + FS;
+        sourcecodeDir = projectPath + repo + FS;
+
 
         if (GROUNDTRUTH == IFDEF) {
             for (int dirNum = 1; dirNum < 2; dirNum++) {
-//                ArrayList<String> macroList = selectTargetMacros(numOfTargetMacro);
+                analysisDir = sourcecodeDir + analysisDirName + FS + dirNum + FS;
+
+                GetForkAddedCode getForkAddedCode = new GetForkAddedCode();
+
+                macroList = getForkAddedCode.createMacroList(sourcecodeDir, analysisDir);
+
+                ArrayList<String> targetMacroList = getForkAddedCode.selectTargetMacros(numOfTargetMacro);
 //                ArrayList<String> macroList = selectApacheMacros(numOfTargetMacro);
-                  ArrayList<String> macroList = new ArrayList<>();
+//                  ArrayList<String> macroList = new ArrayList<>();
 //                macroList.add("CL_DEBUG");
 //                StringBuffer sb = new StringBuffer();
 //                for (int i = 1; i <= macroList.size(); i++) {
 //                    sb.append("<h3>" + i + ") " + macroList.get(i - 1) + "</h3>\n");
 //                }
 //                    iof.rewriteFile(sb.toString(), analysisDir + dirNum + "/testedMacros.txt");
-                new File(analysisDir + dirNum).mkdir();
+                new File(analysisDir).mkdir();
                 commitList = new ArrayList<>();
-                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir + dirNum, DIR, commitList, macroList, numOfCuts, re);
+                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, commitList, targetMacroList, numOfCuts, re);
             }
         } else if (GROUNDTRUTH == REAL) {
+            analysisDir = sourcecodeDir + analysisDirName + FS ;
             new File(analysisDir).mkdir();
-            analyzeRepo.analyzeRepository(sourcecodeDir,analysisDir, numOfCuts, re);
+            analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, numOfCuts, re);
         }
     }
 }

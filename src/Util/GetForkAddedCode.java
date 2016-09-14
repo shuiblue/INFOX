@@ -4,6 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Random;
+
 /**
  * Created by shuruiz on 8/29/16.
  *
@@ -13,8 +15,8 @@ public class GetForkAddedCode {
 
     String forkAddedNodeTxt = "forkAddedNode.txt";
     String expectTxt = "expectCluster.txt";
-    String sourcecodeDir, analysisDir;
-    ArrayList<String> commitSHAList;
+    static String sourcecodeDir, analysisDir;
+    static ArrayList<String> commitSHAList,macroList;
     static ProcessingText iof = new ProcessingText();
     StringBuffer forkAddedNodeString = new StringBuffer();
     StringBuffer expectedClusterString = new StringBuffer();
@@ -96,103 +98,118 @@ public class GetForkAddedCode {
 
     }
 
-    public void identifyChangedCodeFromFile(String fileName, ArrayList<String> macroList) {
+
+    public static void findIndependentMacros(String fileName) {
+        int linenum = 1;
         ArrayList<String> macroStack = new ArrayList<>();
-        int startLine = 0;
-        boolean withinIfdef = false;
-        String newFileName = "";
+        String macro = "";
         File currentFile = new File(sourcecodeDir + "/" + fileName);
+        boolean headerguard = false;
+        int boundary;
         if (currentFile.isFile()) {
             if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
+                try {
+                    BufferedReader result = new BufferedReader(new FileReader(sourcecodeDir + "/" + fileName));
+                    String line;
+                    while ((line = result.readLine()) != null) {
+                        if (line.contains("#if") || line.contains("#elif")) {
+                            if (line.contains("if ENABLED(")) {
+                                String[] conditions = line.split("\\|\\|");
+                                for (String c : conditions) {
+                                    if (c.contains("ENABLED(")) {
 
-                for (String targetMacro : macroList) {
-                    try {
-                        BufferedReader result = new BufferedReader(new FileReader(sourcecodeDir + "/" + fileName));
-                        String line;
-                        int lineNum = 1;
-                        String macro = "";
-                        int currentCommunityNum = -1;
-                        while ((line = result.readLine()) != null) {
-//                            System.out.println(fileName + "-" + lineNum);
-                            if (line.contains("#if") || line.contains("#elif")) {
-                                if (line.contains("if ENABLED(") || line.contains("elif")) {
-                                    if (macroStack.size() > 0 && line.contains("elif")) {
-                                        macroStack.remove(macroStack.size() - 1);
-                                        if (macroStack.size() == 0) {
-                                            withinIfdef = false;
-                                            macro = "";
-                                        }
+                                        int leftPare = c.indexOf("(");
+                                        int rightPare = c.indexOf(")");
+                                        macro = c.substring(leftPare + 1, rightPare).trim();
                                     }
-                                    String[] conditions = line.split("\\|\\|");
-                                    for (String c : conditions) {
-                                        if (c.contains("ENABLED(")) {
+                                }
+                            } else if (line.contains("#ifdef")) {
+                                macro = line.trim().substring(7);
+                            } else if (line.contains("#ifndef")) {
+                                if (fileName.trim().endsWith(".h")) {
+                                    String name = line.trim().substring(8);
+                                    String[] tmp = fileName.split("/");
 
-                                            int leftPare = c.indexOf("(");
-                                            int rightPare = c.indexOf(")");
-                                            macro = c.substring(leftPare + 1, rightPare).trim();
-                                            if (targetMacro.equals(macro)) {
-                                                break;
-                                            }
-                                        }
+                                    String file = tmp[tmp.length - 1].trim();
+                                    file = file.split("\\.")[0].toUpperCase() + "_" + file.split("\\.")[1].toUpperCase();
+                                    if (name.equals(file)) {
+                                        headerguard = true;
                                     }
-                                } else if (line.contains("#ifdef")) {
-                                    macro = line.trim().substring(7);
-                                } else {
-                                    macro = line.trim();
-                                }
-                                if (targetMacro.equals(macro)) {
-                                    withinIfdef = true;
-                                    startLine = lineNum + 1;
-                                    macroStack.add(macro);
-                                    currentCommunityNum = macroList.indexOf(macro) + 1;
-                                    //Rewrite the file name for html purpose
-                                    newFileName = iof.changeFileName(fileName);
-                                } else if (macroStack.size() > 0) {
-                                    macroStack.add(line);
-                                }
-
-                            } else if (macroStack.size() > 0 && (line.contains("#endif"))) {
-                                macroStack.remove(macroStack.size() - 1);
-                                if (macroStack.size() == 0) {
-                                    withinIfdef = false;
-                                    macro = "";
-                                }
-                            } else if (macroStack.size() == 1 && (line.contains("#else"))) {
-                                macroStack.remove(macroStack.size() - 1);
-                                if (macroStack.size() == 0) {
-                                    withinIfdef = false;
-                                    macro = "";
                                 }
                             }
-                            if (startLine <= lineNum && withinIfdef && currentCommunityNum != -1) {
-                                String nodeId = newFileName + "-" + lineNum + " ";
 
-                                if (!forkAddedNodeString.toString().contains(nodeId)) {
-                                    forkAddedNodeString.append(nodeId + "\n");
-                                    expectedClusterString.append(nodeId + currentCommunityNum + "\n");
-                                } else {
-
-                                    String tmp = expectedClusterString.toString();
-                                    expectedClusterString = new StringBuffer();
-                                    expectedClusterString.append(tmp.replace(nodeId, nodeId + currentCommunityNum + "/"));
-                                }
+                            if (!headerguard) {
+                                macroStack.add(macro);
                             }
-                            lineNum++;
+                        } else if (line.contains("#endif")) {
+                            if (macroStack.size() == 0) {
+                                break;
+                            }
+
+                            if (headerguard) {
+                                boundary = 1;
+                            } else {
+                                boundary = 0;
+                            }
+
+
+                            String removedMacro = macroStack.get(macroStack.size() - 1);
+
+                            macroStack.remove(macroStack.remove(macroStack.size() - 1));
+                            if (macroStack.size() == boundary && !macroList.contains(removedMacro) && !removedMacro.equals("") && !removedMacro.startsWith("#")) {
+                                macroList.add(removedMacro);
+                            }
+
                         }
-                        result.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        linenum++;
+
                     }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         } else if (currentFile.isDirectory()) {
             String[] subNames = currentFile.list();
             for (String f : subNames) {
-                identifyChangedCodeFromFile(fileName + "/" + f, macroList);
+                findIndependentMacros(fileName + "/" + f);
             }
         }
     }
 
+    /**
+     * This function aims to create a list of macros from the source code repository,
+     * basically it calls {@link #findIndependentMacros(String)} function
+     * to get changed code list.
+     * @return
+     */
+    public  ArrayList<String> createMacroList(String sourcecodeDir,String analysisDir) {
+        this.sourcecodeDir=sourcecodeDir;
+        this.analysisDir = analysisDir;
+        macroList = new ArrayList<>();
+        File dir1 = new File(sourcecodeDir);
+        File dir2 = new File(analysisDir);
+        String[] names = dir1.list();
+        dir2.mkdirs();
+
+        for (String fileName : names) {
+//            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
+            findIndependentMacros(fileName);
+        }
+        return macroList;
+    }
+
+
+    /**
+     * This function parses all the source code files and calls {@link #findIndependentMacros(String)} function
+     * to get changed code list.
+     * Output: 2 text file.
+     * 1) a list of forkAddedNode
+     * 2) a list of forkAddedNode + expectCluster --- Ground Truth
+     * @param sourcecodeDir
+     * @param analysisDir
+     * @param macroList a list of macros that need to be analyzed. The code that is wrapped by those macros are the ForkAdded code.
+     */
     public void identifyIfdefs(String sourcecodeDir, String analysisDir,  ArrayList<String> macroList) {
 //    public void identifyIfdefs(String projectPath, String repo, int dirNum, ArrayList<String> macroList) {
 //        String testDir = projectPath + repo;
@@ -206,7 +223,7 @@ public class GetForkAddedCode {
         iof.rewriteFile("", analysisDir + expectTxt);
 
         for (String fileName : names) {
-            identifyChangedCodeFromFile(fileName, macroList);
+            identifyChangedCodeFromFile(sourcecodeDir,fileName, macroList);
         }
         iof.writeTofile(forkAddedNodeString.toString(), analysisDir + forkAddedNodeTxt);
         iof.writeTofile(expectedClusterString.toString(), analysisDir + expectTxt);
@@ -229,8 +246,6 @@ public class GetForkAddedCode {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
         iof.rewriteFile(sb.toString(), DIR + dirName + FS + "DPGraph" + FS + "forkAddedNode.txt");
     }
 
@@ -288,6 +303,134 @@ public class GetForkAddedCode {
         }
         return sb.toString();
     }
+
+    public void identifyChangedCodeFromFile(String sourcecodeDir,String fileName, ArrayList<String> macroList) {
+        ArrayList<String> macroStack = new ArrayList<>();
+
+        int startLine = 0;
+        boolean withinIfdef = false;
+        String newFileName = "";
+        File currentFile = new File(sourcecodeDir + "/" + fileName);
+        if (currentFile.isFile()) {
+            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
+
+                for (String targetMacro : macroList) {
+                    try {
+                        BufferedReader result = new BufferedReader(new FileReader(sourcecodeDir + "/" + fileName));
+                        String line;
+                        int lineNum = 1;
+                        String macro = "";
+                        int currentCommunityNum = -1;
+                        while ((line = result.readLine()) != null) {
+//                            System.out.println(fileName + "-" + lineNum);
+                            if (line.contains("#if") || line.contains("#elif")) {
+                                if (line.contains("if ENABLED(") || line.contains("elif")) {
+                                    if (macroStack.size() > 0 && line.contains("elif")) {
+                                        macroStack.remove(macroStack.size() - 1);
+                                        if (macroStack.size() == 0) {
+                                            withinIfdef = false;
+                                            macro = "";
+                                        }
+                                    }
+                                    String[] conditions = line.split("\\|\\|");
+                                    for (String c : conditions) {
+                                        if (c.contains("ENABLED(")) {
+
+                                            int leftPare = c.indexOf("(");
+                                            int rightPare = c.indexOf(")");
+                                            macro = c.substring(leftPare + 1, rightPare).trim();
+                                            if (targetMacro.equals(macro)) {
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                } else if (line.contains("#ifdef")) {
+                                    macro = line.trim().substring(7);
+                                } else{
+                                    macro = line.trim();
+                                }
+                                if (targetMacro.equals(macro)) {
+                                    withinIfdef = true;
+                                    startLine = lineNum + 1;
+                                    macroStack.add(macro);
+
+
+                                    currentCommunityNum = macroList.indexOf(macro) + 1;
+                                    //Rewrite the file name for html purpose
+                                    newFileName = iof.changeFileName(fileName);
+                                } else if (macroStack.size() > 0) {
+                                    macroStack.add(line);
+                                }
+
+                            } else if (macroStack.size() > 0 && (line.contains("#endif"))) {
+                                macroStack.remove(macroStack.size() - 1);
+                                if (macroStack.size() == 0) {
+                                    withinIfdef = false;
+                                    macro = "";
+                                }
+                            } else if (macroStack.size() == 1 && (line.contains("#else"))) {
+                                macroStack.remove(macroStack.size() - 1);
+                                if (macroStack.size() == 0) {
+                                    withinIfdef = false;
+                                    macro = "";
+                                }
+                            }
+
+                            if (startLine <= lineNum && withinIfdef && currentCommunityNum != -1) {
+                                String nodeId = newFileName + "-" + lineNum + " ";
+
+                                if (!forkAddedNodeString.toString().contains(nodeId)) {
+                                    forkAddedNodeString.append(nodeId + "\n");
+                                    expectedClusterString.append(nodeId + currentCommunityNum + "\n");
+                                } else {
+
+                                    String tmp = expectedClusterString.toString();
+                                    expectedClusterString = new StringBuffer();
+                                    expectedClusterString.append(tmp.replace(nodeId, nodeId + currentCommunityNum + "/"));
+
+                                }
+
+
+                            }
+                            lineNum++;
+                        }
+                        result.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+
+                    }
+
+                }
+            }
+        } else if (currentFile.isDirectory()) {
+            String[] subNames = currentFile.list();
+            for (String f : subNames) {
+                identifyChangedCodeFromFile(sourcecodeDir,fileName+"/"+f, macroList);
+            }
+        }
+    }
+
+
+    public static ArrayList<String> selectTargetMacros(int number) {
+        ArrayList<String> targetMacros = new ArrayList<>();
+        ArrayList<Integer> indexList = new ArrayList<>();
+        while (indexList.size() < 5) {
+            Random random = new Random();
+            int index = random.ints(0, (macroList.size() - 1)).findFirst().getAsInt();
+            if (!indexList.contains(index)) {
+
+                indexList.add(index);
+                System.out.println("macroList.size()" + macroList.size());
+                System.out.println("index" + index);
+                targetMacros.add(macroList.get(index));
+            }
+        }
+
+        return targetMacros;
+
+    }
+
 
     public static void main(String[] args) {
         String dir = "C:\\Users\\shuruiz\\Documents\\PRISM-CR\\MCS61_CR\\result";

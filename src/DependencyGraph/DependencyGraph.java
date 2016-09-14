@@ -192,6 +192,10 @@ public class DependencyGraph {
         ProcessingText.writeToPajekFile(completeGraph, nodeList, analysisDir + "complete.pajek.net");
         ProcessingText.writeToPajekFile(compactGraph, compact_nodeList, analysisDir + "compact.pajek.net");
 
+
+        /**re-write source code to StringList.txt, remove all the symbols for similarity calculation **/
+        writeStringsToFile(candidateStrings);
+
         return edgeList;
     }
 
@@ -250,7 +254,7 @@ public class DependencyGraph {
         String xmlFilePath = ProcessingText.getXmlFile(tmpFilePath);
 
 
-        System.out.println("!!!   "+xmlFilePath);
+        System.out.println("!!!   " + xmlFilePath);
         /** generating DOM tree by xmlParser (xom) **/
         Element root = ProcessingText.getXmlDom(xmlFilePath).getRootElement();
 
@@ -314,9 +318,13 @@ public class DependencyGraph {
             } else if (ele.getLocalName().equals("if") && !ele.getNamespacePrefix().equals("cpp")) {
                 tmpStmtList.add(parseIfStmt(ele, fileName, scope, parentLocation));
             } else if (ele.getLocalName().equals("expr_stmt")) {
-                tmpStmtList.add(parseVariableInExpression(ele, getLocationOfElement(ele, fileName), scope, parentLocation, false));
+                String location = getLocationOfElement(ele, fileName);
+                tmpStmtList.add(parseVariableInExpression(ele, location, scope, parentLocation, false));
+                storeStrings(location, ele.getValue());
             } else if (ele.getLocalName().equals("decl_stmt")) {
+                String location = getLocationOfElement(ele, fileName);
                 tmpStmtList.add(parseDeclStmt(fileName, scope, parentLocation, ele));
+                storeStrings(location, ele.getValue());
             } else if (ele.getLocalName().equals("label") && (((Element) ele.getParent().getParent()).getLocalName().equals("block"))) {
                 // this is specifically for struct definition include bitfiles for certain fields
                 //e.g.   unsigned short icon : 8;
@@ -769,8 +777,8 @@ public class DependencyGraph {
                 }
             }
             //store string for comparing
-            String lineNumber = getLineNumOfElement(parameter_list);
-//            storeStrings(fileName + "-" + lineNumber, functionSymbol.getType() + " " + functionSymbol.getName() + " " + parameter_list.getValue());
+            String location = getLocationOfElement(parameter_list, fileName);
+            storeStrings(location, functionSymbol.getType() + " " + functionSymbol.getName() + " " + parameter_list.getValue());
         }
 
         //check block
@@ -795,6 +803,10 @@ public class DependencyGraph {
         //<if><condition><then>[<else>], else is optional
         Element condition = ele.getFirstChildElement("condition", NAMESPACEURI);
         String ifStmtLocation = getLocationOfElement(condition, fileName);
+
+        //store string
+        storeStrings(ifStmtLocation, condition.getValue());
+
         parseVariableInExpression(condition, ifStmtLocation, scope, parentLocation, false);
         //control flow analysis dependency
         if (!CONTROL_FLOW) {
@@ -903,6 +915,9 @@ public class DependencyGraph {
         Element condition = ele.getFirstChildElement("condition", NAMESPACEURI);
         ArrayList<String> stmtList = new ArrayList<>();
         String whileLocation = parseVariableInExpression(condition, "", scope, parentLocation, false);
+
+        //store string
+        storeStrings(whileLocation, condition.getValue());
 
         if (whileLocation.equals("")) {
             whileLocation = fileName + "-" + getLineNumOfElement(condition);
@@ -1096,12 +1111,12 @@ public class DependencyGraph {
         if (element.getLocalName().equals("decl")) {
             if ((!((Element) (element.getParent().getParent())).getLocalName().equals("parameter_list"))
                     && (!((Element) (element.getParent())).getLocalName().equals("decl_stmt"))) {
-//                storeStrings(fileName + "-" + lineNumber, type + " " + name);
+                storeStrings(getLocationOfElement(element, fileName), type + " " + name);
             }
         } else if (!element.getLocalName().equals("function")
                 && !element.getLocalName().equals("function_decl")
                 && !element.getLocalName().equals("constructor")) {
-//            storeStrings(fileName + "-" + lineNumber, type + " " + name);
+            storeStrings(getLocationOfElement(element, fileName), type + " " + name);
         }
 
         //index is optional
@@ -1793,6 +1808,33 @@ public class DependencyGraph {
                     }
                 }
             }
+        }
+    }
+
+
+    /**
+     * This function change source code statements into tokens
+     *
+     * @param location
+     * @param content
+     */
+    private void storeStrings(String location, String content) {
+        if (forkaddedNodeList.contains(location.replace("Email~", ""))) {
+
+            String strList = "";
+            if (idMap.get(location) != null) {
+//              strList.add(content);
+                int strID = idMap.get(location);
+                strList = candidateStrings.get(strID);
+                strList += " " + content;
+                candidateStrings.set(strID, strList);
+            } else {
+                strList = " " + content;
+                idMap.put(nodeList.get(location), stringID);
+                stringID++;
+            }
+
+            candidateStrings.add(strList.replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("[^a-zA-Z ]", " ").replaceAll("\\s+", " "));
         }
     }
 

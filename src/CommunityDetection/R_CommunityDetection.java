@@ -46,7 +46,7 @@ public class R_CommunityDetection {
         this.re = re;
         //------------------------WINDOWS!!!!!!!!!!------------------------
 //        re.eval(".libPaths('C:/Users/shuruizDocuments/R/win-library/3.3/rJava/jri/x64)");
-        re.eval(".libPaths('C:/Users/shuruiz/Documents/R/win-library/3.3')");
+//        re.eval(".libPaths('C:/Users/shuruiz/Documents/R/win-library/3.3')");
         re.eval("library(igraph)");
 //
 //        re.eval("completeGraph<-read.graph(\"" + fileDir + "/complete.pajek.net\", format=\"pajek\")");
@@ -58,10 +58,10 @@ public class R_CommunityDetection {
 
         String winFileDir = fileDir.replace("\\", "/");
         System.getProperty("java.library.path");
-//        System.out.println("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
-//        re.eval("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
-        System.out.println("oldg<-read_graph(\"" + winFileDir + "compact.pajek.net\", format=\'pajek\')");
-        re.eval("oldg<-read_graph(\"" + winFileDir + "compact.pajek.net\", format=\'pajek\')");
+        System.out.println("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
+        re.eval("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
+//        System.out.println("oldg<-read_graph(\"" + winFileDir + "compact.pajek.net\", format=\'pajek\')");
+//        re.eval("oldg<-read_graph(\"" + winFileDir + "compact.pajek.net\", format=\'pajek\')");
         // removes the loop and/or multiple edges from a graph.
         re.eval("g<-simplify(oldg)");
         re.eval("g<-as.undirected(g)");

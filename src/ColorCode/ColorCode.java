@@ -12,11 +12,11 @@ import java.util.List;
 public class ColorCode {
     static ProcessingText iofunc = new ProcessingText();
     static final String CSS = ".css";
-    static String expectTxt = "/forkAddedNode.txt";
-    static String sourceCodeTxt = "/sourceCode.txt";
-    static String nodeListTxt = "/NodeList.txt";
-    static String upstreamNodeTxt = "/upstreamNode.txt";
-    static String forkAddedNodeTxt = "/forkAddedNode.txt";
+    static String expectTxt = "expectCluster.txt";
+    static String sourceCodeTxt = "sourceCode.txt";
+    static String nodeListTxt = "NodeList.txt";
+    static String upstreamNodeTxt = "upstreamNode.txt";
+    static String forkAddedNodeTxt = "forkAddedNode.txt";
     static String jsFileHeader = "/jshead.txt";
     static HashMap<Integer, String> nodeMap;
     static ArrayList<String> colorList = new ArrayList<>();
@@ -35,7 +35,7 @@ public class ColorCode {
 
 
     public void parseSourceCodeFromFile(String fileName) {
-        File currentFile = new File(sourcecodeDir + "/" + fileName);
+        File currentFile = new File(sourcecodeDir  + fileName);
         //            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
         if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
 //            System.out.print(fileName + "\n");
@@ -47,7 +47,7 @@ public class ColorCode {
                 BufferedReader result_br = null;
                 int lineNumber = 1;
                 try {
-                    result_br = new BufferedReader(new FileReader(sourcecodeDir + "/" + fileName));
+                    result_br = new BufferedReader(new FileReader(sourcecodeDir  + fileName));
 
                     String line;
                     while ((line = result_br.readLine()) != null) {
@@ -119,7 +119,7 @@ public class ColorCode {
             br = new BufferedReader(new FileReader(analysisDir + nodeListTxt));
             while ((line = br.readLine()) != null) {
                 // use comma as separator
-//                System.out.println(line);
+                System.out.println(line);
                 nodeMap.put(Integer.valueOf(line.trim().split("---------")[0]), line.trim().split("---------")[1]);
             }
 
@@ -236,7 +236,7 @@ public class ColorCode {
                             }
 
                             String leftSidebarColor = "";
-                            String rightSidebarColor = "white";
+                            String rightSidebarColor = "White";
                             //--------------------------expect Node---------------------------
                             if (expectNodeMap.get(nodeLabel) != null) {
 
@@ -313,9 +313,9 @@ public class ColorCode {
             }
         }
 
-        iofunc.rewriteFile(sb.toString(), analysisDir + "/" + numberOfClusters + CSS);
-        iofunc.rewriteFile(colorTable.toString(), analysisDir + "/" + numberOfClusters + "_colorTable.txt");
-        iofunc.rewriteFile(clusterSB.toString(), analysisDir + "/" + numberOfClusters + "_clusterColor.txt");
+        iofunc.rewriteFile(sb.toString(), analysisDir  + numberOfClusters + CSS);
+        iofunc.rewriteFile(colorTable.toString(), analysisDir + numberOfClusters + "_colorTable.txt");
+        iofunc.rewriteFile(clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor.txt");
     }
 
     private String randomColor() {
@@ -335,8 +335,8 @@ public class ColorCode {
     }
 
     public void combineFiles(int numberOfClusters) {
-//        String htmlfilePath = "/Users/shuruiz/Work/MarlinRepo/visualizeHtml/";
-        String htmlfilePath = "C:\\Users\\shuruiz\\Documents\\visualizeHtml\\";
+        String htmlfilePath = "/Users/shuruiz/Work/MarlinRepo/visualizeHtml/";
+//        String htmlfilePath = "C:\\Users\\shuruiz\\Documents\\visualizeHtml\\";
         String headtxt = "head.txt";
         String bodyPreTxt = "body_pre.txt";
         String endtxt = "end.txt";
@@ -345,8 +345,8 @@ public class ColorCode {
         try {
             //write code.html
             iofunc.rewriteFile(iofunc.readResult(htmlfilePath + headtxt).replace("style.css", numberOfClusters + ".css"), analysisDir + html);
-            iofunc.writeTofile(iofunc.readResult(analysisDir + "/" + numberOfClusters + ".color"), analysisDir + html);
-//            iofunc.writeTofile(iofunc.readResult(analysisDir + "/" + numberOfClusters + ".distanceTable"), analysisDir + html);
+            iofunc.writeTofile(iofunc.readResult(analysisDir  + numberOfClusters + ".color"), analysisDir + html);
+//            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt), analysisDir + html);
 //            iofunc.writeTofile(iofunc.readResult(analysisDir + "testedMacros.txt"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + sourceCodeTxt), analysisDir + html);
