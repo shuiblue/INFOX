@@ -35,10 +35,8 @@ public class DependencyGraph {
      **/
     static public boolean HIERACHICAL = true;
     static final public boolean CONTROL_FLOW = true;
-    static public boolean CONSECUTIVE = true;
 
     public String current_OS = "MAC"; // "WINDOWS"
-
     static final public String CONTROLFLOW_LABEL = "<Control-Flow>";
 
     ProcessingText ProcessingText = new ProcessingText();
@@ -123,9 +121,9 @@ public class DependencyGraph {
      **/
     String sourcecodeDir = "";
     static String tmpXmlPath = "tmpXMLFile" + FS;
-    static String analysisDirName = "DPGraph";
     String edgeListTxt, parsedLineTxt, forkAddedNodeTxt, compact_graph_edgeList_txt;
 
+    int stringID = 0;
 
     /**
      * This function just call the create Dependency Graph, used for cluster nodes.
@@ -133,7 +131,7 @@ public class DependencyGraph {
      *
      * @return dependency graph, no edge label stored.
      */
-    public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String analysisDir) {
+    public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String analysisDir, boolean createEdgeForConsecutiveLines) {
         this.analysisDir = analysisDir;
         this.sourcecodeDir = sourcecodeDir;
 
@@ -182,8 +180,8 @@ public class DependencyGraph {
         /** generating edges cross files  **/
         addEdgesCrossFiles();
 
-        /**  if CONSECUTIVE is true, generating edges for consecutive lines  **/
-        if (CONSECUTIVE) {
+        /** generating edges for consecutive lines  **/
+        if (createEdgeForConsecutiveLines) {
             createNeighborEdges();
         }
 
@@ -193,8 +191,10 @@ public class DependencyGraph {
         ProcessingText.writeToPajekFile(compactGraph, compact_nodeList, analysisDir + "compact.pajek.net");
 
 
-        /**re-write source code to StringList.txt, remove all the symbols for similarity calculation **/
-        writeStringsToFile(candidateStrings);
+        /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
+             ------ similarity calculation purpose---------
+             writeStringsToFile(candidateStrings);
+         */
 
         return edgeList;
     }
@@ -268,9 +268,13 @@ public class DependencyGraph {
         /* for Marlin
                  if (!fileName.contains("pcre_globals")) {
         */
-        String parentLocation = "";
-        /** Generating dependency graph for  **/
-        generatingDependencyGraphForSubTree(root, newFileName, 1, parentLocation);
+        if(!(sourcecodeDir.contains("Apache")&&newFileName.equals("server~util_expr_parseC"))
+                &&!(sourcecodeDir.contains("Apache")&&fileName.contains("pcre_globals"))){
+            String parentLocation = "";
+            /** Generating dependency graph for  **/
+            generatingDependencyGraphForSubTree(root, newFileName, 1, parentLocation);
+
+        }
 
     }
 
@@ -326,10 +330,11 @@ public class DependencyGraph {
                 tmpStmtList.add(parseDeclStmt(fileName, scope, parentLocation, ele));
                 storeStrings(location, ele.getValue());
             } else if (ele.getLocalName().equals("label") && (((Element) ele.getParent().getParent()).getLocalName().equals("block"))) {
-                // this is specifically for struct definition include bitfiles for certain fields
-                //e.g.   unsigned short icon : 8;
-                // srcml  interprets it in a wrong way, so I hard code this case to parse the symbol
-                // <macro><label><expr_stmt>  represent a field
+                /** this is specifically for struct definition include bitfiles for certain fields
+                    e.g.   unsigned short icon : 8;
+                    srcml  interprets it in a wrong way, so I hard code this case to parse the symbol
+                    <macro><label><expr_stmt>  represent a field
+                 **/
                 Symbol declSymbol = addDeclarationSymbol(ele, "decl_stmt", fileName, scope, parentLocation, "");
                 tmpStmtList.add(declSymbol.getLocation());
             } else if (ele.getLocalName().equals("typedef")) {
@@ -364,7 +369,6 @@ public class DependencyGraph {
                 findVarDependency(symbol);
             } else if (ele.getLocalName().equals("expr")) {
                 parseVariableInExpression(ele, currentLocation, scope, parentLocation, isinit);
-//                parseVariableInExpression(subTreeRoot, line, fileName, scope, parentLocation, isinit);
             } else if (ele.getLocalName().equals("break") || ele.getLocalName().equals("continue")) {
                 String breakLoc = fileName + "-" + getLineNumOfElement(ele);
                 storeIntoNodeList(breakLoc);
@@ -452,8 +456,7 @@ public class DependencyGraph {
             storeSymbols(macros);
             ProcessingText.writeTofile(location + "\n", parsedLineTxt);
 
-
-            // macro value <cpp:value>
+            /** check macro value <cpp:value> , if it is a word, that might be another macro **/
             if (!tag.contains("function_decl")) {
                 Element value_ele = ele.getFirstChildElement("value", NAMESPACEURI_CPP);
                 if (value_ele != null) {
@@ -461,6 +464,7 @@ public class DependencyGraph {
                     String[] element_of_value = value.split(" ");
                     for (String str : element_of_value) {
                         str = str.replaceAll("[(){},.;!?<>%]", "");
+                        /**  check the value of macro is a word or not, if it is a word, then it might be another macro **/
                         if (could_be_a_word(str)) {
                             Symbol depend_macro = new Symbol(str, "", location, "cpp:value", scope);
                             findVarDependency(depend_macro);
@@ -471,20 +475,8 @@ public class DependencyGraph {
         }
     }
 
-    private boolean could_be_a_word(String str) {
-        if (str.trim().equals("")) {
-            return false;
-        }
 
-        return Pattern.compile("[a-zA-Z_]*").matcher(str).matches();
-    }
 
-    private boolean isHeaderGuard(String macroName, String fileName) {
-        String macroName_capital = "_" + macroName.toUpperCase() + "_H_";
-        fileName = fileName.split("~")[fileName.split("~").length - 1];
-        String fileName_capital = "_" + fileName.substring(0, fileName.lastIndexOf("H")).toUpperCase() + "_" + "H_";
-        return macroName_capital.contains(fileName_capital);
-    }
 
     /**
      * This function parse
@@ -505,7 +497,6 @@ public class DependencyGraph {
         //while <condition>
         Element conditionEle = ele.getFirstChildElement("condition", NAMESPACEURI);
         if (conditionEle != null) {
-//            String line = getLineNumOfElement(conditionEle);
             String location = getLocationOfElement(conditionEle, fileName);
             parseVariableInExpression(conditionEle, location, scope + 1, parentLocation, false);
             stmtList.add(location);
@@ -588,12 +579,16 @@ public class DependencyGraph {
         Element funcDecl_ele = ele.getFirstChildElement("function_decl", NAMESPACEURI);
         if (funcDecl_ele != null) {
             parseFunctionNode(funcDecl_ele, fileName, scope);
-
-//            addDeclarationSymbol(funcDecl_ele, "function_decl", fileName, scope, parentLocation, "");
         }
     }
 
 
+    /**
+     * This function parse macro definition element
+     * @param ele  macro definition element
+     * @param fileName
+     * @param scope
+     */
     private void parseMacros(Element ele, String fileName, int scope) {
         Element nameEle = ele.getFirstChildElement("name", NAMESPACEURI);
         Element argumentListEle = ele.getFirstChildElement("argument_list", NAMESPACEURI);
@@ -624,7 +619,6 @@ public class DependencyGraph {
                 String var = argument.getValue();
                 Symbol dependent = new Symbol(var, "", argumentLocation, "name", scope);
                 findVarDependency(dependent);
-
             }
         }
     }
@@ -673,6 +667,11 @@ public class DependencyGraph {
         }
     }
 
+    /**
+     * This function check whether it is valid to add hierachical edge for current element
+     * @param element
+     * @return true, if it is valid; otherwise, return false
+     */
     private boolean isValideHierachy(Element element) {
         return element.getLocalName().equals("function")
                 || element.getLocalName().equals("struct")
@@ -681,7 +680,15 @@ public class DependencyGraph {
                 || element.getLocalName().equals("enum");
     }
 
-
+    /**
+     * This function parses struct or class statement
+     * @param ele
+     * @param fileName
+     * @param scope
+     * @param parentLocation
+     * @param alias  struct may havs a alias.
+     * @param tag
+     */
     private void parseStructOrClass(Element ele, String fileName, int scope, String parentLocation, String alias, String tag) {
         String edgeLabel = "";
         if (tag.equals("struct")) {
@@ -1055,7 +1062,6 @@ public class DependencyGraph {
             } else {
                 type = type_Node.getValue();
             }
-//            type = type_Node.getValue();
         } else {
             type = "";
         }
@@ -1092,10 +1098,8 @@ public class DependencyGraph {
             location = parentLocation;
         } else {
             if (nameElement != null) {
-//            line = getLineNumOfElement(nameElement);
                 location = getLocationOfElement(nameElement, fileName);
             } else {
-//            line = getLineNumOfElement(element);
                 location = getLocationOfElement(element, fileName);
             }
         }
@@ -1135,26 +1139,25 @@ public class DependencyGraph {
         }
 
         //name def-use matching (find corresponding macros, if it exists)
-
         Symbol name_symbol = new Symbol(name, "", location, "decl_name", scope);
         findVarDependency(name_symbol);
 
-
         //type def-use matching
         if (is_user_defined_type(type)) {
-//            if (type.equals("stm_status_t")) {
-//                System.out.print("");
-//            }
             Symbol type_symbol = new Symbol(type, "type", location, "", scope);
             findVarDependency(type_symbol);
         }
-
 
         ProcessingText.writeTofile(getLocationOfElement(element, fileName) + "\n", parsedLineTxt);
         return symbol;
     }
 
 
+    /**
+     * This function check whether the type is user defined or not.
+     * @param type name of the type
+     * @return true, if it is user defined.
+     */
     private boolean is_user_defined_type(String type) {
         if (type.contains("char") || type.contains("int") || type.contains("long") || type.contains("float") || type.contains("double")
                 || type.contains("void") || type.contains("boolean") || type.contains("struct") || type.equals("")) {
@@ -1164,26 +1167,7 @@ public class DependencyGraph {
     }
 
 
-    int stringID = 0;
 
-//    private void storeStrings(String location, String content) {
-////TODO: FORK ADDED NODE
-//        if (forkaddedNodeList.contains(location + "\r")) {
-////        if (true) {
-//            String strList ;
-//            if (idMap.get(location) != null) {
-//                int strID = idMap.get(location);
-//                strList = candidateStrings.get(strID);
-//                strList += " " + content;
-//                candidateStrings.set(strID, strList);
-//            } else {
-//                strList = " " + content;
-//                idMap.put(nodeList.get(location), stringID);
-//                stringID++;
-//            }
-//            candidateStrings.add(strList.replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("[^a-zA-Z ]", " ").replaceAll("\\s+", " "));
-//        }
-//    }
 
     /**
      * * This function find variables exist in expression, and create edges if needed
@@ -1559,7 +1543,11 @@ public class DependencyGraph {
                                 if (candidates.size() > 0) {
                                     candidates.clear();
                                 }
-                                break;
+                                if (!s.getTag().equals("macro")) {
+                                    break;
+                                } else {
+                                    continue;
+                                }
                             }
                         }
                         // if the variable is not local, then check global variable def
@@ -1651,8 +1639,6 @@ public class DependencyGraph {
      * @param edgeLabel      edge label
      */
     public void addEdgesToFile(String depen_position, String decl_position, String edgeLabel) {
-
-
 //# reserve multipul edges between 2 nodes
         boolean addNewEdge = true;
         HashSet<String[]> dependencyNodes = completeGraph.get(decl_position);
@@ -1869,6 +1855,19 @@ public class DependencyGraph {
     }
 
     /**
+     * This function check whther current macro is just a header guard
+     * @param macroName
+     * @param fileName
+     * @return true if the macro is a header guard, otherwise, return false
+     */
+    private boolean isHeaderGuard(String macroName, String fileName) {
+        String macroName_capital = "_" + macroName.toUpperCase() + "_H_";
+        fileName = fileName.split("~")[fileName.split("~").length - 1];
+        String fileName_capital = "_" + fileName.substring(0, fileName.lastIndexOf("H")).toUpperCase() + "_" + "H_";
+        return macroName_capital.contains(fileName_capital);
+    }
+
+    /**
      * This method get file name by check the difference of (filePath - dirPath)
      *
      * @param filePath
@@ -1893,4 +1892,16 @@ public class DependencyGraph {
         return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c");
 //        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
+    /**
+     * This function check whether the str is a word or not
+     * @param str
+     * @return true, if it might be a word; otherwise false
+     */
+    private boolean could_be_a_word(String str) {
+        if (str.trim().equals("")) {
+            return false;
+        }
+        return Pattern.compile("[a-zA-Z_]*").matcher(str).matches();
+    }
+
 }

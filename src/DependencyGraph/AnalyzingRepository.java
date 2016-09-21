@@ -2,20 +2,14 @@ package DependencyGraph;
 
 import ColorCode.ColorCode;
 import CommunityDetection.R_CommunityDetection;
-import Similarity.StringSimilarity;
+//import Similarity.StringSimilarity;
 import Util.GetForkAddedCode;
 import org.rosuda.JRI.Rengine;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * Created by shuruiz on 8/29/16.
  */
 public class AnalyzingRepository {
-    static String analysisDirName = "DPGraph";
-    static final String FS = File.separator;
 
     /**
      * This function analyzes the source code repository. There are several steps:
@@ -24,114 +18,50 @@ public class AnalyzingRepository {
      * 3. calculating similarity of statement
      * 4. community detection
      * 5. Generating html file to visualize code clusters.
+     *
      * @param sourcecodeDir
      * @param analysisDir
-     * @param commitList
-     * @param macroList
-     * @param numOfCuts
+     * @param parameters    1. numOfTargetMacro
+     *                      2. numberOfCuts
+     *                      3. Ground Truth : IFDEF / REAL  (1-- ifdef, 0 --- Real)
+     *                      4. Consecutive lines: T/F  (1/0)
+     *                      5. Directed Graph: T/F (1/0)
      * @param re
      */
-    public void analyzeRepository(String sourcecodeDir, String analysisDir, ArrayList<String> commitList, ArrayList<String> macroList, int numOfCuts, Rengine re) {
-        DependencyGraph dependencyGraph = new DependencyGraph();
-        /**--------- used for parsing #ifdef to generate ground truth---------------**/
-        boolean SHA = false;
-        boolean IFDEF = true;
-        GetForkAddedCode icc = new GetForkAddedCode();
-        if (SHA) {
-//            icc.identifyChangedCodeBySHA(projectPath, repo, commitList);
-        } else if (IFDEF) {
-            icc.identifyIfdefs(sourcecodeDir, analysisDir, macroList);
+    public void analyzeRepository(String sourcecodeDir, String analysisDir, int[] parameters, Rengine re) {
+        /**   Set parameters   **/
+
+        int numOfTargetMacro = parameters[0];
+        int numOfCuts = parameters[1];
+        String GroundTruth = parameters[2] == 1 ? "IFDEF" : "REAL";
+        boolean createEdgeForConsecutiveLines = parameters[3] == 1 ? true : false;
+        boolean directedGraph= parameters[4] == 1 ? true : false;
+
+        if (GroundTruth.equals("IFDEF")) {
+            /**  get targetMacroList  **/
+            new GetForkAddedCode().selectTargetMacros(sourcecodeDir, analysisDir, numOfTargetMacro);
+        } else if (GroundTruth.equals("REAL")) {
+                                /* todo: for real feature related cases
+                                targetFeatureList =...
+                                */
         }
 
-        dependencyGraph.getDependencyGraphForProject(sourcecodeDir,analysisDir);
-        /**------------------calculating similarity------------------------------------**/
-        StringSimilarity strSim = new StringSimilarity();
-        strSim.calculateStringSimilarityByR(sourcecodeDir,analysisDir,re);
 
-
-        R_CommunityDetection rCommunityDetection = new R_CommunityDetection();
-        /*------------include dirNum----------------------
-        int bestCut = rCommunityDetection.detectingCommunitiesWithIgraph(filePath + DPGraphDir + dirNum, numOfCuts, re);
-        -----------include dirNum----------------------*/
-        int bestCut = rCommunityDetection.detectingCommunitiesWithIgraph(analysisDir, numOfCuts, re);
-
-        ColorCode colorCode = new ColorCode();
-          /*------------include dirNum----------------------
-        colorCode.parseEachUsefulClusteringResult(projectPath, repo, dirNum, macroList);
-           -----------include dirNum----------------------*/
-        colorCode.parseEachUsefulClusteringResult(sourcecodeDir, analysisDir);
-        /* FOR EMAIL SYSTEM*/
-//        colorCodeBlocks.parseEachUsefulClusteringResult(projectPath, repo, dirNum, 3);
-
-    }
-
-    /**
-     * used for test cases
-     * @param sourcecodeDir
-     * @param analysisDir
-     * @param numOfCuts
-     * @param re
-     * @return
-     */
-    public HashSet<String> analyzeRepository(String sourcecodeDir,  String analysisDir,int numOfCuts, Rengine re) {
-
+        /**  Generating Dependency Graphs for current test case/project  **/
         DependencyGraph dependencyGraph = new DependencyGraph();
-        HashSet<String> edgelist = null;
-        edgelist =
-                dependencyGraph.getDependencyGraphForProject(sourcecodeDir,analysisDir);
-//        /**------------------calculating similarity------------------------------------**/
-//        StringSimilarity strSim = new StringSimilarity();
-//                strSim.calculateStringSimilarityByR(sourcecodeDir,analysisDir,re);
-//        ArrayList<Double[]> levenshtein_matrix =  strSim.levenshtein_Method(sourcecodeDir,analysisDir);
-
-        R_CommunityDetection rCommunityDetection = new R_CommunityDetection();
-        /*-----------include dirNum----------------------
-        int bestCut = rCommunityDetection.detectingCommunitiesWithIgraph(filePath + DPGraphDir + dirNum, numOfCuts, re);
-        -----------include dirNum----------------------*/
-
-        int bestCut = rCommunityDetection.detectingCommunitiesWithIgraph(analysisDir, numOfCuts, re);
-
-        ColorCode colorCode = new ColorCode();
-          /*------------include dirNum----------------------
-        colorCode.parseEachUsefulClusteringResult(projectPath, repo, dirNum, macroList);
-           -----------include dirNum----------------------*/
-        colorCode.parseEachUsefulClusteringResult(sourcecodeDir, analysisDir);
-        return edgelist;
-//        return null;
-    }
+        dependencyGraph.getDependencyGraphForProject(sourcecodeDir, analysisDir,createEdgeForConsecutiveLines);
 
 
-    public HashSet<String> analyzeRepository(String sourcecodeDir, String analysisDir,  ArrayList<String> macroList, int numOfIteration, Rengine re) {
-//        String DPGraphDir = "/DPGraph/";
-//        String filePath = projectPath + repo;
+        /*------------------calculating similarity--------------------------
+        StringSimilarity strSim = new StringSimilarity();
+        strSim.calculateStringSimilarityByR(sourcecodeDir, analysisDir, re);*/
 
+        /** Community Detection  **/
+        new R_CommunityDetection().detectingCommunitiesWithIgraph(analysisDir, numOfCuts, re,directedGraph);
 
-//        DependencyGraph dependencyGraph = new DependencyGraph();
-////        boolean SHA = false;
-//        boolean IFDEF = true;
-//        GetForkAddedCode icc = new GetForkAddedCode();
-////        if (SHA) {
-////            icc.identifyChangedCodeBySHA(projectPath, repo, commitList);
-////        } else
-//
-//
-//        if (IFDEF) {
-//            icc.identifyIfdefs(sourcecodeDir, analysisDir, macroList);
-//        }
-        HashSet<String>  edgelist  =null;
-//                edgelist  = dependencyGraph.getDependencyGraphForProject(sourcecodeDir, analysisDir);
-//        StringSimilarity strSim = new StringSimilarity();
-//        strSim.calculateStringSimilarity(projectPath, repo, dirNum,re);
-
-
-//        R_CommunityDetection rCommunityDetection = new R_CommunityDetection();
-//
-//        int bestCut = rCommunityDetection.detectingCommunitiesWithIgraph(analysisDir, numOfIteration, re);
-        ColorCode colorCode = new ColorCode();
-        colorCode.parseEachUsefulClusteringResult(sourcecodeDir, analysisDir);
-
+        /** Generating html to visualize source code, set background and left side bar color for new code  **/
+        new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, analysisDir);
         /* FOR EMAIL SYSTEM*/
 //        colorCodeBlocks.parseEachUsefulClusteringResult(projectPath, repo, dirNum, 3);
-        return edgelist;
     }
 }

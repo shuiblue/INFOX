@@ -4,6 +4,7 @@ import DependencyGraph.Graph;
 import Util.ProcessingText;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
+
 import java.io.*;
 import java.util.*;
 
@@ -30,13 +31,14 @@ public class R_CommunityDetection {
 //    double[][] shortestPathMatrix;
 
     /**
-     * This methods
+     * This methods is detecting communities for changedCode.pajek.net, which is the graph for new code.
+     *
      * @param fileDir
      * @param numOfcut
      * @param re
      * @return
      */
-    public int detectingCommunitiesWithIgraph(String fileDir, int numOfcut, Rengine re) {
+    public int detectingCommunitiesWithIgraph(String fileDir, int numOfcut, Rengine re, boolean directedGraph) {
         modularityArray = new ArrayList<>();
         checkedEdges = new HashMap<>();
         cutSequence = new ArrayList<>();
@@ -44,27 +46,30 @@ public class R_CommunityDetection {
         forkAddedNode = new HashSet<>();
         modularityMap = new HashMap<>();
         this.re = re;
-        //------------------------WINDOWS!!!!!!!!!!------------------------
+        //------------------------WINDOWS------------------------
 //        re.eval(".libPaths('C:/Users/shuruizDocuments/R/win-library/3.3/rJava/jri/x64)");
 //        re.eval(".libPaths('C:/Users/shuruiz/Documents/R/win-library/3.3')");
         re.eval("library(igraph)");
-//
+
+        /*-------    calculating distance between clusters ----------
 //        re.eval("completeGraph<-read.graph(\"" + fileDir + "/complete.pajek.net\", format=\"pajek\")");
 //        re.eval("completeGraph<- simplify(comGraph)");
 ////        re.eval("completeGraph<-as.undirected(completeGraph)\n");
 //        re.eval("E(completeGraph)$weight <- 1");
 //        REXP shortestPath_R = re.eval("distMatrix <- shortest.paths(completeGraph, v=V(completeGraph), to=V(completeGraph))");
 //        shortestPathMatrix = shortestPath_R.asMatrix();
+        -----------*/
 
         String winFileDir = fileDir.replace("\\", "/");
         System.getProperty("java.library.path");
         System.out.println("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
         re.eval("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
-//        System.out.println("oldg<-read_graph(\"" + winFileDir + "compact.pajek.net\", format=\'pajek\')");
-//        re.eval("oldg<-read_graph(\"" + winFileDir + "compact.pajek.net\", format=\'pajek\')");
         // removes the loop and/or multiple edges from a graph.
         re.eval("g<-simplify(oldg)");
-        re.eval("g<-as.undirected(g)");
+
+        if (!directedGraph) {
+            re.eval("g<-as.undirected(g)");
+        }
         re.eval("originalg<-g");
 
         // get original graph
@@ -85,7 +90,9 @@ public class R_CommunityDetection {
         if (forkAddedFile.exists()) {
             storeNodes(fileDir, forkAddedNodeTxt);
         }
+
 //        upstreamEdge = findUpstreamEdges(originGraph, fileDir);
+
         //print old edge
         ioFunc.rewriteFile("", fileDir + "/clusterTMP.txt");
         //initialize removedEdge Map, all the edges have not been removed, so the values are all false
@@ -104,15 +111,19 @@ public class R_CommunityDetection {
             }
         }
 
-
-        StringBuffer cutResult = new StringBuffer();
-        String detectResult = findBestClusterResult(originGraph, cutSequence, fileDir);
+        findBestClusterResult(originGraph, cutSequence, fileDir);
         writeToModularityCSV(fileDir);
         re.end();
         System.out.println("\nBye.");
         return bestCut;
     }
 
+    /**
+     * This function stores the
+     *
+     * @param fileDir
+     * @param filePath
+     */
     private void storeNodes(String fileDir, String filePath) {
         String path = fileDir + filePath;
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -197,6 +208,12 @@ public class R_CommunityDetection {
     int current_numberOfCommunities = 0;
     ArrayList<Integer> listOfNumberOfCommunities = new ArrayList<>();
 
+    /**
+     * This function is calling community detection algorithm through igraph lib
+     * @param re
+     * @param filePath
+     * @param cutNum
+     */
     public void calculateEachGraph(Rengine re, String filePath, int cutNum) {
 
         //get graph's edgeList and nodeList
@@ -230,7 +247,7 @@ public class R_CommunityDetection {
             listOfNumberOfCommunities.add(current_numberOfCommunities);
 
         }
-        // -calculating distance
+        /**        calculating distance between clusters for joining purpose    **/
 //        calculateDistanceBetweenCommunities(clusters, filePath, current_numberOfCommunities);
 
 
@@ -245,7 +262,7 @@ public class R_CommunityDetection {
         //modularity find removableEdge
         int removableEdgeID = findRemovableEdge(currentGraph);
 //        if (pre_numberOfCommunities != current_numberOfCommunities) {
-        printGraph(currentGraph, filePath, cutNum);
+        printEdgeRemovingResult(currentGraph, filePath, cutNum);
         printMemebershipOfCurrentGraph(clusters, filePath);
 //        }
         modularityMap.put(cutNum, modularity);
@@ -257,6 +274,12 @@ public class R_CommunityDetection {
 
     }
 
+    /**
+     * This function calculate the distance between communities
+     * @param clusters
+     * @param fileDir
+     * @param numOfClusters
+     */
     private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String fileDir, int numOfClusters) {
         ArrayList<ArrayList<Integer>> combination = getPairsOfCommunities(clusters);
         HashMap<ArrayList<Integer>, Integer> distanceMatrix = new HashMap<>();
@@ -365,7 +388,6 @@ public class R_CommunityDetection {
                 clusters.put((int) membership[i], member);
             }
         }
-
         return clusters;
     }
 
@@ -390,7 +412,11 @@ public class R_CommunityDetection {
 
     }
 
-
+    /**
+     * This function is finding next edge to be removed by finding the edge has largest betweenness
+     * @param g
+     * @return
+     */
     public int findRemovableEdge(Graph g) {
         int maxBetEdgeID = findMaxNumberLocation(g.getBetweenness()) + 1;
         int oldEdgeID = findCorrespondingEdgeInOriginGraph(maxBetEdgeID, g);
@@ -427,7 +453,11 @@ public class R_CommunityDetection {
         return reverseEdgelist.get(fromNodeID + "," + toNodeID);
     }
 
-
+    /**
+     * This function find the largest number in the double array
+     * @param doubleArray
+     * @return  location of the number
+     */
     public int findMaxNumberLocation(double[] doubleArray) {
         int loc = 0;
         double max = doubleArray[0];
@@ -440,6 +470,11 @@ public class R_CommunityDetection {
         return loc;
     }
 
+    /**
+     * This function find the largest number in the double array
+     * @param doubleArray
+     * @return  location of the number
+     */
     public int findMaxNumberLocation(ArrayList<Double> doubleArray) {
         int loc = 0;
         double max = doubleArray.get(0);
@@ -449,31 +484,38 @@ public class R_CommunityDetection {
                 loc = counter;
             }
         }
-
         return loc;
     }
 
-
-    public void printGraph(Graph g, String filePath, int cutNum) {
+    /**
+     * This function print the clustering result when removing an edge that has the highest betweenness
+     * @param g
+     * @param filePath
+     * @param cutNum
+     */
+    public void printEdgeRemovingResult(Graph g, String filePath, int cutNum) {
         StringBuffer print = new StringBuffer();
         print.append("\n--------Graph-------\n");
         print.append("** " + cutNum + "edges has been removed **\n");
-
-
         String removableEdge = g.getRemovableEdgeLable();
         int edgeId = originGraph.getReverseEdgelist().get(removableEdge);
         int from = Integer.parseInt(removableEdge.split(",")[0]);
         int to = Integer.parseInt(removableEdge.split(",")[1]);
         String edgeNodes = originGraph.getNodelist().get(from) + "->" + originGraph.getNodelist().get(to);
         print.append("max between edge id:" + edgeId + "-" + removableEdge + "(" + edgeNodes + ")");
-
-
         double modularity = g.getModularity();
         print.append("\nModularity: " + modularity);
         ioFunc.writeTofile(print.toString(), filePath + "/clusterTMP.txt");
 
     }
 
+    /**
+     * This function find the best clustering result by finding the result has the highest modularity
+     * @param g
+     * @param cutSequence
+     * @param filePath
+     * @return
+     */
     public String findBestClusterResult(Graph g, ArrayList<Integer> cutSequence, String filePath) {
         StringBuffer result = new StringBuffer();
         bestCut = findMaxNumberLocation(modularityArray) + 1;
@@ -481,18 +523,10 @@ public class R_CommunityDetection {
             result.append(cutSequence.get(i) + ",");
         }
         result.append("\nbestcut:" + (bestCut) + "\n");
-
-
         result.append("\n\nCut Sequence(" + cutSequence.size() + " steps): ");
-
-//        ioFunc.rewriteFile(result.toString(), filePath + "/cutSequence.txt");
         ioFunc.rewriteFile(result.toString(), filePath + "cutSequence.txt");
-
         return result.toString();
     }
 
 
-    public static void main(String[] args) {
-//        new RCommunityDetection();
-    }
 }

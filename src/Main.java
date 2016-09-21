@@ -1,94 +1,96 @@
 import DependencyGraph.AnalyzingRepository;
-import Util.GetForkAddedCode;
-import Util.GroundTruth;
-import Util.ProcessingText;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import static Util.GroundTruth.*;
 
 /**
  * Created by shuruiz on 6/2/2016.
  */
 public class Main {
-
-
-    static ArrayList<String> commitList = new ArrayList<>();
     static AnalyzingRepository analyzeRepo = new AnalyzingRepository();
-    static ProcessingText iof = new ProcessingText();
-    static ArrayList<String> macroList;
     static String sourcecodeDir, analysisDir;
     static String analysisDirName = "DPGraph";
+    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth";
     static final String FS = File.separator;
 
-    /*-------------------Changable Variables------------------------
-    * DIR : source code directory
-    * GROUNDTRUTH: REAL / IFDEF
-    * numOfCuts: This is the number of edge-cutting of Community Detection algorithm.
-    * */
-//    static String DIR = "C:\\Users\\shuruiz\\Documents\\components\\rel\\mcs.mpss\\";
+    /**
+     * set by developer
+     **/
+    static int numOfTargetMacro = 5;
+    static int numberOfCuts = 4;
+    static int groundTruth = 1;  // (1-- ifdef, 0 --- Real)
 
-    static String projectPath = "/Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth/";
-    static String repo = "Marlin";
-    static GroundTruth GROUNDTRUTH = IFDEF;
-
-//    static GroundTruth GROUNDTRUTH = REAL;
-//    static String repo = "Email";
-
-    //= REAL;
-    static int numOfCuts = 10;
-
-
-    // need to be set by developer
-    static int numOfTargetMacro = 2;
 
     /**
      * Main method for testing the INFOX method
-     *
      * @param args
      */
     public static void main(String[] args) {
-        /*
-        Initialize Rengine to call igraph R library.
-         */
+        /**     Initialize Rengine to call igraph R library.      **/
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {
             System.out.println("Cannot load R");
             return;
         }
 
-        /* testCase specifys the repository that need to be parsed.      */
+        /** generating the parameters for creating dependency graph  **/
+        ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro, numberOfCuts, groundTruth);
 
-        sourcecodeDir = projectPath + repo + FS;
+        /**  parse different repositories under testCasesDir  **/
+        try {
+            Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
+                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
 
-
-        if (GROUNDTRUTH == IFDEF) {
-            for (int dirNum = 1; dirNum < 2; dirNum++) {
-                analysisDir = sourcecodeDir + analysisDirName + FS + dirNum + FS;
-
-                GetForkAddedCode getForkAddedCode = new GetForkAddedCode();
-
-                macroList = getForkAddedCode.createMacroList(sourcecodeDir, analysisDir);
-
-                ArrayList<String> targetMacroList = getForkAddedCode.selectTargetMacros(numOfTargetMacro);
-//                ArrayList<String> macroList = selectApacheMacros(numOfTargetMacro);
-//                  ArrayList<String> macroList = new ArrayList<>();
-//                macroList.add("CL_DEBUG");
-//                StringBuffer sb = new StringBuffer();
-//                for (int i = 1; i <= macroList.size(); i++) {
-//                    sb.append("<h3>" + i + ") " + macroList.get(i - 1) + "</h3>\n");
-//                }
-//                    iof.rewriteFile(sb.toString(), analysisDir + dirNum + "/testedMacros.txt");
-                new File(analysisDir).mkdir();
-                commitList = new ArrayList<>();
-                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, commitList, targetMacroList, numOfCuts, re);
-            }
-        } else if (GROUNDTRUTH == REAL) {
-            analysisDir = sourcecodeDir + analysisDirName + FS ;
-            new File(analysisDir).mkdir();
-            analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, numOfCuts, re);
+                    /**  testCase specifys the repository that need to be parsed.  **/
+                    sourcecodeDir = filePath.toString() + FS;
+                    //TODO: set subdir name for multiple tests
+                    for (int[] param : parameterArray) {
+                        String testDir = "";
+                        for (int index = 0; index <= 4; index++) {
+                            testDir += param[index];
+                        }
+                        analysisDir = sourcecodeDir + analysisDirName + FS + testDir + FS;
+                        new File(analysisDir).mkdir();
+                        analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, param, re);
+                    }
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    /**
+     * This function generates all the possible combination of the parameters for generating different dependency graphs.
+     * the parameters array stores different parameters for creating dependency graphs.
+     * 1. numOfTargetMacro
+     * 2. numberOfCuts
+     * 3. groundTruth : IFDEF / REAL  (1-- ifdef, 0 --- Real)
+     * 4. Consecutive lines: T/F  (1/0)
+     * 5. Directed Edge: T/F (1/0)
+     *
+     * @param numOfTargetMacro int (the number of macros randomly selected from marco list, equals to size of targetMacroList)
+     * @param numberOfCuts     integer (this number specifies how many more clusters should be detect after generating the initial dependency graph )
+     * @return parameterArray
+     */
+    private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro, int numberOfCuts, int groundTruth) {
+        ArrayList<int[]> parameterArray = new ArrayList<>();
+        int[] param = new int[5];
+        param[0] = numOfTargetMacro;
+        param[1] = numberOfCuts;
+        param[2] = groundTruth;
+        for (int i = 0; i <= 1; i++) {
+            for (int j = 0; j <= 1; j++) {
+                param[3] = i;
+                param[4] = j;
+                parameterArray.add(param);
+            }
+        }
+        return parameterArray;
     }
 }

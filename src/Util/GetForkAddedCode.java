@@ -183,9 +183,8 @@ public class GetForkAddedCode {
      * to get changed code list.
      * @return
      */
-    public  ArrayList<String> createMacroList(String sourcecodeDir,String analysisDir) {
-        this.sourcecodeDir=sourcecodeDir;
-        this.analysisDir = analysisDir;
+    public static ArrayList<String> createMacroList() {
+
         macroList = new ArrayList<>();
         File dir1 = new File(sourcecodeDir);
         File dir2 = new File(analysisDir);
@@ -313,7 +312,6 @@ public class GetForkAddedCode {
         File currentFile = new File(sourcecodeDir + "/" + fileName);
         if (currentFile.isFile()) {
             if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
-
                 for (String targetMacro : macroList) {
                     try {
                         BufferedReader result = new BufferedReader(new FileReader(sourcecodeDir + "/" + fileName));
@@ -354,8 +352,6 @@ public class GetForkAddedCode {
                                     withinIfdef = true;
                                     startLine = lineNum + 1;
                                     macroStack.add(macro);
-
-
                                     currentCommunityNum = macroList.indexOf(macro) + 1;
                                     //Rewrite the file name for html purpose
                                     newFileName = iof.changeFileName(fileName);
@@ -388,19 +384,14 @@ public class GetForkAddedCode {
                                     String tmp = expectedClusterString.toString();
                                     expectedClusterString = new StringBuffer();
                                     expectedClusterString.append(tmp.replace(nodeId, nodeId + currentCommunityNum + "/"));
-
                                 }
-
-
                             }
                             lineNum++;
                         }
                         result.close();
                     } catch (IOException e) {
                         e.printStackTrace();
-
                     }
-
                 }
             }
         } else if (currentFile.isDirectory()) {
@@ -411,9 +402,23 @@ public class GetForkAddedCode {
         }
     }
 
+    /**
+     * This function  randomly selects targetMacroList.
+     * It first parse the source code to generate a list of independent macros( 'independent' means there is no interaction between those macros)
+     * //todo in the future, we might handle feature interactions.
+     * Second,
+     * @param sourcecodeDir
+     * @param analysisDir
+     * @param number
+     * @return
+     */
 
-    public static ArrayList<String> selectTargetMacros(int number) {
-        ArrayList<String> targetMacros = new ArrayList<>();
+    public ArrayList<String> selectTargetMacros(String sourcecodeDir, String analysisDir, int number) {
+        this.sourcecodeDir=sourcecodeDir;
+        this.analysisDir = analysisDir;
+        /**  randomly select targetMacroList   **/
+        macroList = createMacroList();
+        ArrayList<String> targetMacroList = new ArrayList<>();
         ArrayList<Integer> indexList = new ArrayList<>();
         while (indexList.size() < 5) {
             Random random = new Random();
@@ -423,12 +428,22 @@ public class GetForkAddedCode {
                 indexList.add(index);
                 System.out.println("macroList.size()" + macroList.size());
                 System.out.println("index" + index);
-                targetMacros.add(macroList.get(index));
+                targetMacroList.add(macroList.get(index));
             }
         }
 
-        return targetMacros;
+         /** store macro name into file, which helps to generate the final html **/
+        StringBuffer sb = new StringBuffer();
+        for (int i = 1; i <= macroList.size(); i++) {
+            sb.append("<h3>" + i + ") " + macroList.get(i - 1) + "</h3>\n");
+        }
+        iof.rewriteFile(sb.toString(), analysisDir + "/testedMacros.txt");
 
+        /**--------- used for parsing #ifdef to generate ground truth---------------
+         parsing source code to find LOC wrapped by those macros and generating forkAddedNode.txt file **/
+        identifyIfdefs(sourcecodeDir, analysisDir, targetMacroList);
+
+        return targetMacroList;
     }
 
 

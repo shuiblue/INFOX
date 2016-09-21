@@ -42,7 +42,8 @@ public class ColorCode {
             String newFileName;
             newFileName = iofunc.changeFileName(fileName);
             if (forkAddedNode.contains(newFileName)) {
-                newFileName = newFileName.replace("~","-");
+                String fileName_forHTML="";
+                fileName_forHTML = newFileName.replace("~","-");
                 sb.append("<h1 id=\"" + newFileName + "title\" >" + fileName + "</h1>\n<pre id=\"" + newFileName + "\"  class=\"prettyprint linenums\">");
                 BufferedReader result_br = null;
                 int lineNumber = 1;
@@ -52,7 +53,8 @@ public class ColorCode {
                     String line;
                     while ((line = result_br.readLine()) != null) {
 
-                        String lable = newFileName + "-" + lineNumber;
+                        String lable = fileName_forHTML + "-" + lineNumber;
+                        String old_lable = newFileName + "-" + lineNumber;
                         sb.append("<front id=\"" + lable + "\">");
 
                             /* for print
@@ -65,7 +67,11 @@ public class ColorCode {
 */
                         sb.append(line.replace("<", "&lt;").replace(">", "&gt;"));
                         sb.append("</front>\n");
-                        if (!forkAddedNode.contains(lable + " ") || line.trim().startsWith("#") || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
+                        if(lineNumber==378){
+                            System.out.print("");
+                        }
+                        if (!forkAddedNode.contains(old_lable)  || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
+//                        if (!forkAddedNode.contains(old_lable) || line.trim().startsWith("#") || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
                             jsContent.append("$(\"#" + lable + "\").toggle()\n");
                         }
 
