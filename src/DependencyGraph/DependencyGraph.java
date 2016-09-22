@@ -305,6 +305,7 @@ public class DependencyGraph {
     public ArrayList<String> generatingDependencyGraphForSubTree(Element subTreeRoot, String fileName, int scope, String parentLocation, boolean isinit) {
         ArrayList<String> tmpStmtList = new ArrayList<>();
         Elements elements = subTreeRoot.getChildElements();
+        boolean isFunctionDeclaration = false;
         for (int i = 0; i < elements.size(); i++) {
             String line = "";
             String currentLocation = "";
@@ -352,9 +353,14 @@ public class DependencyGraph {
             } else if (ele.getLocalName().equals("enum")) {
                 parseEnum(ele, fileName, scope, "");
             } else if (ele.getLocalName().equals("macro")) {
-                parseMacros(ele, fileName, scope);
+                isFunctionDeclaration = parseMacros(ele, fileName, scope);
             } else if (ele.getLocalName().equals("block")) {
-                tmpStmtList.addAll(generatingDependencyGraphForSubTree(ele, fileName, scope + 1, parentLocation, isinit));
+                if (isFunctionDeclaration) {
+                    isFunctionDeclaration = false;
+                    continue;
+                } else {
+                    tmpStmtList.addAll(generatingDependencyGraphForSubTree(ele, fileName, scope + 1, parentLocation, isinit));
+                }
             } else if (ele.getLocalName().equals("extern")) {
                 tmpStmtList.addAll(generatingDependencyGraphForSubTree(ele, fileName, scope, parentLocation, isinit));
                 //todo : hierachy?
@@ -591,20 +597,50 @@ public class DependencyGraph {
     /**
      * This function parse macro definition element
      *
-     * @param ele      macro definition element
+     * @param ele
      * @param fileName
      * @param scope
+     * @return if the macro is actually a FunctionDeclaration, then return true; otherwise, return false;
      */
-    private void parseMacros(Element ele, String fileName, int scope) {
+    private boolean parseMacros(Element ele, String fileName, int scope) {
         Element nameEle = ele.getFirstChildElement("name", NAMESPACEURI);
         Element argumentListEle = ele.getFirstChildElement("argument_list", NAMESPACEURI);
+        String macroName = nameEle.getValue();
+        String location = getLocationOfElement(nameEle, fileName);
+
+        /**  check whether current macro is a function declaration, because srcml cannot parse it correctly
+         * example : Apache/module/arch/unix/mod_unixd.c  L322-L373
+         * **/
+        Elements siblings = ((Element) ele.getParent()).getChildElements();
+        for (int i = 0; i < siblings.size(); i++) {
+            if (siblings.get(i).getValue().toString().equals(ele.getValue().toString()) && (i + 1) < siblings.size()) {
+                if (siblings.get(i + 1).getLocalName().equals("block")) {
+                    Symbol func_decl = new Symbol(macroName, "", location, "function_decl", scope);
+                    ArrayList<Symbol> newsymbol = new ArrayList<>();
+                    newsymbol.add(func_decl);
+                    storeSymbols(newsymbol);
+                    storeIntoNodeList(location);
+
+                    //check block
+                    Element block = siblings.get(i + 1);
+                    if (block != null) {
+                        ArrayList<String> stmtInBlock = generatingDependencyGraphForSubTree(block, fileName, scope + 1, location);
+                        if (HIERACHICAL) {
+                            linkChildToParent(stmtInBlock, location, "<Hierarchy> function-block");
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+
+
         String tag = "macro";
         if (argumentListEle != null) {
             tag = "call";
         }
 
-        String macroName = nameEle.getValue();
-        String location = getLocationOfElement(nameEle, fileName);
+
         Symbol macro = new Symbol(macroName, "", location, tag, scope);
         storeIntoNodeList(location);
 
@@ -627,6 +663,7 @@ public class DependencyGraph {
                 findVarDependency(dependent);
             }
         }
+        return false;
     }
 
     /**
@@ -1394,10 +1431,6 @@ public class DependencyGraph {
      * @param exprLocation
      */
     private void storeIntoNodeList(String exprLocation) {
-
-        if (exprLocation.equals("")) {
-            System.out.print("");
-        }
         // -----------for dependency graph
         if (!nodeList.containsKey(exprLocation)) {
             id++;
@@ -1413,6 +1446,9 @@ public class DependencyGraph {
         // --------for compact graph--------------
         String filename = exprLocation.split("-")[0];
         if (!changedFiles.contains(filename)) {
+            if (filename.equals("")) {
+                System.out.println();
+            }
             exprLocation = filename + "-all";
         }
         if (!compact_nodeList.containsKey(exprLocation)) {
