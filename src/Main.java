@@ -54,10 +54,13 @@ public class Main {
                         for (int index = 0; index <= 4; index++) {
                             testDir += param[index];
                         }
-                        System.out.println("~~~~~~~current configuration: "+testDir);
-                        analysisDir = sourcecodeDir + analysisDirName + FS + testDir + FS;
-                        new File(analysisDir).mkdir();
-                        analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, param, re);
+
+                        for(int i =1;i<=10;i++) {
+                            analysisDir = sourcecodeDir + analysisDirName + FS + testDir + FS+i+FS;
+                            System.out.println("~~~~~~~current configuration: " + testDir+"~~"+i);
+                            new File(analysisDir).mkdir();
+                            analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, param, re);
+                        }
                     }
                 }
             });
