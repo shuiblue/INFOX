@@ -162,6 +162,7 @@ public class R_CommunityDetection {
         while (it_e.hasNext()) {
             Map.Entry node = (Map.Entry) it_e.next();
             nodeList_print.append(node.getKey() + "---------" + node.getValue() + "\n");
+
         }
 //        ioFunc.rewriteFile(nodeList_print.toString(), fileDir + "/NodeList.txt");
         ioFunc.rewriteFile(nodeList_print.toString(), fileDir + "NodeList.txt");

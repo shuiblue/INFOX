@@ -433,11 +433,14 @@ public class GetForkAddedCode {
         }
 
          /** store macro name into file, which helps to generate the final html **/
-        StringBuffer sb = new StringBuffer();
-        for (int i = 1; i <= macroList.size(); i++) {
-            sb.append("<h3>" + i + ") " + macroList.get(i - 1) + "</h3>\n");
+        StringBuffer sb_html = new StringBuffer();
+        StringBuffer sb_featureList = new StringBuffer();
+        for (int i = 1; i <= targetMacroList.size(); i++) {
+            sb_html.append("<h3>" + i + ") " + targetMacroList.get(i - 1) + "</h3>\n");
+            sb_featureList.append(targetMacroList.get(i - 1)+"\n");
         }
-        iof.rewriteFile(sb.toString(), analysisDir + "/testedMacros.txt");
+        iof.rewriteFile(sb_html.toString(), analysisDir + "/testedMacros.txt");
+        iof.rewriteFile(sb_featureList.toString(), analysisDir + "/featureList.txt");
 
         /**--------- used for parsing #ifdef to generate ground truth---------------
          parsing source code to find LOC wrapped by those macros and generating forkAddedNode.txt file **/

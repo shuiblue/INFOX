@@ -254,7 +254,6 @@ public class DependencyGraph {
         String xmlFilePath = ProcessingText.getXmlFile(tmpFilePath);
 
 
-        System.out.println("!!!   " + xmlFilePath);
         /** generating DOM tree by xmlParser (xom) **/
         Element root = ProcessingText.getXmlDom(xmlFilePath).getRootElement();
 
@@ -268,8 +267,8 @@ public class DependencyGraph {
         /* for Marlin
                  if (!fileName.contains("pcre_globals")) {
         */
-        if(!(sourcecodeDir.contains("Apache")&&newFileName.equals("server~util_expr_parseC"))
-                &&!(sourcecodeDir.contains("Apache")&&fileName.contains("pcre_globals"))){
+        if (!(sourcecodeDir.contains("Apache") && newFileName.equals("server~util_expr_parseC"))
+                && !(sourcecodeDir.contains("Apache") && fileName.contains("pcre_globals"))) {
             String parentLocation = "";
             /** Generating dependency graph for  **/
             generatingDependencyGraphForSubTree(root, newFileName, 1, parentLocation);
@@ -331,9 +330,9 @@ public class DependencyGraph {
                 storeStrings(location, ele.getValue());
             } else if (ele.getLocalName().equals("label") && (((Element) ele.getParent().getParent()).getLocalName().equals("block"))) {
                 /** this is specifically for struct definition include bitfiles for certain fields
-                    e.g.   unsigned short icon : 8;
-                    srcml  interprets it in a wrong way, so I hard code this case to parse the symbol
-                    <macro><label><expr_stmt>  represent a field
+                 e.g.   unsigned short icon : 8;
+                 srcml  interprets it in a wrong way, so I hard code this case to parse the symbol
+                 <macro><label><expr_stmt>  represent a field
                  **/
                 Symbol declSymbol = addDeclarationSymbol(ele, "decl_stmt", fileName, scope, parentLocation, "");
                 tmpStmtList.add(declSymbol.getLocation());
@@ -393,7 +392,15 @@ public class DependencyGraph {
 
             }
         }
-        return tmpStmtList;
+        //remove empty s
+        ArrayList<String> stmtList = new ArrayList<>();
+        for (String s : tmpStmtList) {
+            if (!s.equals("")) {
+                stmtList.add(s);
+            }
+        }
+
+        return stmtList;
     }
 
     /**
@@ -474,8 +481,6 @@ public class DependencyGraph {
             }
         }
     }
-
-
 
 
     /**
@@ -585,7 +590,8 @@ public class DependencyGraph {
 
     /**
      * This function parse macro definition element
-     * @param ele  macro definition element
+     *
+     * @param ele      macro definition element
      * @param fileName
      * @param scope
      */
@@ -669,6 +675,7 @@ public class DependencyGraph {
 
     /**
      * This function check whether it is valid to add hierachical edge for current element
+     *
      * @param element
      * @return true, if it is valid; otherwise, return false
      */
@@ -682,11 +689,12 @@ public class DependencyGraph {
 
     /**
      * This function parses struct or class statement
+     *
      * @param ele
      * @param fileName
      * @param scope
      * @param parentLocation
-     * @param alias  struct may havs a alias.
+     * @param alias          struct may havs a alias.
      * @param tag
      */
     private void parseStructOrClass(Element ele, String fileName, int scope, String parentLocation, String alias, String tag) {
@@ -975,12 +983,14 @@ public class DependencyGraph {
         if (!allBelongToNewCode) {
             linkChildToParent(stmtList, headLocation, "<Control-Flow>");
         } else {
-            addEdgesToFile(stmtList.get(0), headLocation, CONTROLFLOW_LABEL + " " + label);
-            for (int i = 0; i < stmtList.size() - 1; i++) {
-                String pre_loc = stmtList.get(i);
-                String after_loc = stmtList.get(i + 1);
-                if (!pre_loc.equals(after_loc)) {
-                    addEdgesToFile(after_loc, pre_loc, CONTROLFLOW_LABEL + " " + label);
+            if (stmtList.size() > 0) {
+                addEdgesToFile(stmtList.get(0), headLocation, CONTROLFLOW_LABEL + " " + label);
+                for (int i = 0; i < stmtList.size() - 1; i++) {
+                    String pre_loc = stmtList.get(i);
+                    String after_loc = stmtList.get(i + 1);
+                    if (!pre_loc.equals(after_loc)) {
+                        addEdgesToFile(after_loc, pre_loc, CONTROLFLOW_LABEL + " " + label);
+                    }
                 }
             }
         }
@@ -1155,6 +1165,7 @@ public class DependencyGraph {
 
     /**
      * This function check whether the type is user defined or not.
+     *
      * @param type name of the type
      * @return true, if it is user defined.
      */
@@ -1165,8 +1176,6 @@ public class DependencyGraph {
         }
         return true;
     }
-
-
 
 
     /**
@@ -1386,6 +1395,9 @@ public class DependencyGraph {
      */
     private void storeIntoNodeList(String exprLocation) {
 
+        if (exprLocation.equals("")) {
+            System.out.print("");
+        }
         // -----------for dependency graph
         if (!nodeList.containsKey(exprLocation)) {
             id++;
@@ -1409,7 +1421,6 @@ public class DependencyGraph {
             compactGraph.put(exprLocation, new HashSet<>());
         }
 
-        System.out.println(exprLocation);
 
     }
 
@@ -1673,7 +1684,7 @@ public class DependencyGraph {
             String dependNode_file = depen_position.split("-")[0];
             String declNode_file = decl_position.split("-")[0];
             String compact_depend_label, compact_decl_label;
-            HashSet<String[]> compact_dependNodes = new HashSet<>();
+            HashSet<String[]> compact_dependNodes;
             if (!changedFiles.contains(dependNode_file)) {
                 compact_depend_label = dependNode_file + "-all";
             } else {
@@ -1711,7 +1722,7 @@ public class DependencyGraph {
                 //------------compact graph---------------
 
                 if (!compact_decl_label.equals(compact_depend_label)) {
-                    System.out.println(compact_decl_label + "," + tmpEdge[0] + "," + tmpEdge[1] + "," + tmpEdge[2]);
+//                    System.out.println(compact_decl_label + "," + tmpEdge[0] + "," + tmpEdge[1] + "," + tmpEdge[2]);
                     compact_dependNodes.add(tmpEdge);
                     compactGraph.put(compact_decl_label, compact_dependNodes);
                 }
@@ -1856,6 +1867,7 @@ public class DependencyGraph {
 
     /**
      * This function check whther current macro is just a header guard
+     *
      * @param macroName
      * @param fileName
      * @return true if the macro is a header guard, otherwise, return false
@@ -1892,8 +1904,10 @@ public class DependencyGraph {
         return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c");
 //        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
+
     /**
      * This function check whether the str is a word or not
+     *
      * @param str
      * @return true, if it might be a word; otherwise false
      */

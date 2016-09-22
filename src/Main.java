@@ -54,6 +54,7 @@ public class Main {
                         for (int index = 0; index <= 4; index++) {
                             testDir += param[index];
                         }
+                        System.out.println("~~~~~~~current configuration: "+testDir);
                         analysisDir = sourcecodeDir + analysisDirName + FS + testDir + FS;
                         new File(analysisDir).mkdir();
                         analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, param, re);
@@ -80,12 +81,13 @@ public class Main {
      */
     private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro, int numberOfCuts, int groundTruth) {
         ArrayList<int[]> parameterArray = new ArrayList<>();
-        int[] param = new int[5];
-        param[0] = numOfTargetMacro;
-        param[1] = numberOfCuts;
-        param[2] = groundTruth;
+
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= 1; j++) {
+                int[] param = new int[5];
+                param[0] = numOfTargetMacro;
+                param[1] = numberOfCuts;
+                param[2] = groundTruth;
                 param[3] = i;
                 param[4] = j;
                 parameterArray.add(param);
