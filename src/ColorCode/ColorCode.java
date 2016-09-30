@@ -14,7 +14,7 @@ public class ColorCode {
     static final String CSS = ".css";
     static String expectTxt = "expectCluster.txt";
     static String sourceCodeTxt = "sourceCode.txt";
-    static String nodeListTxt = "NodeList.txt";
+    static String nodeListTxt = "/NodeList.txt";
     static String upstreamNodeTxt = "upstreamNode.txt";
     static String forkAddedNodeTxt = "forkAddedNode.txt";
     static String jsFileHeader = "/jshead.txt";
@@ -27,6 +27,7 @@ public class ColorCode {
 
     String sourcecodeDir;
     String analysisDir;
+    String testCaseDir;
     boolean print = false;
     StringBuilder sb = new StringBuilder();
 
@@ -126,7 +127,9 @@ public class ColorCode {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 System.out.println(line);
-                nodeMap.put(Integer.valueOf(line.trim().split("---------")[0]), line.trim().split("---------")[1]);
+                if(line.trim().split("---------").length>1) {
+                    nodeMap.put(Integer.valueOf(line.trim().split("---------")[0]), line.trim().split("---------")[1]);
+                }
             }
 
         } catch (FileNotFoundException e) {
@@ -150,7 +153,7 @@ public class ColorCode {
         //--------------------------expect Node---------------------------
         String expectNode = "";
         try {
-            expectNode = iofunc.readResult(analysisDir + expectTxt);
+            expectNode = iofunc.readResult(testCaseDir + expectTxt);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -375,10 +378,11 @@ public class ColorCode {
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
         //----for Marlin repo structure----
       */
-    public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir) {
-//        String filePath = projectPath + repo + "\\";
+    public void parseEachUsefulClusteringResult(String sourcecodeDir, String testCaseDir, String testDir) {
+        final String FS = File.separator;
         this.sourcecodeDir=sourcecodeDir;
-        this.analysisDir=analysisDir;
+        this.analysisDir=testCaseDir+testDir+FS;
+        this.testCaseDir=testCaseDir;
         //f----or Marlin repo structure----
 //        sourcecodeDir = filePath + repo;
 //        sourcecodeDir = filePath;
@@ -394,10 +398,10 @@ public class ColorCode {
 
 
         //get fork added node
-        File forkAddedFile = new File(analysisDir + forkAddedNodeTxt);
+        File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
         if (forkAddedFile.exists()) {
             try {
-                forkAddedNode = iofunc.readResult(analysisDir + forkAddedNodeTxt);
+                forkAddedNode = iofunc.readResult(testCaseDir + forkAddedNodeTxt);
 //                clusterResultListString = iofunc.readResult(clusterFilePath);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -431,7 +435,7 @@ public class ColorCode {
 
                 AnalyzingCommunityDetectionResult analyzeCDResult = new AnalyzingCommunityDetectionResult();
 
-                analyzeCDResult.generatingClusteringTable(analysisDir, numberOfCommunities);
+                analyzeCDResult.generatingClusteringTable(testCaseDir,testDir, numberOfCommunities);
 
                 combineFiles(numberOfCommunities);
 //                } else {

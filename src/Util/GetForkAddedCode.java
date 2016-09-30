@@ -15,7 +15,7 @@ public class GetForkAddedCode {
 
     String forkAddedNodeTxt = "forkAddedNode.txt";
     String expectTxt = "expectCluster.txt";
-    static String sourcecodeDir, analysisDir;
+    static String sourcecodeDir, testCaseDir;
     static ArrayList<String> commitSHAList,macroList;
     static ProcessingText iof = new ProcessingText();
     StringBuffer forkAddedNodeString = new StringBuffer();
@@ -26,12 +26,12 @@ public class GetForkAddedCode {
         String testDir = projectPath + repo;
         this.commitSHAList = commitSHAList;
         sourcecodeDir = testDir + "/Marlin/";
-        analysisDir = testDir + "/DPGraph/";
-        new File(analysisDir).mkdir();
+        testCaseDir = testDir + "/DPGraph/";
+        new File(testCaseDir).mkdir();
         File dir = new File(sourcecodeDir);
         String[] names = dir.list();
-        iof.rewriteFile("", analysisDir + forkAddedNodeTxt);
-        iof.rewriteFile("", analysisDir + expectTxt);
+        iof.rewriteFile("", testCaseDir + forkAddedNodeTxt);
+        iof.rewriteFile("", testCaseDir + expectTxt);
 
 
         for (String fileName : names) {
@@ -81,9 +81,9 @@ public class GetForkAddedCode {
             if (!cleanCode.equals("")) {
                 if (!cleanCode.startsWith("//") && !comments) {
 //                    System.out.println(newFileName + "-" + lineNum);
-                    iof.writeTofile(newFileName + "-" + lineNum + " \n", analysisDir + forkAddedNodeTxt);
+                    iof.writeTofile(newFileName + "-" + lineNum + " \n", testCaseDir + forkAddedNodeTxt);
                     if (!cleanCode.startsWith("#")) {
-                        iof.writeTofile(newFileName + "-" + lineNum + " 1\n", analysisDir + expectTxt);
+                        iof.writeTofile(newFileName + "-" + lineNum + " 1\n", testCaseDir + expectTxt);
                     }
                 } else if (cleanCode.startsWith("/*")) {
                     comments = true;
@@ -187,7 +187,7 @@ public class GetForkAddedCode {
 
         macroList = new ArrayList<>();
         File dir1 = new File(sourcecodeDir);
-        File dir2 = new File(analysisDir);
+        File dir2 = new File(testCaseDir);
         String[] names = dir1.list();
         dir2.mkdirs();
 
@@ -408,14 +408,14 @@ public class GetForkAddedCode {
      * //todo in the future, we might handle feature interactions.
      * Second,
      * @param sourcecodeDir
-     * @param analysisDir
+     * @param testCaseDir
      * @param number
      * @return
      */
 
-    public ArrayList<String> selectTargetMacros(String sourcecodeDir, String analysisDir, int number) {
+    public ArrayList<String> selectTargetMacros(String sourcecodeDir, String testCaseDir, int number) {
         this.sourcecodeDir=sourcecodeDir;
-        this.analysisDir = analysisDir;
+        this.testCaseDir=testCaseDir;
         /**  randomly select targetMacroList   **/
         macroList = createMacroList();
         ArrayList<String> targetMacroList = new ArrayList<>();
@@ -439,12 +439,12 @@ public class GetForkAddedCode {
             sb_html.append("<h3>" + i + ") " + targetMacroList.get(i - 1) + "</h3>\n");
             sb_featureList.append(targetMacroList.get(i - 1)+"\n");
         }
-        iof.rewriteFile(sb_html.toString(), analysisDir + "/testedMacros.txt");
-        iof.rewriteFile(sb_featureList.toString(), analysisDir + "/featureList.txt");
+        iof.rewriteFile(sb_html.toString(), testCaseDir + "/testedMacros.txt");
+        iof.rewriteFile(sb_featureList.toString(), testCaseDir + "/featureList.txt");
 
         /**--------- used for parsing #ifdef to generate ground truth---------------
          parsing source code to find LOC wrapped by those macros and generating forkAddedNode.txt file **/
-        identifyIfdefs(sourcecodeDir, analysisDir, targetMacroList);
+        identifyIfdefs(sourcecodeDir, testCaseDir, targetMacroList);
 
         return targetMacroList;
     }

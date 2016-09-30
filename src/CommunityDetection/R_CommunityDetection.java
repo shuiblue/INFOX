@@ -33,12 +33,13 @@ public class R_CommunityDetection {
     /**
      * This methods is detecting communities for changedCode.pajek.net, which is the graph for new code.
      *
-     * @param fileDir
+     * @param testCaseDir
+     * @param testDir
      * @param numOfcut
      * @param re
      * @return
      */
-    public int detectingCommunitiesWithIgraph(String fileDir, int numOfcut, Rengine re, boolean directedGraph) {
+    public int detectingCommunitiesWithIgraph(String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph) {
         modularityArray = new ArrayList<>();
         checkedEdges = new HashMap<>();
         cutSequence = new ArrayList<>();
@@ -59,11 +60,17 @@ public class R_CommunityDetection {
 //        REXP shortestPath_R = re.eval("distMatrix <- shortest.paths(completeGraph, v=V(completeGraph), to=V(completeGraph))");
 //        shortestPathMatrix = shortestPath_R.asMatrix();
         -----------*/
-
-        String winFileDir = fileDir.replace("\\", "/");
+        String analysisDir = testCaseDir + testDir + FS;
         System.getProperty("java.library.path");
-        System.out.println("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
-        re.eval("oldg<-read_graph(\"" + winFileDir + "changedCode.pajek.net\", format=\'pajek\')");
+
+        String graphDir = analysisDir;
+        if(directedGraph)
+        {
+            graphDir=analysisDir.replace("54101","54100").replace("54111","54110");
+        }
+
+        System.out.println("oldg<-read_graph(\"" + graphDir + "changedCode.pajek.net\", format=\'pajek\')");
+        re.eval("oldg<-read_graph(\"" + graphDir + "changedCode.pajek.net\", format=\'pajek\')");
         // removes the loop and/or multiple edges from a graph.
         re.eval("g<-simplify(oldg)");
 
@@ -79,22 +86,22 @@ public class R_CommunityDetection {
         String[] nodelist = (String[]) nodelist_R.getContent();
         originGraph = new Graph(nodelist, edgelist, null, 0);
 
-        printOriginNodeList(originGraph.getNodelist(), fileDir);
-        File upstreamNodeFile = new File(fileDir + upstreamNodeTxt);
+        printOriginNodeList(originGraph.getNodelist(), analysisDir);
+        File upstreamNodeFile = new File(analysisDir + upstreamNodeTxt);
         if (upstreamNodeFile.exists()) {
             //get nodes/edges belong to upstream
-            storeNodes(fileDir, upstreamNodeTxt);
+            storeNodes(analysisDir, upstreamNodeTxt);
         }
         //get fork added node
-        File forkAddedFile = new File(fileDir + forkAddedNodeTxt);
+        File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
         if (forkAddedFile.exists()) {
-            storeNodes(fileDir, forkAddedNodeTxt);
+            storeNodes(testCaseDir, forkAddedNodeTxt);
         }
 
 //        upstreamEdge = findUpstreamEdges(originGraph, fileDir);
 
         //print old edge
-        ioFunc.rewriteFile("", fileDir + "/clusterTMP.txt");
+        ioFunc.rewriteFile("", analysisDir + "clusterTMP.txt");
         //initialize removedEdge Map, all the edges have not been removed, so the values are all false
         for (int i = 0; i < edgelist.length; i++) {
             checkedEdges.put(i + 1, false);
@@ -104,15 +111,15 @@ public class R_CommunityDetection {
 //            if (currentIteration <= numOfIteration) {
             if (listOfNumberOfCommunities.size() <= numOfcut) {
                 //count betweenness for current graph
-                calculateEachGraph(re, fileDir, cutNum);
+                calculateEachGraph(re, analysisDir, cutNum);
                 cutNum++;
             } else {
                 break;
             }
         }
 
-        findBestClusterResult(originGraph, cutSequence, fileDir);
-        writeToModularityCSV(fileDir);
+        findBestClusterResult(originGraph, cutSequence, analysisDir);
+        writeToModularityCSV(analysisDir);
         re.end();
         System.out.println("\nBye.");
         return bestCut;

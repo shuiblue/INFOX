@@ -1,4 +1,5 @@
 import DependencyGraph.AnalyzingRepository;
+import Util.GetForkAddedCode;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
@@ -49,17 +50,12 @@ public class Main {
                     /**  testCase specifys the repository that need to be parsed.  **/
                     sourcecodeDir = filePath.toString() + FS;
                     //TODO: set subdir name for multiple tests
-                    for (int[] param : parameterArray) {
-                        String testDir = "";
-                        for (int index = 0; index <= 4; index++) {
-                            testDir += param[index];
-                        }
-
-                        for(int i =1;i<=10;i++) {
-                            analysisDir = sourcecodeDir + analysisDirName + FS + testDir + FS+i+FS;
-                            System.out.println("~~~~~~~current configuration: " + testDir+"~~"+i);
-                            new File(analysisDir).mkdir();
-                            analyzeRepo.analyzeRepository(sourcecodeDir, analysisDir, param, re);
+                        for(int i =5;i<=10;i++) {
+                         String   testCaseDir = sourcecodeDir + analysisDirName + FS+i+FS;
+//                            new GetForkAddedCode().selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro);
+                            System.out.println("~~~~~~~current con1figuration: " + i + "~~");
+                            for (int[] param : parameterArray) {
+                            analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir, param, re);
                         }
                     }
                 }

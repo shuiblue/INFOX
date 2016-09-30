@@ -1,6 +1,7 @@
 package ColorCode;
 import Util.ProcessingText;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 /**
@@ -8,12 +9,14 @@ import java.util.*;
  */
 public class AnalyzingCommunityDetectionResult {
     ProcessingText processingText = new ProcessingText();
-    String analysisDir;
+    String analysisDir,testCaseDir;
     List<String> bgcolorList = BackgroundColor.getExpectColorList();
+    static final String FS = File.separator;
 
     //    public void generatingClusteringTable(String analysisDir, int numberOfCommunities, ArrayList<String> macroList) {
-    public void generatingClusteringTable(String analysisDir, int numberOfCommunities) {
-        this.analysisDir = analysisDir;
+    public void generatingClusteringTable( String testCaseDir, String testDir, int numberOfCommunities) {
+        this.analysisDir=testCaseDir+testDir+FS;
+        this.testCaseDir=testCaseDir;
         HashMap<String, HashMap<String, Integer>> resultTable = new HashMap<>();
 
 //        for (int i = 0; i < macroList.size(); i++) {
@@ -202,7 +205,7 @@ public class AnalyzingCommunityDetectionResult {
 
     private ArrayList<String> getFeatureList() {
         try {
-            String[] featureArray = processingText.readResult(analysisDir + "featureList.txt").split("\n");
+            String[] featureArray = processingText.readResult( testCaseDir+ "featureList.txt").split("\n");
             return new ArrayList<>(Arrays.asList(featureArray));
         } catch (IOException e) {
             e.printStackTrace();

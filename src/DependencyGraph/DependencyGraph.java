@@ -96,6 +96,13 @@ public class DependencyGraph {
     HashMap<Integer, Integer> idMap = new HashMap<>();
 
     /**
+     * goto statement
+     **/
+    HashMap<String, String> gotoMap;
+    String label_location = "";
+
+
+    /**
      * This flag is used for checking whether the macro is a header guard or not
      **/
     boolean foundHeaderGuard = false;
@@ -120,6 +127,8 @@ public class DependencyGraph {
      * sourceCode Dir stores the source code to be analyzed
      **/
     String sourcecodeDir = "";
+    String testCaseDir = "";
+    String testDir = "";
     static String tmpXmlPath = "tmpXMLFile" + FS;
     String edgeListTxt, parsedLineTxt, forkAddedNodeTxt, compact_graph_edgeList_txt;
 
@@ -131,9 +140,12 @@ public class DependencyGraph {
      *
      * @return dependency graph, no edge label stored.
      */
-    public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String analysisDir, boolean createEdgeForConsecutiveLines) {
-        this.analysisDir = analysisDir;
+    public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String testCaseDir, String testDir, boolean createEdgeForConsecutiveLines) {
+        this.analysisDir = testCaseDir + testDir + FS;
         this.sourcecodeDir = sourcecodeDir;
+        this.testCaseDir = testCaseDir;
+        this.testDir = testDir;
+        gotoMap = new HashMap<>();
 
         if (current_OS.equals("MAC")) {
             Root_Dir = "/Users/shuruiz/Work/";
@@ -142,7 +154,7 @@ public class DependencyGraph {
         }
 
         /**------------ Specify paths --------------**/
-        forkAddedNodeTxt = analysisDir + "forkAddedNode.txt";
+        forkAddedNodeTxt = testCaseDir + "forkAddedNode.txt";
         edgeListTxt = analysisDir + "edgeList.txt";
         compact_graph_edgeList_txt = analysisDir + "compact_edgeList.txt";
         parsedLineTxt = analysisDir + "parsedLines.txt";
@@ -186,9 +198,9 @@ public class DependencyGraph {
         }
 
         /****   Write dependency graphs into pajek files  ****/
-        ProcessingText.writeToPajekFile(dependencyGraph, nodeList, analysisDir + "changedCode.pajek.net");
-        ProcessingText.writeToPajekFile(completeGraph, nodeList, analysisDir + "complete.pajek.net");
-        ProcessingText.writeToPajekFile(compactGraph, compact_nodeList, analysisDir + "compact.pajek.net");
+        ProcessingText.writeToPajekFile(dependencyGraph, nodeList, testCaseDir, testDir, "changedCode.pajek.net", forkaddedNodeList);
+        ProcessingText.writeToPajekFile(completeGraph, nodeList, testCaseDir, testDir, "complete.pajek.net", forkaddedNodeList);
+        ProcessingText.writeToPajekFile(compactGraph, compact_nodeList, testCaseDir, testDir, "compact.pajek.net", forkaddedNodeList);
 
 
         /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
@@ -306,6 +318,10 @@ public class DependencyGraph {
         ArrayList<String> tmpStmtList = new ArrayList<>();
         Elements elements = subTreeRoot.getChildElements();
         boolean isFunctionDeclaration = false;
+        boolean isGotoLabel = false;
+        String tmpParentLocation = parentLocation;
+        int tmpScope = scope;
+
         for (int i = 0; i < elements.size(); i++) {
             String line = "";
             String currentLocation = "";
@@ -315,6 +331,12 @@ public class DependencyGraph {
             }
             Element ele = elements.get(i);
 
+
+            if (isGotoLabel) {
+                parentLocation = label_location;
+                scope = scope + 1;
+            }
+
             if (ele.getLocalName().equals("define")) {
                 parseDefineNode(fileName, scope, ele);
             } else if (ele.getLocalName().equals("function") || ele.getLocalName().equals("constructor") || ele.getLocalName().equals("function_decl")) {
@@ -322,21 +344,46 @@ public class DependencyGraph {
             } else if (ele.getLocalName().equals("if") && !ele.getNamespacePrefix().equals("cpp")) {
                 tmpStmtList.add(parseIfStmt(ele, fileName, scope, parentLocation));
             } else if (ele.getLocalName().equals("expr_stmt")) {
+
                 String location = getLocationOfElement(ele, fileName);
                 tmpStmtList.add(parseVariableInExpression(ele, location, scope, parentLocation, false));
                 storeStrings(location, ele.getValue());
+            } else if (ele.getLocalName().equals("empty_stmt")) {
+                if (isGotoLabel) {
+                    isGotoLabel = false;
+                }
             } else if (ele.getLocalName().equals("decl_stmt")) {
                 String location = getLocationOfElement(ele, fileName);
                 tmpStmtList.add(parseDeclStmt(fileName, scope, parentLocation, ele));
                 storeStrings(location, ele.getValue());
-            } else if (ele.getLocalName().equals("label") && (((Element) ele.getParent().getParent()).getLocalName().equals("block"))) {
-                /** this is specifically for struct definition include bitfiles for certain fields
-                 e.g.   unsigned short icon : 8;
-                 srcml  interprets it in a wrong way, so I hard code this case to parse the symbol
-                 <macro><label><expr_stmt>  represent a field
-                 **/
-                Symbol declSymbol = addDeclarationSymbol(ele, "decl_stmt", fileName, scope, parentLocation, "");
-                tmpStmtList.add(declSymbol.getLocation());
+//            } else if (ele.getLocalName().equals("label") && (((Element) ele.getParent().getParent()).getLocalName().equals("block"))&&) {
+            } else if (ele.getLocalName().equals("label")) {
+                /*  160929   because of "goto label..", I modify this for parsing
+                <label><name> </name><label>
+                 */
+                if ((((Element) ele.getParent()).getLocalName().equals("macro"))) {
+                    /** this is specifically for struct definition include bitfiles for certain fields
+                     e.g.   unsigned short icon : 8;
+                     srcml  interprets it in a wrong way, so I hard code this case to parse the symbol
+                     <macro><label><expr_stmt>  represent a field
+                     **/
+                    Symbol declSymbol = addDeclarationSymbol(ele, "decl_stmt", fileName, scope, parentLocation, "");
+                    tmpStmtList.add(declSymbol.getLocation());
+                } else if (ele.getValue().contains(":")) {
+                    isGotoLabel = true;
+                    Element name = ele.getFirstChildElement("name", NAMESPACEURI);
+                    label_location = getLocationOfElement(ele, fileName);
+                    String key = "";
+                    for (Map.Entry<String, String> entry : gotoMap.entrySet()) {
+                        if (entry.getValue().equals(name.getValue())) {
+                            key = entry.getKey();
+                            addEdgesToFile(key, label_location, "<Control-Flow> goto");
+                            break;
+                        }
+
+                    }
+                    gotoMap.remove(key);
+                }
             } else if (ele.getLocalName().equals("typedef")) {
                 parseTypedef(ele, fileName, scope, parentLocation);
             } else if (ele.getLocalName().equals("return")) {
@@ -380,6 +427,11 @@ public class DependencyGraph {
                 tmpStmtList.add(breakLoc);
             } else if (ele.getLocalName().equals("struct_decl")) {
                 addDeclarationSymbol(ele, "struct_decl", fileName, scope, parentLocation, "");
+            } else if (ele.getLocalName().equals("goto")) {
+
+                Element name = ele.getFirstChildElement("name", NAMESPACEURI);
+                String location = getLocationOfElement(ele, fileName);
+                gotoMap.put(location, name.getValue());
             } else {
                 if (ele.getLocalName().equals("struct")
                         || ele.getLocalName().equals("class")
@@ -397,6 +449,17 @@ public class DependencyGraph {
                 pt.writeSymboTableToFile(symbolTable, analysisDir);
 
             }
+            if (isGotoLabel && !ele.getLocalName().equals("label")) {
+                String location = tmpStmtList.get(tmpStmtList.size() - 1);
+                addEdgesToFile(location, parentLocation, "<Hierarchy> goto_label");
+                parentLocation = tmpParentLocation;
+                scope = tmpScope + 1;
+                isGotoLabel = false;
+                tmpStmtList.remove(tmpStmtList.size() - 1);
+
+            }
+
+
         }
         //remove empty s
         ArrayList<String> stmtList = new ArrayList<>();
@@ -405,6 +468,7 @@ public class DependencyGraph {
                 stmtList.add(s);
             }
         }
+
 
         return stmtList;
     }
@@ -1360,16 +1424,13 @@ public class DependencyGraph {
 
 
         for (String s : forkaddedNodeList) {
-            if (s.contains("bpfH")) {
-                System.out.print("");
-            }
             s = s.trim();
             if (!s.equals("")) {
                 String[] nodelabel = s.trim().split("-");
                 String fileName = nodelabel[0];
                 int lineNum = Integer.valueOf(nodelabel[1]);
                 if (fileName.equals(currentFile)) {
-                    if (lineNum == preLineNum - diff) {
+                    if (lineNum == preLineNum + diff) {
                         String preloc = fileName + "-" + preLineNum;
 //                        if (completeGraph.get(s) != null && completeGraph.get(preloc) != null) {
                         if (dependencyGraph.get(s) != null && dependencyGraph.get(preloc) != null) {

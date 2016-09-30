@@ -56,7 +56,9 @@ public class ProcessingText {
     }
 
 
-    public void writeToPajekFile(HashMap<String, HashSet<String[]>> dependencyGraph, HashMap<String, Integer> nodeList, String filepath) {
+    public void writeToPajekFile(HashMap<String, HashSet<String[]>> dependencyGraph, HashMap<String, Integer> nodeList, String testCaseDir,String testDir,String filename,ArrayList<String> forkaddedNodeList) {
+         final String FS = File.separator;
+        String filepath = testCaseDir+testDir+FS+filename;
         System.out.println("Write to file: " + filepath);
 //        String pajek = "/graph.pajek.net";
         rewriteFile("*Vertices " + nodeList.size() + "\n", filepath);
@@ -64,15 +66,22 @@ public class ProcessingText {
         Set nodeSet = nodeList.entrySet();
         // Obtaining an iterator for the entry set
         Iterator it_node = nodeSet.iterator();
-
+int isolatedNode = 0;
         while (it_node.hasNext()) {
             Map.Entry node = (Map.Entry) it_node.next();
 
             String nodeId = (String) node.getKey();
-            writeTofile(nodeList.get(nodeId) + " \"" + nodeId + "\"\n", filepath);
+            if((filename.contains("change")&&forkaddedNodeList.contains(nodeId))||!filename.contains("change")){
+                writeTofile(nodeList.get(nodeId) + " \"" + nodeId + "\"\n", filepath);
+            }else{
+              isolatedNode++;
+            }
+
 
         }
-
+        if(filename.contains("change")) {
+            rewriteFile("isolated nodes: " + isolatedNode, testCaseDir + "isolatedNode.txt");
+        }
         // Getting a Set of Key-value pairs
         Set entrySet = dependencyGraph.entrySet();
 
