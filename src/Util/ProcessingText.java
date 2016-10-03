@@ -274,6 +274,9 @@ int isolatedNode = 0;
                 if (line.contains("const")) {
                     line = line.replace("const", "");
                 }
+                if(line.startsWith("%")){
+                    line = line.replace(line,"");
+                }
 
 
                 Pattern p1 = Pattern.compile("([x](\\d|[a-zA-Z])(\\d|[a-zA-Z]))*");

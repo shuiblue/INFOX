@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class Main {
     static AnalyzingRepository analyzeRepo = new AnalyzingRepository();
-    static String sourcecodeDir, analysisDir;
+    static String sourcecodeDir;
     static String analysisDirName = "DPGraph";
     static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth";
     static final String FS = File.separator;
@@ -50,7 +50,7 @@ public class Main {
                     /**  testCase specifys the repository that need to be parsed.  **/
                     sourcecodeDir = filePath.toString() + FS;
                     //TODO: set subdir name for multiple tests
-                        for(int i =5;i<=10;i++) {
+                        for(int i =1;i<=10;i++) {
                          String   testCaseDir = sourcecodeDir + analysisDirName + FS+i+FS;
 //                            new GetForkAddedCode().selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro);
                             System.out.println("~~~~~~~current con1figuration: " + i + "~~");
@@ -82,15 +82,15 @@ public class Main {
         ArrayList<int[]> parameterArray = new ArrayList<>();
 
         for (int i = 0; i <= 1; i++) {
-            for (int j = 0; j <= 1; j++) {
+//            for (int j = 0; j <= 1; j++) {
                 int[] param = new int[5];
                 param[0] = numOfTargetMacro;
                 param[1] = numberOfCuts;
                 param[2] = groundTruth;
                 param[3] = i;
-                param[4] = j;
+                param[4] = 0;
                 parameterArray.add(param);
-            }
+//            }
         }
         return parameterArray;
     }

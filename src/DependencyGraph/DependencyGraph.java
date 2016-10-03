@@ -181,6 +181,16 @@ public class DependencyGraph {
         //parse every source code file in the project
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
+                if (Files.isRegularFile(filePath) && isHeaderFile(filePath.toString())) {
+                    parseSingleFile(filePath);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //parse every source code file in the project
+        try {
+            Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
                 if (Files.isRegularFile(filePath) && isCFile(filePath.toString())) {
                     parseSingleFile(filePath);
                 }
@@ -188,7 +198,6 @@ public class DependencyGraph {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         /** generating edges cross files  **/
         addEdgesCrossFiles();
 
@@ -283,6 +292,7 @@ public class DependencyGraph {
                 && !(sourcecodeDir.contains("Apache") && fileName.contains("pcre_globals"))) {
             String parentLocation = "";
             /** Generating dependency graph for  **/
+            System.out.println("now parsing ----:" + newFileName);
             generatingDependencyGraphForSubTree(root, newFileName, 1, parentLocation);
 
         }
@@ -449,7 +459,7 @@ public class DependencyGraph {
                 pt.writeSymboTableToFile(symbolTable, analysisDir);
 
             }
-            if (isGotoLabel && !ele.getLocalName().equals("label")) {
+            if (isGotoLabel && !ele.getLocalName().equals("label") && tmpStmtList.size() > 0) {
                 String location = tmpStmtList.get(tmpStmtList.size() - 1);
                 addEdgesToFile(location, parentLocation, "<Hierarchy> goto_label");
                 parentLocation = tmpParentLocation;
@@ -506,45 +516,47 @@ public class DependencyGraph {
      */
     private void parseDefineNode(String fileName, int scope, Element ele) {
         Element macroEle = ele.getFirstChildElement("macro", NAMESPACEURI_CPP);
-        Element paramEle = macroEle.getFirstChildElement("parameter_list", NAMESPACEURI);
-        String tag;
-        if (paramEle == null & macroEle != null) {
-            tag = "macro";
-        } else {
-            tag = "function_decl";
-        }
-        Element nameEle = macroEle.getFirstChildElement("name", NAMESPACEURI);
-        String macroName = nameEle.getValue();
-        boolean isHeaderGuard = false;
+        if (macroEle != null) {
+            Element paramEle = macroEle.getFirstChildElement("parameter_list", NAMESPACEURI);
+            String tag;
+            if (paramEle == null & macroEle != null) {
+                tag = "macro";
+            } else {
+                tag = "function_decl";
+            }
+            Element nameEle = macroEle.getFirstChildElement("name", NAMESPACEURI);
+            String macroName = nameEle.getValue();
+            boolean isHeaderGuard = false;
 
-        /** Checking whether the macro is a header guard or not,
-         *  if it is a header guard, it will not be stored into the symbol table   **/
-        if (!foundHeaderGuard && fileName.endsWith("H") && isHeaderGuard(macroName, fileName)) {
-            isHeaderGuard = true;
-            foundHeaderGuard = true;
-        }
-        String location;
-        if (!isHeaderGuard) {
-            location = getLocationOfElement(nameEle, fileName);
-            Symbol macro = new Symbol(macroName, "", location, tag, scope);
-            storeIntoNodeList(location);
-            ArrayList<Symbol> macros = new ArrayList<Symbol>();
-            macros.add(macro);
-            storeSymbols(macros);
-            ProcessingText.writeTofile(location + "\n", parsedLineTxt);
+            /** Checking whether the macro is a header guard or not,
+             *  if it is a header guard, it will not be stored into the symbol table   **/
+            if (!foundHeaderGuard && fileName.endsWith("H") && isHeaderGuard(macroName, fileName)) {
+                isHeaderGuard = true;
+                foundHeaderGuard = true;
+            }
+            String location;
+            if (!isHeaderGuard) {
+                location = getLocationOfElement(nameEle, fileName);
+                Symbol macro = new Symbol(macroName, "", location, tag, scope);
+                storeIntoNodeList(location);
+                ArrayList<Symbol> macros = new ArrayList<Symbol>();
+                macros.add(macro);
+                storeSymbols(macros);
+                ProcessingText.writeTofile(location + "\n", parsedLineTxt);
 
-            /** check macro value <cpp:value> , if it is a word, that might be another macro **/
-            if (!tag.contains("function_decl")) {
-                Element value_ele = ele.getFirstChildElement("value", NAMESPACEURI_CPP);
-                if (value_ele != null) {
-                    String value = value_ele.getValue();
-                    String[] element_of_value = value.split(" ");
-                    for (String str : element_of_value) {
-                        str = str.replaceAll("[(){},.;!?<>%]", "");
-                        /**  check the value of macro is a word or not, if it is a word, then it might be another macro **/
-                        if (could_be_a_word(str)) {
-                            Symbol depend_macro = new Symbol(str, "", location, "cpp:value", scope);
-                            findVarDependency(depend_macro);
+                /** check macro value <cpp:value> , if it is a word, that might be another macro **/
+                if (!tag.contains("function_decl")) {
+                    Element value_ele = ele.getFirstChildElement("value", NAMESPACEURI_CPP);
+                    if (value_ele != null) {
+                        String value = value_ele.getValue();
+                        String[] element_of_value = value.split(" ");
+                        for (String str : element_of_value) {
+                            str = str.replaceAll("[(){},.;!?<>%]", "");
+                            /**  check the value of macro is a word or not, if it is a word, then it might be another macro **/
+                            if (could_be_a_word(str)) {
+                                Symbol depend_macro = new Symbol(str, "", location, "cpp:value", scope);
+                                findVarDependency(depend_macro);
+                            }
                         }
                     }
                 }
@@ -628,7 +640,14 @@ public class DependencyGraph {
             boolean structDecl = (type_ele.getChild(0) instanceof Text) && type_ele.getChild(0).getValue().trim().equals("struct");
             //struct definition
             Element enum_Child = type_ele.getFirstChildElement("enum", NAMESPACEURI);
-            String alias = name_ele.getValue();
+            if (name_ele == null) {
+                name_ele = enum_Child.getFirstChildElement("name", NAMESPACEURI);
+            }
+
+            String alias = "";
+            if (name_ele != null) {
+                alias = name_ele.getValue();
+            }
             if (structDef) {
                 if (structChild.getLocalName().equals("struct")) {
                     parseStructOrClass(structChild, fileName, scope, parentLocation, alias, "struct");
@@ -1132,10 +1151,12 @@ public class DependencyGraph {
         }
 
         Element condition = ele.getFirstChildElement("condition", NAMESPACEURI);
-        Element cond_exprNode = condition.getFirstChildElement("expr", NAMESPACEURI);
 
-        if (cond_exprNode != null) {
-            parseVariableInExpression(condition, getLocationOfElement(cond_exprNode, fileName), scope, parentLocation, false);
+        if(condition!=null) {
+            Element cond_exprNode = condition.getFirstChildElement("expr", NAMESPACEURI);
+            if (cond_exprNode != null) {
+                parseVariableInExpression(condition, getLocationOfElement(cond_exprNode, fileName), scope, parentLocation, false);
+            }
         }
         storeIntoNodeList(forLocation);
         Element block = ele.getFirstChildElement("block", NAMESPACEURI);
@@ -1651,11 +1672,11 @@ public class DependencyGraph {
                                 if (candidates.size() > 0) {
                                     candidates.clear();
                                 }
-                                if (!s.getTag().equals("macro")) {
-                                    break;
-                                } else {
-                                    continue;
-                                }
+//                                if (!s.getTag().equals("macro")) {
+//                                    break;
+//                                } else {
+//                                    continue;
+//                                }
                             }
                         }
                         // if the variable is not local, then check global variable def
@@ -1998,10 +2019,13 @@ public class DependencyGraph {
      * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
      */
     private boolean isCFile(String filePath) {
-        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c");
+        return filePath.endsWith(".cpp")  || filePath.endsWith(".c");
 //        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
-
+    private boolean isHeaderFile(String filePath) {
+        return filePath.endsWith(".h") ;
+//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
+    }
     /**
      * This function check whether the str is a word or not
      *
