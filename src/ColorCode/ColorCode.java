@@ -1,4 +1,5 @@
 package ColorCode;
+
 import Util.ProcessingText;
 
 import java.awt.*;
@@ -30,26 +31,25 @@ public class ColorCode {
     String testCaseDir;
     boolean print = false;
     StringBuilder sb = new StringBuilder();
-
-
-    int expectClustersNum;
-
+    ProcessingText processingText = new ProcessingText();
+    HashMap<Integer, ArrayList<String>> clusterResultMap = new HashMap<>();
+    int initialNumOfClusters = 0;
 
     public void parseSourceCodeFromFile(String fileName) {
-        File currentFile = new File(sourcecodeDir  + fileName);
+        File currentFile = new File(sourcecodeDir + fileName);
         //            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
         if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
 //            System.out.print(fileName + "\n");
             String newFileName;
             newFileName = iofunc.changeFileName(fileName);
             if (forkAddedNode.contains(newFileName)) {
-                String fileName_forHTML="";
-                fileName_forHTML = newFileName.replace("~","-");
+                String fileName_forHTML = "";
+                fileName_forHTML = newFileName.replace("~", "-");
                 sb.append("<h1 id=\"" + newFileName + "title\" >" + fileName + "</h1>\n<pre id=\"" + newFileName + "\"  class=\"prettyprint linenums\">");
                 BufferedReader result_br = null;
                 int lineNumber = 1;
                 try {
-                    result_br = new BufferedReader(new FileReader(sourcecodeDir  + fileName));
+                    result_br = new BufferedReader(new FileReader(sourcecodeDir + fileName));
 
                     String line;
                     while ((line = result_br.readLine()) != null) {
@@ -68,10 +68,10 @@ public class ColorCode {
 */
                         sb.append(line.replace("<", "&lt;").replace(">", "&gt;"));
                         sb.append("</front>\n");
-                        if(lineNumber==378){
+                        if (lineNumber == 378) {
                             System.out.print("");
                         }
-                        if (!forkAddedNode.contains(old_lable)  || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
+                        if (!forkAddedNode.contains(old_lable) || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
 //                        if (!forkAddedNode.contains(old_lable) || line.trim().startsWith("#") || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
                             jsContent.append("$(\"#" + lable + "\").toggle()\n");
                         }
@@ -119,7 +119,8 @@ public class ColorCode {
         BufferedReader br;
         String line;
         nodeMap = new HashMap<>();
-
+        ArrayList<String> distanceArray = new ArrayList<>();
+        ArrayList<ArrayList<String>> closeEdgeList = new ArrayList<>();
         BackgroundColor bgcolor = new BackgroundColor();
 
         try {
@@ -127,7 +128,7 @@ public class ColorCode {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 System.out.println(line);
-                if(line.trim().split("---------").length>1) {
+                if (line.trim().split("---------").length > 1) {
                     nodeMap.put(Integer.valueOf(line.trim().split("---------")[0]), line.trim().split("---------")[1]);
                 }
             }
@@ -147,6 +148,56 @@ public class ColorCode {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        //generating joining table, if distance is 2, then join two clusters
+        //todo: other conditions?
+        String distanceFile = analysisDir + numberOfClusters + "_distanceBetweenCommunityies.txt";
+        try {
+            String distanceString = processingText.readResult(distanceFile);
+            distanceArray = new ArrayList(Arrays.asList(distanceString.split("\n")));
+            for (String str : distanceArray) {
+                String distanceBetweenTwoClusters = str.split(",")[2];
+                if (distanceBetweenTwoClusters.equals("2")) {
+                    boolean existEdge = false;
+                    ArrayList<Integer> redundantEdgeListIndex = new ArrayList<>();
+                    if (closeEdgeList.size() > 0) {
+                        for (ArrayList<String> edgelist : closeEdgeList) {
+                            if(!existEdge) {
+                                if (edgelist.contains(str.split(",")[0])) {
+                                    edgelist.add(str.split(",")[1]);
+                                    existEdge = true;
+                                } else if (edgelist.contains(str.split(",")[1])) {
+                                    edgelist.add(str.split(",")[0]);
+                                    existEdge = true;
+                                }
+                            }else{
+                                if(edgelist.contains(str.split(",")[0])||edgelist.contains(str.split(",")[1])){
+
+                                    redundantEdgeListIndex.add(closeEdgeList.indexOf(edgelist));
+
+                                }
+                            }
+                        }
+                    }
+
+                    for(int index :redundantEdgeListIndex){
+                        closeEdgeList.set(index,new ArrayList<>());
+                    }
+
+
+                    if (!existEdge) {
+                        ArrayList<String> list = new ArrayList<>();
+                        list.add(str.split(",")[0]);
+                        list.add(str.split(",")[1]);
+                        closeEdgeList.add(list);
+                    }
+                }
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
@@ -210,7 +261,7 @@ public class ColorCode {
 //                }
 
                 String cluster = clusters.get(i);
-                if(cluster.trim().length()>0) {
+                if (cluster.trim().length() > 0) {
                     String clusterID = cluster.substring(0, clusters.get(i).trim().indexOf(")"));
                     clusterSB.append(clusterID);
                     String[] elementList = clusters.get(i).trim().split(",");
@@ -221,6 +272,7 @@ public class ColorCode {
                         if (nodeIdStr.length() > 0) {
                             int nodeID = Integer.parseInt(nodeIdStr);
                             String nodeLabel = nodeMap.get(nodeID);
+                            //only set the color when parsing the first node of this cluster
                             if (j == 0) {
                                 String color = colorMap.get(nodeID);
                                 if (color != null) {
@@ -228,6 +280,28 @@ public class ColorCode {
                                 } else {
                                     current_color = randomColor();
                                     colorMap.put(nodeID, current_color);
+
+
+                                    for (Map.Entry<Integer, ArrayList<String>> entry : clusterResultMap.entrySet()) {
+                                        if (entry.getKey() < numberOfClusters) {
+                                            ArrayList<String> currentClusters = entry.getValue();
+                                            for (String clusterStr : currentClusters) {
+                                                if (clusterStr.contains(nodeID + "")) {
+                                                    System.out.print("");
+
+                                                    int currentNumberOfNodes = cluster.split(",").length - 1;
+                                                    int previousNumberOfNodes = clusterStr.split(",").length - 1;
+
+                                                    int diff = previousNumberOfNodes - currentNumberOfNodes;
+                                                    processingText.writeTofile(numberOfClusters + "," + previousNumberOfNodes + " - " + currentNumberOfNodes + " = " + diff + "\n", analysisDir + "LOC_split.txt");
+
+                                                }
+                                            }
+                                        }
+
+                                    }
+
+
                                 }
                             }
 
@@ -235,7 +309,7 @@ public class ColorCode {
                             if (print) {
                                 sb.append("#" + nodeLabel + "{\n\tbackground-color:;\n");
                             } else {
-                                String htmlLabel =nodeLabel.replace("~","-");
+                                String htmlLabel = nodeLabel.replace("~", "-");
                                 if (forkAddedNode.contains(nodeLabel)) {
 
                                     sb.append("#" + htmlLabel + "{\n\tbackground-color:#" + current_color + ";\n");
@@ -262,7 +336,7 @@ public class ColorCode {
                                         rightSidebarColor = bgcolor.getExpectColorList().get(Integer.valueOf(each[1]) - 1);
 //                                    }
                                     } else {
-                                        if(expectCommunity.trim().contains("10")){
+                                        if (expectCommunity.trim().contains("10")) {
                                             System.out.print("");
                                         }
                                         leftSidebarColor = bgcolor.getExpectColorList().get(Integer.valueOf(expectCommunity.trim()) - 1);
@@ -322,7 +396,7 @@ public class ColorCode {
             }
         }
 
-        iofunc.rewriteFile(sb.toString(), analysisDir  + numberOfClusters + CSS);
+        iofunc.rewriteFile(sb.toString(), analysisDir + numberOfClusters + CSS);
         iofunc.rewriteFile(colorTable.toString(), analysisDir + numberOfClusters + "_colorTable.txt");
         iofunc.rewriteFile(clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor.txt");
     }
@@ -354,8 +428,8 @@ public class ColorCode {
         try {
             //write code.html
             iofunc.rewriteFile(iofunc.readResult(htmlfilePath + headtxt).replace("style.css", numberOfClusters + ".css"), analysisDir + html);
-            iofunc.writeTofile(iofunc.readResult(analysisDir  + numberOfClusters + ".color"), analysisDir + html);
-//            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + html);
+            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + html);
+            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt), analysisDir + html);
 //            iofunc.writeTofile(iofunc.readResult(analysisDir + "testedMacros.txt"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + sourceCodeTxt), analysisDir + html);
@@ -379,24 +453,17 @@ public class ColorCode {
         //----for Marlin repo structure----
       */
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String testCaseDir, String testDir) {
+
         final String FS = File.separator;
-        this.sourcecodeDir=sourcecodeDir;
-        this.analysisDir=testCaseDir+testDir+FS;
-        this.testCaseDir=testCaseDir;
-        //f----or Marlin repo structure----
-//        sourcecodeDir = filePath + repo;
-//        sourcecodeDir = filePath;
-////        sourcecodeDir = filePath + "/" + repo;
-//        analysisDir = filePath + "DPGraph\\";
-        //-----for Mac------------------
-//        analysisDir = filePath + "/DPGraph/" + dirNum + "/";
-//        String clusterFilePath = analysisDir + "/clusterTMP.txt";
+        this.sourcecodeDir = sourcecodeDir;
+        this.analysisDir = testCaseDir + testDir + FS;
+        this.testCaseDir = testCaseDir;
+
 
         String clusterFilePath = analysisDir + "clusterTMP.txt";
         String clusterResultListString = "";
-
-
-
+        processingText.rewriteFile("", analysisDir + "edgeCuttingRecord.txt");
+        processingText.rewriteFile("", analysisDir + "LOC_split.txt");
         //get fork added node
         File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
         if (forkAddedFile.exists()) {
@@ -417,33 +484,109 @@ public class ColorCode {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        int pre_numberOfCommunites = 0;
         String[] resultArray = clusterResultListString.split("--------Graph-------");
         for (int i = 0; i < resultArray.length; i++) {
             String result = resultArray[i];
 
 
             if (result.contains("communities")) {
-                int[] clusterInfo = getClusterInfo(result.split("communities")[0]);
-                int numberOfCommunities = clusterInfo[0];
+                double[] clusterInfo = getClusterInfo(result.split("communities")[0]);
+
+                int numberOfCommunities = (int) clusterInfo[0];
 //                int numOfCutEdge = clusterInfo[1];
 //                if (numOfCutEdge <= bestcut) {
-                result = result.split("communities")[1];
-                String[] clusterArray = result.split("\n");
+                if (pre_numberOfCommunites != numberOfCommunities) {
+                    result = result.split("communities")[1];
+                    String[] clusterArray = result.split("\n");
 
-                ArrayList<String> clusters = new ArrayList(Arrays.asList(clusterArray));
-                writeClusterToCSS(clusters, numberOfCommunities);
+                    ArrayList<String> clusters = new ArrayList(Arrays.asList(clusterArray));
 
-                AnalyzingCommunityDetectionResult analyzeCDResult = new AnalyzingCommunityDetectionResult();
+                    if (clusterResultMap.size() == 0) {
+                        initialNumOfClusters = numberOfCommunities;
+                        processingText.writeTofile(initialNumOfClusters + ",0\n", analysisDir + "LOC_split.txt");
+                    }
+                    clusterResultMap.put(numberOfCommunities, clusters);
+                    writeClusterToCSS(clusters, numberOfCommunities);
 
-                analyzeCDResult.generatingClusteringTable(testCaseDir,testDir, numberOfCommunities);
+                    AnalyzingCommunityDetectionResult analyzeCDResult = new AnalyzingCommunityDetectionResult();
 
-                combineFiles(numberOfCommunities);
+                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities);
+
+                    combineFiles(numberOfCommunities);
+                    pre_numberOfCommunites = numberOfCommunities;
+
+                    int numberOfCutEdges = (int) clusterInfo[1];
+                    double modularity = clusterInfo[2];
+                    processingText.writeTofile(numberOfCommunities + "," + numberOfCutEdges + "," + modularity + "\n", analysisDir + "edgeCuttingRecord.txt");
+                }
 //                } else {
 //                    break;
 //                }
             }
         }
+        generateCuttingSummaryTable();
     }
+
+    private void generateCuttingSummaryTable() {
+        String edgeCuttingRecord = "";
+        String loc_splitting = "";
+        try {
+            edgeCuttingRecord = processingText.readResult(analysisDir + "edgeCuttingRecord.txt");
+            loc_splitting = processingText.readResult(analysisDir + "LOC_split.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "<style>\n" +
+                "table, th, td {\n" +
+                "    border: 1px solid black;\n" +
+                "}\n" +
+                "</style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "\n" +
+                "<h2>" + testCaseDir + "\n" +
+                "\n" +
+                "<table>\n" +
+                "  <tr>\n" +
+                "    <th>#Clusters</th>\n" +
+                "    <th>#RemovedEdges</th>\n" +
+                "    <th>modularity</th>\n" +
+                "    <th>#LOC Split</th>\n" +
+                "  </tr>");
+
+
+        String[] edgeCuttingArray = edgeCuttingRecord.split("\n");
+        String[] loc_splittingArray = loc_splitting.split("\n");
+        for (int i = 0; i < edgeCuttingArray.length; i++) {
+            String cut = edgeCuttingArray[i];
+            String numOfClusters = cut.split(",")[0];
+            String numOfRemovedEdges = cut.split(",")[1];
+            String modularity = cut.split(",")[2];
+            String numOfLOCSplit = loc_splittingArray[i].split(",")[1];
+            sb.append("<tr>\n" +
+                    "    <td>" + numOfClusters + "</td>\n" +
+                    "    <td>" + numOfRemovedEdges + "</td>\n" +
+                    "    <td>" + modularity + "</td>\n" +
+                    "    <td>" + numOfLOCSplit + "</td>\n" +
+                    "  </tr>");
+
+        }
+        sb.append("</table>\n" +
+                "\n" +
+                "</body>\n" +
+                "</html>\n");
+
+
+        processingText.writeTofile(sb.toString(), analysisDir + "resultTable.html");
+
+    }
+
 
     /**
      * This function get the number of communities and how many edges have been removed in current cluster result
@@ -453,11 +596,16 @@ public class ColorCode {
      * array[1] --> number of cut edges
      */
 
-    private int[] getClusterInfo(String s) {
-        int[] clusterInfo = new int[2];
-
+    private double[] getClusterInfo(String s) {
+        double[] clusterInfo = new double[3];
+        //get modularity
+        int modularity_loc = s.indexOf("Modularity") + 11;
         //get community number
         int start = s.indexOf("---");
+
+        String modularity = s.substring(modularity_loc, start - 1);
+        clusterInfo[2] = Double.parseDouble(modularity);
+
         String number = s.substring(start + 3);
         clusterInfo[0] = Integer.valueOf(number.trim());
 

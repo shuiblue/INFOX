@@ -49,20 +49,18 @@ public class AnalyzingRepository {
 
         /**  Generating Dependency Graphs for current test case/project  **/
 //
-        if(!directedGraph) {
-            DependencyGraph dependencyGraph = new DependencyGraph();
-            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
-        }
+//        if(!directedGraph) {
+//            DependencyGraph dependencyGraph = new DependencyGraph();
+//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
+//        }
         /*------------------calculating similarity--------------------------
         StringSimilarity strSim = new StringSimilarity();
         strSim.calculateStringSimilarityByR(sourcecodeDir, analysisDir, re);*/
 
         /** Community Detection  **/
-        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
+//        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
         new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
-        /* FOR EMAIL SYSTEM*/
-//        colorCodeBlocks.parseEachUsefulClusteringResult(projectPath, repo, dirNum, 3);
     }
 }

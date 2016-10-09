@@ -18,17 +18,18 @@ public class Main {
     static String analysisDirName = "DPGraph";
     static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth";
     static final String FS = File.separator;
-
+    static ArrayList<int[]> parameterArray = new ArrayList<>();
     /**
      * set by developer
      **/
-    static int numOfTargetMacro = 5;
+
     static int numberOfCuts = 4;
     static int groundTruth = 1;  // (1-- ifdef, 0 --- Real)
 
 
     /**
      * Main method for testing the INFOX method
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -40,28 +41,31 @@ public class Main {
         }
 
         /** generating the parameters for creating dependency graph  **/
-        ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro, numberOfCuts, groundTruth);
+        for (int numOfTargetMacro = 3; numOfTargetMacro <= 10; numOfTargetMacro++) {
+            parameterArray = getParameterSetting(numOfTargetMacro, numberOfCuts, groundTruth);
 
-        /**  parse different repositories under testCasesDir  **/
-        try {
-            Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
-                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
+            /**  parse different repositories under testCasesDir  **/
+            try {
+                int finalNumOfTargetMacro = numOfTargetMacro;
+                Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
+                    if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
 
-                    /**  testCase specifys the repository that need to be parsed.  **/
-                    sourcecodeDir = filePath.toString() + FS;
-                    //TODO: set subdir name for multiple tests
-                        for(int i =1;i<=10;i++) {
-                         String   testCaseDir = sourcecodeDir + analysisDirName + FS+i+FS;
-//                            new GetForkAddedCode().selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro);
+                        /**  testCase specifys the repository that need to be parsed.  **/
+                        sourcecodeDir = filePath.toString() + FS;
+                        //TODO: set subdir name for multiple tests
+                        for (int i = 1; i <=5; i++) {
+                            String testCaseDir = sourcecodeDir + analysisDirName + FS + finalNumOfTargetMacro +"macros"+ FS + i + FS;
+//                            new GetForkAddedCode().selectTargetMacros(sourcecodeDir, testCaseDir, finalNumOfTargetMacro);
                             System.out.println("~~~~~~~current con1figuration: " + i + "~~");
                             for (int[] param : parameterArray) {
-                            analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir, param, re);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir, param, re);
+                            }
                         }
                     }
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -81,15 +85,18 @@ public class Main {
     private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro, int numberOfCuts, int groundTruth) {
         ArrayList<int[]> parameterArray = new ArrayList<>();
 
-        for (int i = 0; i <= 1; i++) {
-//            for (int j = 0; j <= 1; j++) {
+//        for (int i = 0; i <= 1; i++) {
+            for (int j = 0; j <= 1; j++) {
                 int[] param = new int[5];
                 param[0] = numOfTargetMacro;
                 param[1] = numberOfCuts;
                 param[2] = groundTruth;
-                param[3] = i;
-                param[4] = 0;
+//                param[3] = i;
+//                param[4] = j;
+                param[3] = 1;
+                param[4] = j;
                 parameterArray.add(param);
+
 //            }
         }
         return parameterArray;

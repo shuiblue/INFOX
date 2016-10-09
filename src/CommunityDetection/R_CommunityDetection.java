@@ -74,9 +74,6 @@ public class R_CommunityDetection {
         // removes the loop and/or multiple edges from a graph.
         re.eval("g<-simplify(oldg)");
 
-        if (!directedGraph) {
-            re.eval("g<-as.undirected(g)");
-        }
         re.eval("originalg<-g");
 
         // get original graph
@@ -111,7 +108,7 @@ public class R_CommunityDetection {
 //            if (currentIteration <= numOfIteration) {
             if (listOfNumberOfCommunities.size() <= numOfcut) {
                 //count betweenness for current graph
-                calculateEachGraph(re, analysisDir, cutNum);
+                calculateEachGraph(re, analysisDir, cutNum,directedGraph);
                 cutNum++;
             } else {
                 break;
@@ -220,7 +217,7 @@ public class R_CommunityDetection {
      * @param filePath
      * @param cutNum
      */
-    public void calculateEachGraph(Rengine re, String filePath, int cutNum) {
+    public void calculateEachGraph(Rengine re, String filePath, int cutNum, boolean directedGraph) {
 
         //get graph's edgeList and nodeList
         REXP edgelist_R = re.eval("get.edgelist(g)", true);
@@ -234,9 +231,15 @@ public class R_CommunityDetection {
             }
         }
 
+        String command;
+        if (!directedGraph) {
+           command="edge.betweenness(g,directed=FALSE)";
+        }else {
+            command="edge.betweenness(g,directed=TRUE)";
+        }
 
         //get betweenness for current graph
-        REXP betweenness_R = re.eval("edge.betweenness(g)", true);
+        REXP betweenness_R = re.eval(command, true);
         double[] betweenness = betweenness_R.asDoubleArray();
 
         //calculate modularty for current graph
@@ -253,8 +256,11 @@ public class R_CommunityDetection {
             listOfNumberOfCommunities.add(current_numberOfCommunities);
 
         }
+
         /**        calculating distance between clusters for joining purpose    **/
-//        calculateDistanceBetweenCommunities(clusters, filePath, current_numberOfCommunities);
+        if(pre_numberOfCommunities!=current_numberOfCommunities) {
+            calculateDistanceBetweenCommunities(clusters, filePath, current_numberOfCommunities,directedGraph);
+        }
 
 
         REXP modularity_R = re.eval("modularity(originalg,cl)");
@@ -286,7 +292,7 @@ public class R_CommunityDetection {
      * @param fileDir
      * @param numOfClusters
      */
-    private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String fileDir, int numOfClusters) {
+    private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String fileDir, int numOfClusters, boolean directedGraph) {
         ArrayList<ArrayList<Integer>> combination = getPairsOfCommunities(clusters);
         HashMap<ArrayList<Integer>, Integer> distanceMatrix = new HashMap<>();
         StringBuffer sb = new StringBuffer();
@@ -294,7 +300,11 @@ public class R_CommunityDetection {
         String filePath = ("comGraph<-read.graph(\"" + fileDir + "complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
         re.eval(filePath);
         re.eval("scomGraph<- simplify(comGraph)");
-        re.eval("completeGraph<-as.undirected(scomGraph)");
+
+        if (!directedGraph) {
+            re.eval("completeGraph<-as.undirected(scomGraph)");
+        }
+
         re.eval("E(completeGraph)$weight <- 1");
         for (ArrayList<Integer> pair : combination) {
 //        for (ArrayList<Integer> pair : combination) {
@@ -306,7 +316,7 @@ public class R_CommunityDetection {
                 if (shortestDistanceOfNodes.get(c1) == null) {
 
                     String c1_array_cmd = "distMatrixc1 <- shortest.paths(completeGraph, v=\"" + c1 + "\", to=V(completeGraph))";
-                    ioFunc.sleep();
+//                    ioFunc.sleep();
                     REXP shortestPath_R_c1 = re.eval(c1_array_cmd);
                     c1_array = shortestPath_R_c1.asDoubleArray();
                     shortestDistanceOfNodes.put(c1, c1_array);
@@ -326,6 +336,7 @@ public class R_CommunityDetection {
                 }
             }
             distanceMatrix.put(pair, (int) shortestPath);
+            System.out.println("---"+pair.get(0)+"---"+pair.get(1)+"-------"+shortestPath);
         }
 
         StringBuffer clusterIDList = new StringBuffer();

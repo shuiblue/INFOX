@@ -1633,6 +1633,9 @@ public class DependencyGraph {
 
     public void findVarDependency(Symbol variable) {
         String var_name = variable.getName();
+//        if(var_name.equals("redundant_temperature")){
+//            System.out.print("");
+//        }
         String var_alias = variable.getAlias();
         String var = "";
         int scope = variable.getScope();
@@ -1647,9 +1650,9 @@ public class DependencyGraph {
             if (s != null) {
                 if (!s.tag.contains("function")) {
                     boolean match = true;
-                    if (variable.getTag().contains("decl") && !s.getTag().equals("macro")) {
-                        match = false;
-                    }
+//                    if (variable.getTag().contains("decl") && !s.getTag().equals("macro")) {
+//                        match = false;
+//                    }
                     if (variable.getTag().equals("struct") && !s.getTag().equals("struct_decl")) {
                         match = false;
                     }
