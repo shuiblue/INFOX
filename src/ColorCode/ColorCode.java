@@ -120,7 +120,7 @@ public class ColorCode {
         String line;
         nodeMap = new HashMap<>();
         ArrayList<String> distanceArray = new ArrayList<>();
-        ArrayList<ArrayList<String>> closeEdgeList = new ArrayList<>();
+        ArrayList<ArrayList<String>> closeClusterList = new ArrayList<>();
         BackgroundColor bgcolor = new BackgroundColor();
 
         try {
@@ -160,29 +160,29 @@ public class ColorCode {
                 String distanceBetweenTwoClusters = str.split(",")[2];
                 if (distanceBetweenTwoClusters.equals("2")) {
                     boolean existEdge = false;
-                    ArrayList<Integer> redundantEdgeListIndex = new ArrayList<>();
-                    if (closeEdgeList.size() > 0) {
-                        for (ArrayList<String> edgelist : closeEdgeList) {
+                    ArrayList<Integer> redundantClusterListIndex = new ArrayList<>();
+                    if (closeClusterList.size() > 0) {
+                        for (ArrayList<String> clusterlist : closeClusterList) {
                             if(!existEdge) {
-                                if (edgelist.contains(str.split(",")[0])) {
-                                    edgelist.add(str.split(",")[1]);
+                                if (clusterlist.contains(str.split(",")[0])) {
+                                    clusterlist.add(str.split(",")[1]);
                                     existEdge = true;
-                                } else if (edgelist.contains(str.split(",")[1])) {
-                                    edgelist.add(str.split(",")[0]);
+                                } else if (clusterlist.contains(str.split(",")[1])) {
+                                    clusterlist.add(str.split(",")[0]);
                                     existEdge = true;
                                 }
                             }else{
-                                if(edgelist.contains(str.split(",")[0])||edgelist.contains(str.split(",")[1])){
+                                if(clusterlist.contains(str.split(",")[0])||clusterlist.contains(str.split(",")[1])){
 
-                                    redundantEdgeListIndex.add(closeEdgeList.indexOf(edgelist));
+                                    redundantClusterListIndex.add(closeClusterList.indexOf(clusterlist));
 
                                 }
                             }
                         }
                     }
 
-                    for(int index :redundantEdgeListIndex){
-                        closeEdgeList.set(index,new ArrayList<>());
+                    for(int index :redundantClusterListIndex){
+                        closeClusterList.set(index,new ArrayList<>());
                     }
 
 
@@ -190,7 +190,7 @@ public class ColorCode {
                         ArrayList<String> list = new ArrayList<>();
                         list.add(str.split(",")[0]);
                         list.add(str.split(",")[1]);
-                        closeEdgeList.add(list);
+                        closeClusterList.add(list);
                     }
                 }
             }
