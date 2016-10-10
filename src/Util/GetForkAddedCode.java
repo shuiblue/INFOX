@@ -420,7 +420,7 @@ public class GetForkAddedCode {
         macroList = createMacroList();
         ArrayList<String> targetMacroList = new ArrayList<>();
         ArrayList<Integer> indexList = new ArrayList<>();
-        while (indexList.size() < 5) {
+        while (indexList.size() < number) {
             Random random = new Random();
             int index = random.ints(0, (macroList.size() - 1)).findFirst().getAsInt();
             if (!indexList.contains(index)) {

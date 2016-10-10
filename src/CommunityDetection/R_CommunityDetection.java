@@ -336,7 +336,10 @@ public class R_CommunityDetection {
                 }
             }
             distanceMatrix.put(pair, (int) shortestPath);
-            System.out.println("---"+pair.get(0)+"---"+pair.get(1)+"-------"+shortestPath);
+
+                System.out.println("---"+pair.get(0)+"---"+pair.get(1)+"-------"+shortestPath);
+
+
         }
 
         StringBuffer clusterIDList = new StringBuffer();

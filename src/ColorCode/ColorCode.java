@@ -5,7 +5,6 @@ import Util.ProcessingText;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * Created by shuruiz on 8/29/16.
@@ -20,9 +19,8 @@ public class ColorCode {
     static String forkAddedNodeTxt = "forkAddedNode.txt";
     static String jsFileHeader = "/jshead.txt";
     static HashMap<Integer, String> nodeMap;
-    static ArrayList<String> colorList = new ArrayList<>();
-    static HashMap<Integer, String> colorMap = new HashMap<>();
-
+    HashMap<Integer, String> colorMap = new HashMap<>();
+    ArrayList<String> bigSizeClusterList = new ArrayList<>();
     static StringBuffer jsContent = new StringBuffer();
     static String forkAddedNode = "";
 
@@ -33,6 +31,8 @@ public class ColorCode {
     StringBuilder sb = new StringBuilder();
     ProcessingText processingText = new ProcessingText();
     HashMap<Integer, ArrayList<String>> clusterResultMap = new HashMap<>();
+    ArrayList<ArrayList<String>> closeClusterList = new ArrayList<>();
+    HashMap<ArrayList<String>, String> closeClusters_ColorMap = new HashMap<>();
     int initialNumOfClusters = 0;
 
     public void parseSourceCodeFromFile(String fileName) {
@@ -119,9 +119,14 @@ public class ColorCode {
         BufferedReader br;
         String line;
         nodeMap = new HashMap<>();
-        ArrayList<String> distanceArray = new ArrayList<>();
-        ArrayList<ArrayList<String>> closeClusterList = new ArrayList<>();
+        ArrayList<String> distanceArray;
+
+
         BackgroundColor bgcolor = new BackgroundColor();
+
+//        HashMap<String, String> clusterColorMap = new HashMap<>();
+//        HashMap<String, String> join_clusterColorMap = new HashMap<>();
+
 
         try {
             br = new BufferedReader(new FileReader(analysisDir + nodeListTxt));
@@ -158,12 +163,32 @@ public class ColorCode {
             distanceArray = new ArrayList(Arrays.asList(distanceString.split("\n")));
             for (String str : distanceArray) {
                 String distanceBetweenTwoClusters = str.split(",")[2];
+                String cluster_1 = str.split(",")[0];
+                String cluster_2 = str.split(",")[1];
+
+                int length_cluster_1 = 0, length_cluster_2 = 0;
+                for (String cl : clusters) {
+                    if (cl.startsWith(cluster_1 + ")")) {
+                        length_cluster_1 = cl.split(",").length - 1;
+                    }
+                    if (cl.startsWith(cluster_2 + ")")) {
+                        length_cluster_2 = cl.split(",").length - 1;
+                    }
+                }
+
+                if (length_cluster_1 > 50 &&!bigSizeClusterList.contains(cluster_1)) {
+                    bigSizeClusterList.add(cluster_1);
+                } else if (length_cluster_2 > 50&&!bigSizeClusterList.contains(cluster_2)) {
+                    bigSizeClusterList.add(cluster_2);
+                }
+
+
                 if (distanceBetweenTwoClusters.equals("2")) {
                     boolean existEdge = false;
                     ArrayList<Integer> redundantClusterListIndex = new ArrayList<>();
                     if (closeClusterList.size() > 0) {
                         for (ArrayList<String> clusterlist : closeClusterList) {
-                            if(!existEdge) {
+                            if (!existEdge) {
                                 if (clusterlist.contains(str.split(",")[0])) {
                                     clusterlist.add(str.split(",")[1]);
                                     existEdge = true;
@@ -171,31 +196,33 @@ public class ColorCode {
                                     clusterlist.add(str.split(",")[0]);
                                     existEdge = true;
                                 }
-                            }else{
-                                if(clusterlist.contains(str.split(",")[0])||clusterlist.contains(str.split(",")[1])){
-
+                            } else {
+                                if (clusterlist.contains(str.split(",")[0]) || clusterlist.contains(str.split(",")[1])) {
                                     redundantClusterListIndex.add(closeClusterList.indexOf(clusterlist));
-
                                 }
                             }
                         }
                     }
 
-                    for(int index :redundantClusterListIndex){
-                        closeClusterList.set(index,new ArrayList<>());
+                    for (int index : redundantClusterListIndex) {
+                        closeClusterList.set(index, new ArrayList<>());
                     }
-
 
                     if (!existEdge) {
                         ArrayList<String> list = new ArrayList<>();
-                        list.add(str.split(",")[0]);
-                        list.add(str.split(",")[1]);
+                        list.add(cluster_1);
+                        list.add(cluster_2);
                         closeClusterList.add(list);
                     }
                 }
+
+
             }
-
-
+            for (ArrayList<String> arrayList : closeClusterList) {
+                if (arrayList.size() > 0) {
+                    closeClusters_ColorMap.put(arrayList, "");
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -217,8 +244,11 @@ public class ColorCode {
         }
 
         StringBuilder sb = new StringBuilder();
+        StringBuilder joining_sb = new StringBuilder();
         StringBuilder colorTable = new StringBuilder();
-        sb.append("td {\n" +
+        StringBuilder joining_colorTable = new StringBuilder();
+
+        String css_head = "td {\n" +
                 "    width: 5px;\n" +
                 "    border:1px solid black;\n" +
                 "    text-align:center;\n" +
@@ -243,15 +273,20 @@ public class ColorCode {
                 "\tposition:fixed;\n" +
                 "\ttop:50px;\n" +
                 "\tright:50px;\n" +
-                "}\n"
+                "}\n";
 
-        );
+        sb.append(css_head);
+        joining_sb.append(css_head);
+
+
         //record cluster id and  colors
         StringBuffer clusterSB = new StringBuffer();
+        StringBuffer joining_clusterSB = new StringBuffer();
         for (int i = 0; i < clusters.size(); i++) {
 
             if (clusters.get(i).length() > 0) {
                 String current_color = "";
+                String afterJoining_color = null;
 //                if (colorList.size() > i - 1) {
 //                    current_color = colorList.get(i - 1);
 //                } else {
@@ -260,10 +295,12 @@ public class ColorCode {
 //
 //                }
 
+
                 String cluster = clusters.get(i);
                 if (cluster.trim().length() > 0) {
                     String clusterID = cluster.substring(0, clusters.get(i).trim().indexOf(")"));
                     clusterSB.append(clusterID);
+                    joining_clusterSB.append(clusterID);
                     String[] elementList = clusters.get(i).trim().split(",");
                     int length = elementList.length;
                     String previous_Color = "";
@@ -281,14 +318,11 @@ public class ColorCode {
                                     current_color = randomColor();
                                     colorMap.put(nodeID, current_color);
 
-
-                                    for (Map.Entry<Integer, ArrayList<String>> entry : clusterResultMap.entrySet()) {
-                                        if (entry.getKey() < numberOfClusters) {
-                                            ArrayList<String> currentClusters = entry.getValue();
+//                                    for (Map.Entry<Integer, ArrayList<String>> entry : clusterResultMap.entrySet()) {
+                                        if (initialNumOfClusters< numberOfClusters) {
+                                            ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters-1);
                                             for (String clusterStr : currentClusters) {
-                                                if (clusterStr.contains(nodeID + "")) {
-                                                    System.out.print("");
-
+                                                if (clusterStr.contains(nodeID + " ,")) {
                                                     int currentNumberOfNodes = cluster.split(",").length - 1;
                                                     int previousNumberOfNodes = clusterStr.split(",").length - 1;
 
@@ -297,24 +331,38 @@ public class ColorCode {
 
                                                 }
                                             }
-                                        }
+//                                        }
 
                                     }
 
 
                                 }
+                                afterJoining_color = current_color;
+                                /**  check whether current cluster need to be join with others, and whether the afterJoningColor has been set **/
+                                for (Map.Entry<ArrayList<String>, String> entry : closeClusters_ColorMap.entrySet()) {
+                                    if (entry.getKey().contains(clusterID) && !entry.getValue().equals("")&&!bigSizeClusterList.contains(clusterID)) {
+                                        afterJoining_color = entry.getValue();
+                                        break;
+                                    }
+                                }
                             }
+
+
+
 
                         /*for printing purpose*/
                             if (print) {
                                 sb.append("#" + nodeLabel + "{\n\tbackground-color:;\n");
+                                joining_sb.append("#" + nodeLabel + "{\n\tbackground-color:;\n");
                             } else {
                                 String htmlLabel = nodeLabel.replace("~", "-");
                                 if (forkAddedNode.contains(nodeLabel)) {
 
                                     sb.append("#" + htmlLabel + "{\n\tbackground-color:#" + current_color + ";\n");
+                                    joining_sb.append("#" + htmlLabel + "{\n\tbackground-color:#" + afterJoining_color + ";\n");
                                 } else {
                                     sb.append("#" + htmlLabel + "{\n\tbackground-color:White;\n");
+                                    joining_sb.append("#" + htmlLabel + "{\n\tbackground-color:White;\n");
                                 }
                             }
 
@@ -331,10 +379,8 @@ public class ColorCode {
                                     String expectCommunity = expectNodeMap.get(nodeLabel);
                                     if (expectCommunity.contains("/")) {
                                         String[] each = expectCommunity.split("/");
-//                                    for(String e:each){
                                         leftSidebarColor = bgcolor.getExpectColorList().get(Integer.valueOf(each[0]) - 1);
                                         rightSidebarColor = bgcolor.getExpectColorList().get(Integer.valueOf(each[1]) - 1);
-//                                    }
                                     } else {
                                         if (expectCommunity.trim().contains("10")) {
                                             System.out.print("");
@@ -345,7 +391,6 @@ public class ColorCode {
                                     }
 
                                 }
-//                            System.out.println(nodeLabel);
 
                             }
 //                        --------------------------expect Node---------------------------
@@ -361,7 +406,6 @@ public class ColorCode {
                                 }
                             } else if (!forkAddedNode.equals("")) {
                                 if (!forkAddedNode.contains(nodeLabel)) {
-//                                sidebarColor = "Gray";
                                    /*for print */
                                     if (print) {
                                         leftSidebarColor = "White";
@@ -373,32 +417,60 @@ public class ColorCode {
                             }
                             sb.append("\tborder-style: solid;\n\tborder-width: thin thick thin thick;" +
                                     "\n\tborder-color: white " + rightSidebarColor + " white " + leftSidebarColor + ";\n" + "}\n");
+                            joining_sb.append("\tborder-style: solid;\n\tborder-width: thin thick thin thick;" +
+                                    "\n\tborder-color: white " + rightSidebarColor + " white " + leftSidebarColor + ";\n" + "}\n");
 
 
                             //write to file for calculate color table
                             //--------------------------expect Node---------------------------
                             if (expectNode.contains(nodeLabel + " ")) {
                                 colorTable.append(nodeLabel + "," + current_color + "," + leftSidebarColor + "\n");
+                                joining_colorTable.append(nodeLabel + "," + afterJoining_color + "," + leftSidebarColor + "\n");
                                 if (!rightSidebarColor.equals("White")) {
                                     colorTable.append(nodeLabel + "," + current_color + "," + rightSidebarColor + "\n");
+                                    joining_colorTable.append(nodeLabel + "," + afterJoining_color + "," + rightSidebarColor + "\n");
                                 }
 
                             }
-//--------------------------expect Node---------------------------*/
+                            /**--------------------------expect Node---------------------------**/
                             if (!previous_Color.equals(current_color)) {
                                 clusterSB.append("," + current_color + "," + leftSidebarColor + "\n");
+                                joining_clusterSB.append("," + afterJoining_color + "," + leftSidebarColor + "\n");
                             }
                             previous_Color = current_color;
 
                         }
+
+
+                        if (j == 0) {
+                            /**      joining color table   **/
+//                            clusterColorMap.put(clusterID, current_color);
+                            for (ArrayList<String> clusterList : closeClusterList) {
+                                if (clusterList.contains(clusterID)) {
+                                    if (closeClusters_ColorMap.get(clusterList).equals("")) {
+                                        closeClusters_ColorMap.put(clusterList, current_color);
+//                                       join_clusterColorMap.put(clusterID,current_color);
+                                    }
+//                                   else {
+////                                       join_clusterColorMap.put(clusterID,afterJoining_color);
+//                                   }
+                                }
+                            }
+
+                        }
                     }
+
+
                 }
             }
         }
 
         iofunc.rewriteFile(sb.toString(), analysisDir + numberOfClusters + CSS);
+        iofunc.rewriteFile(joining_sb.toString(), analysisDir + numberOfClusters + "_join" + CSS);
         iofunc.rewriteFile(colorTable.toString(), analysisDir + numberOfClusters + "_colorTable.txt");
+        iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + numberOfClusters + "_colorTable_join.txt");
         iofunc.rewriteFile(clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor.txt");
+        iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor_join.txt");
     }
 
     private String randomColor() {
@@ -409,7 +481,7 @@ public class ColorCode {
         Color randomColor = new Color(r, g, b);
         String color = Integer.toHexString(randomColor.getRGB() & 0x00ffffff);
 
-        if (!colorMap.keySet().contains(color)) {
+        if (!colorMap.values().contains(color)) {
             return color;
         } else {
             return randomColor();
@@ -429,15 +501,40 @@ public class ColorCode {
             //write code.html
             iofunc.rewriteFile(iofunc.readResult(htmlfilePath + headtxt).replace("style.css", numberOfClusters + ".css"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + html);
-            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + html);
+
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt), analysisDir + html);
-//            iofunc.writeTofile(iofunc.readResult(analysisDir + "testedMacros.txt"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + sourceCodeTxt), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + endtxt), analysisDir + html);
 
             //toggle js
             iofunc.rewriteFile(iofunc.readResult(htmlfilePath + jsFileHeader), analysisDir + togglejsPath);
             iofunc.writeTofile(jsContent.toString() + "\n});", analysisDir + togglejsPath);
+
+
+            //write color table
+            iofunc.rewriteFile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + numberOfClusters + "_joiningTable.html");
+            iofunc.writeTofile("<h3> ----------------Before Joining-----------------", analysisDir + numberOfClusters + "_joiningTable.html");
+            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + numberOfClusters + "_joiningTable.html");
+            StringBuffer sb = new StringBuffer();
+            sb.append("<h3> ---------clusters could be joined: <br>");
+            for (ArrayList<String> list : closeClusterList) {
+                if (list.size() > 0) {
+                    sb.append("[");
+                    for (String s : list) {
+                        sb.append(s + " , ");
+                    }
+                    sb.append("] <br>");
+                }
+            }
+            sb.append("<h3> ---------big size cluster (#node>50) will not be joined : [ ");
+            for(String bsc: bigSizeClusterList){
+                sb.append(bsc+" , ");
+            }
+            sb.append("]");
+            iofunc.writeTofile(sb.toString(), analysisDir + numberOfClusters + "_joiningTable.html");
+            iofunc.writeTofile("<h3> ----------------After Joining-----------------", analysisDir + numberOfClusters + "_joiningTable.html");
+            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + "_join.color"), analysisDir + numberOfClusters + "_joiningTable.html");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -511,7 +608,8 @@ public class ColorCode {
 
                     AnalyzingCommunityDetectionResult analyzeCDResult = new AnalyzingCommunityDetectionResult();
 
-                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities);
+                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false);
+                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true);
 
                     combineFiles(numberOfCommunities);
                     pre_numberOfCommunites = numberOfCommunities;

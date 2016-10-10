@@ -33,7 +33,6 @@ public class AnalyzingRepository {
      */
     public void analyzeRepository(String sourcecodeDir, String testCaseDir, int[] parameters, Rengine re) {
         /**   Set parameters   **/
-//        int numOfTargetMacro = parameters[0];
         int numOfCuts = parameters[1];
         boolean createEdgeForConsecutiveLines = parameters[3] == 1 ? true : false;
         boolean directedGraph = parameters[4] == 1 ? true : false;
@@ -49,16 +48,16 @@ public class AnalyzingRepository {
 
         /**  Generating Dependency Graphs for current test case/project  **/
 //
-//        if(!directedGraph) {
-//            DependencyGraph dependencyGraph = new DependencyGraph();
-//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
-//        }
+        if(!directedGraph) {
+            DependencyGraph dependencyGraph = new DependencyGraph();
+            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
+        }
         /*------------------calculating similarity--------------------------
         StringSimilarity strSim = new StringSimilarity();
         strSim.calculateStringSimilarityByR(sourcecodeDir, analysisDir, re);*/
 
         /** Community Detection  **/
-//        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
+        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
         new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);

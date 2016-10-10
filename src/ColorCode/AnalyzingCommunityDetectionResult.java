@@ -1,21 +1,24 @@
 package ColorCode;
+
 import Util.ProcessingText;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
 /**
  * Created by shuruiz on 8/29/16.
  */
 public class AnalyzingCommunityDetectionResult {
     ProcessingText processingText = new ProcessingText();
-    String analysisDir,testCaseDir;
+    String analysisDir, testCaseDir;
     List<String> bgcolorList = BackgroundColor.getExpectColorList();
     static final String FS = File.separator;
+
     //    public void generatingClusteringTable(String analysisDir, int numberOfCommunities, ArrayList<String> macroList) {
-    public void generatingClusteringTable( String testCaseDir, String testDir, int numberOfCommunities) {
-        this.analysisDir=testCaseDir+testDir+FS;
-        this.testCaseDir=testCaseDir;
+    public void generatingClusteringTable(String testCaseDir, String testDir, int numberOfCommunities, boolean isJoiningTable) {
+        this.analysisDir = testCaseDir + testDir + FS;
+        this.testCaseDir = testCaseDir;
         HashMap<String, HashMap<String, Integer>> resultTable = new HashMap<>();
 
 //        for (int i = 0; i < macroList.size(); i++) {
@@ -23,7 +26,12 @@ public class AnalyzingCommunityDetectionResult {
 //        }
 
 
-        String filePath = analysisDir + numberOfCommunities + "_colorTable.txt";
+        String filePath;
+        if (!isJoiningTable) {
+            filePath = analysisDir + numberOfCommunities + "_colorTable.txt";
+        } else {
+            filePath = analysisDir + numberOfCommunities + "_colorTable_join.txt";
+        }
         try {
             String cssString = processingText.readResult(filePath);
             String[] colorArray = cssString.split("\n");
@@ -57,7 +65,7 @@ public class AnalyzingCommunityDetectionResult {
                 }
             }
 
-            printResultTable(resultTable, communityColorList, numberOfCommunities);
+            printResultTable(resultTable, communityColorList, numberOfCommunities, isJoiningTable);
 //            printResultTable(resultTable, communityColorList, numberOfCommunities, macroList);
 
             printClusterDistanceTable(numberOfCommunities);
@@ -90,18 +98,8 @@ public class AnalyzingCommunityDetectionResult {
             }
 
             // TODO: table color
-            colorList = processingText.readResult(analysisDir + numberOfCommunities + "_clusterColor.txt").split("\n");
-            HashMap<String, String> colorTable = new HashMap();
-            for (String c : colorList) {
-                //[0] id  [1] current color  [2] expect color
-                String[] content = c.split(",");
-                String id = content[0];
-                String current_color = content[1];
-                String expect_color = content[2];
 
-                colorTable.put(id, current_color);
-            }
-
+            HashMap<String, String> idToColorMap = getIdToColorMap(numberOfCommunities, false);
 
             distanceList = processingText.readResult(analysisDir + numberOfCommunities + "_distanceBetweenCommunityies.txt").split("\n");
             for (String d : distanceList) {
@@ -113,15 +111,22 @@ public class AnalyzingCommunityDetectionResult {
 
             sb.append("<table id=\"distance\"> <tr> <td> </td>\n");
             for (String id : clusterIDList) {
-                sb.append("<td bgcolor=\"#" + colorTable.get(id) + "\">" + id + "</td>\n");
+                sb.append("<td bgcolor=\"#" + idToColorMap.get(id) + "\">" + id + "</td>\n");
 
             }
             sb.append("</tr>\n");
 
             for (String id : clusterIDList) {
-                sb.append("<tr><td bgcolor=\"#" + colorTable.get(id) + "\">" + id + "</td>\n");
+                sb.append("<tr><td bgcolor=\"#" + idToColorMap.get(id) + "\">" + id + "</td>\n");
 
                 for (String s : distanceTable.get(id)) {
+                    if(s==null){
+                        s="-";
+                    }else {
+                        if (s.equals("999999")) {
+                            s = "&infin;";
+                        }
+                    }
                     sb.append("<td>" + s + "</td>\n");
                 }
                 sb.append("</tr>\n");
@@ -141,12 +146,28 @@ public class AnalyzingCommunityDetectionResult {
     }
 
     //    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, ArrayList<String> macroList) {
-    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities) {
+    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, boolean isJoiningTable) {
 
         StringBuffer sb = new StringBuffer();
         Iterator it = resultTable.keySet().iterator();
 
         ArrayList<String> featureList = getFeatureList();
+
+
+        String[] colorList = null;
+        try {
+            colorList = processingText.readResult(analysisDir + numberOfCommunities + "_clusterColor.txt").split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        HashMap<String, String> clusterIdToColorMap = getIdToColorMap(numberOfCommunities, isJoiningTable);
+        Map<String, String> colorToClusterIdMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : clusterIdToColorMap.entrySet()) {
+            colorToClusterIdMap.put(entry.getValue(), entry.getKey());
+        }
+
 
 //                new ArrayList<>();
 //        macroList.add("ots_firewall");
@@ -155,13 +176,13 @@ public class AnalyzingCommunityDetectionResult {
         sb.append("<table id=\"cluster\">\n" +
                 "    <tr>\n" +
                 "        <td>\n" +
-                "            <span>Result</span>\n" +
+                "            <span>ClusterID</span>\n" +
                 "            <hr/>\n" +
                 "            <span>CRs ( LOC )</span>\n" +
                 "        </td>\n");
 
         for (String color : communityColorList) {
-            sb.append("<td bgcolor=\"#" + color + "\"></td>\n");
+            sb.append("<td bgcolor=\"#" + color + "\">" + colorToClusterIdMap.get(color) + "</td>\n");
         }
         sb.append("</tr>\n");
 // ----------------for ifdef evaluation----------------------------------
@@ -179,32 +200,57 @@ public class AnalyzingCommunityDetectionResult {
             if (distributedMap != null) {
                 for (String s : communityColorList) {
                     String number;
-                    if(distributedMap.get(s)==null){
-                        number="-";
-                    }else{
-                        number=distributedMap.get(s).toString();
+                    if (distributedMap.get(s) == null) {
+                        number = "-";
+                    } else {
+                        number = distributedMap.get(s).toString();
                     }
-                    sb.append("<td>" + number+ "</td>\n");
+                    sb.append("<td>" + number + "</td>\n");
                 }
                 sb.append("</tr>\n");
-            }else{
-                System.out.println("distributedMap is null: "+expectColor);
+            } else {
+                System.out.println("distributedMap is null: " + expectColor);
             }
         }
 
-//        else{
-//
-//        }
-//         ----------------for ifdef evaluation----------------------------------
+        if (!isJoiningTable) {
+
+        }
 
 
         sb.append("</table>");
-        processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + ".color");
+        if (!isJoiningTable) {
+            processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + ".color");
+
+        } else {
+            processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + "_join.color");
+        }
+    }
+
+    private HashMap<String, String> getIdToColorMap(int numberOfCommunities, boolean isJoiningTable) {
+
+        String[] colorList = new String[0];
+        try {
+            colorList = processingText.readResult(analysisDir + numberOfCommunities + "_clusterColor.txt").split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HashMap<String, String> colorTable = new HashMap();
+        for (String c : colorList) {
+            //[0] id  [1] current color  [2] expect color
+            String[] content = c.split(",");
+            String id = content[0];
+            String current_color = content[1];
+            String expect_color = content[2];
+
+            colorTable.put(id, current_color);
+        }
+        return colorTable;
     }
 
     private ArrayList<String> getFeatureList() {
         try {
-            String[] featureArray = processingText.readResult( testCaseDir+ "featureList.txt").split("\n");
+            String[] featureArray = processingText.readResult(testCaseDir + "featureList.txt").split("\n");
             return new ArrayList<>(Arrays.asList(featureArray));
         } catch (IOException e) {
             e.printStackTrace();
