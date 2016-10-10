@@ -20,7 +20,7 @@ public class ColorCode {
     static String jsFileHeader = "/jshead.txt";
     static HashMap<Integer, String> nodeMap;
     HashMap<Integer, String> colorMap = new HashMap<>();
-    ArrayList<String> bigSizeClusterList = new ArrayList<>();
+    HashSet<String> bigSizeClusterList = new HashSet<>();
     static StringBuffer jsContent = new StringBuffer();
     static String forkAddedNode = "";
 
@@ -31,8 +31,8 @@ public class ColorCode {
     StringBuilder sb = new StringBuilder();
     ProcessingText processingText = new ProcessingText();
     HashMap<Integer, ArrayList<String>> clusterResultMap = new HashMap<>();
-    ArrayList<ArrayList<String>> closeClusterList = new ArrayList<>();
-    HashMap<ArrayList<String>, String> closeClusters_ColorMap = new HashMap<>();
+    ArrayList<HashSet<String>> closeClusterList = new ArrayList<>();
+    HashMap<HashSet<String>, String> closeClusters_ColorMap = new HashMap<>();
     int initialNumOfClusters = 0;
 
     public void parseSourceCodeFromFile(String fileName) {
@@ -187,7 +187,7 @@ public class ColorCode {
                     boolean existEdge = false;
                     ArrayList<Integer> redundantClusterListIndex = new ArrayList<>();
                     if (closeClusterList.size() > 0) {
-                        for (ArrayList<String> clusterlist : closeClusterList) {
+                        for (HashSet<String> clusterlist : closeClusterList) {
                             if (!existEdge) {
                                 if (clusterlist.contains(str.split(",")[0])) {
                                     clusterlist.add(str.split(",")[1]);
@@ -205,11 +205,11 @@ public class ColorCode {
                     }
 
                     for (int index : redundantClusterListIndex) {
-                        closeClusterList.set(index, new ArrayList<>());
+                        closeClusterList.set(index, new HashSet<>());
                     }
 
                     if (!existEdge) {
-                        ArrayList<String> list = new ArrayList<>();
+                        HashSet<String> list = new HashSet<>();
                         list.add(cluster_1);
                         list.add(cluster_2);
                         closeClusterList.add(list);
@@ -218,7 +218,7 @@ public class ColorCode {
 
 
             }
-            for (ArrayList<String> arrayList : closeClusterList) {
+            for (HashSet<String> arrayList : closeClusterList) {
                 if (arrayList.size() > 0) {
                     closeClusters_ColorMap.put(arrayList, "");
                 }
@@ -339,7 +339,7 @@ public class ColorCode {
                                 }
                                 afterJoining_color = current_color;
                                 /**  check whether current cluster need to be join with others, and whether the afterJoningColor has been set **/
-                                for (Map.Entry<ArrayList<String>, String> entry : closeClusters_ColorMap.entrySet()) {
+                                for (Map.Entry<HashSet<String>, String> entry : closeClusters_ColorMap.entrySet()) {
                                     if (entry.getKey().contains(clusterID) && !entry.getValue().equals("")&&!bigSizeClusterList.contains(clusterID)) {
                                         afterJoining_color = entry.getValue();
                                         break;
@@ -445,7 +445,7 @@ public class ColorCode {
                         if (j == 0) {
                             /**      joining color table   **/
 //                            clusterColorMap.put(clusterID, current_color);
-                            for (ArrayList<String> clusterList : closeClusterList) {
+                            for (HashSet<String> clusterList : closeClusterList) {
                                 if (clusterList.contains(clusterID)) {
                                     if (closeClusters_ColorMap.get(clusterList).equals("")) {
                                         closeClusters_ColorMap.put(clusterList, current_color);
@@ -517,7 +517,7 @@ public class ColorCode {
             iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + numberOfClusters + "_joiningTable.html");
             StringBuffer sb = new StringBuffer();
             sb.append("<h3> ---------clusters could be joined: <br>");
-            for (ArrayList<String> list : closeClusterList) {
+            for (HashSet<String> list : closeClusterList) {
                 if (list.size() > 0) {
                     sb.append("[");
                     for (String s : list) {
@@ -681,7 +681,7 @@ public class ColorCode {
                 "</html>\n");
 
 
-        processingText.writeTofile(sb.toString(), analysisDir + "resultTable.html");
+        processingText.rewriteFile(sb.toString(), analysisDir + "resultTable.html");
 
     }
 

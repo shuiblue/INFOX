@@ -217,7 +217,7 @@ public class DependencyGraph {
              writeStringsToFile(candidateStrings);
          */
 
-        return edgeList;
+         return edgeList;
     }
 
 
@@ -1152,7 +1152,7 @@ public class DependencyGraph {
 
         Element condition = ele.getFirstChildElement("condition", NAMESPACEURI);
 
-        if(condition!=null) {
+        if (condition != null) {
             Element cond_exprNode = condition.getFirstChildElement("expr", NAMESPACEURI);
             if (cond_exprNode != null) {
                 parseVariableInExpression(condition, getLocationOfElement(cond_exprNode, fileName), scope, parentLocation, false);
@@ -1672,9 +1672,9 @@ public class DependencyGraph {
                                 String edgeLable = "<Def-Use> " + var;
                                 addEdgesToFile(depenNodeLabel, s, edgeLable);
                                 edgeNum++;
-                                if (candidates.size() > 0) {
-                                    candidates.clear();
-                                }
+//                                if (candidates.size() > 0) {
+//                                    candidates.clear();
+//                                }
 //                                if (!s.getTag().equals("macro")) {
 //                                    break;
 //                                } else {
@@ -1686,37 +1686,40 @@ public class DependencyGraph {
                         if (((((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) && !s.getName().equals(""))
                                 || ((s.getAlias().equals(var_name)) || (s.getAlias().equals(var_alias))) && !s.getAlias().equals(""))
                                 && scope > s.getScope()) {
-//                        String edgeLable = "<Def-Use> " + var;
-                            candidates.add(s);
-//                     addEdgesToFile(depenNodeLabel, s, edgeLable);
-                            edgeNum++;
                             if ((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) {
                                 var = s.getName();
                             } else {
                                 var = s.getAlias();
                             }
+                            String edgeLable = "<Def-Use> " + var;
+                            addEdgesToFile(depenNodeLabel, s, edgeLable);
+//                            candidates.add(s);
+                            edgeNum++;
+
                         }
                     }
                 }
             }
         }
+        /**   this following part is for adding one decl for dependency variable. however, we need to link all the possible decl to dependency, so remove this for now.**/
+//        Symbol decl_symbol = null;
+//        int min_scope = 99;
+//        for (Symbol candidate : candidates) {
+//            if (candidate.scope < min_scope) {
+//                if (candidate.getLocation().split("-")[0].equals(fileName)) {
+//                    decl_symbol = candidate;
+//                    min_scope = candidate.scope;
+//                } else if (decl_symbol == null) {
+//                    decl_symbol = candidate;
+//                }
+//            }
+//        }
+//        if (decl_symbol != null) {
+//            String edgeLable = "<Def-Use> " + var;
+//            addEdgesToFile(depenNodeLabel, decl_symbol, edgeLable);
+//        }
 
-        Symbol decl_symbol = null;
-        int min_scope = 99;
-        for (Symbol candidate : candidates) {
-            if (candidate.scope < min_scope) {
-                if (candidate.getLocation().split("-")[0].equals(fileName)) {
-                    decl_symbol = candidate;
-                    min_scope = candidate.scope;
-                } else if (decl_symbol == null) {
-                    decl_symbol = candidate;
-                }
-            }
-        }
-        if (decl_symbol != null) {
-            String edgeLable = "<Def-Use> " + var;
-            addEdgesToFile(depenNodeLabel, decl_symbol, edgeLable);
-        }
+
         if (edgeNum == 0) {
             lonelySymbolSet.add(variable);
         }
@@ -2022,13 +2025,15 @@ public class DependencyGraph {
      * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
      */
     private boolean isCFile(String filePath) {
-        return filePath.endsWith(".cpp")  || filePath.endsWith(".c");
+        return filePath.endsWith(".cpp") || filePath.endsWith(".c");
 //        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
+
     private boolean isHeaderFile(String filePath) {
-        return filePath.endsWith(".h") ;
+        return filePath.endsWith(".h");
 //        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
+
     /**
      * This function check whether the str is a word or not
      *
