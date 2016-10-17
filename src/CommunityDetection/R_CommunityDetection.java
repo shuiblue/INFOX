@@ -63,14 +63,9 @@ public class R_CommunityDetection {
         String analysisDir = testCaseDir + testDir + FS;
         System.getProperty("java.library.path");
 
-        String graphDir = analysisDir;
-        if(directedGraph)
-        {
-            graphDir=analysisDir.replace("54101","54100").replace("54111","54110");
-        }
 
-        System.out.println("oldg<-read_graph(\"" + graphDir + "changedCode.pajek.net\", format=\'pajek\')");
-        re.eval("oldg<-read_graph(\"" + graphDir + "changedCode.pajek.net\", format=\'pajek\')");
+        System.out.println("oldg<-read_graph(\"" + testCaseDir + "changedCode.pajek.net\", format=\'pajek\')");
+        re.eval("oldg<-read_graph(\"" + testCaseDir + "changedCode.pajek.net\", format=\'pajek\')");
         // removes the loop and/or multiple edges from a graph.
         re.eval("g<-simplify(oldg)");
 
@@ -108,7 +103,7 @@ public class R_CommunityDetection {
 //            if (currentIteration <= numOfIteration) {
             if (listOfNumberOfCommunities.size() <= numOfcut) {
                 //count betweenness for current graph
-                calculateEachGraph(re, analysisDir, cutNum,directedGraph);
+                calculateEachGraph(re, testCaseDir,testDir, cutNum,directedGraph);
                 cutNum++;
             } else {
                 break;
@@ -214,10 +209,13 @@ public class R_CommunityDetection {
     /**
      * This function is calling community detection algorithm through igraph lib
      * @param re
-     * @param filePath
+     * @param testCaseDir
+     * @param testDir
      * @param cutNum
      */
-    public void calculateEachGraph(Rengine re, String filePath, int cutNum, boolean directedGraph) {
+    public void calculateEachGraph(Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph) {
+String analysisDir = testCaseDir+testDir+FS;
+
 
         //get graph's edgeList and nodeList
         REXP edgelist_R = re.eval("get.edgelist(g)", true);
@@ -259,7 +257,7 @@ public class R_CommunityDetection {
 
         /**        calculating distance between clusters for joining purpose    **/
         if(pre_numberOfCommunities!=current_numberOfCommunities) {
-            calculateDistanceBetweenCommunities(clusters, filePath, current_numberOfCommunities,directedGraph);
+            calculateDistanceBetweenCommunities(clusters,  testCaseDir,testDir, current_numberOfCommunities,directedGraph);
         }
 
 
@@ -274,8 +272,8 @@ public class R_CommunityDetection {
         //modularity find removableEdge
         int removableEdgeID = findRemovableEdge(currentGraph);
 //        if (pre_numberOfCommunities != current_numberOfCommunities) {
-        printEdgeRemovingResult(currentGraph, filePath, cutNum);
-        printMemebershipOfCurrentGraph(clusters, filePath);
+        printEdgeRemovingResult(currentGraph, analysisDir, cutNum);
+        printMemebershipOfCurrentGraph(clusters, analysisDir);
 //        }
         modularityMap.put(cutNum, modularity);
         modularityArray.add(modularity);
@@ -289,20 +287,24 @@ public class R_CommunityDetection {
     /**
      * This function calculate the distance between communities
      * @param clusters
-     * @param fileDir
+     * @param testCaseDir
+     * @param testDir
      * @param numOfClusters
      */
-    private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String fileDir, int numOfClusters, boolean directedGraph) {
+    private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String testCaseDir, String testDir, int numOfClusters, boolean directedGraph) {
+
         ArrayList<ArrayList<Integer>> combination = getPairsOfCommunities(clusters);
         HashMap<ArrayList<Integer>, Integer> distanceMatrix = new HashMap<>();
         StringBuffer sb = new StringBuffer();
         HashMap<Integer, double[]> shortestDistanceOfNodes = new HashMap<>();
-        String filePath = ("comGraph<-read.graph(\"" + fileDir + "complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
+        String filePath = ("comGraph<-read.graph(\"" + testCaseDir + "complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
         re.eval(filePath);
         re.eval("scomGraph<- simplify(comGraph)");
 
         if (!directedGraph) {
             re.eval("completeGraph<-as.undirected(scomGraph)");
+        }else{
+            re.eval("completeGraph<-scomGraph");
         }
 
         re.eval("E(completeGraph)$weight <- 1");
@@ -362,8 +364,9 @@ public class R_CommunityDetection {
         ioFunc.rewriteFile(sb.toString(), fileDir + "/" + numOfClusters + "_distanceBetweenCommunityies.txt");
         ioFunc.rewriteFile(clusterIDList.toString(), fileDir + "/" + numOfClusters + "_clusterIdList.txt");
 */
-        ioFunc.rewriteFile(sb.toString(), fileDir + numOfClusters + "_distanceBetweenCommunityies.txt");
-        ioFunc.rewriteFile(clusterIDList.toString(), fileDir + numOfClusters + "_clusterIdList.txt");
+        String analysisDir = testCaseDir+testDir+FS;
+        ioFunc.rewriteFile(sb.toString(), analysisDir + numOfClusters + "_distanceBetweenCommunityies.txt");
+        ioFunc.rewriteFile(clusterIDList.toString(), analysisDir + numOfClusters + "_clusterIdList.txt");
     }
 
     /**

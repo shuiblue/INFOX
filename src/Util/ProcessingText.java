@@ -58,7 +58,8 @@ public class ProcessingText {
 
     public void writeToPajekFile(HashMap<String, HashSet<String[]>> dependencyGraph, HashMap<String, Integer> nodeList, String testCaseDir,String testDir,String filename,ArrayList<String> forkaddedNodeList) {
          final String FS = File.separator;
-        String filepath = testCaseDir+testDir+FS+filename;
+        String filepath = testCaseDir+filename;
+//        String filepath = testCaseDir+testDir+FS+filename;
         System.out.println("Write to file: " + filepath);
 //        String pajek = "/graph.pajek.net";
         rewriteFile("*Vertices " + nodeList.size() + "\n", filepath);

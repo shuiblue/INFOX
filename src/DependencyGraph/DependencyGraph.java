@@ -1,5 +1,6 @@
 package DependencyGraph;
 
+import NamingClusters.StopWords;
 import Util.ProcessingText;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.Exchanger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -92,6 +94,7 @@ public class DependencyGraph {
      * used for Similarity Calculation, LD algorithm
      **/
     ArrayList<String> candidateStrings = new ArrayList<>();
+    HashMap<String, String> sourceCodeLocMap = new HashMap<>();
     //map nodeID in graph -> stringID in candidateString list
     HashMap<Integer, Integer> idMap = new HashMap<>();
 
@@ -213,11 +216,11 @@ public class DependencyGraph {
 
 
         /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
-             ------ similarity calculation purpose---------
-             writeStringsToFile(candidateStrings);
-         */
+             ------ similarity calculation purpose---------     */
+        writeStringsToFile(sourceCodeLocMap);
 
-         return edgeList;
+
+        return edgeList;
     }
 
 
@@ -349,6 +352,8 @@ public class DependencyGraph {
 
             if (ele.getLocalName().equals("define")) {
                 parseDefineNode(fileName, scope, ele);
+                String location = getLocationOfElement(ele, fileName);
+                storeStrings(location, ele.getValue());
             } else if (ele.getLocalName().equals("function") || ele.getLocalName().equals("constructor") || ele.getLocalName().equals("function_decl")) {
                 parseFunctionNode(ele, fileName, scope);
             } else if (ele.getLocalName().equals("if") && !ele.getNamespacePrefix().equals("cpp")) {
@@ -401,6 +406,8 @@ public class DependencyGraph {
                 if (returnContent != null) {
                     tmpStmtList.add(parseVariableInExpression(ele, "", scope, parentLocation, false));
                 }
+                String location = getLocationOfElement(ele, fileName);
+                storeStrings(location, ele.getValue());
             } else if (ele.getLocalName().equals("for")) {
                 tmpStmtList.add(parseForStmt(ele, fileName, scope, parentLocation));
             } else if (ele.getLocalName().equals("while") || ele.getLocalName().equals("switch")) {
@@ -431,6 +438,7 @@ public class DependencyGraph {
                 findVarDependency(symbol);
             } else if (ele.getLocalName().equals("expr")) {
                 parseVariableInExpression(ele, currentLocation, scope, parentLocation, isinit);
+
             } else if (ele.getLocalName().equals("break") || ele.getLocalName().equals("continue")) {
                 String breakLoc = fileName + "-" + getLineNumOfElement(ele);
                 storeIntoNodeList(breakLoc);
@@ -1312,6 +1320,7 @@ public class DependencyGraph {
      */
 //    private String parseVariableInExpression(Element element, String stmtLineNumber, String fileName, int scope, String parentLocation, boolean isInit) {
     private String parseVariableInExpression(Element element, String stmtLocation, int scope, String parentLocation, boolean isInit) {
+
         Element exprNode;
 
         String fileName;
@@ -1430,6 +1439,8 @@ public class DependencyGraph {
             linkChildToParent(exprLocation, parentLocation, element);
             ProcessingText.writeTofile(exprLocation + "\n", parsedLineTxt);
         }
+
+        storeStrings(exprLocation, element.getValue());
         return exprLocation;
     }
 
@@ -1896,11 +1907,11 @@ public class DependencyGraph {
         }
     }
 
-    private void writeStringsToFile(ArrayList<String> candidateStrings) {
+    private void writeStringsToFile(HashMap<String, String> sourceCodeLocMap) {
         StringBuffer sb = new StringBuffer();
-        for (String str : candidateStrings) {
-            sb.append("\"" + str + "\",");
-        }
+
+        sourceCodeLocMap.forEach((k, v) -> sb.append(k + ":" + v + "\n"));
+
         ProcessingText.rewriteFile(sb.toString(), analysisDir + "/StringList.txt");
     }
 
@@ -1940,9 +1951,8 @@ public class DependencyGraph {
      * @param content
      */
     private void storeStrings(String location, String content) {
-        if (forkaddedNodeList.contains(location.replace("Email~", ""))) {
-
-            String strList = "";
+        if (forkaddedNodeList.contains(location)) {
+            String strList;
             if (idMap.get(location) != null) {
 //              strList.add(content);
                 int strID = idMap.get(location);
@@ -1955,7 +1965,14 @@ public class DependencyGraph {
                 stringID++;
             }
 
-            candidateStrings.add(strList.replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("[^a-zA-Z ]", " ").replaceAll("\\s+", " "));
+
+            //replace all symbols that are not alphabet except underscore
+            String newContent = new StopWords().removeStopWord(strList.replaceAll("[^a-zA-Z|^_]"," ").replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("\\s+", " ").toLowerCase());
+
+
+            candidateStrings.add(newContent);
+            sourceCodeLocMap.put(location, newContent);
+
         }
     }
 

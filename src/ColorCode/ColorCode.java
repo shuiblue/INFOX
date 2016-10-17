@@ -68,11 +68,7 @@ public class ColorCode {
 */
                         sb.append(line.replace("<", "&lt;").replace(">", "&gt;"));
                         sb.append("</front>\n");
-                        if (lineNumber == 378) {
-                            System.out.print("");
-                        }
-                        if (!forkAddedNode.contains(old_lable) || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
-//                        if (!forkAddedNode.contains(old_lable) || line.trim().startsWith("#") || line.trim().startsWith("//") || line.trim().startsWith("/*")) {
+                        if (!forkAddedNode.contains(old_lable+" ") || line.trim().startsWith("//") || line.trim().startsWith("/*")||line.trim().startsWith("*")) {
                             jsContent.append("$(\"#" + lable + "\").toggle()\n");
                         }
 
@@ -183,7 +179,7 @@ public class ColorCode {
                 }
 
 
-                if (distanceBetweenTwoClusters.equals("2")) {
+                if (distanceBetweenTwoClusters.equals("10")) {
                     boolean existEdge = false;
                     ArrayList<Integer> redundantClusterListIndex = new ArrayList<>();
                     if (closeClusterList.size() > 0) {
@@ -549,7 +545,7 @@ public class ColorCode {
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
         //----for Marlin repo structure----
       */
-    public void parseEachUsefulClusteringResult(String sourcecodeDir, String testCaseDir, String testDir) {
+    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(String sourcecodeDir, String testCaseDir, String testDir) {
 
         final String FS = File.separator;
         this.sourcecodeDir = sourcecodeDir;
@@ -624,6 +620,7 @@ public class ColorCode {
             }
         }
         generateCuttingSummaryTable();
+        return clusterResultMap;
     }
 
     private void generateCuttingSummaryTable() {

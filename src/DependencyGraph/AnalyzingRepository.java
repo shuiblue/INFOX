@@ -3,10 +3,13 @@ package DependencyGraph;
 import ColorCode.ColorCode;
 import CommunityDetection.R_CommunityDetection;
 //import Similarity.StringSimilarity;
+import NamingClusters.TFIDF;
 import Util.GetForkAddedCode;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by shuruiz on 8/29/16.
@@ -37,6 +40,7 @@ public class AnalyzingRepository {
         boolean createEdgeForConsecutiveLines = parameters[3] == 1 ? true : false;
         boolean directedGraph = parameters[4] == 1 ? true : false;
 
+
         String testDir = "";
         for (int index = 0; index <= 4; index++) {
             testDir += parameters[index];
@@ -47,10 +51,10 @@ public class AnalyzingRepository {
         new File(analysisDir).mkdir();
 
         /**  Generating Dependency Graphs for current test case/project  **/
-        if(!directedGraph) {
-            DependencyGraph dependencyGraph = new DependencyGraph();
-            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
-        }
+//        if(!directedGraph) {
+//            DependencyGraph dependencyGraph = new DependencyGraph();
+//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
+//        }
         /*------------------calculating similarity--------------------------
         StringSimilarity strSim = new StringSimilarity();
         strSim.calculateStringSimilarityByR(sourcecodeDir, analysisDir, re);*/
@@ -59,6 +63,8 @@ public class AnalyzingRepository {
         new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
-        new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
+        HashMap<Integer, ArrayList<String>> clusterList = new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
+
+        new TFIDF().findKeyWordsForEachCut(testCaseDir,testDir,clusterList);
     }
 }

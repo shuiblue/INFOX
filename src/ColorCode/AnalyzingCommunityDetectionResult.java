@@ -187,7 +187,6 @@ public class AnalyzingCommunityDetectionResult {
         sb.append("</tr>\n");
 // ----------------for ifdef evaluation----------------------------------
         for (int i = 0; i < featureList.size(); i++) {
-//        for (int i = 0; i < communityColorList.size(); i++) {
             String expectColor = bgcolorList.get(i);
             //print rest lines
             sb.append("  <tr>\n" +
@@ -213,12 +212,7 @@ public class AnalyzingCommunityDetectionResult {
             }
         }
 
-        if (!isJoiningTable) {
-
-        }
-
-
-        sb.append("</table>");
+          sb.append("</table>");
         if (!isJoiningTable) {
             processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + ".color");
 
