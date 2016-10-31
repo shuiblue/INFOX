@@ -307,7 +307,8 @@ String analysisDir = testCaseDir+testDir+FS;
             re.eval("completeGraph<-scomGraph");
         }
 
-        re.eval("E(completeGraph)$weight <- 1");
+        /**   whether to calculate the distance with weight  **/
+//        re.eval("E(completeGraph)$weight <- 1");
         for (ArrayList<Integer> pair : combination) {
 //        for (ArrayList<Integer> pair : combination) {
             ArrayList<Integer> cluster_1 = clusters.get(pair.get(0));

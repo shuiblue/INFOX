@@ -235,7 +235,7 @@ public class AnalyzingCommunityDetectionResult {
             String[] content = c.split(",");
             String id = content[0];
             String current_color = content[1];
-            String expect_color = content[2];
+             String expect_color = content[2];
 
             colorTable.put(id, current_color);
         }

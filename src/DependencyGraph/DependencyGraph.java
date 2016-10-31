@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.Exchanger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -41,7 +40,7 @@ public class DependencyGraph {
     public String current_OS = "MAC"; // "WINDOWS"
     static final public String CONTROLFLOW_LABEL = "<Control-Flow>";
 
-    ProcessingText ProcessingText = new ProcessingText();
+    ProcessingText processingText = new ProcessingText();
 
     /**
      * symbol Table stores all the declaration nodes.*
@@ -70,6 +69,7 @@ public class DependencyGraph {
     int id = 0;
     //node list stores  the id for the node, used for create graph file. HashMap<String, Integer>
     HashMap<String, Integer> nodeList = new HashMap<>();
+    ArrayList<String> complete_nodeList = new ArrayList();
 
     //edge list stores all the edges, used for testing
     HashSet<String> edgeList = new HashSet<>();
@@ -163,9 +163,9 @@ public class DependencyGraph {
         parsedLineTxt = analysisDir + "parsedLines.txt";
 
         /**------------ Preparing for writing into output files  --------------**/
-        ProcessingText.rewriteFile("", edgeListTxt);
-        ProcessingText.rewriteFile("", compact_graph_edgeList_txt);
-        ProcessingText.rewriteFile("", parsedLineTxt);
+        processingText.rewriteFile("", edgeListTxt);
+        processingText.rewriteFile("", compact_graph_edgeList_txt);
+        processingText.rewriteFile("", parsedLineTxt);
 
         changedFiles = new HashSet<>();
 
@@ -181,20 +181,20 @@ public class DependencyGraph {
             forkaddedNodeList = new ArrayList<>();
         }
 
-        //parse every source code file in the project
+        //parse every header file in the project
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
-                if (Files.isRegularFile(filePath) && isHeaderFile(filePath.toString())) {
+                if (Files.isRegularFile(filePath) && processingText.isHeaderFile(filePath.toString())) {
                     parseSingleFile(filePath);
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //parse every source code file in the project
+        //parse every .c / .cpp  file in the project
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
-                if (Files.isRegularFile(filePath) && isCFile(filePath.toString())) {
+                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
                     parseSingleFile(filePath);
                 }
             });
@@ -210,9 +210,9 @@ public class DependencyGraph {
         }
 
         /****   Write dependency graphs into pajek files  ****/
-        ProcessingText.writeToPajekFile(dependencyGraph, nodeList, testCaseDir, testDir, "changedCode.pajek.net", forkaddedNodeList);
-        ProcessingText.writeToPajekFile(completeGraph, nodeList, testCaseDir, testDir, "complete.pajek.net", forkaddedNodeList);
-        ProcessingText.writeToPajekFile(compactGraph, compact_nodeList, testCaseDir, testDir, "compact.pajek.net", forkaddedNodeList);
+        processingText.writeToPajekFile(dependencyGraph, nodeList, testCaseDir, testDir, "changedCode.pajek.net", forkaddedNodeList);
+        processingText.writeToPajekFile(completeGraph, nodeList, testCaseDir, testDir, "complete.pajek.net", forkaddedNodeList);
+        processingText.writeToPajekFile(compactGraph, compact_nodeList, testCaseDir, testDir, "compact.pajek.net", forkaddedNodeList);
 
 
         /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
@@ -231,7 +231,7 @@ public class DependencyGraph {
      * @throws IOException
      */
     private ArrayList getForkAddedNodeList() throws IOException {
-        String[] lines = ProcessingText.readResult(forkAddedNodeTxt).split("\n");
+        String[] lines = processingText.readResult(forkAddedNodeTxt).split("\n");
         ArrayList<String> forkAddedNodeList = new ArrayList<>();
         for (String s : lines) {
             String node = s.split(" ")[0];
@@ -256,7 +256,7 @@ public class DependencyGraph {
         foundHeaderGuard = false;
 
         //get fileName
-        String fileName = getFileNameFromDir(filePath.toString(), sourcecodeDir);
+        String fileName = processingText.getFileNameFromDir(filePath.toString(), sourcecodeDir);
 
 
         /**   re-write source code file in case the misinterpretation of srcml   **/
@@ -272,17 +272,17 @@ public class DependencyGraph {
         }
 
         /** replace text that cannot be correctly parsed by srcML  **/
-        ProcessingText.removeSrcmlCannotHandleText(tmpFilePath);
+        processingText.removeSrcmlCannotHandleText(tmpFilePath);
 
         /** generating xml file by src2srcml **/
-        String xmlFilePath = ProcessingText.getXmlFile(tmpFilePath);
+        String xmlFilePath = processingText.getXmlFile(tmpFilePath);
 
 
         /** generating DOM tree by xmlParser (xom) **/
-        Element root = ProcessingText.getXmlDom(xmlFilePath).getRootElement();
+        Element root = processingText.getXmlDom(xmlFilePath).getRootElement();
 
         /** Rewrite the file name for the convenience of generating html files later **/
-        String newFileName = ProcessingText.changeFileName(fileName);
+        String newFileName = processingText.changeFileName(fileName);
 
         /*  for Apache
                 if (!newFileName.equals("server/util_expr_parseC")) {
@@ -550,7 +550,7 @@ public class DependencyGraph {
                 ArrayList<Symbol> macros = new ArrayList<Symbol>();
                 macros.add(macro);
                 storeSymbols(macros);
-                ProcessingText.writeTofile(location + "\n", parsedLineTxt);
+                processingText.writeTofile(location + "\n", parsedLineTxt);
 
                 /** check macro value <cpp:value> , if it is a word, that might be another macro **/
                 if (!tag.contains("function_decl")) {
@@ -737,7 +737,7 @@ public class DependencyGraph {
 
         symbolTable.add(macro);
         lonelySymbolSet.add(macro);
-        ProcessingText.writeTofile(location + "\n", parsedLineTxt);
+        processingText.writeTofile(location + "\n", parsedLineTxt);
 
         if (argumentListEle != null) {
             Elements arguments = argumentListEle.getChildElements();
@@ -1288,7 +1288,7 @@ public class DependencyGraph {
             findVarDependency(type_symbol);
         }
 
-        ProcessingText.writeTofile(getLocationOfElement(element, fileName) + "\n", parsedLineTxt);
+        processingText.writeTofile(getLocationOfElement(element, fileName) + "\n", parsedLineTxt);
         return symbol;
     }
 
@@ -1437,7 +1437,7 @@ public class DependencyGraph {
             }
 
             linkChildToParent(exprLocation, parentLocation, element);
-            ProcessingText.writeTofile(exprLocation + "\n", parsedLineTxt);
+            processingText.writeTofile(exprLocation + "\n", parsedLineTxt);
         }
 
         storeStrings(exprLocation, element.getValue());
@@ -1454,7 +1454,7 @@ public class DependencyGraph {
         int diff = 1;
         //todo: fork added node
 
-
+/**   only generate consecutive edge for new code **/
         for (String s : forkaddedNodeList) {
             s = s.trim();
             if (!s.equals("")) {
@@ -1464,7 +1464,6 @@ public class DependencyGraph {
                 if (fileName.equals(currentFile)) {
                     if (lineNum == preLineNum + diff) {
                         String preloc = fileName + "-" + preLineNum;
-//                        if (completeGraph.get(s) != null && completeGraph.get(preloc) != null) {
                         if (dependencyGraph.get(s) != null && dependencyGraph.get(preloc) != null) {
                             addEdgesToFile(s, preloc, "<neighbor>");
                             diff = 1;
@@ -1534,6 +1533,9 @@ public class DependencyGraph {
             }
             completeGraph.put(exprLocation, new HashSet<>());
 
+            if (!complete_nodeList.contains(exprLocation)) {
+                complete_nodeList.add(exprLocation);
+            }
         }
         System.out.println(exprLocation);
         // --------for compact graph--------------
@@ -1832,7 +1834,7 @@ public class DependencyGraph {
             }
             if (!compact_decl_label.equals(compact_depend_label)) {
                 String edge = compact_depend_label + "," + compact_decl_label + "," + edgeLabel;
-                ProcessingText.writeTofile(edge + "\n", compact_graph_edgeList_txt);
+                processingText.writeTofile(edge + "\n", compact_graph_edgeList_txt);
                 compact_edgeList.add(edge);
                 compact_dependNodes = compactGraph.get(compact_decl_label);
                 if (compact_dependNodes == null) {
@@ -1865,7 +1867,7 @@ public class DependencyGraph {
             }
 
             if (dependId != declId) {
-                ProcessingText.writeTofile(depen_position + "," + decl_position + "," + edgeLabel + "\n", edgeListTxt);
+                processingText.writeTofile(depen_position + "," + decl_position + "," + edgeLabel + "\n", edgeListTxt);
                 edgeList.add(depen_position + "->" + decl_position + "," + edgeLabel + "");
 
                 //add to dependency graph
@@ -1912,7 +1914,7 @@ public class DependencyGraph {
 
         sourceCodeLocMap.forEach((k, v) -> sb.append(k + ":" + v + "\n"));
 
-        ProcessingText.rewriteFile(sb.toString(), analysisDir + "/StringList.txt");
+        processingText.rewriteFile(sb.toString(), testCaseDir + "/StringList.txt");
     }
 
 
@@ -1951,6 +1953,7 @@ public class DependencyGraph {
      * @param content
      */
     private void storeStrings(String location, String content) {
+        boolean removeUnderscore = true;
         if (forkaddedNodeList.contains(location)) {
             String strList;
             if (idMap.get(location) != null) {
@@ -1966,12 +1969,16 @@ public class DependencyGraph {
             }
 
 
-            //replace all symbols that are not alphabet except underscore
-            String newContent = new StopWords().removeStopWord(strList.replaceAll("[^a-zA-Z|^_]"," ").replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("\\s+", " ").toLowerCase());
-
-
-            candidateStrings.add(newContent);
-            sourceCodeLocMap.put(location, newContent);
+//            //replace all symbols that are not alphabet except underscore
+//            String newContent;
+//
+//            if (!removeUnderscore) {
+//                newContent = new StopWords().removeStopWord(strList.replaceAll("[^a-zA-Z|^_]", " ").replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("\\s+", " ").toLowerCase());
+//            } else {
+//                newContent = new StopWords().removeStopWord(strList.replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("[^a-zA-Z ]", " ").replaceAll("\\s+", " ").toLowerCase());
+//            }
+//            candidateStrings.add(newContent);
+//            sourceCodeLocMap.put(location, newContent);
 
         }
     }
@@ -2020,36 +2027,6 @@ public class DependencyGraph {
         return macroName_capital.contains(fileName_capital);
     }
 
-    /**
-     * This method get file name by check the difference of (filePath - dirPath)
-     *
-     * @param filePath
-     * @param dirPath
-     * @return
-     */
-    public static String getFileNameFromDir(String filePath, String dirPath) {
-        int index = filePath.lastIndexOf(dirPath);
-        if (index > -1) {
-            return filePath.substring(dirPath.length());
-        }
-        return filePath;
-    }
-
-    /**
-     * This function checks whether the file is a C files when parsing the source code directory
-     *
-     * @param filePath
-     * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
-     */
-    private boolean isCFile(String filePath) {
-        return filePath.endsWith(".cpp") || filePath.endsWith(".c");
-//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
-    }
-
-    private boolean isHeaderFile(String filePath) {
-        return filePath.endsWith(".h");
-//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
-    }
 
     /**
      * This function check whether the str is a word or not

@@ -1,10 +1,9 @@
 package DependencyGraph;
 
 import ColorCode.ColorCode;
-import CommunityDetection.R_CommunityDetection;
-//import Similarity.StringSimilarity;
-import NamingClusters.TFIDF;
-import Util.GetForkAddedCode;
+import NamingClusters.GetCommitMsg;
+import NamingClusters.IdentifyingKeyWordForCluster;
+import NamingClusters.Tokenizer;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
@@ -51,20 +50,31 @@ public class AnalyzingRepository {
         new File(analysisDir).mkdir();
 
         /**  Generating Dependency Graphs for current test case/project  **/
-//        if(!directedGraph) {
+//        if (!directedGraph) {
 //            DependencyGraph dependencyGraph = new DependencyGraph();
 //            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
 //        }
-        /*------------------calculating similarity--------------------------
-        StringSimilarity strSim = new StringSimilarity();
-        strSim.calculateStringSimilarityByR(sourcecodeDir, analysisDir, re);*/
 
         /** Community Detection  **/
-        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
+//        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
         HashMap<Integer, ArrayList<String>> clusterList = new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
+//
+        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
 
-        new TFIDF().findKeyWordsForEachCut(testCaseDir,testDir,clusterList);
+        /** parse commit msg for each node **/
+        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
+        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
+
+
+
+        /**  calculate tfidf  to identifing keywords from each cluster**/
+        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
+
+        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
+        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
+
+
     }
 }

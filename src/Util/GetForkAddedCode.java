@@ -417,34 +417,56 @@ public class GetForkAddedCode {
         this.sourcecodeDir=sourcecodeDir;
         this.testCaseDir=testCaseDir;
         /**  randomly select targetMacroList   **/
-        macroList = createMacroList();
+//        macroList = createMacroList();
         ArrayList<String> targetMacroList = new ArrayList<>();
-        ArrayList<Integer> indexList = new ArrayList<>();
-        while (indexList.size() < number) {
-            Random random = new Random();
-            int index = random.ints(0, (macroList.size() - 1)).findFirst().getAsInt();
-            if (!indexList.contains(index)) {
-
-                indexList.add(index);
-                System.out.println("macroList.size()" + macroList.size());
-                System.out.println("index" + index);
-                targetMacroList.add(macroList.get(index));
-            }
-        }
-
-         /** store macro name into file, which helps to generate the final html **/
-        StringBuffer sb_html = new StringBuffer();
-        StringBuffer sb_featureList = new StringBuffer();
-        for (int i = 1; i <= targetMacroList.size(); i++) {
-            sb_html.append("<h3>" + i + ") " + targetMacroList.get(i - 1) + "</h3>\n");
-            sb_featureList.append(targetMacroList.get(i - 1)+"\n");
-        }
-        iof.rewriteFile(sb_html.toString(), testCaseDir + "/testedMacros.txt");
-        iof.rewriteFile(sb_featureList.toString(), testCaseDir + "/featureList.txt");
+//        ArrayList<Integer> indexList = new ArrayList<>();
+//        while (indexList.size() < number) {
+//            Random random = new Random();
+//            int index = random.ints(0, (macroList.size() - 1)).findFirst().getAsInt();
+//            if (!indexList.contains(index)) {
+//
+//                indexList.add(index);
+//                System.out.println("macroList.size()" + macroList.size());
+//                System.out.println("index" + index);
+//                targetMacroList.add(macroList.get(index));
+//            }
+//        }
+//
+//         /** store macro name into file, which helps to generate the final html **/
+//        StringBuffer sb_html = new StringBuffer();
+//        StringBuffer sb_featureList = new StringBuffer();
+//        for (int i = 1; i <= targetMacroList.size(); i++) {
+//            sb_html.append("<h3>" + i + ") " + targetMacroList.get(i - 1) + "</h3>\n");
+//            sb_featureList.append(targetMacroList.get(i - 1)+"\n");
+//        }
+//        iof.rewriteFile(sb_html.toString(), testCaseDir + "/testedMacros.txt");
+//        iof.rewriteFile(sb_featureList.toString(), testCaseDir + "/featureList.txt");
 
         /**--------- used for parsing #ifdef to generate ground truth---------------
          parsing source code to find LOC wrapped by those macros and generating forkAddedNode.txt file **/
+        targetMacroList.add("FILAMENT_SENSOR");
+        targetMacroList.add("ADVANCE");
+        targetMacroList.add("PREVENT_DANGEROUS_EXTRUDE");
         identifyIfdefs(sourcecodeDir, testCaseDir, targetMacroList);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         return targetMacroList;
     }

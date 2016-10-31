@@ -179,6 +179,7 @@ public class ColorCode {
                 }
 
 
+                /**  condition for joining two clusters is the distance between them is 10--weighted  , 2-- unweighted**/
                 if (distanceBetweenTwoClusters.equals("10")) {
                     boolean existEdge = false;
                     ArrayList<Integer> redundantClusterListIndex = new ArrayList<>();
@@ -378,9 +379,6 @@ public class ColorCode {
                                         leftSidebarColor = bgcolor.getExpectColorList().get(Integer.valueOf(each[0]) - 1);
                                         rightSidebarColor = bgcolor.getExpectColorList().get(Integer.valueOf(each[1]) - 1);
                                     } else {
-                                        if (expectCommunity.trim().contains("10")) {
-                                            System.out.print("");
-                                        }
                                         leftSidebarColor = bgcolor.getExpectColorList().get(Integer.valueOf(expectCommunity.trim()) - 1);
                                         rightSidebarColor = "White";
 
@@ -610,7 +608,7 @@ public class ColorCode {
                     combineFiles(numberOfCommunities);
                     pre_numberOfCommunites = numberOfCommunities;
 
-                    int numberOfCutEdges = (int) clusterInfo[1];
+                    int numberOfCutEdges = (int) clusterInfo[1]-1;
                     double modularity = clusterInfo[2];
                     processingText.writeTofile(numberOfCommunities + "," + numberOfCutEdges + "," + modularity + "\n", analysisDir + "edgeCuttingRecord.txt");
                 }

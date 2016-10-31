@@ -56,9 +56,9 @@ public class ProcessingText {
     }
 
 
-    public void writeToPajekFile(HashMap<String, HashSet<String[]>> dependencyGraph, HashMap<String, Integer> nodeList, String testCaseDir,String testDir,String filename,ArrayList<String> forkaddedNodeList) {
-         final String FS = File.separator;
-        String filepath = testCaseDir+filename;
+    public void writeToPajekFile(HashMap<String, HashSet<String[]>> dependencyGraph, HashMap<String, Integer> nodeList, String testCaseDir, String testDir, String filename, ArrayList<String> forkaddedNodeList) {
+        final String FS = File.separator;
+        String filepath = testCaseDir + filename;
 //        String filepath = testCaseDir+testDir+FS+filename;
         System.out.println("Write to file: " + filepath);
 //        String pajek = "/graph.pajek.net";
@@ -67,20 +67,20 @@ public class ProcessingText {
         Set nodeSet = nodeList.entrySet();
         // Obtaining an iterator for the entry set
         Iterator it_node = nodeSet.iterator();
-int isolatedNode = 0;
+        int isolatedNode = 0;
         while (it_node.hasNext()) {
             Map.Entry node = (Map.Entry) it_node.next();
 
             String nodeId = (String) node.getKey();
-            if((filename.contains("change")&&forkaddedNodeList.contains(nodeId))||!filename.contains("change")){
+            if ((filename.contains("change") && forkaddedNodeList.contains(nodeId)) || !filename.contains("change")) {
                 writeTofile(nodeList.get(nodeId) + " \"" + nodeId + "\"\n", filepath);
-            }else{
-              isolatedNode++;
+            } else {
+                isolatedNode++;
             }
 
 
         }
-        if(filename.contains("change")) {
+        if (filename.contains("change")) {
             rewriteFile("isolated nodes: " + isolatedNode, testCaseDir + "isolatedNode.txt");
         }
         // Getting a Set of Key-value pairs
@@ -227,8 +227,10 @@ int isolatedNode = 0;
                 e.printStackTrace();
             }
         }
+        BufferedReader br = null;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
+        try {
+            br = new BufferedReader(new FileReader(inputFile));
             String line;
             while ((line = br.readLine()) != null) {
                 // replace PACK(void *)   to void for srcML
@@ -275,8 +277,8 @@ int isolatedNode = 0;
                 if (line.contains("const")) {
                     line = line.replace("const", "");
                 }
-                if(line.startsWith("%")){
-                    line = line.replace(line,"");
+                if (line.startsWith("%")) {
+                    line = line.replace(line, "");
                 }
 
 
@@ -291,6 +293,12 @@ int isolatedNode = 0;
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         io.rewriteFile(sb.toString(), inputFile);
     }
@@ -299,6 +307,17 @@ int isolatedNode = 0;
         String[] nameArray = fileName.split("\\.");
         String suffix = nameArray[nameArray.length - 1];
         return fileName.replace("." + suffix, suffix.toUpperCase()).replace("-", "~").replace("/", "~").replace("\\", "~");
+    }
+
+    /**
+     * This function get origin file name from node label
+     *
+     * @param nodeLabel filename+linenumber
+     * @return origin file name
+     */
+    public String getOriginFileName(String nodeLabel) {
+        return nodeLabel.split("-")[0].replace("~", "/").replace("H", ".h").replace("CPP", ".cpp").replace("C", ".c");
+
     }
 
     public void writeSymboTableToFile(HashSet<Symbol> symbolTable, String analysisDir) {
@@ -321,6 +340,69 @@ int isolatedNode = 0;
             result_br.close();
         }
         return counter;
+    }
+
+    /**
+     * This method get file name by check the difference of (filePath - dirPath)
+     *
+     * @param filePath
+     * @param dirPath
+     * @return
+     */
+    public static String getFileNameFromDir(String filePath, String dirPath) {
+        int index = filePath.lastIndexOf(dirPath);
+        if (index > -1) {
+            return filePath.substring(dirPath.length());
+        }
+        return filePath;
+    }
+
+    /**
+     * This function checks whether the file is a C files when parsing the source code directory
+     *
+     * @param filePath
+     * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
+     */
+    public boolean isCFile(String filePath) {
+        return filePath.endsWith(".cpp") || filePath.endsWith(".c");
+//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
+    }
+
+    public boolean isHeaderFile(String filePath) {
+        return filePath.endsWith(".h");
+//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
+    }
+
+    public String removeUselessLine(String line) {
+        /**remove comments **/
+//        line = removeComments(line);
+
+        if (line.trim().startsWith("#include")) {
+            line = "";
+        }
+        return line;
+    }
+
+
+    /**
+     * This function checks whether current line is a comment line
+     *
+     * @param line
+     * @return true, if it is a comment line
+     */
+    public String removeComments(String line) {
+
+        line = line.trim();
+
+        if (line.contains("//")) {
+            int index = line.indexOf("//");
+            line = line.substring(0, index);
+        }
+        if (line.startsWith("*") || line.startsWith("/*") || line.startsWith("//")) {
+            line = "";
+        }
+
+        return line;
     }
 
     public static void main(String[] args) {
