@@ -11,7 +11,7 @@ import java.util.*;
 public class GetCommitMsg {
     static final String FS = File.separator;
 
-    public GetCommitMsg(String testCaseDir, String testDir, HashMap<Integer, ArrayList<String>> clusterList, int n_gram) {
+    public GetCommitMsg( String testCaseDir, String testDir, HashMap<Integer, ArrayList<String>> clusterList, int n_gram) {
 
 
         String analysisDir = testCaseDir + testDir + FS;
@@ -58,6 +58,8 @@ public class GetCommitMsg {
                             String nodeLable = nodeIdMap.get(nodeIdStr);
                             if (nodeLable != null) {
                                 String fileName = processingText.getOriginFileName(nodeLable);
+//                                int index = fileName.lastIndexOf("/");
+//                                fileName = fileName.substring(index-8);
                                 String lineNumber = nodeLable.split("-")[1];
 
                                 String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram);
@@ -116,6 +118,8 @@ public class GetCommitMsg {
         String lineInfo = lineNumber + "," + lineNumber + ":" + fileName;
         ProcessBuilder processBuilder = new ProcessBuilder("git", "log", "--pretty=medium", "-L", lineInfo);
         processBuilder.directory(new File("/Users/shuruiz/Work/originMarlin/upstream/Marlin/.git").getParentFile()); // this is where you set the root folder for the executable to run with
+       System.out.print(fileName+"-"+lineNumber+"\n");
+
         processBuilder.redirectErrorStream(true);
         Process process = null;
         InputStream inputStream = null;
@@ -168,6 +172,12 @@ public class GetCommitMsg {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         String[] commit = new String[]{commitSHA, normalized_line,originCommit};

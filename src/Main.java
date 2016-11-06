@@ -41,9 +41,9 @@ public class Main {
         }
 
         /** generating the parameters for creating dependency graph  **/
-        for (int numOfTargetMacro= 3; numOfTargetMacro <=3; numOfTargetMacro++) {
+        for (int numOfTargetMacro= 4; numOfTargetMacro <=10; numOfTargetMacro++) {
             int numberOfCuts = numOfTargetMacro + 3;
-            parameterArray = getParameterSetting(numOfTargetMacro, numberOfCuts, groundTruth);
+//            parameterArray = getParameterSetting(numOfTargetMacro, numberOfCuts, groundTruth);
 
             /**  parse different repositories under testCasesDir  **/
             try {
@@ -54,7 +54,7 @@ public class Main {
                         /**  testCase specifys the repository that need to be parsed.  **/
                         sourcecodeDir = filePath.toString() + FS;
                         //TODO: set subdir name for multiple tests
-                        for (int i =6; i <=6; i++) {
+                        for (int i =1; i <=1; i++) {
                             String testCaseDir = sourcecodeDir + analysisDirName + FS + finalNumOfTargetMacro + "macros" + FS + i + FS;
                             new GetForkAddedCode().selectTargetMacros(sourcecodeDir, testCaseDir, finalNumOfTargetMacro);
                             System.out.println("~~~~~~~current con1figuration: " + i + "~~");

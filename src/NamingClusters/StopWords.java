@@ -47,11 +47,19 @@ public class StopWords {
         stopWordList.add("and");
         stopWordList.add("the");
         stopWordList.add("with");
+        stopWordList.add("in");
+        stopWordList.add("as");
+        stopWordList.add("to");
+        stopWordList.add("of");
+        stopWordList.add("when");
+        stopWordList.add("sizeof");
     }
 
     public String removeStopWord(String string) {
         for (String stw : stopWordList) {
-            string = string.replace(stw, "");
+            if(string.equals(stw)) {
+                string = string.replace(stw, "");
+            }
         }
         return string;
     }

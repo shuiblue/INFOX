@@ -316,7 +316,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replace("H", ".h").replace("CPP", ".cpp").replace("C", ".c");
+        return nodeLabel.split("-")[0].replace("~", "/").replace("H", ".h").replace("CPP", ".cpp").replaceAll("[C]$",".c");
 
     }
 
@@ -398,7 +398,11 @@ public class ProcessingText {
             int index = line.indexOf("//");
             line = line.substring(0, index);
         }
-        if (line.startsWith("*") || line.startsWith("/*") || line.startsWith("//")) {
+        if (line.contains("/*")) {
+            int index = line.indexOf("/*");
+            line = line.substring(0, index);
+        }
+        if (line.startsWith("*")  || line.startsWith("//")) {
             line = "";
         }
 

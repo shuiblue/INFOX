@@ -63,9 +63,9 @@ public class IdentifyingKeyWordForCluster {
         }
 
 
+
         clusterList.forEach((k, v) -> {
             sb.append(k + " clusters: \n");
-
 
             for (String cl : v) {
                 if (cl.length() > 0) {
@@ -85,11 +85,12 @@ public class IdentifyingKeyWordForCluster {
                         }
                     }
                     /** add source code **/
-                    docs.add(clusterString);
+                    List<List<String>> newCode_docs = new ArrayList<>();
+                    newCode_docs.add(clusterString);
 
 
                     /**get all the commit msg for changed code **/
-                    boolean includeCommitMsg = false;
+
                     HashMap<String, ArrayList<String>> cluster_to_commit_map = new HashMap<>();
 
                     String fileName_prefix = "";
@@ -100,29 +101,26 @@ public class IdentifyingKeyWordForCluster {
                     }
 
 
-                    if (!includeCommitMsg) {
-                        try {
-                            ArrayList<String> commitForAllNewCode=null;
-                            String commitMsg = processingText.readResult(analysisDir + fileName_prefix + k + "_commitMsgPerCluster.txt");
-                            includeCommitMsg = true;
+                    try {
+                        ArrayList<String> commitForAllNewCode = null;
+                        String commitMsg = processingText.readResult(analysisDir + fileName_prefix + k + "_commitMsgPerCluster.txt");
 
-                            String[] clusterCommitArray = commitMsg.split("\n");
-                            for (String s : clusterCommitArray) {
-                                if (s.trim().startsWith("[")) {
-                                    int index = s.indexOf("]");
-                                    String clusterNumber = s.trim().substring(1, index);
-                                    String msg = s.substring(index + 1);
-                                    commitForAllNewCode = new ArrayList<String>();
-                                    commitForAllNewCode.addAll(new ArrayList<String>(Arrays.asList(msg.split(" "))));
-                                    cluster_to_commit_map.put(clusterNumber, commitForAllNewCode);
-                                    docs.add(commitForAllNewCode);
-                                }
+                        String[] clusterCommitArray = commitMsg.split("\n");
+                        for (String s : clusterCommitArray) {
+                            if (s.trim().startsWith("[")) {
+                                int index = s.indexOf("]");
+                                String clusterNumber = s.trim().substring(1, index);
+                                String msg = s.substring(index + 1);
+                                commitForAllNewCode = new ArrayList<String>();
+                                commitForAllNewCode.addAll(new ArrayList<String>(Arrays.asList(msg.split(" "))));
+                                cluster_to_commit_map.put(clusterNumber, commitForAllNewCode);
+                                newCode_docs.add(commitForAllNewCode);
                             }
-
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
 
 
@@ -138,7 +136,11 @@ public class IdentifyingKeyWordForCluster {
                     HashSet<String> clusterSet = new HashSet<>(clusterString);
 
                     for (String term : clusterSet) {
-                        double weight = tfidf.calculateTfIdf(clusterString, docs, term);
+                        List<List<String>> all_docs = new ArrayList<List<String>>();
+                        all_docs.addAll(docs);
+                        all_docs.addAll(newCode_docs);
+
+                        double weight = tfidf.calculateTfIdf(clusterString, all_docs, term);
                         final double[] maxDiff = new double[1];
                         final String[] minWeightTerm = new String[1];
                         if (!topTerms.keySet().contains(term)) {
