@@ -1,5 +1,5 @@
 import DependencyGraph.AnalyzingRepository;
-import Util.GetForkAddedCode;
+import Util.ParsingMacros;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
@@ -40,34 +40,37 @@ public class Main {
             return;
         }
 
+        ParsingMacros parsingMacros = new ParsingMacros();
+
         /** generating the parameters for creating dependency graph  **/
-        for (int numOfTargetMacro= 4; numOfTargetMacro <=10; numOfTargetMacro++) {
-            int numberOfCuts = numOfTargetMacro + 3;
-//            parameterArray = getParameterSetting(numOfTargetMacro, numberOfCuts, groundTruth);
 
-            /**  parse different repositories under testCasesDir  **/
-            try {
-                int finalNumOfTargetMacro = numOfTargetMacro;
-                Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
-                    if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
+        /**  parse different repositories under testCasesDir  **/
+        try {
+            Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
+                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
+                    sourcecodeDir = filePath.toString() + FS;
 
+                    for (int numOfTargetMacro = 4; numOfTargetMacro <= 15; numOfTargetMacro++) {
+                        parameterArray = getParameterSetting(numOfTargetMacro, groundTruth);
                         /**  testCase specifys the repository that need to be parsed.  **/
-                        sourcecodeDir = filePath.toString() + FS;
+
                         //TODO: set subdir name for multiple tests
-                        for (int i =1; i <=1; i++) {
-                            String testCaseDir = sourcecodeDir + analysisDirName + FS + finalNumOfTargetMacro + "macros" + FS + i + FS;
-                            new GetForkAddedCode().selectTargetMacros(sourcecodeDir, testCaseDir, finalNumOfTargetMacro);
+                        for (int i = 1; i <= 6; i++) {
+                            String testCaseDir_1 = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
+                            String testCaseDir_2 = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                             System.out.println("~~~~~~~current con1figuration: " + i + "~~");
                             for (int[] param : parameterArray) {
-                                analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir, param, re);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir_1, param, re);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir_2, param, re);
                             }
                         }
                     }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     /**
@@ -80,18 +83,19 @@ public class Main {
      * 5. Directed Edge: T/F (1/0)
      *
      * @param numOfTargetMacro int (the number of macros randomly selected from marco list, equals to size of targetMacroList)
-     * @param numberOfCuts     integer (this number specifies how many more clusters should be detect after generating the initial dependency graph )
      * @return parameterArray
      */
-    private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro, int numberOfCuts, int groundTruth) {
+    private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro, int groundTruth) {
         ArrayList<int[]> parameterArray = new ArrayList<>();
-            int[] param = new int[5];
-            param[0] = numOfTargetMacro;
-            param[1] = numberOfCuts;
-            param[2] = groundTruth;
-            param[3] = 1;
-            param[4] = 0;
-            parameterArray.add(param);
+        int[] param = new int[5];
+        param[0] = numOfTargetMacro;
+        param[1] = numOfTargetMacro + 3;  // int numberOfCuts = numOfTargetMacro + 3;
+        param[2] = groundTruth;
+        param[3] = 1;
+        param[4] = 0;
+        parameterArray.add(param);
         return parameterArray;
     }
+
+
 }
