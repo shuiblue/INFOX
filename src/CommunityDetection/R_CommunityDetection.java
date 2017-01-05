@@ -28,7 +28,9 @@ public class R_CommunityDetection {
     static int bestCut;
     Rengine re = null;
     static final String FS = File.separator;
-//    double[][] shortestPathMatrix;
+    //    double[][] shortestPathMatrix;
+    static double[][] edgelist;
+    static String[] nodelist;
 
     /**
      * This methods is detecting communities for changedCode.pajek.net, which is the graph for new code.
@@ -72,11 +74,12 @@ public class R_CommunityDetection {
         re.eval("originalg<-g");
 
         // get original graph
-        REXP edgelist_R = re.eval("get.edgelist(g)", true);
+        REXP edgelist_R = re.eval("cbind( get.edgelist(g) , round( E(g)$weight, 3 ))", true);
         REXP nodelist_R = re.eval("get.vertex.attribute(g)$id", true);
-        double[][] edgelist = edgelist_R.asMatrix();
-        String[] nodelist = (String[]) nodelist_R.getContent();
+        edgelist = edgelist_R.asDoubleMatrix();
+       nodelist = (String[]) nodelist_R.getContent();
         originGraph = new Graph(nodelist, edgelist, null, 0);
+
 
         printOriginNodeList(originGraph.getNodelist(), analysisDir);
         File upstreamNodeFile = new File(analysisDir + upstreamNodeTxt);
@@ -103,7 +106,7 @@ public class R_CommunityDetection {
 //            if (currentIteration <= numOfIteration) {
             if (listOfNumberOfCommunities.size() <= numOfcut) {
                 //count betweenness for current graph
-                calculateEachGraph(re, testCaseDir,testDir, cutNum,directedGraph);
+                calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph);
                 cutNum++;
             } else {
                 break;
@@ -208,20 +211,21 @@ public class R_CommunityDetection {
 
     /**
      * This function is calling community detection algorithm through igraph lib
+     *
      * @param re
      * @param testCaseDir
      * @param testDir
      * @param cutNum
      */
     public void calculateEachGraph(Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph) {
-String analysisDir = testCaseDir+testDir+FS;
+        String analysisDir = testCaseDir + testDir + FS;
 
 
         //get graph's edgeList and nodeList
-        REXP edgelist_R = re.eval("get.edgelist(g)", true);
-        REXP nodelist_R = re.eval("get.vertex.attribute(g)$id", true);
-        double[][] edgelist = edgelist_R.asMatrix();
-        String[] nodelist = (String[]) nodelist_R.getContent();
+//        REXP edgelist_R = re.eval("cbind( get.edgelist(g) , round( E(g)$weight, 3 ))", true);
+//        REXP nodelist_R = re.eval("get.vertex.attribute(g)$id", true);
+//        double[][] edgelist = edgelist_R.asMatrix();
+//        String[] nodelist = (String[]) nodelist_R.getContent();
         ArrayList<Integer> nodeIdList = new ArrayList<>();
         for (int i = 0; i < nodelist.length; i++) {
             if (forkAddedNode.contains(nodelist[i])) {
@@ -231,9 +235,9 @@ String analysisDir = testCaseDir+testDir+FS;
 
         String command;
         if (!directedGraph) {
-           command="edge.betweenness(g,directed=FALSE)";
-        }else {
-            command="edge.betweenness(g,directed=TRUE)";
+            command = "edge.betweenness(g,directed=FALSE)";
+        } else {
+            command = "edge.betweenness(g,directed=TRUE)";
         }
 
         //get betweenness for current graph
@@ -256,8 +260,8 @@ String analysisDir = testCaseDir+testDir+FS;
         }
 
         /**        calculating distance between clusters for joining purpose    **/
-        if(pre_numberOfCommunities!=current_numberOfCommunities) {
-            calculateDistanceBetweenCommunities(clusters,  testCaseDir,testDir, current_numberOfCommunities,directedGraph);
+        if (pre_numberOfCommunities != current_numberOfCommunities) {
+            calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, current_numberOfCommunities, directedGraph);
         }
 
 
@@ -286,6 +290,7 @@ String analysisDir = testCaseDir+testDir+FS;
 
     /**
      * This function calculate the distance between communities
+     *
      * @param clusters
      * @param testCaseDir
      * @param testDir
@@ -303,7 +308,7 @@ String analysisDir = testCaseDir+testDir+FS;
 
         if (!directedGraph) {
             re.eval("completeGraph<-as.undirected(scomGraph)");
-        }else{
+        } else {
             re.eval("completeGraph<-scomGraph");
         }
 
@@ -340,7 +345,7 @@ String analysisDir = testCaseDir+testDir+FS;
             }
             distanceMatrix.put(pair, (int) shortestPath);
 
-                System.out.println("---"+pair.get(0)+"---"+pair.get(1)+"-------"+shortestPath);
+            System.out.println("---" + pair.get(0) + "---" + pair.get(1) + "-------" + shortestPath);
 
 
         }
@@ -365,7 +370,7 @@ String analysisDir = testCaseDir+testDir+FS;
         ioFunc.rewriteFile(sb.toString(), fileDir + "/" + numOfClusters + "_distanceBetweenCommunityies.txt");
         ioFunc.rewriteFile(clusterIDList.toString(), fileDir + "/" + numOfClusters + "_clusterIdList.txt");
 */
-        String analysisDir = testCaseDir+testDir+FS;
+        String analysisDir = testCaseDir + testDir + FS;
         ioFunc.rewriteFile(sb.toString(), analysisDir + numOfClusters + "_distanceBetweenCommunityies.txt");
         ioFunc.rewriteFile(clusterIDList.toString(), analysisDir + numOfClusters + "_clusterIdList.txt");
     }
@@ -438,6 +443,7 @@ String analysisDir = testCaseDir+testDir+FS;
 
     /**
      * This function is finding next edge to be removed by finding the edge has largest betweenness
+     *
      * @param g
      * @return
      */
@@ -479,8 +485,9 @@ String analysisDir = testCaseDir+testDir+FS;
 
     /**
      * This function find the largest number in the double array
+     *
      * @param doubleArray
-     * @return  location of the number
+     * @return location of the number
      */
     public int findMaxNumberLocation(double[] doubleArray) {
         int loc = 0;
@@ -496,8 +503,9 @@ String analysisDir = testCaseDir+testDir+FS;
 
     /**
      * This function find the largest number in the double array
+     *
      * @param doubleArray
-     * @return  location of the number
+     * @return location of the number
      */
     public int findMaxNumberLocation(ArrayList<Double> doubleArray) {
         int loc = 0;
@@ -513,6 +521,7 @@ String analysisDir = testCaseDir+testDir+FS;
 
     /**
      * This function print the clustering result when removing an edge that has the highest betweenness
+     *
      * @param g
      * @param filePath
      * @param cutNum
@@ -522,11 +531,15 @@ String analysisDir = testCaseDir+testDir+FS;
         print.append("\n--------Graph-------\n");
         print.append("** " + cutNum + "edges has been removed **\n");
         String removableEdge = g.getRemovableEdgeLable();
-        int edgeId = originGraph.getReverseEdgelist().get(removableEdge);
+        int index_lastComma = removableEdge.lastIndexOf(",");
+        String removableEdge_from_to = removableEdge.substring(0,index_lastComma);
+
+        int edgeId = originGraph.getReverseEdgelist().get(removableEdge_from_to);
         int from = Integer.parseInt(removableEdge.split(",")[0]);
         int to = Integer.parseInt(removableEdge.split(",")[1]);
+        int weight = Integer.parseInt(removableEdge.split(",")[2]);
         String edgeNodes = originGraph.getNodelist().get(from) + "->" + originGraph.getNodelist().get(to);
-        print.append("max between edge id:" + edgeId + "-" + removableEdge + "(" + edgeNodes + ")");
+        print.append("max between edge id:" + edgeId + "-" + removableEdge + "(" + edgeNodes + " weight= "+weight+")");
         double modularity = g.getModularity();
         print.append("\nModularity: " + modularity);
         ioFunc.writeTofile(print.toString(), filePath + "/clusterTMP.txt");
@@ -535,6 +548,7 @@ String analysisDir = testCaseDir+testDir+FS;
 
     /**
      * This function find the best clustering result by finding the result has the highest modularity
+     *
      * @param g
      * @param cutSequence
      * @param filePath

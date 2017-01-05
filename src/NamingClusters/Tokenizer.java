@@ -8,16 +8,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by shuruiz on 10/26/16.
  */
 public class Tokenizer {
     Stemmer stemmer = new Stemmer();
+    HashSet<String> tokenSet = new HashSet<>();
+    Levenshtein levenshtein = new Levenshtein();
 
     /**
      * This function tokenizes the repository source code and store into tokenizedSouceCode.txt
@@ -65,23 +64,23 @@ public class Tokenizer {
                             for (String s : lineArray) {
                                 if (!s.matches("\\d+") && s.length() > 0) {
                                     s = new StopWords().removeStopWord(s);
-                                    s = stemmer.stemmingAWord(s);
                                     if (s.trim().length() > 0) {
                                         if (s.contains("_") && !s.endsWith("_h") && !s.endsWith("_")) {
+                                            //1-grams
+                                            List<String> one_GramsList = generateNgrams(1, s);
+                                            for (String one_gram : one_GramsList) {
+                                                oneGram_newLine += one_gram + " ";
+                                            }
 
                                             //2-grams
                                             List<String> twoGramsList = generateNgrams(2, s);
                                             for (String tg : twoGramsList) {
                                                 twoGram_newLine += tg + " ";
                                             }
-
-                                            //1-grams
-                                            oneGram_newLine += s.replace("_", " ");
                                         } else {
                                             oneGram_newLine += s + " ";
                                             twoGram_newLine += s + " ";
                                         }
-
                                     }
                                 }
                             }
@@ -125,8 +124,8 @@ public class Tokenizer {
 
         /**stemming tokens**/
 
-        new Stemmer().stemmingFile(testCaseDir + "tokenizedSouceCode_oneGram.txt");
-        new Stemmer().stemmingFile(testCaseDir + "tokenizedSouceCode_twoGram.txt");
+//        new Stemmer().stemmingFile(testCaseDir + "tokenizedSouceCode_oneGram.txt");
+//        new Stemmer().stemmingFile(testCaseDir + "tokenizedSouceCode_twoGram.txt");
 
     }
 

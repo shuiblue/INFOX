@@ -596,6 +596,8 @@ public class Stemmer {
      */
     public static void main(String[] args) {
 //        stemmingFile("");
-        stemmingAWord("apples ");
+        stemmingAWord("meas ");
+        stemmingAWord("advance ");
+        stemmingAWord("advanc ");
     }
 }

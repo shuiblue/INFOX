@@ -53,6 +53,9 @@ public class StopWords {
         stopWordList.add("of");
         stopWordList.add("when");
         stopWordList.add("sizeof");
+        stopWordList.add("final");
+        stopWordList.add("is");
+        stopWordList.add("it");
     }
 
     public String removeStopWord(String string) {

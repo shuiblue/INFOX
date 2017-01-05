@@ -51,13 +51,13 @@ public class AnalyzingRepository {
         new File(analysisDir).mkdir();
 
         /**  Generating Dependency Graphs for current test case/project  **/
-        if (!directedGraph) {
-            DependencyGraph dependencyGraph = new DependencyGraph();
-            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
-        }
+//        if (!directedGraph) {
+//            DependencyGraph dependencyGraph = new DependencyGraph();
+//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
+//        }
 //
-        /** Community Detection  **/
-        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
+//        /** Community Detection  **/
+//        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
         HashMap<Integer, ArrayList<String>> clusterList = new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);

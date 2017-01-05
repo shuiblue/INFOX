@@ -63,7 +63,6 @@ public class IdentifyingKeyWordForCluster {
         }
 
 
-
         clusterList.forEach((k, v) -> {
             sb.append(k + " clusters: \n");
 
@@ -127,8 +126,11 @@ public class IdentifyingKeyWordForCluster {
                     /**  add commit msg of changed code **/
 
                     ArrayList<String> words = cluster_to_commit_map.get(clusterID);
-                    words.forEach(w ->
-                            clusterString.add(w));
+                    words.forEach(w -> {
+                        if (w.trim().length() > 1 ) {
+                            clusterString.add(w);
+                        }
+                    });
 
                     clusterIndexToID.put(docs.size() - 1, clusterID);
 

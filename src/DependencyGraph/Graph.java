@@ -32,7 +32,7 @@ public class Graph {
             nodelist.put(node_id++, node);
         }
         for (int j = 1; j <= elist.length; j++) {
-            edgelist.put(j, (int) elist[j - 1][0] + "," + (int) elist[j - 1][1]);
+            edgelist.put(j, (int) elist[j - 1][0] + "," + (int) elist[j - 1][1]+ "," + (int) elist[j - 1][2]);
             reverseEdgelist.put((int) elist[j - 1][0] + "," + (int) elist[j - 1][1], j);
         }
         this.betweenness = betweenness;

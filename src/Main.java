@@ -50,12 +50,12 @@ public class Main {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro = 4; numOfTargetMacro <= 15; numOfTargetMacro++) {
+                    for (int numOfTargetMacro = 2; numOfTargetMacro <=2; numOfTargetMacro++) {
                         parameterArray = getParameterSetting(numOfTargetMacro, groundTruth);
                         /**  testCase specifys the repository that need to be parsed.  **/
 
                         //TODO: set subdir name for multiple tests
-                        for (int i = 1; i <= 6; i++) {
+                        for (int i = 1; i <= 1; i++) {
                             String testCaseDir_1 = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                             String testCaseDir_2 = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                             System.out.println("~~~~~~~current con1figuration: " + i + "~~");

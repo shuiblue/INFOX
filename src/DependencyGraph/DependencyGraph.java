@@ -235,7 +235,9 @@ public class DependencyGraph {
         ArrayList<String> forkAddedNodeList = new ArrayList<>();
         for (String s : lines) {
             String node = s.split(" ")[0];
-            forkAddedNodeList.add(node);
+            if(!forkAddedNodeList.contains(node)) {
+                forkAddedNodeList.add(node);
+            }
             String filename = node.split("-")[0];
 
             // used for generating compact dependency Graph
@@ -1458,6 +1460,9 @@ public class DependencyGraph {
         for (String s : forkaddedNodeList) {
             s = s.trim();
             if (!s.equals("")) {
+                if(s.contains("ultralcdCPP")){
+                    System.out.print("");
+                }
                 String[] nodelabel = s.trim().split("-");
                 String fileName = nodelabel[0];
                 int lineNum = Integer.valueOf(nodelabel[1]);
