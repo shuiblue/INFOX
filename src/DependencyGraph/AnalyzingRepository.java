@@ -1,6 +1,7 @@
 package DependencyGraph;
 
 import ColorCode.ColorCode;
+import CommunityDetection.AnalyzingCommunityDetectionResult;
 import CommunityDetection.R_CommunityDetection;
 import NamingClusters.GetCommitMsg;
 import NamingClusters.IdentifyingKeyWordForCluster;
@@ -60,7 +61,8 @@ public class AnalyzingRepository {
 //        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
-        HashMap<Integer, ArrayList<String>> clusterList = new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
+//        HashMap<Integer, ArrayList<String>> clusterList = new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
+        HashMap<Integer, ArrayList<String>> clusterList = new AnalyzingCommunityDetectionResult().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
         new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
 
         /** parse commit msg for each node **/

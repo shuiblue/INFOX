@@ -1,5 +1,6 @@
 package ColorCode;
 
+import CommunityDetection.AnalyzingCommunityDetectionResult;
 import Util.ProcessingText;
 
 import java.awt.*;
@@ -16,17 +17,14 @@ public class ColorCode {
     static String sourceCodeTxt = "sourceCode.txt";
     static String nodeListTxt = "/NodeList.txt";
     static String upstreamNodeTxt = "upstreamNode.txt";
-    static String forkAddedNodeTxt = "forkAddedNode.txt";
     static String jsFileHeader = "/jshead.txt";
     static HashMap<Integer, String> nodeMap;
     HashMap<Integer, String> colorMap = new HashMap<>();
     HashSet<String> bigSizeClusterList = new HashSet<>();
     static StringBuffer jsContent = new StringBuffer();
     static String forkAddedNode = "";
-
-    String sourcecodeDir;
-    String analysisDir;
-    String testCaseDir;
+    static final String FS = File.separator;
+    String analysisDir, testCaseDir,sourcecodeDir;
     boolean print = false;
     StringBuilder sb = new StringBuilder();
     ProcessingText processingText = new ProcessingText();
@@ -36,6 +34,12 @@ public class ColorCode {
     HashMap<String, String> expectNodeMap = new HashMap<>();
     HashMap<Integer, HashSet<Integer>> groundTruthClusters = new HashMap<>();
     int initialNumOfClusters = 0;
+
+    public ColorCode(String sourcecodeDir, String testCaseDir, String testDir) {
+        this.sourcecodeDir = sourcecodeDir;
+        this.analysisDir = testCaseDir + testDir + FS;
+        this.testCaseDir = testCaseDir;
+    }
 
     public void parseSourceCodeFromFile(String fileName) {
         File currentFile = new File(sourcecodeDir + fileName);
@@ -113,7 +117,7 @@ public class ColorCode {
         }
     }
 
-    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters) {
+    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters ,HashMap<Integer, ArrayList<String>> clusterResultMap ) {
         BufferedReader br;
         String line;
         nodeMap = new HashMap<>();
@@ -320,7 +324,7 @@ public class ColorCode {
 
 //                                    for (Map.Entry<Integer, ArrayList<String>> entry : clusterResultMap.entrySet()) {
                                     if (initialNumOfClusters < numberOfClusters) {
-                                        ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters - 1);
+                                        ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters );
                                         for (String clusterStr : currentClusters) {
                                             if (clusterStr.contains(nodeID + " ,")) {
                                                 int currentNumberOfNodes = cluster.split(",").length - 1;
@@ -468,6 +472,9 @@ public class ColorCode {
         iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + numberOfClusters + "_colorTable_join.txt");
         iofunc.rewriteFile(clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor.txt");
         iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor_join.txt");
+
+        new AnalyzingCommunityDetectionResult().setExpectNodeMap(expectNodeMap);
+        new AnalyzingCommunityDetectionResult().setNodeMap(nodeMap);
     }
 
     private String randomColor() {
@@ -537,248 +544,6 @@ public class ColorCode {
         }
     }
 
-    /**
-     * This function parse the cluster.txt file, to analyze each clustering result after removing a bridge
-     */
-         /*------------include dirNum----------------------
-         * Used for marlin
-
-    public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
-        //----for Marlin repo structure----
-      */
-    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(String sourcecodeDir, String testCaseDir, String testDir) {
-
-        final String FS = File.separator;
-        this.sourcecodeDir = sourcecodeDir;
-        this.analysisDir = testCaseDir + testDir + FS;
-        this.testCaseDir = testCaseDir;
-
-
-        String clusterFilePath = analysisDir + "clusterTMP.txt";
-        String clusterResultListString = "";
-        processingText.rewriteFile("", analysisDir + "edgeCuttingRecord.txt");
-        processingText.rewriteFile("", analysisDir + "LOC_split.txt");
-        //get fork added node
-        File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
-        if (forkAddedFile.exists()) {
-            try {
-                forkAddedNode = iofunc.readResult(testCaseDir + forkAddedNodeTxt);
-//                clusterResultListString = iofunc.readResult(clusterFilePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            createSourceFileHtml();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            clusterResultListString = iofunc.readResult(clusterFilePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        int pre_numberOfCommunites = 0;
-        int previous_cutted_edge_num = 0;
-        String weight_List = "";
-        String[] resultArray = clusterResultListString.split("--------Graph-------");
-
-        for (int i = 0; i < resultArray.length; i++) {
-            String result = resultArray[i];
-
-
-            if (result.contains("communities")) {
-                /**     calculating cluster info, such as modularity, #edge cut ..  **/
-                double[] clusterInfo = getClusterInfo(result.split("communities")[0]);
-
-                int numberOfCommunities = (int) clusterInfo[0];
-                int weight = (int) clusterInfo[3];
-//                int numOfCutEdge = clusterInfo[1];
-//                if (numOfCutEdge <= bestcut) {
-
-                if (pre_numberOfCommunites != numberOfCommunities) {
-                    result = result.split("communities")[1];
-                    String[] clusterArray = result.split("\n");
-
-                    ArrayList<String> clusters = new ArrayList(Arrays.asList(clusterArray));
-
-                    if (clusterResultMap.size() == 0) {
-                        initialNumOfClusters = numberOfCommunities;
-                        processingText.writeTofile(initialNumOfClusters + ",0\n", analysisDir + "LOC_split.txt");
-                    }
-                    clusterResultMap.put(numberOfCommunities, clusters);
-                    /**   write to css file        **/
-                    writeClusterToCSS(clusters, numberOfCommunities);
-
-
-                    calculatingAccuracy(clusters);
-
-
-                    AnalyzingCommunityDetectionResult analyzeCDResult = new AnalyzingCommunityDetectionResult();
-
-                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false);
-                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true);
-
-                    combineFiles(numberOfCommunities);
-                    pre_numberOfCommunites = numberOfCommunities;
-
-                    int numberOfCutEdges = (int) clusterInfo[1] - 1;
-                    double modularity = clusterInfo[2];
-
-
-                    processingText.writeTofile(numberOfCommunities + "," + (numberOfCutEdges - previous_cutted_edge_num) + "," + modularity + "," + weight_List + "\n", analysisDir + "edgeCuttingRecord.txt");
-                    weight_List = weight + "-";
-                    previous_cutted_edge_num = numberOfCutEdges;
-                } else {
-                    weight_List += weight + "-";
-
-                }
-
-
-            }
-        }
-        generateCuttingSummaryTable();
-        return clusterResultMap;
-    }
-
-    /**
-     * This function calculats accuracy for each cutting result
-     *
-     * @param clusters
-     */
-    private void calculatingAccuracy(ArrayList<String> clusters) {
-
-        generateGroundTruthMap();
-
-
-    }
-
-    /**
-     * This function generates the ground truth cluster,
-     * The output is a hashmap: key--- clusterID, value--- set of nodeid
-     */
-    private void generateGroundTruthMap() {
-        for (Integer nodeId : nodeMap.keySet()) {
-            String nodeLabel = nodeMap.get(nodeId);
-            HashSet<Integer> nodeSet;
-
-            Integer clusterNumber = Integer.valueOf(expectNodeMap.get(nodeLabel));
-            if (groundTruthClusters.get(clusterNumber) != null) {
-                nodeSet = groundTruthClusters.get(clusterNumber);
-            }else{
-                nodeSet = new HashSet<>();
-            }
-            nodeSet.add(nodeId);
-            groundTruthClusters.put(clusterNumber, nodeSet);
-        }
-
-    }
-
-    private void generateCuttingSummaryTable() {
-        String edgeCuttingRecord = "";
-        String loc_splitting = "";
-        try {
-            edgeCuttingRecord = processingText.readResult(analysisDir + "edgeCuttingRecord.txt");
-            loc_splitting = processingText.readResult(analysisDir + "LOC_split.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        StringBuffer sb = new StringBuffer();
-        sb.append("<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<head>\n" +
-                "<style>\n" +
-                "table, th, td {\n" +
-                "    border: 1px solid black;\n" +
-                "}\n" +
-                "</style>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "\n" +
-                "<h2>" + testCaseDir + "\n" +
-                "\n" +
-                "<table>\n" +
-                "  <tr>\n" +
-                "    <th>#Clusters</th>\n" +
-                "    <th>#RemovedEdges</th>\n" +
-                "    <th>modularity</th>\n" +
-                "    <th>#LOC Split</th>\n" +
-                "    <th>#weight of cut edges</th>\n" +
-                "  </tr>");
-
-
-        String[] edgeCuttingArray = edgeCuttingRecord.split("\n");
-        String[] loc_splittingArray = loc_splitting.split("\n");
-        for (int i = 0; i < edgeCuttingArray.length; i++) {
-            String cut = edgeCuttingArray[i];
-            String[] cut_content = cut.split(",");
-
-            String numOfClusters = cut_content[0];
-            String numOfRemovedEdges = cut_content[1];
-            String modularity = cut_content[2];
-            String numOfLOCSplit = loc_splittingArray[i].split(",")[1];
-            String weight_list = "";
-            if (cut_content.length > 3) {
-                String weightList_origin = cut_content[3];
-                weight_list = weightList_origin.substring(0, weightList_origin.length() - 1);
-            }
-            sb.append("<tr>\n" +
-                    "    <td>" + numOfClusters + "</td>\n" +
-                    "    <td>" + numOfRemovedEdges + "</td>\n" +
-                    "    <td>" + modularity + "</td>\n" +
-                    "    <td>" + numOfLOCSplit + "</td>\n" +
-                    "    <td>" + weight_list + "</td>\n" +
-                    "  </tr>");
-
-        }
-        sb.append("</table>\n" +
-                "\n" +
-                "</body>\n" +
-                "</html>\n");
-
-
-        processingText.rewriteFile(sb.toString(), analysisDir + "resultTable.html");
-
-    }
-
-
-    /**
-     * This function get the number of communities and how many edges have been removed in current cluster result
-     *
-     * @param s cluster information
-     * @return int array [0] --> num of communities
-     * array[1] --> number of cut edges
-     */
-
-    private double[] getClusterInfo(String s) {
-        double[] clusterInfo = new double[4];
-        //get weight
-        int weight_from = s.indexOf("weight=") + 8;
-        int weight_to = s.indexOf(")");
-        String weight = s.substring(weight_from, weight_to);
-        clusterInfo[3] = Double.parseDouble(weight);
-
-
-        //get modularity
-        int modularity_loc = s.indexOf("Modularity") + 11;
-        //get community number
-        int start = s.indexOf("---");
-
-        String modularity = s.substring(modularity_loc, start - 1);
-        clusterInfo[2] = Double.parseDouble(modularity);
-
-        String number = s.substring(start + 3);
-        clusterInfo[0] = Integer.valueOf(number.trim());
-
-        // get number of cut edge
-        int i = s.indexOf("**");
-        int j = s.indexOf("edges");
-        String numOfCutEdges = s.substring(i + 3, j);
-        clusterInfo[1] = Integer.valueOf(numOfCutEdges.trim());
-
-        return clusterInfo;
-    }
 
     public static void main(String[] args) {
 
