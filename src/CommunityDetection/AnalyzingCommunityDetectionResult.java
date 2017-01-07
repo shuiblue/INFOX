@@ -2,6 +2,7 @@ package CommunityDetection;
 
 import ColorCode.BackgroundColor;
 import ColorCode.ColorCode;
+import Util.GenerateCombination;
 import Util.ProcessingText;
 
 import java.io.File;
@@ -342,7 +343,8 @@ public class AnalyzingCommunityDetectionResult {
 
 
                     generateGroundTruthMap();
-                    calculatingAccuracy(clusters);
+                    HashMap<Integer, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters);
+                    calculatingAccuracy(groundTruthClusters, current_clustering_result);
 
 
                     AnalyzingCommunityDetectionResult analyzeCDResult = new AnalyzingCommunityDetectionResult();
@@ -373,11 +375,13 @@ public class AnalyzingCommunityDetectionResult {
     }
 
     /**
-     * This function calculats accuracy for each cutting result
+     * This function generates current clustering result map
+     * #index  -> hashset of nodeid
      *
-     * @param clusters
+     * @param clusters a list of clusters
+     * @return hash map of current_clustering_result
      */
-    private void calculatingAccuracy(ArrayList<String> clusters) {
+    private HashMap<Integer, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters) {
         int index = 1;
 
         HashMap<Integer, HashSet<Integer>> current_clustering_result = new HashMap<>();
@@ -397,10 +401,90 @@ public class AnalyzingCommunityDetectionResult {
                 current_clustering_result.put(index++, cluster_nodeid_Set);
             }
         }
+        return current_clustering_result;
+    }
 
-        System.out.print("");
+    /**
+     * This function calculats accuracy for each cutting result
+     */
+    public void calculatingAccuracy(HashMap<Integer, HashSet<Integer>> groundTruthClusters, HashMap<Integer, HashSet<Integer>> current_clustering_result) {
+        int true_positive = 0;
+        int false_positive = 0;
+        int true_negtive = 0;
+        int false_negtive = 0;
+
+        HashSet<Integer> nodeIDSet = new HashSet<>();
+        Iterator node_iter = nodeMap.entrySet().iterator();
+        while (node_iter.hasNext()) {
+            Map.Entry pair = (Map.Entry) node_iter.next();
+            nodeIDSet.add((int) pair.getKey());
+        }
+
+        /* for test purpose
+        HashSet<Integer> nodeIDSet = new LinkedHashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6));
+        */
+
+        HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination().getAllPairs(nodeIDSet);
+        Iterator nodePair_iterator = nodePairSet.iterator();
 
 
+        while (nodePair_iterator.hasNext()) {
+            HashSet<Integer> pair = (HashSet<Integer>) nodePair_iterator.next();
+            /**   check ground truth **/
+            boolean groundTruth_nodes_belong_Together = nodes_belong_together(groundTruthClusters, pair);
+
+            /**check clustering result**/
+            boolean clusteringResult_nodes_belong_Together = nodes_belong_together(current_clustering_result, pair);
+
+
+            if (groundTruth_nodes_belong_Together == true && clusteringResult_nodes_belong_Together == true) {
+                true_positive++;
+            } else if (groundTruth_nodes_belong_Together == true && clusteringResult_nodes_belong_Together == false) {
+                false_negtive++;
+            } else if (groundTruth_nodes_belong_Together == false && clusteringResult_nodes_belong_Together == true) {
+                false_positive++;
+            } else if (groundTruth_nodes_belong_Together == false && clusteringResult_nodes_belong_Together == false) {
+                true_negtive++;
+            }
+            System.out.print("");
+        }
+
+        float accuracy = (float) (true_positive + true_negtive) / (true_negtive + true_positive + false_negtive + false_positive);
+        System.out.println("\ntrue_positive: " + true_positive);
+        System.out.println("true_negtive: " + true_negtive);
+        System.out.println("false_negtive: " + false_negtive);
+        System.out.println("false_positive: " + false_positive);
+        System.out.println("accuracy: " + accuracy);
+        System.out.println("----------");
+
+    }
+
+    /**
+     * This function check whether a pair of node belong to one cluster
+     * @param clusters several clusters
+     * @param pair a pair of node id
+     * @return true- belong together; false - do not belong together
+     */
+    private boolean nodes_belong_together(HashMap<Integer, HashSet<Integer>> clusters, HashSet<Integer> pair) {
+        List<Integer> list = new ArrayList<>(pair);
+        int first = list.get(0);
+        int second = list.get(1);
+
+        boolean nodes_belong_Together = false;
+        Iterator iterator = clusters.entrySet().iterator();
+        while (iterator.hasNext()) {
+            HashSet<Integer> currentCluster = (HashSet<Integer>) ((Map.Entry) iterator.next()).getValue();
+            if (currentCluster.contains(first) && currentCluster.contains(second)) {
+                nodes_belong_Together = true;
+                break;
+            } else if ((currentCluster.contains(first) && !currentCluster.contains(second)) || (!currentCluster.contains(first) && currentCluster.contains(second))) {
+                nodes_belong_Together = false;
+                break;
+            } else {
+                continue;
+            }
+        }
+        return nodes_belong_Together;
     }
 
     /**
@@ -421,7 +505,6 @@ public class AnalyzingCommunityDetectionResult {
             nodeSet.add(nodeId);
             groundTruthClusters.put(clusterNumber, nodeSet);
         }
-        System.out.print("");
     }
 
     private void generateCuttingSummaryTable() {
