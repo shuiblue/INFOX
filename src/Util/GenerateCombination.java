@@ -13,6 +13,11 @@ public class GenerateCombination {
 
     static HashSet<HashSet<Integer>> allPairs = new HashSet<>();
 
+    /**
+     * This function generates all the pairs of the set
+     * @param set
+     * @return
+     */
     public static HashSet<HashSet<Integer>> getAllPairs(HashSet<Integer> set) {
         List<Integer> list = new ArrayList<>(set);
         Integer first = list.remove(0);
@@ -51,7 +56,7 @@ public class GenerateCombination {
         test_Clusters.put(2, test_two);
         test_Clusters.put(3, test_three);
 
-        new AnalyzingCommunityDetectionResult().calculatingAccuracy(groundTruthClusters, test_Clusters);
+//        new AnalyzingCommunityDetectionResult().calculatingAccuracy(groundTruthClusters, test_Clusters,false);
 
     }
 

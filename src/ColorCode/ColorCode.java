@@ -13,9 +13,9 @@ import java.util.*;
 public class ColorCode {
     static ProcessingText iofunc = new ProcessingText();
     static final String CSS = ".css";
-    static String expectTxt = "expectCluster.txt";
     static String sourceCodeTxt = "sourceCode.txt";
-    static String nodeListTxt = "/NodeList.txt";
+
+    static String expectTxt = "expectCluster.txt";
     static String upstreamNodeTxt = "upstreamNode.txt";
     static String jsFileHeader = "/jshead.txt";
     static HashMap<Integer, String> nodeMap;
@@ -24,7 +24,7 @@ public class ColorCode {
     static StringBuffer jsContent = new StringBuffer();
     static String forkAddedNode = "";
     static final String FS = File.separator;
-    String analysisDir, testCaseDir,sourcecodeDir;
+    String analysisDir, testCaseDir, sourcecodeDir;
     boolean print = false;
     StringBuilder sb = new StringBuilder();
     ProcessingText processingText = new ProcessingText();
@@ -32,13 +32,13 @@ public class ColorCode {
     ArrayList<HashSet<String>> closeClusterList = new ArrayList<>();
     HashMap<HashSet<String>, String> closeClusters_ColorMap = new HashMap<>();
     HashMap<String, String> expectNodeMap = new HashMap<>();
-    HashMap<Integer, HashSet<Integer>> groundTruthClusters = new HashMap<>();
     int initialNumOfClusters = 0;
 
-    public ColorCode(String sourcecodeDir, String testCaseDir, String testDir) {
+    public ColorCode(String sourcecodeDir, String testCaseDir, String testDir,String forkAddedNode) {
         this.sourcecodeDir = sourcecodeDir;
         this.analysisDir = testCaseDir + testDir + FS;
         this.testCaseDir = testCaseDir;
+        this.forkAddedNode = forkAddedNode;
     }
 
     public void parseSourceCodeFromFile(String fileName) {
@@ -117,34 +117,14 @@ public class ColorCode {
         }
     }
 
-    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters ,HashMap<Integer, ArrayList<String>> clusterResultMap ) {
-        BufferedReader br;
-        String line;
-        nodeMap = new HashMap<>();
+    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap,HashMap<Integer, String> nodeMap , HashMap<String, String> expectNodeMap) {
         ArrayList<String> distanceArray;
-
 
         BackgroundColor bgcolor = new BackgroundColor();
 
 //        HashMap<String, String> clusterColorMap = new HashMap<>();
 //        HashMap<String, String> join_clusterColorMap = new HashMap<>();
 
-
-        try {
-            br = new BufferedReader(new FileReader(analysisDir + nodeListTxt));
-            while ((line = br.readLine()) != null) {
-                // use comma as separator
-                System.out.println(line);
-                if (line.trim().split("---------").length > 1) {
-                    nodeMap.put(Integer.valueOf(line.trim().split("---------")[0]), line.trim().split("---------")[1]);
-                }
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
 
         //get upstream Node
@@ -158,94 +138,13 @@ public class ColorCode {
                 e.printStackTrace();
             }
         }
-
-        //generating joining table, if distance is 2, then join two clusters
-        //todo: other conditions?
-        String distanceFile = analysisDir + numberOfClusters + "_distanceBetweenCommunityies.txt";
-        try {
-            String distanceString = processingText.readResult(distanceFile);
-            distanceArray = new ArrayList(Arrays.asList(distanceString.split("\n")));
-            for (String str : distanceArray) {
-                String distanceBetweenTwoClusters = str.split(",")[2];
-                String cluster_1 = str.split(",")[0];
-                String cluster_2 = str.split(",")[1];
-
-                int length_cluster_1 = 0, length_cluster_2 = 0;
-                for (String cl : clusters) {
-                    if (cl.startsWith(cluster_1 + ")")) {
-                        length_cluster_1 = cl.split(",").length - 1;
-                    }
-                    if (cl.startsWith(cluster_2 + ")")) {
-                        length_cluster_2 = cl.split(",").length - 1;
-                    }
-                }
-
-                if (length_cluster_1 > 50 && !bigSizeClusterList.contains(cluster_1)) {
-                    bigSizeClusterList.add(cluster_1);
-                } else if (length_cluster_2 > 50 && !bigSizeClusterList.contains(cluster_2)) {
-                    bigSizeClusterList.add(cluster_2);
-                }
-
-
-                /**  condition for joining two clusters is the distance between them is 10--weighted  , 2-- unweighted**/
-                if (distanceBetweenTwoClusters.equals("10")) {
-                    boolean existEdge = false;
-                    ArrayList<Integer> redundantClusterListIndex = new ArrayList<>();
-                    if (closeClusterList.size() > 0) {
-                        for (HashSet<String> clusterlist : closeClusterList) {
-                            if (!existEdge) {
-                                if (clusterlist.contains(str.split(",")[0])) {
-                                    clusterlist.add(str.split(",")[1]);
-                                    existEdge = true;
-                                } else if (clusterlist.contains(str.split(",")[1])) {
-                                    clusterlist.add(str.split(",")[0]);
-                                    existEdge = true;
-                                }
-                            } else {
-                                if (clusterlist.contains(str.split(",")[0]) || clusterlist.contains(str.split(",")[1])) {
-                                    redundantClusterListIndex.add(closeClusterList.indexOf(clusterlist));
-                                }
-                            }
-                        }
-                    }
-
-                    for (int index : redundantClusterListIndex) {
-                        closeClusterList.set(index, new HashSet<>());
-                    }
-
-                    if (!existEdge) {
-                        HashSet<String> list = new HashSet<>();
-                        list.add(cluster_1);
-                        list.add(cluster_2);
-                        closeClusterList.add(list);
-                    }
-                }
-
-
-            }
-            for (HashSet<String> arrayList : closeClusterList) {
-                if (arrayList.size() > 0) {
-                    closeClusters_ColorMap.put(arrayList, "");
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        //--------------------------expect Node---------------------------
         String expectNode = "";
         try {
             expectNode = iofunc.readResult(testCaseDir + expectTxt);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        expectNodeMap = new HashMap<>();
-        String[] nodeCluster = expectNode.split("\n");
-        for (int i = 0; i < nodeCluster.length; i++) {
-            expectNodeMap.put(nodeCluster[i].split(" ")[0], nodeCluster[i].split(" ")[1]);
-//            expectNodeMap.put(nodeCluster[i].split(" ")[0], Integer.valueOf(nodeCluster[i].split(" ")[1]));
-        }
+
 
         StringBuilder sb = new StringBuilder();
         StringBuilder joining_sb = new StringBuilder();
@@ -324,7 +223,7 @@ public class ColorCode {
 
 //                                    for (Map.Entry<Integer, ArrayList<String>> entry : clusterResultMap.entrySet()) {
                                     if (initialNumOfClusters < numberOfClusters) {
-                                        ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters );
+                                        ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters);
                                         for (String clusterStr : currentClusters) {
                                             if (clusterStr.contains(nodeID + " ,")) {
                                                 int currentNumberOfNodes = cluster.split(",").length - 1;
@@ -472,10 +371,94 @@ public class ColorCode {
         iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + numberOfClusters + "_colorTable_join.txt");
         iofunc.rewriteFile(clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor.txt");
         iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor_join.txt");
-
-        new AnalyzingCommunityDetectionResult().setExpectNodeMap(expectNodeMap);
-        new AnalyzingCommunityDetectionResult().setNodeMap(nodeMap);
     }
+
+
+
+    /**
+     * This function generates ining table, if distance is 2, then join two clusters
+     * //todo: other conditions?
+     * @param clusters
+     * @param numberOfClusters
+     */
+    public ArrayList<HashSet<String>> joiningCloseClusters(ArrayList<String> clusters, int numberOfClusters) {
+        ArrayList<String> distanceArray;
+        String distanceFile = analysisDir + numberOfClusters + "_distanceBetweenCommunityies.txt";
+        closeClusterList = new ArrayList<>();
+        try {
+            String distanceString = processingText.readResult(distanceFile);
+            distanceArray = new ArrayList(Arrays.asList(distanceString.split("\n")));
+            for (String str : distanceArray) {
+                String distanceBetweenTwoClusters = str.split(",")[2];
+                String cluster_1 = str.split(",")[0];
+                String cluster_2 = str.split(",")[1];
+
+                int length_cluster_1 = 0, length_cluster_2 = 0;
+                for (String cl : clusters) {
+                    if (cl.startsWith(cluster_1 + ")")) {
+                        length_cluster_1 = cl.split(",").length - 1;
+                    }
+                    if (cl.startsWith(cluster_2 + ")")) {
+                        length_cluster_2 = cl.split(",").length - 1;
+                    }
+                }
+
+                if (length_cluster_1 > 50 && !bigSizeClusterList.contains(cluster_1)) {
+                    bigSizeClusterList.add(cluster_1);
+                } else if (length_cluster_2 > 50 && !bigSizeClusterList.contains(cluster_2)) {
+                    bigSizeClusterList.add(cluster_2);
+                }
+
+
+                /**  condition for joining two clusters is the distance between them is 10--weighted  , 2-- unweighted**/
+                if (distanceBetweenTwoClusters.equals("10")) {
+                    boolean existEdge = false;
+                    ArrayList<Integer> redundantClusterListIndex = new ArrayList<>();
+                    if (closeClusterList.size() > 0) {
+                        for (HashSet<String> clusterlist : closeClusterList) {
+                            if (!existEdge) {
+                                if (clusterlist.contains(str.split(",")[0])) {
+                                    clusterlist.add(str.split(",")[1]);
+                                    existEdge = true;
+                                } else if (clusterlist.contains(str.split(",")[1])) {
+                                    clusterlist.add(str.split(",")[0]);
+                                    existEdge = true;
+                                }
+                            } else {
+                                if (clusterlist.contains(str.split(",")[0]) || clusterlist.contains(str.split(",")[1])) {
+                                    redundantClusterListIndex.add(closeClusterList.indexOf(clusterlist));
+                                }
+                            }
+                        }
+                    }
+
+                    for (int index : redundantClusterListIndex) {
+                        closeClusterList.set(index, new HashSet<>());
+                    }
+
+                    if (!existEdge) {
+                        HashSet<String> list = new HashSet<>();
+                        list.add(cluster_1);
+                        list.add(cluster_2);
+                        closeClusterList.add(list);
+                    }
+                }
+
+
+            }
+            for (HashSet<String> arrayList : closeClusterList) {
+                if (arrayList.size() > 0) {
+                    closeClusters_ColorMap.put(arrayList, "");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return closeClusterList;
+    }
+
+
 
     private String randomColor() {
         Random rand = new Random();

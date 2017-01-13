@@ -61,21 +61,23 @@ public class AnalyzingRepository {
 //        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
-//        HashMap<Integer, ArrayList<String>> clusterList = new ColorCode().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
-        HashMap<Integer, ArrayList<String>> clusterList = new AnalyzingCommunityDetectionResult().parseEachUsefulClusteringResult(sourcecodeDir, testCaseDir, testDir);
-        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
-
-        /** parse commit msg for each node **/
-        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
-        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
+        AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir);
+        analyzingCommunityDetectionResult.generateGroundTruthMap();
+        HashMap<Integer, ArrayList<String>> clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult();
+//
+//        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
+//
+//        /** parse commit msg for each node **/
+//        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
+//        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
 
 
 
         /**  calculate tfidf  to identifing keywords from each cluster**/
-        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
-
-        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
-        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
+//        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
+//
+//        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
+//        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
 
 
     }

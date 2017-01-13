@@ -5,18 +5,21 @@ import ColorCode.ColorCode;
 import Util.GenerateCombination;
 import Util.ProcessingText;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by shuruiz on 8/29/16.
  */
 public class AnalyzingCommunityDetectionResult {
     ProcessingText processingText = new ProcessingText();
-    String analysisDir, testCaseDir, sourcecodeDir;
-
+    String analysisDir, testCaseDir, sourcecodeDir, testDir;
+    static String nodeListTxt = "/NodeList.txt";
     static String forkAddedNodeTxt = "forkAddedNode.txt";
+
+    static String expectTxt = "expectCluster.txt";
     static String forkAddedNode = "";
     int initialNumOfClusters = 0;
     HashMap<Integer, ArrayList<String>> clusterResultMap = new HashMap<>();
@@ -29,6 +32,15 @@ public class AnalyzingCommunityDetectionResult {
     static final String FS = File.separator;
 
     static ProcessingText iofunc = new ProcessingText();
+
+
+    public AnalyzingCommunityDetectionResult(String sourcecodeDir, String testCaseDir, String testDir) {
+        this.sourcecodeDir = sourcecodeDir;
+        this.analysisDir = testCaseDir + testDir + FS;
+        this.testCaseDir = testCaseDir;
+        this.testDir = testDir;
+    }
+
 
     //    public void generatingClusteringTable(String analysisDir, int numberOfCommunities, ArrayList<String> macroList) {
     public void generatingClusteringTable(String testCaseDir, String testDir, int numberOfCommunities, boolean isJoiningTable) {
@@ -276,18 +288,15 @@ public class AnalyzingCommunityDetectionResult {
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
         //----for Marlin repo structure----
       */
-    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(String sourcecodeDir, String testCaseDir, String testDir) {
+    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult() {
 
-
-        this.sourcecodeDir = sourcecodeDir;
-        this.analysisDir = testCaseDir + testDir + FS;
-        this.testCaseDir = testCaseDir;
-        ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir);
 
         String clusterFilePath = analysisDir + "clusterTMP.txt";
         String clusterResultListString = "";
         processingText.rewriteFile("", analysisDir + "edgeCuttingRecord.txt");
         processingText.rewriteFile("", analysisDir + "LOC_split.txt");
+        processingText.rewriteFile("", analysisDir + "accuracy.txt");
+        processingText.rewriteFile("", analysisDir + "joined_accuracy.txt");
         //get fork added node
         File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
         if (forkAddedFile.exists()) {
@@ -298,6 +307,7 @@ public class AnalyzingCommunityDetectionResult {
                 e.printStackTrace();
             }
         }
+        ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir, forkAddedNode);
         try {
             colorCode.createSourceFileHtml();
         } catch (IOException e) {
@@ -339,18 +349,25 @@ public class AnalyzingCommunityDetectionResult {
                     clusterResultMap.put(numberOfCommunities, clusters);
                     /**   write to css file        **/
 
-                    colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap);
-
-
-                    generateGroundTruthMap();
                     HashMap<Integer, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters);
-                    calculatingAccuracy(groundTruthClusters, current_clustering_result);
 
 
-                    AnalyzingCommunityDetectionResult analyzeCDResult = new AnalyzingCommunityDetectionResult();
+                    /**   get joined clusters   **/
+                    HashMap<Integer, HashSet<Integer>> joined_clusters = getJoinedClusters(colorCode, numberOfCommunities, clusters, current_clustering_result);
 
-                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false);
-                    analyzeCDResult.generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true);
+
+                    /** calculating accuracy for clustering result
+                     * 0 - true_positive,1 - false_positive, 2 - true_negtive, 3 - false_negtive, 4- accuracy
+                     * **/
+                    calculatingAccuracy(groundTruthClusters, current_clustering_result, false);
+                    calculatingAccuracy(groundTruthClusters, joined_clusters, true);
+
+
+                    generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false);
+                    generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true);
+
+
+                    colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap);
 
                     colorCode.combineFiles(numberOfCommunities);
                     pre_numberOfCommunites = numberOfCommunities;
@@ -374,6 +391,75 @@ public class AnalyzingCommunityDetectionResult {
         return clusterResultMap;
     }
 
+    private HashMap<Integer, HashSet<Integer>> getJoinedClusters(ColorCode colorCode, int numberOfCommunities, ArrayList<String> clusters, HashMap<Integer, HashSet<Integer>> current_clustering_result) {
+        /**  get joining result  **/
+        ArrayList<HashSet<String>> closeClusters_list = colorCode.joiningCloseClusters(clusters, numberOfCommunities);
+        HashMap<Integer, HashSet<Integer>> joined_clusters = new HashMap<>();
+        joined_clusters.putAll(current_clustering_result);
+        System.out.println("#clusters:" + numberOfCommunities);
+
+        for (HashSet<String> closeClusters : closeClusters_list) {
+            HashSet<Integer> tmp = new HashSet<>();
+            Iterator it = closeClusters.iterator();
+            int index = 0;
+            while (it.hasNext()) {
+                index = Integer.valueOf((String) it.next());
+
+                tmp.addAll(current_clustering_result.get(index));
+                joined_clusters.remove(index);
+
+            }
+            joined_clusters.put(index, tmp);
+        }
+
+        return joined_clusters;
+    }
+
+
+    /**
+     * This function generate nodeMap from node list text, key -- node id; value -- node label
+     */
+    private void getNodeMap_id_to_label() {
+        nodeMap = new HashMap<>();
+        BufferedReader br;
+        String line;
+        try {
+            br = new BufferedReader(new FileReader(analysisDir + nodeListTxt));
+            while ((line = br.readLine()) != null) {
+                // use comma as separator
+                if (line.trim().split("---------").length > 1) {
+                    nodeMap.put(Integer.valueOf(line.trim().split("---------")[0]), line.trim().split("---------")[1]);
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This function generates expect node Map
+     *
+     * @return
+     */
+    private String generatingExpectNodeMap() {
+        expectNodeMap = new HashMap<>();
+        String expectNode = "";
+        try {
+            expectNode = iofunc.readResult(testCaseDir + expectTxt);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        expectNodeMap = new HashMap<>();
+        String[] nodeCluster = expectNode.split("\n");
+        for (int i = 0; i < nodeCluster.length; i++) {
+            expectNodeMap.put(nodeCluster[i].split(" ")[0], nodeCluster[i].split(" ")[1]);
+        }
+        return expectNode;
+    }
+
     /**
      * This function generates current clustering result map
      * #index  -> hashset of nodeid
@@ -382,11 +468,12 @@ public class AnalyzingCommunityDetectionResult {
      * @return hash map of current_clustering_result
      */
     private HashMap<Integer, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters) {
-        int index = 1;
 
         HashMap<Integer, HashSet<Integer>> current_clustering_result = new HashMap<>();
         for (String s : clusters) {
             if (!s.equals("")) {
+
+                int index = Integer.valueOf(s.substring(0, s.indexOf(")")));
                 String str = s.substring(s.indexOf("[") + 1).replace("]", "");
                 String[] nodeList = str.split(",");
                 HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
@@ -398,16 +485,22 @@ public class AnalyzingCommunityDetectionResult {
                         cluster_nodeid_Set.add(Integer.valueOf(istr));
                     }
                 }
-                current_clustering_result.put(index++, cluster_nodeid_Set);
+                current_clustering_result.put(index, cluster_nodeid_Set);
             }
         }
         return current_clustering_result;
     }
 
     /**
-     * This function calculats accuracy for each cutting result
+     * * This function calculats accuracy for each cutting result
+     *
+     * @param groundTruthClusters       ground truth clusters
+     * @param current_clustering_result current clustering result clusters
+     * @return int array, size = 5;
+     * true_positive, false_positive, true_negtive, false_negtive, accuracy
      */
-    public void calculatingAccuracy(HashMap<Integer, HashSet<Integer>> groundTruthClusters, HashMap<Integer, HashSet<Integer>> current_clustering_result) {
+
+    public void calculatingAccuracy(HashMap<Integer, HashSet<Integer>> groundTruthClusters, HashMap<Integer, HashSet<Integer>> current_clustering_result, boolean isjoined) {
         int true_positive = 0;
         int false_positive = 0;
         int true_negtive = 0;
@@ -419,10 +512,6 @@ public class AnalyzingCommunityDetectionResult {
             Map.Entry pair = (Map.Entry) node_iter.next();
             nodeIDSet.add((int) pair.getKey());
         }
-
-        /* for test purpose
-        HashSet<Integer> nodeIDSet = new LinkedHashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6));
-        */
 
         HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination().getAllPairs(nodeIDSet);
         Iterator nodePair_iterator = nodePairSet.iterator();
@@ -436,7 +525,6 @@ public class AnalyzingCommunityDetectionResult {
             /**check clustering result**/
             boolean clusteringResult_nodes_belong_Together = nodes_belong_together(current_clustering_result, pair);
 
-
             if (groundTruth_nodes_belong_Together == true && clusteringResult_nodes_belong_Together == true) {
                 true_positive++;
             } else if (groundTruth_nodes_belong_Together == true && clusteringResult_nodes_belong_Together == false) {
@@ -446,23 +534,23 @@ public class AnalyzingCommunityDetectionResult {
             } else if (groundTruth_nodes_belong_Together == false && clusteringResult_nodes_belong_Together == false) {
                 true_negtive++;
             }
-            System.out.print("");
         }
 
-        float accuracy = (float) (true_positive + true_negtive) / (true_negtive + true_positive + false_negtive + false_positive);
-        System.out.println("\ntrue_positive: " + true_positive);
-        System.out.println("true_negtive: " + true_negtive);
-        System.out.println("false_negtive: " + false_negtive);
-        System.out.println("false_positive: " + false_positive);
-        System.out.println("accuracy: " + accuracy);
-        System.out.println("----------");
+        float accuracy = (float) (true_positive + true_negtive) / (true_positive + false_positive + false_negtive + true_negtive);
 
+        String fileName = "accuracy.txt";
+        if (isjoined) {
+            fileName = "joined_accuracy.txt";
+        }
+
+        processingText.writeTofile(true_positive + "," + false_positive + "," + true_negtive + "," + false_negtive + "," + accuracy + "\n", analysisDir + fileName);
     }
 
     /**
      * This function check whether a pair of node belong to one cluster
+     *
      * @param clusters several clusters
-     * @param pair a pair of node id
+     * @param pair     a pair of node id
      * @return true- belong together; false - do not belong together
      */
     private boolean nodes_belong_together(HashMap<Integer, HashSet<Integer>> clusters, HashSet<Integer> pair) {
@@ -491,10 +579,19 @@ public class AnalyzingCommunityDetectionResult {
      * This function generates the ground truth cluster,
      * The output is a hashmap: key--- clusterID, value--- set of nodeid
      */
-    private void generateGroundTruthMap() {
+    public void generateGroundTruthMap() {
+        /**get node map  id-> label**/
+        //todo :refactoring
+        getNodeMap_id_to_label();
+        generatingExpectNodeMap();
+
         for (Integer nodeId : nodeMap.keySet()) {
             String nodeLabel = nodeMap.get(nodeId);
             HashSet<Integer> nodeSet;
+
+            if (expectNodeMap.get(nodeLabel) == null) {
+                System.out.print("");
+            }
 
             Integer clusterNumber = Integer.valueOf(expectNodeMap.get(nodeLabel));
             if (groundTruthClusters.get(clusterNumber) != null) {
@@ -510,9 +607,13 @@ public class AnalyzingCommunityDetectionResult {
     private void generateCuttingSummaryTable() {
         String edgeCuttingRecord = "";
         String loc_splitting = "";
+        String accuracyStr = "";
+        String joined_accuracyStr = "";
         try {
             edgeCuttingRecord = processingText.readResult(analysisDir + "edgeCuttingRecord.txt");
             loc_splitting = processingText.readResult(analysisDir + "LOC_split.txt");
+            accuracyStr = processingText.readResult(analysisDir + "accuracy.txt");
+            joined_accuracyStr = processingText.readResult(analysisDir + "joined_accuracy.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -538,11 +639,21 @@ public class AnalyzingCommunityDetectionResult {
                 "    <th>modularity</th>\n" +
                 "    <th>#LOC Split</th>\n" +
                 "    <th>#weight of cut edges</th>\n" +
+                "    <th>accuracy : (TP + TN) / ALL </th>\n" +
+                "    <th>Joined accuracy \n" +
+                "    <th>precision: TP / (TP + FP) \n" +
+                "    <th>Joined precision \n" +
+                "    <th>recall: TP / (TP + FN) \n" +
+                "    <th>Joined recall \n" +
+                "    <th>F score \n" +
+                "    <th>Joined F score \n" +
                 "  </tr>");
 
 
         String[] edgeCuttingArray = edgeCuttingRecord.split("\n");
         String[] loc_splittingArray = loc_splitting.split("\n");
+        String[] accuracy_Array = accuracyStr.split("\n");
+        String[] joined_accuracy_Array = joined_accuracyStr.split("\n");
         for (int i = 0; i < edgeCuttingArray.length; i++) {
             String cut = edgeCuttingArray[i];
             String[] cut_content = cut.split(",");
@@ -556,12 +667,61 @@ public class AnalyzingCommunityDetectionResult {
                 String weightList_origin = cut_content[3];
                 weight_list = weightList_origin.substring(0, weightList_origin.length() - 1);
             }
+
+            /**  organizing accuracy result [0 - TRUE_positive,1 - false_positive, 2 - true_negtive, 3 - false_negtive, 4- accuracy]
+             * (true_positive + true_negtive) / (true_positive + false_positive + false_negtive + true_negtive)
+             * 0 + 2 / 0+1+3+2
+             * **/
+
+
+            String[] accuracy_oneCut = accuracy_Array[i].split(",");
+            int TP = Integer.parseInt(accuracy_oneCut[0]);
+            int FP = Integer.parseInt(accuracy_oneCut[1]);
+            int TN = Integer.parseInt(accuracy_oneCut[2]);
+            int FN = Integer.parseInt(accuracy_oneCut[3]);
+            String AC = accuracy_oneCut[4];
+            float precision =(float) TP / (TP + FP);
+            float recall =(float) TP / (TP + FN);
+            float f_score =(float) (2*precision*recall)/(precision+recall);
+
+
+            String accruacy = AC;
+//                    + " = " + TP + " + " + TN + "\n"
+//                    + " / "
+//                    + TP + " + " + FP + " + " + FN + " + " + TN;
+
+            String[] joined_accuracy_oneCut = joined_accuracy_Array[i].split(",");
+
+            int joined_TP = Integer.parseInt(joined_accuracy_oneCut[0]);
+            int joined_FP = Integer.parseInt(joined_accuracy_oneCut[1]);
+            int joined_TN = Integer.parseInt(joined_accuracy_oneCut[2]);
+            int joined_FN = Integer.parseInt(joined_accuracy_oneCut[3]);
+            String joined_AC =joined_accuracy_oneCut[4];
+            float joined_precision = (float)joined_TP / (joined_TP + joined_FP);
+            float joined_recall =(float) joined_TP /(joined_TP + joined_FN);
+            float joined_f_score = (float)(2*joined_precision*joined_recall)/(joined_precision+joined_recall);
+
+            String joined_accruacy = joined_AC;
+//                    + " = " + joined_TP + " + " + joined_TN + "\n"
+//                    + " / "
+//                    + joined_TP + " + " + joined_FP + " + " + joined_FN + " + " + joined_TN;
+
+
+
             sb.append("<tr>\n" +
                     "    <td>" + numOfClusters + "</td>\n" +
                     "    <td>" + numOfRemovedEdges + "</td>\n" +
                     "    <td>" + modularity + "</td>\n" +
                     "    <td>" + numOfLOCSplit + "</td>\n" +
                     "    <td>" + weight_list + "</td>\n" +
+                    "    <td>" + accruacy + "</td>\n" +
+                    "    <td>" + joined_accruacy + "</td>\n" +
+                    "    <td>" + precision + "</td>\n" +
+                    "    <td>" + joined_precision + "</td>\n" +
+                    "    <td>" + recall + "</td>\n" +
+                    "    <td>" + joined_recall + "</td>\n" +
+                    "    <td>" + f_score + "</td>\n" +
+                    "    <td>" + joined_f_score + "</td>\n" +
                     "  </tr>");
 
         }
@@ -613,11 +773,4 @@ public class AnalyzingCommunityDetectionResult {
         return clusterInfo;
     }
 
-    public static void setNodeMap(HashMap<Integer, String> nodeMap) {
-        AnalyzingCommunityDetectionResult.nodeMap = nodeMap;
-    }
-
-    public static void setExpectNodeMap(HashMap<String, String> expectNodeMap) {
-        AnalyzingCommunityDetectionResult.expectNodeMap = expectNodeMap;
-    }
 }

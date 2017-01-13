@@ -77,11 +77,12 @@ public class R_CommunityDetection {
         REXP edgelist_R = re.eval("cbind( get.edgelist(g) , round( E(g)$weight, 3 ))", true);
         REXP nodelist_R = re.eval("get.vertex.attribute(g)$id", true);
         edgelist = edgelist_R.asDoubleMatrix();
-       nodelist = (String[]) nodelist_R.getContent();
+        nodelist = (String[]) nodelist_R.getContent();
         originGraph = new Graph(nodelist, edgelist, null, 0);
 
+        HashMap<Integer, String> nodeMap = originGraph.getNodelist();
+        printOriginNodeList(nodeMap, analysisDir);
 
-        printOriginNodeList(originGraph.getNodelist(), analysisDir);
         File upstreamNodeFile = new File(analysisDir + upstreamNodeTxt);
         if (upstreamNodeFile.exists()) {
             //get nodes/edges belong to upstream
@@ -532,14 +533,14 @@ public class R_CommunityDetection {
         print.append("** " + cutNum + "edges has been removed **\n");
         String removableEdge = g.getRemovableEdgeLable();
         int index_lastComma = removableEdge.lastIndexOf(",");
-        String removableEdge_from_to = removableEdge.substring(0,index_lastComma);
+        String removableEdge_from_to = removableEdge.substring(0, index_lastComma);
 
         int edgeId = originGraph.getReverseEdgelist().get(removableEdge_from_to);
         int from = Integer.parseInt(removableEdge.split(",")[0]);
         int to = Integer.parseInt(removableEdge.split(",")[1]);
         int weight = Integer.parseInt(removableEdge.split(",")[2]);
         String edgeNodes = originGraph.getNodelist().get(from) + "->" + originGraph.getNodelist().get(to);
-        print.append("max between edge id:" + edgeId + "-" + removableEdge + "(" + edgeNodes + " weight= "+weight+")");
+        print.append("max between edge id:" + edgeId + "-" + removableEdge + "(" + edgeNodes + " weight= " + weight + ")");
         double modularity = g.getModularity();
         print.append("\nModularity: " + modularity);
         ioFunc.writeTofile(print.toString(), filePath + "/clusterTMP.txt");
