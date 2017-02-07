@@ -1,6 +1,7 @@
 package DependencyGraph;
 
 import NamingClusters.StopWords;
+import Util.GenerateCombination;
 import Util.ProcessingText;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -15,6 +16,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.Rengine;
 
 /**
  * Created by shuruiz on 12/10/15.
@@ -136,6 +139,93 @@ public class DependencyGraph {
     String edgeListTxt, parsedLineTxt, forkAddedNodeTxt, compact_graph_edgeList_txt;
 
     int stringID = 0;
+    static HashMap<String, String> label_to_id = new HashMap<>();
+
+    public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir, String testCaseDir, String testDir, boolean createEdgeForConsecutiveLines, Rengine re) {
+        this.analysisDir = testCaseDir + testDir + FS;
+        this.testCaseDir = testCaseDir;
+        String graphPath = sourcecodeDir + "DPGraph/complete.pajek.net";
+        try {
+            String completeGraph = processingText.readResult(graphPath);
+            String nodeListString = completeGraph.split("\\*arcs")[0];
+            String[] nodeList = nodeListString.split("\n");
+            String edgeListString = completeGraph.split("\\*arcs")[1];
+
+            String[] edgeList = edgeListString.split("\n");
+
+            for (String line : nodeList) {
+                if (!line.startsWith("*")) {
+                    label_to_id.put(line.split(" ")[1], line.split(" ")[0]);
+                }
+            }
+
+            /** Check whether forkAddedNode file exists **/
+            changedFiles = new HashSet<>();
+
+            forkAddedNodeTxt = testCaseDir + "forkAddedNode.txt";
+            if (new File(forkAddedNodeTxt).exists()) {
+                try {
+                    forkaddedNodeList = getForkAddedNodeList();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                System.out.println("file forkAddedNode.txt does not exist!");
+                forkaddedNodeList = new ArrayList<>();
+            }
+
+            HashSet<String> forkaddedNodeID_Set= new HashSet<>();
+            StringBuilder sb_forkAddedNode = new StringBuilder();
+            StringBuilder sb_forkAddedNode_id = new StringBuilder();
+            for (String s : forkaddedNodeList) {
+                if (label_to_id.get("\"" + s + "\"") != null) {
+                    forkaddedNodeID_Set.add(label_to_id.get("\"" + s + "\""));
+                    sb_forkAddedNode.append("\"" + label_to_id.get("\"" + s + "\"") + "\",");
+                    sb_forkAddedNode_id.append(label_to_id.get("\"" + s + "\"") + ",");
+                }
+            }
+
+            //get subgraph
+            re.eval("library(igraph)");
+            System.getProperty("java.library.path");
+            re.eval("oldg<-read_graph(\"" + graphPath + "\", format=\'pajek\')");
+            re.eval("subv <- c(" + sb_forkAddedNode.toString().substring(0, sb_forkAddedNode.toString().length() - 1) + ")");
+            re.eval("subg<-induced.subgraph(graph=oldg,vids=subv)");
+            re.eval(" write_graph(subg,\"/Users/shuruiz/Box Sync/community detection tool/igraph/22.pajek.net\", format=\"pajek\")");
+
+
+            REXP edgelist_R = re.eval("cbind( get.edgelist(subg) , round( E(subg)$weight, 3 ))", true);
+            REXP nodelist_R = re.eval("get.vertex.attribute(subg)$id", true);
+            double[][] edgelist = edgelist_R.asDoubleMatrix();
+            String[] old_nodelist = (String[]) nodelist_R.getContent();
+
+
+            StringBuilder sub_edgelist_sb = new StringBuilder();
+            for(double[] edge: edgelist){
+                String from = label_to_id.get("\""+old_nodelist[(int) edge[0]-1]+"\"");
+                String to = label_to_id.get("\""+old_nodelist[(int)edge[1]-1]+"\"");
+
+                sub_edgelist_sb.append(from+" "+to+" 5\n");
+
+            }
+
+            processingText.rewriteFile(nodeListString +"*Arcs\n"+sub_edgelist_sb.toString() ,testCaseDir + "changedCode.pajek.net");
+            processingText.rewriteFile(sb_forkAddedNode_id.toString() ,testCaseDir + "forkAddedNodeID.txt");
+
+
+/** generating edges for consecutive lines  **/
+            if (createEdgeForConsecutiveLines) {
+                createNeighborEdges_reverse();
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     /**
      * This function just call the create Dependency Graph, used for cluster nodes.
@@ -176,16 +266,30 @@ public class DependencyGraph {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         } else {
             System.out.println("file forkAddedNode.txt does not exist!");
             forkaddedNodeList = new ArrayList<>();
         }
 
+        processingText.rewriteFile("", analysisDir + "memoryRecord.txt");
         //parse every header file in the project
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
                 if (Files.isRegularFile(filePath) && processingText.isHeaderFile(filePath.toString())) {
-                    parseSingleFile(filePath);
+                    if (!filePath.toString().contains("pixman-arm-neon-asm.h")
+                            && !filePath.toString().contains("SkBitmapSamplerTemplate.h")
+                            && !filePath.toString().contains("prstrms.h")
+                            && !filePath.toString().contains("/js/")) {
+
+                        int mb = 1024 * 1024;
+                        long mem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / mb;
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("\nnow parsing..." + filePath + "\n memory usage: " + mem + "");
+                        processingText.writeTofile(sb.toString(), analysisDir + "memoryRecord.txt");
+
+                        parseSingleFile(filePath);
+                    }
                 }
             });
         } catch (IOException e) {
@@ -235,7 +339,7 @@ public class DependencyGraph {
         ArrayList<String> forkAddedNodeList = new ArrayList<>();
         for (String s : lines) {
             String node = s.split(" ")[0];
-            if(!forkAddedNodeList.contains(node)) {
+            if (!forkAddedNodeList.contains(node)) {
                 forkAddedNodeList.add(node);
             }
             String filename = node.split("-")[0];
@@ -650,40 +754,51 @@ public class DependencyGraph {
             boolean structDecl = (type_ele.getChild(0) instanceof Text) && type_ele.getChild(0).getValue().trim().equals("struct");
             //struct definition
             Element enum_Child = type_ele.getFirstChildElement("enum", NAMESPACEURI);
-            if (name_ele == null) {
-                name_ele = enum_Child.getFirstChildElement("name", NAMESPACEURI);
-            }
 
-            String alias = "";
-            if (name_ele != null) {
-                alias = name_ele.getValue();
-            }
-            if (structDef) {
-                if (structChild.getLocalName().equals("struct")) {
-                    parseStructOrClass(structChild, fileName, scope, parentLocation, alias, "struct");
+            if (enum_Child != null) {
+                int i = 0;
+
+                while (name_ele == null) {
+                    name_ele = enum_Child.getFirstChildElement("name", NAMESPACEURI);
+
+                    if (name_ele == null) {
+                        System.out.print("");
+                        return;
+                    }
                 }
-            } else if (structDecl) {
-                addDeclarationSymbol(type_ele, "struct", fileName, scope, parentLocation, alias);
-            } else if (enum_Child != null) {
-                parseEnum(enum_Child, fileName, scope, name_ele.getValue());
-            } else {
-                String location = getLocationOfElement(ele, fileName);
-                Symbol symbol = new Symbol(alias, type_ele.getValue(), location, "typedef", scope, "");
-                ArrayList<Symbol> newsymbol = new ArrayList<>();
-                newsymbol.add(symbol);
-                storeSymbols(newsymbol);
 
-                //save into nodeList
-                storeIntoNodeList(location);
+                String alias = "";
+                if (name_ele != null) {
+                    alias = name_ele.getValue();
+                }
+                if (structDef) {
+                    if (structChild.getLocalName().equals("struct")) {
+                        parseStructOrClass(structChild, fileName, scope, parentLocation, alias, "struct");
+                    }
+                } else if (structDecl) {
+                    addDeclarationSymbol(type_ele, "struct", fileName, scope, parentLocation, alias);
+                } else if (enum_Child != null) {
+                    parseEnum(enum_Child, fileName, scope, name_ele.getValue());
+                } else {
+                    String location = getLocationOfElement(ele, fileName);
+                    Symbol symbol = new Symbol(alias, type_ele.getValue(), location, "typedef", scope, "");
+                    ArrayList<Symbol> newsymbol = new ArrayList<>();
+                    newsymbol.add(symbol);
+                    storeSymbols(newsymbol);
+
+                    //save into nodeList
+                    storeIntoNodeList(location);
+                }
+
+
             }
-
-
+            //typedef function
+            Element funcDecl_ele = ele.getFirstChildElement("function_decl", NAMESPACEURI);
+            if (funcDecl_ele != null) {
+                parseFunctionNode(funcDecl_ele, fileName, scope);
+            }
         }
-        //typedef function
-        Element funcDecl_ele = ele.getFirstChildElement("function_decl", NAMESPACEURI);
-        if (funcDecl_ele != null) {
-            parseFunctionNode(funcDecl_ele, fileName, scope);
-        }
+        return;
     }
 
 
@@ -697,65 +812,70 @@ public class DependencyGraph {
      */
     private boolean parseMacros(Element ele, String fileName, int scope) {
         Element nameEle = ele.getFirstChildElement("name", NAMESPACEURI);
-        Element argumentListEle = ele.getFirstChildElement("argument_list", NAMESPACEURI);
-        String macroName = nameEle.getValue();
-        String location = getLocationOfElement(nameEle, fileName);
+        if (nameEle != null) {
+            Element argumentListEle = ele.getFirstChildElement("argument_list", NAMESPACEURI);
+            String macroName = nameEle.getValue();
+            String location = getLocationOfElement(nameEle, fileName);
 
-        /**  check whether current macro is a function declaration, because srcml cannot parse it correctly
-         * example : Apache/module/arch/unix/mod_unixd.c  L322-L373
-         * **/
-        Elements siblings = ((Element) ele.getParent()).getChildElements();
-        for (int i = 0; i < siblings.size(); i++) {
-            if (siblings.get(i).getValue().toString().equals(ele.getValue().toString()) && (i + 1) < siblings.size()) {
-                if (siblings.get(i + 1).getLocalName().equals("block")) {
-                    Symbol func_decl = new Symbol(macroName, "", location, "function_decl", scope);
-                    ArrayList<Symbol> newsymbol = new ArrayList<>();
-                    newsymbol.add(func_decl);
-                    storeSymbols(newsymbol);
-                    storeIntoNodeList(location);
+            /**  check whether current macro is a function declaration, because srcml cannot parse it correctly
+             * example : Apache/module/arch/unix/mod_unixd.c  L322-L373
+             * **/
+            Elements siblings = ((Element) ele.getParent()).getChildElements();
+            for (int i = 0; i < siblings.size(); i++) {
+                if (siblings.get(i).getValue().toString().equals(ele.getValue().toString()) && (i + 1) < siblings.size()) {
+                    if (siblings.get(i + 1).getLocalName().equals("block")) {
+                        Symbol func_decl = new Symbol(macroName, "", location, "function_decl", scope);
+                        ArrayList<Symbol> newsymbol = new ArrayList<>();
+                        newsymbol.add(func_decl);
+                        storeSymbols(newsymbol);
+                        storeIntoNodeList(location);
 
-                    //check block
-                    Element block = siblings.get(i + 1);
-                    if (block != null) {
-                        ArrayList<String> stmtInBlock = generatingDependencyGraphForSubTree(block, fileName, scope + 1, location);
-                        if (HIERACHICAL) {
-                            linkChildToParent(stmtInBlock, location, "<Hierarchy> function-block");
+                        //check block
+                        Element block = siblings.get(i + 1);
+                        if (block != null) {
+                            ArrayList<String> stmtInBlock = generatingDependencyGraphForSubTree(block, fileName, scope + 1, location);
+                            if (HIERACHICAL) {
+                                linkChildToParent(stmtInBlock, location, "<Hierarchy> function-block");
+                            }
                         }
+                        return true;
                     }
-                    return true;
                 }
             }
-        }
 
 
-        String tag = "macro";
-        if (argumentListEle != null) {
-            tag = "call";
-        }
-
-
-        Symbol macro = new Symbol(macroName, "", location, tag, scope);
-        storeIntoNodeList(location);
-
-        symbolTable.add(macro);
-        lonelySymbolSet.add(macro);
-        processingText.writeTofile(location + "\n", parsedLineTxt);
-
-        if (argumentListEle != null) {
-            Elements arguments = argumentListEle.getChildElements();
-            for (int x = 0; x < arguments.size(); x++) {
-
-                Element argument = arguments.get(x);
-                String argumentLocation = getLocationOfElement(argument, fileName);
-
-                //save into nodeList
-                storeIntoNodeList(argumentLocation);
-
-                String var = argument.getValue();
-                Symbol dependent = new Symbol(var, "", argumentLocation, "name", scope);
-                findVarDependency(dependent);
+            String tag = "macro";
+            if (argumentListEle != null) {
+                tag = "call";
             }
+
+
+            Symbol macro = new Symbol(macroName, "", location, tag, scope);
+            storeIntoNodeList(location);
+
+            symbolTable.add(macro);
+            lonelySymbolSet.add(macro);
+            processingText.writeTofile(location + "\n", parsedLineTxt);
+
+            if (argumentListEle != null) {
+                Elements arguments = argumentListEle.getChildElements();
+                for (int x = 0; x < arguments.size(); x++) {
+
+                    Element argument = arguments.get(x);
+                    String argumentLocation = getLocationOfElement(argument, fileName);
+
+                    //save into nodeList
+                    storeIntoNodeList(argumentLocation);
+
+                    String var = argument.getValue();
+                    Symbol dependent = new Symbol(var, "", argumentLocation, "name", scope);
+                    findVarDependency(dependent);
+                }
+            }
+
+            return false;
         }
+        System.out.println("macro name is null!----it is not a macro");
         return false;
     }
 
@@ -1450,7 +1570,10 @@ public class DependencyGraph {
      * This function create edges between consecutive lines,
      * ignore comments
      */
-    private void createNeighborEdges() {
+    private void createNeighborEdges_reverse() {
+        StringBuilder sb = new StringBuilder();
+
+
         String currentFile = "";
         int preLineNum = -1;
         int diff = 1;
@@ -1460,22 +1583,21 @@ public class DependencyGraph {
         for (String s : forkaddedNodeList) {
             s = s.trim();
             if (!s.equals("")) {
-                if(s.contains("ultralcdCPP")){
-                    System.out.print("");
-                }
                 String[] nodelabel = s.trim().split("-");
                 String fileName = nodelabel[0];
                 int lineNum = Integer.valueOf(nodelabel[1]);
                 if (fileName.equals(currentFile)) {
                     if (lineNum == preLineNum + diff) {
                         String preloc = fileName + "-" + preLineNum;
-                        if (dependencyGraph.get(s) != null && dependencyGraph.get(preloc) != null) {
-                            addEdgesToFile(s, preloc, "<neighbor>");
+                        String a = label_to_id.get("\"" + s + "\"");
+                        String b = label_to_id.get("\"" + preloc + "\"");
+                        if (a != null && b != null) {
+                            sb.append(a + " " + b + " 1\n");
                             diff = 1;
                             preLineNum = lineNum;
-                        } else if (dependencyGraph.get(preloc) == null && dependencyGraph.get(s) != null) {
+                        } else if (b == null && a != null) {
                             preLineNum = lineNum;
-                        } else if (dependencyGraph.get(preloc) != null && dependencyGraph.get(s) == null) {
+                        } else if (b != null && a == null) {
                             diff++;
                         } else {
                             preLineNum = lineNum - 1;
@@ -1494,6 +1616,9 @@ public class DependencyGraph {
                 currentFile = fileName;
             }
         }
+
+        processingText.writeTofile(sb.toString(), testCaseDir + "changedCode.pajek.net");
+
     }
 
     private boolean is_not_a_C_dataType(String var) {
@@ -1546,9 +1671,6 @@ public class DependencyGraph {
         // --------for compact graph--------------
         String filename = exprLocation.split("-")[0];
         if (!changedFiles.contains(filename)) {
-            if (filename.equals("")) {
-                System.out.println();
-            }
             exprLocation = filename + "-all";
         }
         if (!compact_nodeList.containsKey(exprLocation)) {
@@ -1651,9 +1773,6 @@ public class DependencyGraph {
 
     public void findVarDependency(Symbol variable) {
         String var_name = variable.getName();
-//        if(var_name.equals("redundant_temperature")){
-//            System.out.print("");
-//        }
         String var_alias = variable.getAlias();
         String var = "";
         int scope = variable.getScope();
@@ -1864,7 +1983,6 @@ public class DependencyGraph {
                 //------------compact graph---------------
 
                 if (!compact_decl_label.equals(compact_depend_label)) {
-//                    System.out.println(compact_decl_label + "," + tmpEdge[0] + "," + tmpEdge[1] + "," + tmpEdge[2]);
                     compact_dependNodes.add(tmpEdge);
                     compactGraph.put(compact_decl_label, compact_dependNodes);
                 }
@@ -2044,6 +2162,50 @@ public class DependencyGraph {
             return false;
         }
         return Pattern.compile("[a-zA-Z_]*").matcher(str).matches();
+    }
+
+    private void createNeighborEdges() {
+        String currentFile = "";
+        int preLineNum = -1;
+        int diff = 1;
+        //todo: fork added node
+
+/**   only generate consecutive edge for new code **/
+        for (String s : forkaddedNodeList) {
+            s = s.trim();
+            if (!s.equals("")) {
+                String[] nodelabel = s.trim().split("-");
+                String fileName = nodelabel[0];
+                int lineNum = Integer.valueOf(nodelabel[1]);
+                if (fileName.equals(currentFile)) {
+                    if (lineNum == preLineNum + diff) {
+                        String preloc = fileName + "-" + preLineNum;
+                        if (dependencyGraph.get(s) != null && dependencyGraph.get(preloc) != null) {
+                            addEdgesToFile(s, preloc, "<neighbor>");
+                            diff = 1;
+                            preLineNum = lineNum;
+                        } else if (dependencyGraph.get(preloc) == null && dependencyGraph.get(s) != null) {
+                            preLineNum = lineNum;
+                        } else if (dependencyGraph.get(preloc) != null && dependencyGraph.get(s) == null) {
+                            diff++;
+                        } else {
+                            preLineNum = lineNum - 1;
+                        }
+                    } else {
+                        preLineNum = lineNum;
+                        diff = 1;
+                    }
+                } else {
+                    diff = 1;
+                    preLineNum = lineNum;
+                }
+                if (preLineNum == -1) {
+                    preLineNum = lineNum;
+                }
+                currentFile = fileName;
+            }
+        }
+
     }
 
 }

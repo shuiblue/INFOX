@@ -18,6 +18,7 @@ public class R_CommunityDetection {
     //    HashSet<String> upstreamEdge;
     HashMap<Integer, Boolean> checkedEdges;
     Graph originGraph;
+    static String  sourcecodeDir = "";
 
     static String upstreamNodeTxt = "/upstreamNode.txt";
     static String forkAddedNodeTxt = "/forkAddedNode.txt";
@@ -41,7 +42,8 @@ public class R_CommunityDetection {
      * @param re
      * @return
      */
-    public int detectingCommunitiesWithIgraph(String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph) {
+    public int detectingCommunitiesWithIgraph(String sourcecodeDir,String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph) {
+        this.sourcecodeDir=sourcecodeDir;
         modularityArray = new ArrayList<>();
         checkedEdges = new HashMap<>();
         cutSequence = new ArrayList<>();
@@ -303,7 +305,7 @@ public class R_CommunityDetection {
         HashMap<ArrayList<Integer>, Integer> distanceMatrix = new HashMap<>();
         StringBuffer sb = new StringBuffer();
         HashMap<Integer, double[]> shortestDistanceOfNodes = new HashMap<>();
-        String filePath = ("comGraph<-read.graph(\"" + testCaseDir + "complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
+        String filePath = ("comGraph<-read.graph(\"" + sourcecodeDir + "DPGraph/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
         re.eval(filePath);
         re.eval("scomGraph<- simplify(comGraph)");
 
@@ -313,10 +315,7 @@ public class R_CommunityDetection {
             re.eval("completeGraph<-scomGraph");
         }
 
-        /**   whether to calculate the distance with weight  **/
-//        re.eval("E(completeGraph)$weight <- 1");
         for (ArrayList<Integer> pair : combination) {
-//        for (ArrayList<Integer> pair : combination) {
             ArrayList<Integer> cluster_1 = clusters.get(pair.get(0));
             ArrayList<Integer> cluster_2 = clusters.get(pair.get(1));
             double shortestPath = 999999;
@@ -325,22 +324,25 @@ public class R_CommunityDetection {
                 if (shortestDistanceOfNodes.get(c1) == null) {
 
                     String c1_array_cmd = "distMatrixc1 <- shortest.paths(completeGraph, v=\"" + c1 + "\", to=V(completeGraph))";
-//                    ioFunc.sleep();
-                    REXP shortestPath_R_c1 = re.eval(c1_array_cmd);
+                   re.eval(c1_array_cmd);
+                    REXP shortestPath_R_c1 = re.eval("distMatrixc1");
+
                     c1_array = shortestPath_R_c1.asDoubleArray();
                     shortestDistanceOfNodes.put(c1, c1_array);
                 } else {
                     c1_array = shortestDistanceOfNodes.get(c1);
-//                    System.out.println("exist");
                 }
 
                 for (Integer cl2 : cluster_2) {
                     int c2 = cl2 - 1;
-                    double c1_c2 = c1_array[c2];
-//                    System.out.println(c1+"+"+c2+" " + c1_c2);
 
-                    if (shortestPath > c1_c2) {
-                        shortestPath = c1_c2;
+                    if (c2 < c1_array.length) {
+                        double c1_c2 = c1_array[c2];
+//                        System.out.println(c1 + "+" + c2 + " " + c1_c2);
+
+                        if (shortestPath > c1_c2) {
+                            shortestPath = c1_c2;
+                        }
                     }
                 }
             }

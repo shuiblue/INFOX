@@ -181,7 +181,6 @@ public class ColorCode {
         sb.append(css_head);
         joining_sb.append(css_head);
 
-
         //record cluster id and  colors
         StringBuffer clusterSB = new StringBuffer();
         StringBuffer joining_clusterSB = new StringBuffer();
@@ -207,6 +206,9 @@ public class ColorCode {
                     String[] elementList = clusters.get(i).trim().split(",");
                     int length = elementList.length;
                     String previous_Color = "";
+
+
+
                     for (int j = 0; j < length; j++) {
                         String nodeIdStr = elementList[j].replace("[", "").replace("]", "").replace(clusterID + ")", "").trim();
                         if (nodeIdStr.length() > 0) {
@@ -222,22 +224,27 @@ public class ColorCode {
                                     colorMap.put(nodeID, current_color);
 
 //                                    for (Map.Entry<Integer, ArrayList<String>> entry : clusterResultMap.entrySet()) {
-                                    if (initialNumOfClusters < numberOfClusters) {
-                                        ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters);
-                                        for (String clusterStr : currentClusters) {
-                                            if (clusterStr.contains(nodeID + " ,")) {
-                                                int currentNumberOfNodes = cluster.split(",").length - 1;
-                                                int previousNumberOfNodes = clusterStr.split(",").length - 1;
+                                    if (clusterResultMap.size() > 1){
 
-                                                int diff = previousNumberOfNodes - currentNumberOfNodes;
-                                                processingText.writeTofile(numberOfClusters + "," + previousNumberOfNodes + " - " + currentNumberOfNodes + " = " + diff + "\n", analysisDir + "LOC_split.txt");
+                                        if (initialNumOfClusters < numberOfClusters) {
+                                            ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters-1);
 
+                                            for (String clusterStr : currentClusters) {
+
+                                                if (clusterStr.contains(nodeID + " ,")) {
+                                                    int currentNumberOfNodes = cluster.split(",").length - 1;
+                                                    int previousNumberOfNodes = clusterStr.split(",").length - 1;
+
+                                                    int diff = previousNumberOfNodes -currentNumberOfNodes ;
+                                                    processingText.writeTofile(numberOfClusters + "," + previousNumberOfNodes  + " - " + currentNumberOfNodes + " = " + diff + "\n", analysisDir + "LOC_split.txt");
+                                                }
                                             }
-                                        }
 //                                        }
 
+                                        }
+                                }else{
+                                        initialNumOfClusters=numberOfClusters;
                                     }
-
 
                                 }
                                 afterJoining_color = current_color;
@@ -488,7 +495,7 @@ public class ColorCode {
             //write code.html
             iofunc.rewriteFile(iofunc.readResult(htmlfilePath + headtxt).replace("style.css", numberOfClusters + ".css"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + html);
-
+            Thread.sleep(100);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + sourceCodeTxt), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + endtxt), analysisDir + html);
@@ -523,6 +530,8 @@ public class ColorCode {
             iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + "_join.color"), analysisDir + numberOfClusters + "_joiningTable.html");
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

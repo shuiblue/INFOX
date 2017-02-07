@@ -16,7 +16,7 @@ public class Main {
     static AnalyzingRepository analyzeRepo = new AnalyzingRepository();
     static String sourcecodeDir;
     static String analysisDirName = "DPGraph";
-    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/IfdefGroundTruth";
+    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin";
     static final String FS = File.separator;
     static ArrayList<int[]> parameterArray = new ArrayList<>();
     /**
@@ -52,19 +52,25 @@ public class Main {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro = 5; numOfTargetMacro <= 5; numOfTargetMacro++) {
+//for mozilla
+//                    String testCaseDir = sourcecodeDir + analysisDirName + FS;
+//                    int[] param = new int[]{};
+//                    analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir, param, re);
+//for mozilla
+
+                    for (int numOfTargetMacro =4; numOfTargetMacro <= 6; numOfTargetMacro++) {
                         /** generating the parameters for creating dependency graph  **/
                         parameterArray = getParameterSetting(numOfTargetMacro, groundTruth);
 
                         /**  testCase specifys the repository that need to be parsed.  **/
                         //TODO: set subdir name for multiple tests
-                        for (int i = 5; i <= 5; i++) {
+                        for (int i = 2; i <= 6; i++) {
                             String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                             String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                             System.out.println("~~~~~~~current con1figuration: " + i + "~~");
                             for (int[] param : parameterArray) {
                                 System.out.println(testCaseDir);
-//                                analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir, param, re);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir, param, re);
                                 analyzeRepo.analyzeRepository(sourcecodeDir, testCaseDir_macrosFromOneFile, param, re);
                             }
                         }

@@ -12,6 +12,7 @@ import java.util.*;
 public class GenerateCombination {
 
     static HashSet<HashSet<Integer>> allPairs = new HashSet<>();
+    static HashSet<HashSet<String>> allPairs_string = new HashSet<>();
 
     /**
      * This function generates all the pairs of the set
@@ -35,6 +36,25 @@ public class GenerateCombination {
         }
 
         return allPairs;
+    }
+
+    public static HashSet<HashSet<String>> getAllPairs_string(HashSet<String> set) {
+        List<String> list = new ArrayList<>(set);
+        String first = list.remove(0);
+        for (String node : list) {
+            HashSet<String> currentPair = new HashSet<>();
+            currentPair.add(first);
+            currentPair.add(node);
+            allPairs_string.add(currentPair);
+        }
+        if (set.size() > 2) {
+            set.remove(first);
+            getAllPairs_string(set);
+        } else {
+            allPairs_string.add(set);
+        }
+
+        return allPairs_string;
     }
 
     public static void main(String[] args) {

@@ -41,6 +41,9 @@ public class AnalyzingRepository {
         boolean createEdgeForConsecutiveLines = parameters[3] == 1 ? true : false;
         boolean directedGraph = parameters[4] == 1 ? true : false;
 
+//        boolean createEdgeForConsecutiveLines = true;
+//        boolean directedGraph = false;
+
 
         String testDir = "";
         for (int index = 0; index <= 4; index++) {
@@ -48,17 +51,19 @@ public class AnalyzingRepository {
         }
 
         String analysisDir = testCaseDir + testDir + FS;
+//        String analysisDir = testCaseDir + testDir;
         System.out.println("~~~~~~~current configuration: " + testDir + "~~");
         new File(analysisDir).mkdir();
 
         /**  Generating Dependency Graphs for current test case/project  **/
-//        if (!directedGraph) {
-//            DependencyGraph dependencyGraph = new DependencyGraph();
+        if (!directedGraph) {
+            DependencyGraph dependencyGraph = new DependencyGraph();
+            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, testCaseDir, testDir,createEdgeForConsecutiveLines,re);
 //            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
-//        }
-//
-//        /** Community Detection  **/
-//        new R_CommunityDetection().detectingCommunitiesWithIgraph(testCaseDir, testDir, numOfCuts, re, directedGraph);
+        }
+
+        /** Community Detection  **/
+        new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir,testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
         AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir);
@@ -70,7 +75,6 @@ public class AnalyzingRepository {
 //        /** parse commit msg for each node **/
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
-
 
 
         /**  calculate tfidf  to identifing keywords from each cluster**/
