@@ -18,20 +18,25 @@ public class R_CommunityDetection {
     //    HashSet<String> upstreamEdge;
     HashMap<Integer, Boolean> checkedEdges;
     Graph originGraph;
-    static String  sourcecodeDir = "";
-
-    static String upstreamNodeTxt = "/upstreamNode.txt";
-    static String forkAddedNodeTxt = "/forkAddedNode.txt";
+    String sourcecodeDir = "";
+    String analysisDirName = "";
+    String upstreamNodeTxt = "/upstreamNode.txt";
+    String forkAddedNodeTxt = "/forkAddedNode.txt";
 
     public ArrayList<Integer> cutSequence;
     ProcessingText ioFunc = new ProcessingText();
-    HashMap<Integer, Double> modularityMap;
-    static int bestCut;
+    HashMap<Integer, double[]> modularityMap;
+//    int bestCut;
     Rengine re = null;
     static final String FS = File.separator;
     //    double[][] shortestPathMatrix;
-    static double[][] edgelist;
-    static String[] nodelist;
+    double[][] edgelist;
+    String[] nodelist;
+
+    int pre_numberOfCommunities = 0;
+    int current_numberOfCommunities = 0;
+    ArrayList<Integer> listOfNumberOfCommunities = new ArrayList<>();
+
 
     /**
      * This methods is detecting communities for changedCode.pajek.net, which is the graph for new code.
@@ -42,8 +47,9 @@ public class R_CommunityDetection {
      * @param re
      * @return
      */
-    public int detectingCommunitiesWithIgraph(String sourcecodeDir,String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph) {
-        this.sourcecodeDir=sourcecodeDir;
+    public boolean detectingCommunitiesWithIgraph(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph) {
+        this.sourcecodeDir = sourcecodeDir;
+        this.analysisDirName = analysisDirName;
         modularityArray = new ArrayList<>();
         checkedEdges = new HashMap<>();
         cutSequence = new ArrayList<>();
@@ -55,15 +61,6 @@ public class R_CommunityDetection {
 //        re.eval(".libPaths('C:/Users/shuruizDocuments/R/win-library/3.3/rJava/jri/x64)");
 //        re.eval(".libPaths('C:/Users/shuruiz/Documents/R/win-library/3.3')");
         re.eval("library(igraph)");
-
-        /*-------    calculating distance between clusters ----------
-//        re.eval("completeGraph<-read.graph(\"" + fileDir + "/complete.pajek.net\", format=\"pajek\")");
-//        re.eval("completeGraph<- simplify(comGraph)");
-////        re.eval("completeGraph<-as.undirected(completeGraph)\n");
-//        re.eval("E(completeGraph)$weight <- 1");
-//        REXP shortestPath_R = re.eval("distMatrix <- shortest.paths(completeGraph, v=V(completeGraph), to=V(completeGraph))");
-//        shortestPathMatrix = shortestPath_R.asMatrix();
-        -----------*/
         String analysisDir = testCaseDir + testDir + FS;
         System.getProperty("java.library.path");
 
@@ -72,55 +69,62 @@ public class R_CommunityDetection {
         re.eval("oldg<-read_graph(\"" + testCaseDir + "changedCode.pajek.net\", format=\'pajek\')");
         // removes the loop and/or multiple edges from a graph.
         re.eval("g<-simplify(oldg)");
-
         re.eval("originalg<-g");
 
         // get original graph
         REXP edgelist_R = re.eval("cbind( get.edgelist(g) , round( E(g)$weight, 3 ))", true);
         REXP nodelist_R = re.eval("get.vertex.attribute(g)$id", true);
-        edgelist = edgelist_R.asDoubleMatrix();
-        nodelist = (String[]) nodelist_R.getContent();
-        originGraph = new Graph(nodelist, edgelist, null, 0);
 
-        HashMap<Integer, String> nodeMap = originGraph.getNodelist();
-        printOriginNodeList(nodeMap, analysisDir);
+        if(edgelist_R!=null) {
+            edgelist = edgelist_R.asDoubleMatrix();
+            nodelist = (String[]) nodelist_R.getContent();
+            originGraph = new Graph(nodelist, edgelist, null, 0);
 
-        File upstreamNodeFile = new File(analysisDir + upstreamNodeTxt);
-        if (upstreamNodeFile.exists()) {
-            //get nodes/edges belong to upstream
-            storeNodes(analysisDir, upstreamNodeTxt);
-        }
-        //get fork added node
-        File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
-        if (forkAddedFile.exists()) {
-            storeNodes(testCaseDir, forkAddedNodeTxt);
-        }
+            HashMap<Integer, String> nodeMap = originGraph.getNodelist();
+            printOriginNodeList(nodeMap, analysisDir);
+
+            File upstreamNodeFile = new File(analysisDir + upstreamNodeTxt);
+            if (upstreamNodeFile.exists()) {
+                //get nodes/edges belong to upstream
+                storeNodes(analysisDir, upstreamNodeTxt);
+            }
+            //get fork added node
+            File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
+            if (forkAddedFile.exists()) {
+                storeNodes(testCaseDir, forkAddedNodeTxt);
+            }
 
 //        upstreamEdge = findUpstreamEdges(originGraph, fileDir);
 
-        //print old edge
-        ioFunc.rewriteFile("", analysisDir + "clusterTMP.txt");
-        //initialize removedEdge Map, all the edges have not been removed, so the values are all false
-        for (int i = 0; i < edgelist.length; i++) {
-            checkedEdges.put(i + 1, false);
-        }
-        int cutNum = 1;
-        while (checkedEdges.values().contains(false)) {
-//            if (currentIteration <= numOfIteration) {
-            if (listOfNumberOfCommunities.size() <= numOfcut) {
-                //count betweenness for current graph
-                calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph);
-                cutNum++;
-            } else {
-                break;
+            //print old edge
+            ioFunc.rewriteFile("", analysisDir + "clusterTMP.txt");
+            //initialize removedEdge Map, all the edges have not been removed, so the values are all false
+            for (int i = 0; i < edgelist.length; i++) {
+                checkedEdges.put(i + 1, false);
             }
-        }
+            int cutNum = 1;
+            while (checkedEdges.values().contains(false)) {
+//            if (currentIteration <= numOfIteration) {
+                if (listOfNumberOfCommunities.size() <= numOfcut) {
+                    //count betweenness for current graph
+                    calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numOfcut);
+                    cutNum++;
+                } else {
+                    break;
+                }
+            }
+            /** find best modularity but not fit for INFOX**/
+//        findBestClusterResult(originGraph, cutSequence, analysisDir);
+//           writeToModularity_Betweenness_CSV(analysisDir);
 
-        findBestClusterResult(originGraph, cutSequence, analysisDir);
-        writeToModularityCSV(analysisDir);
-        re.end();
-        System.out.println("\nBye.");
-        return bestCut;
+            re.end();
+            System.out.println("\nBye.");
+        }else{
+            re.end();
+            System.out.println("no edge");
+            return false;
+        }
+        return  true;
     }
 
     /**
@@ -148,14 +152,15 @@ public class R_CommunityDetection {
         }
     }
 
-    private void writeToModularityCSV(String fileDir) {
+    private void writeToModularity_Betweenness_CSV(String fileDir) {
         StringBuffer csv = new StringBuffer();
         Iterator it = modularityMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry node = (Map.Entry) it.next();
-            csv.append(node.getKey() + "," + node.getValue() + "\n");
+            double[] modularity_betweenness = (double[]) node.getValue();
+            csv.append(node.getKey() + "," + modularity_betweenness[0] + "," + modularity_betweenness[1] + "\n");
         }
-        ioFunc.rewriteFile(csv.toString(), fileDir + "modularity.csv");
+        ioFunc.rewriteFile(csv.toString(), fileDir + "modularity_betweenness.csv");
 //        ioFunc.rewriteFile(csv.toString(), fileDir + "/modularity.csv");
 
     }
@@ -172,46 +177,6 @@ public class R_CommunityDetection {
     }
 
 
-//    private HashSet<String> findUpstreamEdges(Graph originGraph, String filePath) {
-//        HashSet<String> upstreamEdge = new HashSet<>();
-//        HashMap<Integer, String> allEdges = originGraph.getEdgelist();
-//        HashMap<Integer, String> allNodes = originGraph.getNodelist();
-//
-//        //Print upstream Edge
-//        StringBuffer print = new StringBuffer();
-//        print.append("Upstream Edgelist:\n");
-//
-//        Iterator it_e = allEdges.entrySet().iterator();
-//        while (it_e.hasNext()) {
-//            Map.Entry edge = (Map.Entry) it_e.next();
-//            int from = Integer.parseInt(edge.getValue().toString().split(",")[0]);
-//            int to = Integer.parseInt(edge.getValue().toString().split(",")[1]);
-//
-//            String from_nodeLabel = allNodes.get(from);
-//            String to_nodeLabel = allNodes.get(to);
-//            if (upstreamNode.size() > 0) {
-//                if (upstreamNode.contains(from_nodeLabel) && upstreamNode.contains(to_nodeLabel)) {
-//                    upstreamEdge.add((String) edge.getValue());
-//                    print.append(edge.getValue() + ": " + allNodes.get(from) + "->" + allNodes.get(to) + "\n");
-//                }
-//            } else if (forkAddedNode.size() > 0) {
-//                if (!forkAddedNode.contains(from_nodeLabel) && !forkAddedNode.contains(to_nodeLabel)) {
-//                    upstreamEdge.add((String) edge.getValue());
-//                    print.append(edge.getValue() + ": " + allNodes.get(from) + "->" + allNodes.get(to) + "\n");
-//                }
-//            }
-//        }
-//        ioFunc.rewriteFile(print.toString(), filePath + "/upstreamEdge.txt");
-////      System.out.print("upstreaEDGE"+upstreamEdge.size());
-//        return upstreamEdge;
-//
-//    }
-
-
-    int pre_numberOfCommunities = 0;
-    int current_numberOfCommunities = 0;
-    ArrayList<Integer> listOfNumberOfCommunities = new ArrayList<>();
-
     /**
      * This function is calling community detection algorithm through igraph lib
      *
@@ -220,7 +185,7 @@ public class R_CommunityDetection {
      * @param testDir
      * @param cutNum
      */
-    public void calculateEachGraph(Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph) {
+    public void calculateEachGraph(Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph, int numofCut) {
         String analysisDir = testCaseDir + testDir + FS;
 
 
@@ -262,8 +227,10 @@ public class R_CommunityDetection {
 
         }
 
-        /**        calculating distance between clusters for joining purpose    **/
-        if (pre_numberOfCommunities != current_numberOfCommunities) {
+        /** calculating distance between clusters for joining purpose
+         * if numofcut == 0 , don't join clusters
+         * **/
+        if (pre_numberOfCommunities != current_numberOfCommunities && numofCut > 0) {
             calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, current_numberOfCommunities, directedGraph);
         }
 
@@ -277,16 +244,16 @@ public class R_CommunityDetection {
 //        minimizeUpstreamEdgeBetweenness(currentGraph);
 
         //modularity find removableEdge
-        int removableEdgeID = findRemovableEdge(currentGraph);
+        String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
 //        if (pre_numberOfCommunities != current_numberOfCommunities) {
-        printEdgeRemovingResult(currentGraph, analysisDir, cutNum);
+        printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1]);
         printMemebershipOfCurrentGraph(clusters, analysisDir);
 //        }
-        modularityMap.put(cutNum, modularity);
+        modularityMap.put(cutNum, new double[]{modularity, Double.parseDouble(edgeID_maxBetweenness[1])});
         modularityArray.add(modularity);
 
         //remove edge
-        re.eval("g<-g-edge(\"" + removableEdgeID + "\")");
+        re.eval("g<-g-edge(\"" + edgeID_maxBetweenness[0] + "\")");
         pre_numberOfCommunities = current_numberOfCommunities;
 
     }
@@ -305,14 +272,16 @@ public class R_CommunityDetection {
         HashMap<ArrayList<Integer>, Integer> distanceMatrix = new HashMap<>();
         StringBuffer sb = new StringBuffer();
         HashMap<Integer, double[]> shortestDistanceOfNodes = new HashMap<>();
-        String filePath = ("comGraph<-read.graph(\"" + sourcecodeDir + "DPGraph/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
+        String filePath = ("comGraph<-read.graph(\"" + sourcecodeDir + analysisDirName + "/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
         re.eval(filePath);
         re.eval("scomGraph<- simplify(comGraph)");
 
         if (!directedGraph) {
-            re.eval("completeGraph<-as.undirected(scomGraph)");
+            REXP g = re.eval("completeGraph<-as.undirected(scomGraph)");
+            System.out.print("");
         } else {
-            re.eval("completeGraph<-scomGraph");
+            REXP g = re.eval("completeGraph<-scomGraph");
+            System.out.print("");
         }
 
         for (ArrayList<Integer> pair : combination) {
@@ -324,7 +293,7 @@ public class R_CommunityDetection {
                 if (shortestDistanceOfNodes.get(c1) == null) {
 
                     String c1_array_cmd = "distMatrixc1 <- shortest.paths(completeGraph, v=\"" + c1 + "\", to=V(completeGraph))";
-                   re.eval(c1_array_cmd);
+                    re.eval(c1_array_cmd);
                     REXP shortestPath_R_c1 = re.eval("distMatrixc1");
 
                     c1_array = shortestPath_R_c1.asDoubleArray();
@@ -338,7 +307,6 @@ public class R_CommunityDetection {
 
                     if (c2 < c1_array.length) {
                         double c1_c2 = c1_array[c2];
-//                        System.out.println(c1 + "+" + c2 + " " + c1_c2);
 
                         if (shortestPath > c1_c2) {
                             shortestPath = c1_c2;
@@ -348,7 +316,7 @@ public class R_CommunityDetection {
             }
             distanceMatrix.put(pair, (int) shortestPath);
 
-            System.out.println("---" + pair.get(0) + "---" + pair.get(1) + "-------" + shortestPath);
+//            System.out.println("---" + pair.get(0) + "---" + pair.get(1) + "-------" + shortestPath);
 
 
         }
@@ -450,13 +418,16 @@ public class R_CommunityDetection {
      * @param g
      * @return
      */
-    public int findRemovableEdge(Graph g) {
-        int maxBetEdgeID = findMaxNumberLocation(g.getBetweenness()) + 1;
+    public String[] findRemovableEdge(Graph g) {
+        String[] edgeID_maxBetweenness = new String[2];
+        edgeID_maxBetweenness = findMaxNumberLocation(g.getBetweenness());
+        int maxBetEdgeID = Integer.parseInt(edgeID_maxBetweenness[0]) + 1;
+
         int oldEdgeID = findCorrespondingEdgeInOriginGraph(maxBetEdgeID, g);
         checkedEdges.put(oldEdgeID, true);
         cutSequence.add(oldEdgeID);
         g.setRemovableEdgeLable(g.getEdgelist().get(maxBetEdgeID));
-        return maxBetEdgeID;
+        return edgeID_maxBetweenness;
     }
 
 //    private void minimizeUpstreamEdgeBetweenness(Graph g) {
@@ -492,7 +463,8 @@ public class R_CommunityDetection {
      * @param doubleArray
      * @return location of the number
      */
-    public int findMaxNumberLocation(double[] doubleArray) {
+    public String[] findMaxNumberLocation(double[] doubleArray) {
+        String[] edgeID_maxBetweenness = new String[2];
         int loc = 0;
         double max = doubleArray[0];
         for (int counter = 1; counter < doubleArray.length; counter++) {
@@ -501,7 +473,7 @@ public class R_CommunityDetection {
                 loc = counter;
             }
         }
-        return loc;
+        return new String[]{String.valueOf(loc+1), String.valueOf(max)};
     }
 
     /**
@@ -529,7 +501,7 @@ public class R_CommunityDetection {
      * @param filePath
      * @param cutNum
      */
-    public void printEdgeRemovingResult(Graph g, String filePath, int cutNum) {
+    public void printEdgeRemovingResult(Graph g, String filePath, int cutNum, String lastRemovedEdgeBetweenness) {
         StringBuffer print = new StringBuffer();
         print.append("\n--------Graph-------\n");
         print.append("** " + cutNum + "edges has been removed **\n");
@@ -543,6 +515,7 @@ public class R_CommunityDetection {
         int weight = Integer.parseInt(removableEdge.split(",")[2]);
         String edgeNodes = originGraph.getNodelist().get(from) + "->" + originGraph.getNodelist().get(to);
         print.append("max between edge id:" + edgeId + "-" + removableEdge + "(" + edgeNodes + " weight= " + weight + ")");
+        print.append("\nlatest removed edge betweenness:" + lastRemovedEdgeBetweenness);
         double modularity = g.getModularity();
         print.append("\nModularity: " + modularity);
         ioFunc.writeTofile(print.toString(), filePath + "/clusterTMP.txt");
@@ -559,7 +532,7 @@ public class R_CommunityDetection {
      */
     public String findBestClusterResult(Graph g, ArrayList<Integer> cutSequence, String filePath) {
         StringBuffer result = new StringBuffer();
-        bestCut = findMaxNumberLocation(modularityArray) + 1;
+       int bestCut = findMaxNumberLocation(modularityArray) + 1;
         for (int i = 0; i < bestCut; i++) {
             result.append(cutSequence.get(i) + ",");
         }

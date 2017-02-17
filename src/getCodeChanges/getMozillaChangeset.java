@@ -18,11 +18,11 @@ public class getMozillaChangeset {
     public static void checkAvailableChangeSet() {
 
 
-        processingText.rewriteFile("", "/Users/shuruiz/Work/Open Source Project/Mozilla/AvailableBugIdList.txt");
+        processingText.rewriteFile("", "/Users/shuruiz/Box Sync/INFOX-doc/experiment/AvailableFirefox_BugIdList.txt");
         StringBuilder stringBuilder = new StringBuilder();
         List<String> bugidList = new ArrayList<>();
 
-        String fileName = "/Users/shuruiz/Work/Open Source Project/Mozilla/bugs-2017-01-16.csv";
+        String fileName = "/Users/shuruiz/Box Sync/INFOX-doc/experiment/feature.csv";
 
         try (Stream<String> lines = Files.lines(Paths.get(fileName))) {
             List<List<String>> values = lines.map(line -> Arrays.asList(line.split(","))).collect(Collectors.toList());
@@ -69,7 +69,7 @@ public class getMozillaChangeset {
 
 
         }
-        processingText.writeTofile(builder.toString(), "/Users/shuruiz/Work/Open Source Project/Mozilla/AvailableBugIdList.txt");
+        processingText.writeTofile(builder.toString(), "/Users/shuruiz/Box Sync/INFOX-doc/experiment/AvailableFirefox_BugIdList.txt");
     }
 
     public static void getCommitChangeCfile() {
@@ -168,8 +168,8 @@ public class getMozillaChangeset {
         String[] filePath = {
                 "js/src/jsbuiltins.cpp",
                 "js/src/jsmath.cpp"
-               };
-        processingText.rewriteFile("","/Users/shuruiz/Work/Open Source Project/Mozilla/forkAddedNode.txt");
+        };
+        processingText.rewriteFile("", "/Users/shuruiz/Work/Open Source Project/Mozilla/forkAddedNode.txt");
         StringBuilder sb = new StringBuilder();
         for (String file : filePath) {
             try {
@@ -185,7 +185,7 @@ public class getMozillaChangeset {
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith(revision + ":")) {
                         String newFileName = processingText.changeFileName(file);
-                        sb.append(newFileName+"-"+lineNumber+"\n");
+                        sb.append(newFileName + "-" + lineNumber + "\n");
                     }
                     lineNumber++;
                 }
@@ -197,15 +197,35 @@ public class getMozillaChangeset {
                 e.printStackTrace();
             }
         }
-        processingText.writeTofile(sb.toString(),"/Users/shuruiz/Work/Open Source Project/Mozilla/forkAddedNode.txt");
+        processingText.writeTofile(sb.toString(), "/Users/shuruiz/Work/Open Source Project/Mozilla/forkAddedNode.txt");
     }
 
 
+    public static void filterOutNonFeatureBug() {
+        String line = "";
+        String input = "mozilla_bug.csv";
+        String output = "feature.csv";
+        String path = "/Users/shuruiz/Box Sync/INFOX-doc/experiment/";
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(path + input))) {
+            while ((line = br.readLine()) != null) {
+                if (line.split(",")[6].contains("feature")) {
+                    sb.append(line + "\n");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        new ProcessingText().rewriteFile(sb.toString(), path + output);
+    }
+
     public static void main(String[] args) {
-//        checkAvailableChangeSet();
-//        getCommitChangeCfile();
+        checkAvailableChangeSet();
+        getCommitChangeCfile();
 
         getChangedCode();
+
+//        filterOutNonFeatureBug();
     }
 
 

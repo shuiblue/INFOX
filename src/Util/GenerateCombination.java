@@ -11,15 +11,21 @@ import java.util.*;
 
 public class GenerateCombination {
 
-    static HashSet<HashSet<Integer>> allPairs = new HashSet<>();
+    static HashSet<HashSet<Integer>> allPairs;
     static HashSet<HashSet<String>> allPairs_string = new HashSet<>();
+
+    public GenerateCombination() {
+        allPairs = new HashSet<>();
+    }
 
     /**
      * This function generates all the pairs of the set
+     *
      * @param set
      * @return
      */
     public static HashSet<HashSet<Integer>> getAllPairs(HashSet<Integer> set) {
+
         List<Integer> list = new ArrayList<>(set);
         Integer first = list.remove(0);
         for (Integer node : list) {

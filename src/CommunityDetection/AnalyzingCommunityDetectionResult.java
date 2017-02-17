@@ -9,21 +9,21 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 /**
  * Created by shuruiz on 8/29/16.
  */
 public class AnalyzingCommunityDetectionResult {
-    ProcessingText processingText = new ProcessingText();
-    String analysisDir, testCaseDir, sourcecodeDir, testDir;
-    static String nodeListTxt = "/NodeList.txt";
-    static String forkAddedNodeTxt = "forkAddedNode.txt";
 
-    static String expectTxt = "expectCluster.txt";
-    static String forkAddedNode = "";
+    String analysisDir, testCaseDir, sourcecodeDir, testDir;
+    String nodeListTxt = "/NodeList.txt";
+    String forkAddedNodeTxt = "forkAddedNode.txt";
+    String expectTxt = "expectCluster.txt";
+    String forkAddedNode = "";
     int initialNumOfClusters = 0;
-    HashMap<Integer, ArrayList<String>> clusterResultMap = new HashMap<>();
+    HashMap<Integer, ArrayList<String>> clusterResultMap ;
     static HashMap<Integer, String> nodeMap = new HashMap<>();
 
 
@@ -32,38 +32,32 @@ public class AnalyzingCommunityDetectionResult {
     List<String> bgcolorList = BackgroundColor.getExpectColorList();
     static final String FS = File.separator;
 
-    static ProcessingText iofunc = new ProcessingText();
-    static int BIG_SIZE = 50;
 
+    static boolean isMS_CLUSTERCHANGES = false;
 
-    public AnalyzingCommunityDetectionResult(String sourcecodeDir, String testCaseDir, String testDir) {
+    public AnalyzingCommunityDetectionResult(String sourcecodeDir, String testCaseDir, String testDir, boolean isMS_CLUSTERCHANGES) {
         this.sourcecodeDir = sourcecodeDir;
         this.analysisDir = testCaseDir + testDir + FS;
         this.testCaseDir = testCaseDir;
         this.testDir = testDir;
+        this.isMS_CLUSTERCHANGES = isMS_CLUSTERCHANGES;
     }
 
 
-    //    public void generatingClusteringTable(String analysisDir, int numberOfCommunities, ArrayList<String> macroList) {
-    public void generatingClusteringTable(String testCaseDir, String testDir, int numberOfCommunities, boolean isJoiningTable) {
+    public void generatingClusteringTable(String testCaseDir, String testDir, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold) {
+        ProcessingText processingText = new ProcessingText();
         this.analysisDir = testCaseDir + testDir + FS;
         this.testCaseDir = testCaseDir;
         HashMap<String, HashMap<String, Integer>> resultTable = new HashMap<>();
-
-//        for (int i = 0; i < macroList.size(); i++) {
-//            resultTable.put(bgcolorList.get(i), new HashMap<>());
-//        }
-
 
         String filePath;
         if (!isJoiningTable) {
             filePath = analysisDir + numberOfCommunities + "_colorTable.txt";
         } else {
-            filePath = analysisDir + numberOfCommunities + "_colorTable_join.txt";
+            filePath = analysisDir + numberOfCommunities + "_colorTable_join_bigSize-" + clusterSizeThreshold + ".txt";
         }
         try {
 
-            Thread.sleep(1000);
             String cssString = processingText.readResult(filePath);
             String[] colorArray = cssString.split("\n");
             ArrayList<String> nodeColorList = new ArrayList(Arrays.asList(colorArray));
@@ -96,14 +90,14 @@ public class AnalyzingCommunityDetectionResult {
                 }
             }
 
-            printResultTable(resultTable, communityColorList, numberOfCommunities, isJoiningTable);
+            printResultTable(resultTable, communityColorList, numberOfCommunities, isJoiningTable, clusterSizeThreshold);
 //            printResultTable(resultTable, communityColorList, numberOfCommunities, macroList);
 
-            printClusterDistanceTable(numberOfCommunities);
+            if (!isMS_CLUSTERCHANGES) {
+                printClusterDistanceTable(numberOfCommunities);
+            }
 
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -112,7 +106,7 @@ public class AnalyzingCommunityDetectionResult {
     private void printClusterDistanceTable(int numberOfCommunities) {
         StringBuffer sb = new StringBuffer();
         HashMap<String, String[]> distanceTable = new HashMap<>();
-
+        ProcessingText processingText = new ProcessingText();
         ArrayList<String> clusterIDList = new ArrayList<>();
         String[] colorList;
         String[] distanceList;
@@ -133,7 +127,6 @@ public class AnalyzingCommunityDetectionResult {
             // TODO: table color
 
             HashMap<String, String> idToColorMap = getIdToColorMap(numberOfCommunities, false);
-
             distanceList = processingText.readResult(analysisDir + numberOfCommunities + "_distanceBetweenCommunityies.txt").split("\n");
             for (String d : distanceList) {
                 String[] content = d.split(",");
@@ -179,8 +172,8 @@ public class AnalyzingCommunityDetectionResult {
     }
 
     //    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, ArrayList<String> macroList) {
-    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, boolean isJoiningTable) {
-
+    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold) {
+        ProcessingText processingText = new ProcessingText();
         StringBuffer sb = new StringBuffer();
         Iterator it = resultTable.keySet().iterator();
 
@@ -250,12 +243,12 @@ public class AnalyzingCommunityDetectionResult {
             processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + ".color");
 
         } else {
-            processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + "_join.color");
+            processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + "_join_bigSize-" + clusterSizeThreshold + ".color");
         }
     }
 
     private HashMap<String, String> getIdToColorMap(int numberOfCommunities, boolean isJoiningTable) {
-
+        ProcessingText processingText = new ProcessingText();
         String[] colorList = new String[0];
         try {
             colorList = processingText.readResult(analysisDir + numberOfCommunities + "_clusterColor.txt").split("\n");
@@ -276,6 +269,7 @@ public class AnalyzingCommunityDetectionResult {
     }
 
     private ArrayList<String> getFeatureList() {
+        ProcessingText processingText = new ProcessingText();
         try {
             String[] featureArray = processingText.readResult(testCaseDir + "featureList.txt").split("\n");
             return new ArrayList<>(Arrays.asList(featureArray));
@@ -294,9 +288,9 @@ public class AnalyzingCommunityDetectionResult {
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
         //----for Marlin repo structure----
       */
-    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult() {
-
-
+    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(int clusterSizeThreshold) {
+        clusterResultMap = new HashMap<>();
+        ProcessingText processingText = new ProcessingText();
         String clusterFilePath = analysisDir + "clusterTMP.txt";
         String clusterResultListString = "";
         processingText.rewriteFile("", analysisDir + "edgeCuttingRecord.txt");
@@ -307,20 +301,19 @@ public class AnalyzingCommunityDetectionResult {
         File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
         if (forkAddedFile.exists()) {
             try {
-                forkAddedNode = iofunc.readResult(testCaseDir + forkAddedNodeTxt);
-//                clusterResultListString = iofunc.readResult(clusterFilePath);
+                forkAddedNode = processingText.readResult(testCaseDir + forkAddedNodeTxt);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir, forkAddedNode);
+        ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir, forkAddedNode, isMS_CLUSTERCHANGES);
         try {
             colorCode.createSourceFileHtml();
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            clusterResultListString = iofunc.readResult(clusterFilePath);
+            clusterResultListString = processingText.readResult(clusterFilePath);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -340,8 +333,6 @@ public class AnalyzingCommunityDetectionResult {
                 int numberOfCommunities = (int) clusterInfo[0];
                 if (numberOfCommunities > 1) {
                     int weight = (int) clusterInfo[3];
-//                int numOfCutEdge = clusterInfo[1];
-//                if (numOfCutEdge <= bestcut) {
 
                     if (pre_numberOfCommunites != numberOfCommunities) {
                         result = result.split("communities")[1];
@@ -359,31 +350,37 @@ public class AnalyzingCommunityDetectionResult {
                         HashMap<Integer, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters);
 
 
-                        /**   get joined clusters   **/
-                        HashMap<Integer, HashSet<Integer>> joined_clusters = getJoinedClusters(colorCode, numberOfCommunities, clusters, current_clustering_result);
-
-
                         /** calculating accuracy for clustering result
                          * 0 - true_positive,1 - false_positive, 2 - true_negtive, 3 - false_negtive, 4- accuracy
                          * **/
                         calculatingAccuracy(groundTruthClusters, current_clustering_result, false);
-                        calculatingAccuracy(groundTruthClusters, joined_clusters, true);
+                        colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap, clusterSizeThreshold);
 
 
-                        generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false);
-                        generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true);
+                        if (!isMS_CLUSTERCHANGES) {
+                            /**   get joined clusters   **/
 
 
-                        colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap);
 
-                        colorCode.combineFiles(numberOfCommunities);
+                            HashMap<Integer, HashSet<Integer>> joined_clusters = getJoinedClusters(colorCode, numberOfCommunities, clusters, current_clustering_result, clusterSizeThreshold);
+                            calculatingAccuracy(groundTruthClusters, joined_clusters, true);
+                            generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true, clusterSizeThreshold);
+//                            colorCode.combineFiles(numberOfCommunities, clusterSizeThreshold);
+                        }
+                            generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false, 0);
+
+
+                        colorCode.combineFiles(numberOfCommunities, clusterSizeThreshold);
+
+
                         pre_numberOfCommunites = numberOfCommunities;
 
                         int numberOfCutEdges = (int) clusterInfo[1] - 1;
                         double modularity = clusterInfo[2];
 
+                        double betweenness = clusterInfo[4];
 
-                        processingText.writeTofile(numberOfCommunities + "," + (numberOfCutEdges - previous_cutted_edge_num) + "," + modularity + "," + weight_List + "\n", analysisDir + "edgeCuttingRecord.txt");
+                        processingText.writeTofile(numberOfCommunities + "," + (numberOfCutEdges - previous_cutted_edge_num) + "," + modularity + "," + weight_List + "," + betweenness + "\n", analysisDir + "edgeCuttingRecord.txt");
                         weight_List = weight + "->";
                         previous_cutted_edge_num = numberOfCutEdges;
                     } else {
@@ -395,13 +392,22 @@ public class AnalyzingCommunityDetectionResult {
                 }
             }
         }
-        generateCuttingSummaryTable();
+        generateCuttingSummaryTable(clusterSizeThreshold);
         return clusterResultMap;
     }
 
-    private HashMap<Integer, HashSet<Integer>> getJoinedClusters(ColorCode colorCode, int numberOfCommunities, ArrayList<String> clusters, HashMap<Integer, HashSet<Integer>> current_clustering_result) {
+    /**
+     * This function get joined clusters
+     *
+     * @param colorCode
+     * @param numberOfCommunities
+     * @param clusters
+     * @param current_clustering_result
+     * @return
+     */
+    private HashMap<Integer, HashSet<Integer>> getJoinedClusters(ColorCode colorCode, int numberOfCommunities, ArrayList<String> clusters, HashMap<Integer, HashSet<Integer>> current_clustering_result, int clusterSizeThreshold) {
         /**  get joining result  **/
-        ArrayList<HashSet<String>> closeClusters_list = colorCode.joiningCloseClusters(clusters, numberOfCommunities);
+        ArrayList<HashSet<String>> closeClusters_list = colorCode.joiningCloseClusters(clusters, numberOfCommunities, clusterSizeThreshold);
         HashMap<Integer, HashSet<Integer>> joined_clusters = new HashMap<>();
         joined_clusters.putAll(current_clustering_result);
         System.out.println("#clusters:" + numberOfCommunities);
@@ -412,8 +418,7 @@ public class AnalyzingCommunityDetectionResult {
             int index = 0;
             while (it.hasNext()) {
                 index = Integer.valueOf((String) it.next());
-
-                if (current_clustering_result.get(index).size() < BIG_SIZE) {
+                if (current_clustering_result.get(index).size() < clusterSizeThreshold) {
                     tmp.addAll(current_clustering_result.get(index));
                     joined_clusters.remove(index);
                 }
@@ -455,6 +460,7 @@ public class AnalyzingCommunityDetectionResult {
      * @return
      */
     private String generatingExpectNodeMap() {
+        ProcessingText iofunc = new ProcessingText();
         expectNodeMap = new HashMap<>();
         String expectNode = "";
         try {
@@ -515,7 +521,7 @@ public class AnalyzingCommunityDetectionResult {
         int false_positive = 0;
         int true_negtive = 0;
         int false_negtive = 0;
-
+        ProcessingText processingText = new ProcessingText();
         HashSet<Integer> nodeIDSet = new HashSet<>();
 
         try {
@@ -528,7 +534,6 @@ public class AnalyzingCommunityDetectionResult {
 
             }
 
-            System.out.print("");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -604,7 +609,10 @@ public class AnalyzingCommunityDetectionResult {
      * This function generates the ground truth cluster,
      * The output is a hashmap: key--- clusterID, value--- set of nodeid
      */
-    public void generateGroundTruthMap() {
+    public int[] generateGroundTruthMap() {
+        int[] avg_max_size = new int[2];
+        int avgFeatureSize = 0;
+        groundTruthClusters = new HashMap<>();
         /**get node map  id-> label**/
         //todo :refactoring
         getNodeMap_id_to_label();
@@ -626,11 +634,26 @@ public class AnalyzingCommunityDetectionResult {
                 groundTruthClusters.put(clusterNumber, nodeSet);
             }
         }
+        Iterator it = groundTruthClusters.entrySet().iterator();
+        ArrayList<Integer> sizeList = new ArrayList<>();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            avgFeatureSize += ((HashSet<Integer>) pair.getValue()).size();
+            sizeList.add(((HashSet<Integer>) pair.getValue()).size());
+
+        }
+
+        Collections.sort(sizeList);
+        int maxSize = sizeList.get(sizeList.size()-1);
+        avgFeatureSize = avgFeatureSize / groundTruthClusters.size();
+
+        return new int[]{avgFeatureSize, maxSize};
     }
 
-    private void generateCuttingSummaryTable() {
+    private void generateCuttingSummaryTable(int clusterSizeThreshold) {
+        ProcessingText processingText = new ProcessingText();
         StringBuilder sb_csv = new StringBuilder();
-        sb_csv.append("#Clusters,#RemovedEdges,modularity,#LOC Split,#weight of cut edges,accuracy,Joined accuracy\n");
+        sb_csv.append("Clusters,RemovedEdges,modularity,latest betweenness,LOC Split,weight of cut edges,accuracy,Joined accuracy\n");
         String edgeCuttingRecord = "";
         String loc_splitting = "";
         String accuracyStr = "";
@@ -656,11 +679,15 @@ public class AnalyzingCommunityDetectionResult {
             String numOfRemovedEdges = cut_content[1];
             String modularity = cut_content[2];
             String numOfLOCSplit = loc_splittingArray[i].split(",")[1];
-            String weight_list = "";
+            String weight_list = "0";
             if (cut_content.length > 3) {
                 String weightList_origin = cut_content[3];
-                weight_list = weightList_origin.substring(0, weightList_origin.length() - 2);
+                if (weightList_origin.length() > 0) {
+                    weight_list = weightList_origin.substring(0, weightList_origin.length() - 2);
+                }
             }
+
+            String betweenness = cut_content[4];
 
             /**  organizing accuracy result [0 - TRUE_positive,1 - false_positive, 2 - true_negtive, 3 - false_negtive, 4- accuracy]
              * (true_positive + true_negtive) / (true_positive + false_positive + false_negtive + true_negtive)
@@ -678,23 +705,26 @@ public class AnalyzingCommunityDetectionResult {
 //                    + " = " + TP + " + " + TN
 //                    + " / "
 //                    + TP + " + " + FP + " + " + FN + " + " + TN;
+            String joined_accruacy = "";
+            if (!isMS_CLUSTERCHANGES) {
+                String[] joined_accuracy_oneCut = joined_accuracy_Array[i].split(",");
 
-            String[] joined_accuracy_oneCut = joined_accuracy_Array[i].split(",");
+                int joined_TP = Integer.parseInt(joined_accuracy_oneCut[0]);
+                int joined_FP = Integer.parseInt(joined_accuracy_oneCut[1]);
+                int joined_TN = Integer.parseInt(joined_accuracy_oneCut[2]);
+                int joined_FN = Integer.parseInt(joined_accuracy_oneCut[3]);
+                float joined_AC = Float.parseFloat(joined_accuracy_oneCut[4]);
 
-            int joined_TP = Integer.parseInt(joined_accuracy_oneCut[0]);
-            int joined_FP = Integer.parseInt(joined_accuracy_oneCut[1]);
-            int joined_TN = Integer.parseInt(joined_accuracy_oneCut[2]);
-            int joined_FN = Integer.parseInt(joined_accuracy_oneCut[3]);
-            float joined_AC = Float.parseFloat(joined_accuracy_oneCut[4]);
-
-            String joined_accruacy = joined_AC+"";
+                joined_accruacy = joined_AC + "";
 //                    + " = " + joined_TP + " + " + joined_TN
 //                    + " / "
 //                    + joined_TP + " + " + joined_FP + " + " + joined_FN + " + " + joined_TN;
-
-            sb_csv.append(numOfClusters + "," + numOfRemovedEdges + "," + modularity + "," + numOfLOCSplit + "," + weight_list + "," + accruacy + "," + joined_accruacy + "\n");
+            } else {
+                joined_accruacy = "MS_no_join";
+            }
+            sb_csv.append(numOfClusters + "," + numOfRemovedEdges + "," + modularity + "," + betweenness + "," + numOfLOCSplit + "," + weight_list + "," + accruacy + "," + joined_accruacy + "\n");
         }
-        processingText.rewriteFile(sb_csv.toString(), analysisDir + "resultTable.csv");
+        processingText.rewriteFile(sb_csv.toString(), analysisDir + "resultTable_joinThreshold-" + clusterSizeThreshold + ".csv");
 
     }
 
@@ -708,18 +738,25 @@ public class AnalyzingCommunityDetectionResult {
      */
 
     private double[] getClusterInfo(String s) {
-        double[] clusterInfo = new double[4];
+        double[] clusterInfo = new double[5];
         //get weight
         int weight_from = s.indexOf("weight=") + 8;
         int weight_to = s.indexOf(")");
         String weight = s.substring(weight_from, weight_to);
         clusterInfo[3] = Double.parseDouble(weight);
 
+        //get latest removed edge betweenness
+        int betweenness = s.indexOf(" betweenness:") + 13;
+
 
         //get modularity
         int modularity_loc = s.indexOf("Modularity") + 11;
         //get community number
         int start = s.indexOf("---");
+
+
+        String betweenness_str = s.substring(betweenness, modularity_loc - 11).trim();
+        clusterInfo[4] = Double.parseDouble(betweenness_str);
 
         String modularity = s.substring(modularity_loc, start - 1);
         clusterInfo[2] = Double.parseDouble(modularity);

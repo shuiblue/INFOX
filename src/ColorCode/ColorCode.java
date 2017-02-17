@@ -32,20 +32,22 @@ public class ColorCode {
     ArrayList<HashSet<String>> closeClusterList = new ArrayList<>();
     HashMap<HashSet<String>, String> closeClusters_ColorMap = new HashMap<>();
     HashMap<String, String> expectNodeMap = new HashMap<>();
-    int initialNumOfClusters = 0;
+    static int initialNumOfClusters = 0;
 
-    public ColorCode(String sourcecodeDir, String testCaseDir, String testDir,String forkAddedNode) {
+    static boolean isMS_CLUSTERCHANGES = false;
+
+    public ColorCode(String sourcecodeDir, String testCaseDir, String testDir, String forkAddedNode, boolean isMS_CLUSTERCHANGES) {
         this.sourcecodeDir = sourcecodeDir;
         this.analysisDir = testCaseDir + testDir + FS;
         this.testCaseDir = testCaseDir;
         this.forkAddedNode = forkAddedNode;
+        this.isMS_CLUSTERCHANGES = isMS_CLUSTERCHANGES;
     }
 
     public void parseSourceCodeFromFile(String fileName) {
         File currentFile = new File(sourcecodeDir + fileName);
         //            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
         if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
-//            System.out.print(fileName + "\n");
             String newFileName;
             newFileName = iofunc.changeFileName(fileName);
             if (forkAddedNode.contains(newFileName)) {
@@ -117,14 +119,13 @@ public class ColorCode {
         }
     }
 
-    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap,HashMap<Integer, String> nodeMap , HashMap<String, String> expectNodeMap) {
+    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap, HashMap<Integer, String> nodeMap, HashMap<String, String> expectNodeMap,int clusterSizeThreshold) {
         ArrayList<String> distanceArray;
 
         BackgroundColor bgcolor = new BackgroundColor();
 
 //        HashMap<String, String> clusterColorMap = new HashMap<>();
 //        HashMap<String, String> join_clusterColorMap = new HashMap<>();
-
 
 
         //get upstream Node
@@ -208,7 +209,6 @@ public class ColorCode {
                     String previous_Color = "";
 
 
-
                     for (int j = 0; j < length; j++) {
                         String nodeIdStr = elementList[j].replace("[", "").replace("]", "").replace(clusterID + ")", "").trim();
                         if (nodeIdStr.length() > 0) {
@@ -224,10 +224,10 @@ public class ColorCode {
                                     colorMap.put(nodeID, current_color);
 
 //                                    for (Map.Entry<Integer, ArrayList<String>> entry : clusterResultMap.entrySet()) {
-                                    if (clusterResultMap.size() > 1){
+                                    if (clusterResultMap.size() > 1) {
 
                                         if (initialNumOfClusters < numberOfClusters) {
-                                            ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters-1);
+                                            ArrayList<String> currentClusters = clusterResultMap.get(numberOfClusters - 1);
 
                                             for (String clusterStr : currentClusters) {
 
@@ -235,15 +235,15 @@ public class ColorCode {
                                                     int currentNumberOfNodes = cluster.split(",").length - 1;
                                                     int previousNumberOfNodes = clusterStr.split(",").length - 1;
 
-                                                    int diff = previousNumberOfNodes -currentNumberOfNodes ;
-                                                    processingText.writeTofile(numberOfClusters + "," + previousNumberOfNodes  + " - " + currentNumberOfNodes + " = " + diff + "\n", analysisDir + "LOC_split.txt");
+                                                    int diff = previousNumberOfNodes - currentNumberOfNodes;
+                                                    processingText.writeTofile(numberOfClusters + "," + previousNumberOfNodes + " - " + currentNumberOfNodes + " = " + diff + "\n", analysisDir + "LOC_split.txt");
                                                 }
                                             }
 //                                        }
 
                                         }
-                                }else{
-                                        initialNumOfClusters=numberOfClusters;
+                                    } else {
+                                        initialNumOfClusters = numberOfClusters;
                                     }
 
                                 }
@@ -373,22 +373,23 @@ public class ColorCode {
         }
 
         iofunc.rewriteFile(sb.toString(), analysisDir + numberOfClusters + CSS);
-        iofunc.rewriteFile(joining_sb.toString(), analysisDir + numberOfClusters + "_join" + CSS);
         iofunc.rewriteFile(colorTable.toString(), analysisDir + numberOfClusters + "_colorTable.txt");
-        iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + numberOfClusters + "_colorTable_join.txt");
         iofunc.rewriteFile(clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor.txt");
-        iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor_join.txt");
-    }
 
+        iofunc.rewriteFile(joining_sb.toString(), analysisDir + numberOfClusters + "_join_bigSize-" + clusterSizeThreshold + CSS);
+        iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + numberOfClusters +"_colorTable_join_bigSize-" + clusterSizeThreshold + ".txt");
+        iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor_join_bigSize-" + clusterSizeThreshold + ".txt");
+    }
 
 
     /**
      * This function generates ining table, if distance is 2, then join two clusters
      * //todo: other conditions?
+     *
      * @param clusters
      * @param numberOfClusters
      */
-    public ArrayList<HashSet<String>> joiningCloseClusters(ArrayList<String> clusters, int numberOfClusters) {
+    public ArrayList<HashSet<String>> joiningCloseClusters(ArrayList<String> clusters, int numberOfClusters,int clusterSizeThreshold) {
         ArrayList<String> distanceArray;
         String distanceFile = analysisDir + numberOfClusters + "_distanceBetweenCommunityies.txt";
         closeClusterList = new ArrayList<>();
@@ -410,9 +411,9 @@ public class ColorCode {
                     }
                 }
 
-                if (length_cluster_1 > 50 && !bigSizeClusterList.contains(cluster_1)) {
+                if (length_cluster_1 > clusterSizeThreshold && !bigSizeClusterList.contains(cluster_1)) {
                     bigSizeClusterList.add(cluster_1);
-                } else if (length_cluster_2 > 50 && !bigSizeClusterList.contains(cluster_2)) {
+                } else if (length_cluster_2 > clusterSizeThreshold && !bigSizeClusterList.contains(cluster_2)) {
                     bigSizeClusterList.add(cluster_2);
                 }
 
@@ -466,7 +467,6 @@ public class ColorCode {
     }
 
 
-
     private String randomColor() {
         Random rand = new Random();
         float r = (float) (rand.nextFloat() / 2f + 0.5);
@@ -483,7 +483,7 @@ public class ColorCode {
 
     }
 
-    public void combineFiles(int numberOfClusters) {
+    public void combineFiles(int numberOfClusters,int clusterSizeThreshold ) {
         String htmlfilePath = "/Users/shuruiz/Work/MarlinRepo/visualizeHtml/";
 //        String htmlfilePath = "C:\\Users\\shuruiz\\Documents\\visualizeHtml\\";
         String headtxt = "head.txt";
@@ -495,7 +495,6 @@ public class ColorCode {
             //write code.html
             iofunc.rewriteFile(iofunc.readResult(htmlfilePath + headtxt).replace("style.css", numberOfClusters + ".css"), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + html);
-            Thread.sleep(100);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(analysisDir + sourceCodeTxt), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + endtxt), analysisDir + html);
@@ -504,34 +503,32 @@ public class ColorCode {
             iofunc.rewriteFile(iofunc.readResult(htmlfilePath + jsFileHeader), analysisDir + togglejsPath);
             iofunc.writeTofile(jsContent.toString() + "\n});", analysisDir + togglejsPath);
 
-
-            //write color table
-            iofunc.rewriteFile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + numberOfClusters + "_joiningTable.html");
-            iofunc.writeTofile("<h3> ----------------Before Joining-----------------", analysisDir + numberOfClusters + "_joiningTable.html");
-            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + numberOfClusters + "_joiningTable.html");
-            StringBuffer sb = new StringBuffer();
-            sb.append("<h3> ---------clusters could be joined: <br>");
-            for (HashSet<String> list : closeClusterList) {
-                if (list.size() > 0) {
-                    sb.append("[");
-                    for (String s : list) {
-                        sb.append(s + " , ");
+            if (!isMS_CLUSTERCHANGES) {
+                //write color table
+                iofunc.rewriteFile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
+                iofunc.writeTofile("<h3> ----------------Before Joining-----------------", analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
+                iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
+                StringBuffer sb = new StringBuffer();
+                sb.append("<h3> ---------clusters could be joined: <br>");
+                for (HashSet<String> list : closeClusterList) {
+                    if (list.size() > 0) {
+                        sb.append("[");
+                        for (String s : list) {
+                            sb.append(s + " , ");
+                        }
+                        sb.append("] <br>");
                     }
-                    sb.append("] <br>");
                 }
+                sb.append("<h3> ---------big size cluster (#node>50) will not be joined : [ ");
+                for (String bsc : bigSizeClusterList) {
+                    sb.append(bsc + " , ");
+                }
+                sb.append("]");
+                iofunc.writeTofile(sb.toString(), analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
+                iofunc.writeTofile("<h3> ----------------After Joining-----------------", analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
+                iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + "_join_bigSize-" + clusterSizeThreshold + ".color"), analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
             }
-            sb.append("<h3> ---------big size cluster (#node>50) will not be joined : [ ");
-            for (String bsc : bigSizeClusterList) {
-                sb.append(bsc + " , ");
-            }
-            sb.append("]");
-            iofunc.writeTofile(sb.toString(), analysisDir + numberOfClusters + "_joiningTable.html");
-            iofunc.writeTofile("<h3> ----------------After Joining-----------------", analysisDir + numberOfClusters + "_joiningTable.html");
-            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + "_join.color"), analysisDir + numberOfClusters + "_joiningTable.html");
-
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

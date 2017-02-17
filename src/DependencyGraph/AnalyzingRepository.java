@@ -35,41 +35,75 @@ public class AnalyzingRepository {
      *                      5. Directed Graph: T/F (1/0)
      * @param re
      */
-    public void analyzeRepository(String sourcecodeDir, String testCaseDir, int[] parameters, Rengine re) {
+    public void analyzeRepository(String sourcecodeDir, String analysisDirName, String testCaseDir, int[] parameters, Rengine re) {
+
+        boolean isMS_CLUSTERCHANGES;
+
         /**   Set parameters   **/
+        /** param[5]
+         *  1 -- INFOX,
+         *  2--MS,
+         *  3--MS+CF+HIE (NO spliting, joining),
+         *  4--INFOX-(DEF_USE)
+         *  5--INFOX-(CONTROL_FLOW),
+         *  6--INFOX-(HIERARCHY)
+         *  7--INFOX-(Consecutive)
+         *  8--MS-(Consecutive)
+         *  **/
         int numOfCuts = parameters[1];
-        boolean createEdgeForConsecutiveLines = parameters[3] == 1 ? true : false;
+        if (parameters[5] == 2 || parameters[5] == 3 || parameters[5] == 8) {
+            numOfCuts = 0;
+            isMS_CLUSTERCHANGES = true;
+        } else {
+            isMS_CLUSTERCHANGES = false;
+        }
+
+
         boolean directedGraph = parameters[4] == 1 ? true : false;
-
-//        boolean createEdgeForConsecutiveLines = true;
-//        boolean directedGraph = false;
-
-
         String testDir = "";
         for (int index = 0; index <= 4; index++) {
             testDir += parameters[index];
         }
 
         String analysisDir = testCaseDir + testDir + FS;
-//        String analysisDir = testCaseDir + testDir;
         System.out.println("~~~~~~~current configuration: " + testDir + "~~");
         new File(analysisDir).mkdir();
 
         /**  Generating Dependency Graphs for current test case/project  **/
         if (!directedGraph) {
-            DependencyGraph dependencyGraph = new DependencyGraph();
-            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, testCaseDir, testDir,createEdgeForConsecutiveLines,re);
-//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir, createEdgeForConsecutiveLines);
+            DependencyGraph dependencyGraph = new DependencyGraph(parameters[5]);
+            /**  this function extract changed_code_dependency_graph from complete graph**/
+            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
+
+            /**  this function generate all the graph at the same time **/
+//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
         }
 
         /** Community Detection  **/
-        new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir,testCaseDir, testDir, numOfCuts, re, directedGraph);
+        boolean hasEdge = new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph);
 
-        /** Generating html to visualize source code, set background and left side bar color for new code  **/
-        AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir);
-        analyzingCommunityDetectionResult.generateGroundTruthMap();
-        HashMap<Integer, ArrayList<String>> clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult();
-//
+        if (hasEdge) {
+            /** Generating html to visualize source code, set background and left side bar color for new code  **/
+            AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES);
+
+
+            int[] avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
+            HashMap<Integer, ArrayList<String>> clusterList;
+            if (!isMS_CLUSTERCHANGES) {
+                int avgFeatureSize = avgFeatureSize_maxSize[0];
+                int maxFeatureSize = avgFeatureSize_maxSize[1];
+                int clusterSizeThreshold = avgFeatureSize / 2;
+
+                System.out.println("clusterSizeThreshold: " + clusterSizeThreshold);
+                while (clusterSizeThreshold < maxFeatureSize) {
+
+                   clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
+                    clusterSizeThreshold += 10;
+
+                }
+            } else {
+                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0);
+            }
 //        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
 //
 //        /** parse commit msg for each node **/
@@ -77,12 +111,12 @@ public class AnalyzingRepository {
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
 
 
-        /**  calculate tfidf  to identifing keywords from each cluster**/
+            /**  calculate tfidf  to identifing keywords from each cluster**/
 //        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
 //
 //        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
 //        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
 
-
+        }
     }
 }
