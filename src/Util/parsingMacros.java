@@ -141,11 +141,11 @@ public class ParsingMacros {
                     }
                 }
                 /*  for testing Marlin*/
-                targetMacroList = new ArrayList<>();
-                targetMacroList.add("E2_IS_TMC");
-                targetMacroList.add("MESH_BED_LEVELING");
-                targetMacroList.add("REVERSE_MENU_DIRECTION");
-                targetMacroList.add("Z_PROBE_ALLEN_KEY_DEPLOY_3_X");
+//                targetMacroList = new ArrayList<>();
+//                targetMacroList.add("E2_IS_TMC");
+//                targetMacroList.add("MESH_BED_LEVELING");
+//                targetMacroList.add("REVERSE_MENU_DIRECTION");
+//                targetMacroList.add("Z_PROBE_ALLEN_KEY_DEPLOY_3_X");
 
             }
         }
@@ -185,6 +185,7 @@ public class ParsingMacros {
     private boolean noFeatureInteraction(ArrayList<String> selectedMacros, String candidate_macro) {
 
         for (String macro : selectedMacros) {
+            macro = "FAST_PWM_FAN";
             if (macro_to_interactedMacroList.get(candidate_macro) != null && macro_to_interactedMacroList.get(candidate_macro).contains(macro)) {
                 return false;
             }
@@ -383,8 +384,8 @@ public class ParsingMacros {
                     sourcecodeDir = filePath.toString() + FS;
                     parsingMacros.createMacroList(sourcecodeDir);
 
-                    for (int numOfTargetMacro = 4; numOfTargetMacro <= 4; numOfTargetMacro++) {
-                        for (int i = 1; i <= 1; i++) {
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 3; numOfTargetMacro++) {
+                        for (int i = 3; i <= 3; i++) {
 //                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
 //                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
 

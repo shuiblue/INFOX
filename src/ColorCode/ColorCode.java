@@ -18,7 +18,9 @@ public class ColorCode {
     static String expectTxt = "expectCluster.txt";
     static String upstreamNodeTxt = "upstreamNode.txt";
     static String jsFileHeader = "/jshead.txt";
+
     static HashMap<Integer, String> nodeMap;
+
     HashMap<Integer, String> colorMap = new HashMap<>();
     HashSet<String> bigSizeClusterList = new HashSet<>();
     static StringBuffer jsContent = new StringBuffer();
@@ -76,7 +78,7 @@ public class ColorCode {
 */
                         sb.append(line.replace("<", "&lt;").replace(">", "&gt;"));
                         sb.append("</front>\n");
-                        if (!forkAddedNode.contains(old_lable + " ") || line.trim().startsWith("//") || line.trim().startsWith("/*") || line.trim().startsWith("*")) {
+                        if (!forkAddedNode.contains(old_lable ) || line.trim().startsWith("//") || line.trim().startsWith("/*") || line.trim().startsWith("*")) {
                             jsContent.append("$(\"#" + lable + "\").toggle()\n");
                         }
 
@@ -124,8 +126,8 @@ public class ColorCode {
 
         BackgroundColor bgcolor = new BackgroundColor();
 
-//        HashMap<String, String> clusterColorMap = new HashMap<>();
-//        HashMap<String, String> join_clusterColorMap = new HashMap<>();
+        HashMap<String, String> clusterColorMap = new HashMap<>();
+        HashMap<String, String> join_clusterColorMap = new HashMap<>();
 
 
         //get upstream Node
@@ -146,7 +148,7 @@ public class ColorCode {
             e.printStackTrace();
         }
 
-
+///****testing
         StringBuilder sb = new StringBuilder();
         StringBuilder joining_sb = new StringBuilder();
         StringBuilder colorTable = new StringBuilder();
@@ -259,8 +261,8 @@ public class ColorCode {
 
 
 
-
                         /*for printing purpose*/
+// /***
                             if (print) {
                                 sb.append("#" + nodeLabel + "{\n\tbackground-color:;\n");
                                 joining_sb.append("#" + nodeLabel + "{\n\tbackground-color:;\n");
@@ -300,10 +302,11 @@ public class ColorCode {
                                 }
 
                             }
+
 //                        --------------------------expect Node---------------------------
                             if (!upstreamNode.equals("")) {
                                 if (upstreamNode.contains(nodeLabel)) {
-                                   /*for print */
+//                                   /*for print
                                     if (print) {
                                         leftSidebarColor = "White";
                                     } else {
@@ -313,7 +316,7 @@ public class ColorCode {
                                 }
                             } else if (!forkAddedNode.equals("")) {
                                 if (!forkAddedNode.contains(nodeLabel)) {
-                                   /*for print */
+//                                   /*for print
                                     if (print) {
                                         leftSidebarColor = "White";
                                     } else {
@@ -339,7 +342,7 @@ public class ColorCode {
                                 }
 
                             }
-                            /**--------------------------expect Node---------------------------**/
+//                            /**--------------------------expect Node---------------------------*
                             if (!previous_Color.equals(current_color)) {
                                 clusterSB.append("," + current_color + "," + leftSidebarColor + "\n");
                                 joining_clusterSB.append("," + afterJoining_color + "," + leftSidebarColor + "\n");
@@ -350,21 +353,22 @@ public class ColorCode {
 
 
                         if (j == 0) {
-                            /**      joining color table   **/
-//                            clusterColorMap.put(clusterID, current_color);
+//                            /**      joining color table
+                            clusterColorMap.put(clusterID, current_color);
                             for (HashSet<String> clusterList : closeClusterList) {
                                 if (clusterList.contains(clusterID)) {
                                     if (closeClusters_ColorMap.get(clusterList).equals("")) {
                                         closeClusters_ColorMap.put(clusterList, current_color);
-//                                       join_clusterColorMap.put(clusterID,current_color);
+                                       join_clusterColorMap.put(clusterID,current_color);
                                     }
-//                                   else {
-////                                       join_clusterColorMap.put(clusterID,afterJoining_color);
-//                                   }
+                                   else {
+                                       join_clusterColorMap.put(clusterID,afterJoining_color);
+                                   }
                                 }
                             }
 
                         }
+
                     }
 
 
@@ -379,11 +383,12 @@ public class ColorCode {
         iofunc.rewriteFile(joining_sb.toString(), analysisDir + numberOfClusters + "_join_bigSize-" + clusterSizeThreshold + CSS);
         iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + numberOfClusters +"_colorTable_join_bigSize-" + clusterSizeThreshold + ".txt");
         iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor_join_bigSize-" + clusterSizeThreshold + ".txt");
+
     }
 
 
     /**
-     * This function generates ining table, if distance is 2, then join two clusters
+     * This function generates joining table, if distance is 2, then join two clusters
      * //todo: other conditions?
      *
      * @param clusters
@@ -444,7 +449,7 @@ public class ColorCode {
                         closeClusterList.set(index, new HashSet<>());
                     }
 
-                    if (!existEdge) {
+                    if (!existEdge ) {
                         HashSet<String> list = new HashSet<>();
                         list.add(cluster_1);
                         list.add(cluster_2);

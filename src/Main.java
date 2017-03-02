@@ -45,10 +45,18 @@ public class Main {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro =3; numOfTargetMacro <= 3; numOfTargetMacro++) {
+                    for (int numOfTargetMacro =7; numOfTargetMacro >=7; numOfTargetMacro--) {
                         /** generating the parameters for creating dependency graph  **/
                         ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro);
-
+                        /** 1 -- INFOX,
+                         *  2--MS,
+                         *  3--MS+CF+HIE (NO spliting, joining),
+                         *  4--INFOX-(DEF_USE)
+                         *  5--INFOX-(CONTROL_FLOW),
+                         *  6--INFOX-(HIERARCHY)
+                         *  7--INFOX-(Consecutive)
+                         *  8--MS-(Consecutive)
+                         *  **/
                         for (int[] param : parameterArray) {
                             String analysisDirName = "";
                             if (param[5] == 1) {
@@ -71,23 +79,14 @@ public class Main {
 
                             /**  testCase specifys the repository that need to be parsed.  **/
                             //TODO: set subdir name for multiple tests
-                            for (int i = 2; i <= 2; i++) {
-                                /** 1 -- INFOX,
-                                 *  2--MS,
-                                 *  3--MS+CF+HIE (NO spliting, joining),
-                                 *  4--INFOX-(DEF_USE)
-                                 *  5--INFOX-(CONTROL_FLOW),
-                                 *  6--INFOX-(HIERARCHY)
-                                 *  7--INFOX-(Consecutive)
-                                 *  8--MS-(Consecutive)
-                                 *  **/
+                            for (int i =1; i <=1; i++) {
+
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-
                                 System.out.println(testCaseDir);
                                 analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re);
-                                System.out.println(testCaseDir_macrosFromOneFile);
-                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re);
+//                                System.out.println(testCaseDir_macrosFromOneFile);
+//                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re);
                             }
                         }
                     }
@@ -115,16 +114,16 @@ public class Main {
     private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro) {
 
         ArrayList<int[]> parameterArray = new ArrayList<>();
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 1; i++) {
             int[] param = new int[6];
             param[0] = numOfTargetMacro;
 //            param[1] = numOfTargetMacro + 3;  // int numberOfCuts = numOfTargetMacro + 3;
-            param[1] = 3;  // int numberOfCuts = numOfTargetMacro + 3;
+            param[1] = 5;  // int numberOfCuts = numOfTargetMacro + 3;
             param[2] = 1;
             param[3] = 1;
             param[4] = 0;
             param[5] = i;
-//            param[5] = 2;
+//            param[5] = 1;
             parameterArray.add(param);
 
         }

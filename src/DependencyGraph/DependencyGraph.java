@@ -347,7 +347,7 @@ public class DependencyGraph {
 
         /** generating edges for consecutive lines  **/
         if (CONSECUTIVE) {
-            createNeighborEdges();
+//            createNeighborEdges();
         }
 
         /****   Write dependency graphs into pajek files  ****/
@@ -535,7 +535,9 @@ public class DependencyGraph {
                     for (Map.Entry<String, String> entry : gotoMap.entrySet()) {
                         if (entry.getValue().equals(name.getValue())) {
                             key = entry.getKey();
-                            addEdgesToFile(key, label_location, "<Control-Flow> goto");
+                            if(CONTROL_FLOW) {
+                                addEdgesToFile(key, label_location, "<Control-Flow> goto");
+                            }
                             break;
                         }
 
@@ -614,7 +616,9 @@ public class DependencyGraph {
             int tmpStmtList_size = tmpStmtList.size();
             if (isGotoLabel && !ele.getLocalName().equals("label") && tmpStmtList_size > 0) {
                 String location = tmpStmtList.get(tmpStmtList_size - 1);
-                addEdgesToFile(location, parentLocation, "<Hierarchy> goto_label");
+                if(HIERACHICAL) {
+                    addEdgesToFile(location, parentLocation, "<Hierarchy> goto_label");
+                }
                 parentLocation = tmpParentLocation;
                 scope = tmpScope + 1;
                 isGotoLabel = false;

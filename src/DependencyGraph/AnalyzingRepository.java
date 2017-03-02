@@ -78,11 +78,12 @@ public class AnalyzingRepository {
             /**  this function generate all the graph at the same time **/
 //            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
         }
-
+//
         /** Community Detection  **/
         boolean hasEdge = new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         if (hasEdge) {
+//        if (hasEdge) {
             /** Generating html to visualize source code, set background and left side bar color for new code  **/
             AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES);
 
@@ -90,23 +91,26 @@ public class AnalyzingRepository {
             int[] avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
             HashMap<Integer, ArrayList<String>> clusterList;
             if (!isMS_CLUSTERCHANGES) {
-                int avgFeatureSize = avgFeatureSize_maxSize[0];
-                int maxFeatureSize = avgFeatureSize_maxSize[1];
-                int clusterSizeThreshold = avgFeatureSize / 2;
-
+//                int avgFeatureSize = avgFeatureSize_maxSize[0];
+//                int maxFeatureSize = avgFeatureSize_maxSize[1];
+                int maxFeatureSize = 100;
+//                int clusterSizeThreshold = avgFeatureSize / 2;
+                int clusterSizeThreshold = 50;
                 System.out.println("clusterSizeThreshold: " + clusterSizeThreshold);
-                while (clusterSizeThreshold < maxFeatureSize) {
+//                while (clusterSizeThreshold < maxFeatureSize) {
+//
+//                   clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
+//                    clusterSizeThreshold += 10;
+//
+//                }
+                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
 
-                   clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
-                    clusterSizeThreshold += 10;
-
-                }
             } else {
                 clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0);
             }
 //        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
-//
-//        /** parse commit msg for each node **/
+
+        /** parse commit msg for each node **/
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
 
