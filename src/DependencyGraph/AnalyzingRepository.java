@@ -18,6 +18,21 @@ import java.util.HashMap;
 public class AnalyzingRepository {
     static final String FS = File.separator;
 
+    public void analyzeRepository(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean hasGroundTruth) {
+        boolean isMS_CLUSTERCHANGES;
+        int numOfCuts = 5;
+        boolean directedGraph = false;
+        if (approachIndex == 2 || approachIndex == 3 || approachIndex == 8) {
+            numOfCuts = 0;
+            isMS_CLUSTERCHANGES = true;
+        } else {
+            isMS_CLUSTERCHANGES = false;
+        }
+
+        String testDir = "test";
+        executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, isMS_CLUSTERCHANGES, numOfCuts, directedGraph, testDir, hasGroundTruth);
+    }
+
     /**
      * This function analyzes the source code repository. There are several steps:
      * 1. Identify lines of code wrapped with target macros(identifyIfdefs}
@@ -35,7 +50,7 @@ public class AnalyzingRepository {
      *                      5. Directed Graph: T/F (1/0)
      * @param re
      */
-    public void analyzeRepository(String sourcecodeDir, String analysisDirName, String testCaseDir, int[] parameters, Rengine re) {
+    public void analyzeRepository(String sourcecodeDir, String analysisDirName, String testCaseDir, int[] parameters, Rengine re, boolean hasGroundTruth) {
 
         boolean isMS_CLUSTERCHANGES;
 
@@ -70,57 +85,61 @@ public class AnalyzingRepository {
         new File(analysisDir).mkdir();
 
         /**  Generating Dependency Graphs for current test case/project  **/
-        if (!directedGraph) {
-            DependencyGraph dependencyGraph = new DependencyGraph(parameters[5]);
-            /**  this function extract changed_code_dependency_graph from complete graph**/
-            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
+        executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, parameters[5], re, isMS_CLUSTERCHANGES, numOfCuts, directedGraph, testDir, hasGroundTruth);
+    }
 
-            /**  this function generate all the graph at the same time **/
-//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
-        }
+    private void executeINFOX(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean isMS_CLUSTERCHANGES, int numOfCuts, boolean directedGraph, String testDir, boolean hasGroundTruth) {
+//        if (!directedGraph) {
+//            DependencyGraph dependencyGraph = new DependencyGraph(approachIndex);
+//            /**  this function extract changed_code_dependency_graph from complete graph**/
+////            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
 //
+//            /**  this function generate all the graph at the same time **/
+//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
+//        }
         /** Community Detection  **/
-        boolean hasEdge = new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph);
+//        boolean hasEdge = new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph);
 
-        if (hasEdge) {
 //        if (hasEdge) {
+        if (true) {
             /** Generating html to visualize source code, set background and left side bar color for new code  **/
             AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES);
+            int[] avgFeatureSize_maxSize=null;
+            /** get nodeMap: id -- lable  **/
+            analyzingCommunityDetectionResult.getNodeMap_id_to_label();
 
+            /**   if this test has ground Truth, then generate the ground Truth map for later comparing **/
+            if (hasGroundTruth) {
+                avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
+            }
 
-            int[] avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
             HashMap<Integer, ArrayList<String>> clusterList;
             if (!isMS_CLUSTERCHANGES) {
-//                int avgFeatureSize = avgFeatureSize_maxSize[0];
-//                int maxFeatureSize = avgFeatureSize_maxSize[1];
-                int maxFeatureSize = 100;
-//                int clusterSizeThreshold = avgFeatureSize / 2;
+                //Marlin - 50
+                //Cherokee - 38
                 int clusterSizeThreshold = 50;
-                System.out.println("clusterSizeThreshold: " + clusterSizeThreshold);
-//                while (clusterSizeThreshold < maxFeatureSize) {
-//
-//                   clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
-//                    clusterSizeThreshold += 10;
-//
-//                }
-                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
-
-            } else {
-                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0);
-            }
+                if (hasGroundTruth) {
+                    int avgFeatureSize = avgFeatureSize_maxSize[0];
+                    int maxFeatureSize = avgFeatureSize_maxSize[1];
+                }
+                   /** starts to analyze each clustering result  ***/
+                    clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold,hasGroundTruth);
+                } else {
+                    clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0,hasGroundTruth);
+                }
 //        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
 
-        /** parse commit msg for each node **/
+                /** parse commit msg for each node **/
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
 
 
-            /**  calculate tfidf  to identifing keywords from each cluster**/
+                /**  calculate tfidf  to identifing keywords from each cluster**/
 //        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
 //
 //        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
 //        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
 
+            }
         }
     }
-}

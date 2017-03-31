@@ -29,10 +29,12 @@ public class GenerateCombination {
         List<Integer> list = new ArrayList<>(set);
         Integer first = list.remove(0);
         for (Integer node : list) {
+            System.out.println(allPairs.size());
             HashSet<Integer> currentPair = new HashSet<>();
             currentPair.add(first);
             currentPair.add(node);
             allPairs.add(currentPair);
+
         }
         if (set.size() > 2) {
             set.remove(first);

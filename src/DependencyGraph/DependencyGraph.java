@@ -85,8 +85,8 @@ public class DependencyGraph {
      * ----------------------compact Graph ------------------------------
      * if the file is not changed, then the whole file is a node
      */
-     HashSet<String> changedFiles;
-     int compact_graph_node_id = 0;
+    HashSet<String> changedFiles;
+    int compact_graph_node_id = 0;
     HashMap<String, HashSet<String[]>> compactGraph = new HashMap<>();
 
     //node list stores  the id for the node, used for create graph file. HashMap<String, Integer>
@@ -115,9 +115,6 @@ public class DependencyGraph {
      * This flag is used for checking whether the macro is a header guard or not
      **/
     boolean foundHeaderGuard = false;
-
-
-
 
 
     /**
@@ -178,10 +175,10 @@ public class DependencyGraph {
     }
 
 
-    public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir,String analysisDirName, String testCaseDir, String testDir, Rengine re) {
+    public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re) {
         this.analysisDir = testCaseDir + testDir + FS;
         this.testCaseDir = testCaseDir;
-        String graphPath = sourcecodeDir + analysisDirName+"/complete.pajek.net";
+        String graphPath = sourcecodeDir + analysisDirName + "/complete.pajek.net";
         try {
             String completeGraph = processingText.readResult(graphPath);
             String nodeListString = completeGraph.split("\\*arcs")[0];
@@ -309,7 +306,7 @@ public class DependencyGraph {
             forkaddedNodeList = new ArrayList<>();
         }
 
-        processingText.rewriteFile("", analysisDir + "memoryRecord.txt");
+//        processingText.rewriteFile("", analysisDir + "memoryRecord.txt");
         //parse every header file in the project
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
@@ -318,12 +315,6 @@ public class DependencyGraph {
                             && !filePath.toString().contains("SkBitmapSamplerTemplate.h")
                             && !filePath.toString().contains("prstrms.h")
                             && !filePath.toString().contains("/js/")) {
-
-                        int mb = 1024 * 1024;
-                        long mem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / mb;
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("\nnow parsing..." + filePath + "\n memory usage: " + mem + "");
-                        processingText.writeTofile(sb.toString(), analysisDir + "memoryRecord.txt");
 
                         parseSingleFile(filePath);
                     }
@@ -335,7 +326,10 @@ public class DependencyGraph {
         //parse every .c / .cpp  file in the project
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
-                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
+//                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
+/**  need to parse pde file as well for real fork**/
+                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString())||processingText.isPdeFile(filePath.toString()))) {
+
                     parseSingleFile(filePath);
                 }
             });
@@ -347,7 +341,7 @@ public class DependencyGraph {
 
         /** generating edges for consecutive lines  **/
         if (CONSECUTIVE) {
-//            createNeighborEdges();
+            createNeighborEdges();
         }
 
         /****   Write dependency graphs into pajek files  ****/
@@ -405,7 +399,9 @@ public class DependencyGraph {
         /**   re-write source code file in case the misinterpretation of srcml   **/
         String tmpFilePath = Root_Dir + tmpXmlPath + filePath.toString().replace(Root_Dir, "");
 //        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
-        if (fileName.endsWith(".h")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
+//        if (fileName.endsWith(".h")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
+        /**for real fork **/
+        if (fileName.endsWith(".h")||fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
             tmpFilePath += ".cpp";
         }
         try {
@@ -535,7 +531,7 @@ public class DependencyGraph {
                     for (Map.Entry<String, String> entry : gotoMap.entrySet()) {
                         if (entry.getValue().equals(name.getValue())) {
                             key = entry.getKey();
-                            if(CONTROL_FLOW) {
+                            if (CONTROL_FLOW) {
                                 addEdgesToFile(key, label_location, "<Control-Flow> goto");
                             }
                             break;
@@ -616,7 +612,7 @@ public class DependencyGraph {
             int tmpStmtList_size = tmpStmtList.size();
             if (isGotoLabel && !ele.getLocalName().equals("label") && tmpStmtList_size > 0) {
                 String location = tmpStmtList.get(tmpStmtList_size - 1);
-                if(HIERACHICAL) {
+                if (HIERACHICAL) {
                     addEdgesToFile(location, parentLocation, "<Hierarchy> goto_label");
                 }
                 parentLocation = tmpParentLocation;
@@ -1835,41 +1831,44 @@ public class DependencyGraph {
         if (DEF_USE) {
             String var_name = variable.getName();
             String var_alias = variable.getAlias();
-            String var = "";
-            int scope = variable.getScope();
-            String fileName = variable.getLocation().split("-")[0];
-            String depenNodeLabel = variable.getLocation();
+            if (!var_alias.equals("unknowntype") && !var_name.equals("unknowntype")
+                    &&!var_name.equals("ret_error")&&!var_name.equals("ret_ok")&&!var_name.equals("ret")) {
+//            if (!var_alias.equals("unknowntype") && !var_name.equals("unknowntype")) {
+                String var = "";
+                int scope = variable.getScope();
+                String fileName = variable.getLocation().split("-")[0];
+                String depenNodeLabel = variable.getLocation();
 //        storeIntoNodeList(depenNodeLabel);
-            int edgeNum = 0;
-            // Key- scope, value--label
-            ArrayList<Symbol> candidates = new ArrayList<>();
+                int edgeNum = 0;
+                // Key- scope, value--label
+                ArrayList<Symbol> candidates = new ArrayList<>();
 
-            for (Symbol s : symbolTable) {
-                if (s != null) {
-                    if (!s.tag.contains("function")) {
-                        boolean match = true;
+                for (Symbol s : symbolTable) {
+                    if (s != null) {
+                        if (!s.tag.contains("function")) {
+                            boolean match = true;
 //                    if (variable.getTag().contains("decl") && !s.getTag().equals("macro")) {
 //                        match = false;
 //                    }
-                        if (variable.getTag().equals("struct") && !s.getTag().equals("struct_decl")) {
-                            match = false;
-                        }
-                        if (match) {
-                            //check local variable
-                            if (((((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) && !s.getName().equals(""))
-                                    || ((s.getAlias().equals(var_name)) || (s.getAlias().equals(var_alias))) && !s.getAlias().equals(""))
-                                    && scope == s.getScope()) {
+                            if (variable.getTag().equals("struct") && !s.getTag().equals("struct_decl")) {
+                                match = false;
+                            }
+                            if (match) {
+                                //check local variable
+                                if (((((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) && !s.getName().equals(""))
+                                        || ((s.getAlias().equals(var_name)) || (s.getAlias().equals(var_alias))) && !s.getAlias().equals(""))
+                                        && scope == s.getScope()) {
 
-                                if ((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) {
-                                    var = s.getName();
-                                } else {
-                                    var = s.getAlias();
-                                }
-                                String declLabel = s.getLocation();
-                                if (!declLabel.equals(depenNodeLabel)) {
-                                    String edgeLable = "<Def-Use> " + var;
-                                    addEdgesToFile(depenNodeLabel, s, edgeLable);
-                                    edgeNum++;
+                                    if ((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) {
+                                        var = s.getName();
+                                    } else {
+                                        var = s.getAlias();
+                                    }
+                                    String declLabel = s.getLocation();
+                                    if (!declLabel.equals(depenNodeLabel)) {
+                                        String edgeLable = "<Def-Use> " + var;
+                                        addEdgesToFile(depenNodeLabel, s, edgeLable);
+                                        edgeNum++;
 //                                if (candidates.size() > 0) {
 //                                    candidates.clear();
 //                                }
@@ -1878,28 +1877,28 @@ public class DependencyGraph {
 //                                } else {
 //                                    continue;
 //                                }
+                                    }
                                 }
-                            }
-                            // if the variable is not local, then check global variable def
-                            if (((((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) && !s.getName().equals(""))
-                                    || ((s.getAlias().equals(var_name)) || (s.getAlias().equals(var_alias))) && !s.getAlias().equals(""))
-                                    && scope > s.getScope()) {
-                                if ((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) {
-                                    var = s.getName();
-                                } else {
-                                    var = s.getAlias();
-                                }
-                                String edgeLable = "<Def-Use> " + var;
-                                addEdgesToFile(depenNodeLabel, s, edgeLable);
+                                // if the variable is not local, then check global variable def
+                                if (((((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) && !s.getName().equals(""))
+                                        || ((s.getAlias().equals(var_name)) || (s.getAlias().equals(var_alias))) && !s.getAlias().equals(""))
+                                        && scope > s.getScope()) {
+                                    if ((s.getName().equals(var_name)) || (s.getName().equals(var_alias))) {
+                                        var = s.getName();
+                                    } else {
+                                        var = s.getAlias();
+                                    }
+                                    String edgeLable = "<Def-Use> " + var;
+                                    addEdgesToFile(depenNodeLabel, s, edgeLable);
 //                            candidates.add(s);
-                                edgeNum++;
+                                    edgeNum++;
 
+                                }
                             }
                         }
                     }
                 }
-            }
-            /**   this following part is for adding one decl for dependency variable. however, we need to link all the possible decl to dependency, so remove this for now.**/
+                /**   this following part is for adding one decl for dependency variable. however, we need to link all the possible decl to dependency, so remove this for now.**/
 //        Symbol decl_symbol = null;
 //        int min_scope = 99;
 //        for (Symbol candidate : candidates) {
@@ -1918,8 +1917,9 @@ public class DependencyGraph {
 //        }
 
 
-            if (edgeNum == 0) {
-                lonelySymbolSet.add(variable);
+                if (edgeNum == 0) {
+                    lonelySymbolSet.add(variable);
+                }
             }
         }
     }

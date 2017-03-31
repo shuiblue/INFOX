@@ -262,6 +262,10 @@ public class ProcessingText {
                 if (line.contains("(size_t)")) {
                     line = line.replace("(size_t)", "");
                 }
+
+                if (line.contains("static inline __attribute__((always_inline))")) {
+                    line = line.replace("static inline __attribute__((always_inline))", "");
+                }
                 if (line.contains("inline _attribute_((always_inline))")) {
                     line = line.replace("inline _attribute_((always_inline))", "");
                 }
@@ -316,7 +320,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replace("H", ".h").replace("CPP", ".cpp").replaceAll("[C]$",".c");
+        return nodeLabel.split("-")[0].replace("~", "/").replace("H", ".h").replace("CPP", ".cpp").replaceAll("[C]$", ".c");
 
     }
 
@@ -373,6 +377,13 @@ public class ProcessingText {
 //        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
 
+    public boolean isPdeFile(String filePath) {
+        return  filePath.endsWith(".pde");
+    }
+    public boolean isCFile_general(String filePath){
+        return isCFile(filePath)||isHeaderFile(filePath)||isPdeFile(filePath);
+    }
+
     public String removeUselessLine(String line) {
         /**remove comments **/
 //        line = removeComments(line);
@@ -402,11 +413,23 @@ public class ProcessingText {
             int index = line.indexOf("/*");
             line = line.substring(0, index);
         }
-        if (line.startsWith("*")  || line.startsWith("//")) {
+        if (line.startsWith("*") || line.startsWith("//")) {
             line = "";
         }
 
         return line;
+    }
+
+    /**
+     * This function check current line is code or comment
+     * @param line the content of current line
+     * @return true== if it is code; false=== it is comment
+     */
+    public boolean isCode (String line){
+           if (line.startsWith("*") || line.startsWith("//")||line.startsWith("/*") ||line.endsWith("*/")||line.trim().length()==0) {
+            return false;
+        }
+        return true;
     }
 
     public static void main(String[] args) {

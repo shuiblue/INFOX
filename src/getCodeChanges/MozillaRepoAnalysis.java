@@ -12,12 +12,14 @@ import java.util.stream.Stream;
 /**
  * Created by shuruiz on 1/14/17.
  */
-public class getMozillaChangeset {
+public class MozillaRepoAnalysis {
     static ProcessingText processingText = new ProcessingText();
 
+
+    /**
+     * This function used for finding available changeSet from Firefox buglist
+     */
     public static void checkAvailableChangeSet() {
-
-
         processingText.rewriteFile("", "/Users/shuruiz/Box Sync/INFOX-doc/experiment/AvailableFirefox_BugIdList.txt");
         StringBuilder stringBuilder = new StringBuilder();
         List<String> bugidList = new ArrayList<>();

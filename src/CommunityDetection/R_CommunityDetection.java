@@ -299,7 +299,6 @@ public class R_CommunityDetection {
 
         System.out.println("current number of edge: " + edgelist_com.length);
         System.out.println("changed current number of edge: " + current_edgelist.length);
-        re.eval("write.graph(completeGraph,\"" + sourcecodeDir + analysisDirName + "/" + cutNum + ".pajek.net\", format=\"pajek\")");
 
 
         pre_numberOfCommunities = current_numberOfCommunities;

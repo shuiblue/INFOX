@@ -9,7 +9,8 @@ import java.util.*;
  * Created by shuruiz on 8/29/16.
  */
 public class GetForkAddedCode {
-    static String DIR = "C:\\Users\\shuruiz\\Documents\\components\\rel\\mcs.mpss\\test\\";
+    //    static String DIR = "C:\\Users\\shuruiz\\Documents\\components\\rel\\mcs.mpss\\test\\";
+    static String DIR = "/Users/shuruiz/Work/Open Source Project/Suricata/suricata";
 
     String forkAddedNodeTxt = "forkAddedNode.txt";
     String expectTxt = "expectCluster.txt";
@@ -19,37 +20,48 @@ public class GetForkAddedCode {
     String FS = File.separator;
     StringBuilder sb = new StringBuilder();
 
-    public void identifyChangedCodeBySHA(String projectPath, String repo, ArrayList<String> commitSHAList) {
-        String testDir = projectPath + repo;
+    public void identifyChangedCodeBySHA(String projectPath, String changedFile, ArrayList<String> commitSHAList) {
+        String testDir = projectPath;
         this.commitSHAList = commitSHAList;
-        sourcecodeDir = testDir + "/Marlin/";
+        sourcecodeDir = testDir;
         testCaseDir = testDir + "/DPGraph/";
         new File(testCaseDir).mkdir();
         File dir = new File(sourcecodeDir);
         String[] names = dir.list();
-        iof.rewriteFile("", testCaseDir + forkAddedNodeTxt);
-        iof.rewriteFile("", testCaseDir + expectTxt);
+//        iof.rewriteFile("", testCaseDir + forkAddedNodeTxt);
+//        iof.rewriteFile("", testCaseDir + expectTxt);
 
 
-        for (String fileName : names) {
-//            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
-            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
-                try {
-                    String cmd = "/usr/bin/git --git-dir=" + testDir + "/.git --work-tree=" + testDir + " blame -n --abbrev=6 " + sourcecodeDir + fileName;
-                    Process p = Runtime.getRuntime().exec(cmd);
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(p.getInputStream()));
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        if (line.length() > 0) {
-                            checkSHA(line, fileName);
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-//                iof.rewriteFile(sb.toString(), analysisDir + fileName + SHA);
+        try {
+            String cmd = "/usr/bin/git --git-dir=" + testDir + "/.git --work-tree=" + testDir + " blame -n --abbrev=6 " + sourcecodeDir + FS + changedFile +" > "+ sourcecodeDir + FS +"blame.txt";
+//            String cmd = "/usr/bin/git --git-dir=" + testDir + "/.git --work-tree=" + testDir + " blame -n --abbrev=6 " + sourcecodeDir + FS + changedFile +" > "+ sourcecodeDir + FS +"blame.txt";
+//            String cmd[] = {"git", "blame", "-n","--abbrev=6" ,sourcecodeDir + FS + changedFile, ">", sourcecodeDir + FS + "blame.txt"};
+//            String cmd[] = {"/usr/bin/git", "--git-dir=" + testDir + "/.git", "--work-tree=" + testDir, "blame", sourcecodeDir + FS + changedFile, ">", sourcecodeDir + FS + "blame.txt"};
+//            ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+//            Process process = processBuilder.start();
+//            process.waitFor();
+//
+//            BufferedReader reader =
+//                    new BufferedReader(new InputStreamReader(process.getInputStream()));
+//
+//            String line = "";
+//            while ((line = reader.readLine())!= null) {
+//                sb.append(line + "\n");
+//            }
+
+
+        String blameTXT = iof.readResult(DIR + FS + "blame.txt");
+        for (String line : blameTXT.split("\n")) {
+            if (line.trim().length() > 0) {
+                checkSHA(line, changedFile);
             }
+
+        }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
         }
     }
 
@@ -80,7 +92,7 @@ public class GetForkAddedCode {
 //                    System.out.println(newFileName + "-" + lineNum);
                     iof.writeTofile(newFileName + "-" + lineNum + " \n", testCaseDir + forkAddedNodeTxt);
                     if (!cleanCode.startsWith("#")) {
-                        iof.writeTofile(newFileName + "-" + lineNum + " 1\n", testCaseDir + expectTxt);
+                        iof.writeTofile(newFileName + "-" + lineNum + " "+(commitSHAList.indexOf(sha)+1)+"\n", testCaseDir + expectTxt);
                     }
                 } else if (cleanCode.startsWith("/*")) {
                     comments = true;
@@ -117,8 +129,6 @@ public class GetForkAddedCode {
         try {
             String fileContent = iof.readResult(file);
             String[] lines = fileContent.split(System.getProperty("line.separator"));
-//            String[] lines = fileContent.split("\r\n");
-//            String[] lines = fileContent.split("\r\n|\r|\n");
             String newFileName = iof.changeFileName(file.replace(DIR, ""));
             for (int i = lines.length; i > 0; i--) {
                 String line = newFileName + "-" + i;
@@ -168,21 +178,37 @@ public class GetForkAddedCode {
     }
 
     public static void main(String[] args) {
-        String dir = "C:\\Users\\shuruiz\\Documents\\PRISM-CR\\MCS61_CR\\result";
-        String outputfile = "C:\\Users\\shuruiz\\Documents\\PRISM-CR\\MCS61_CR\\forkAddedCode.txt";
+//        String dir = "C:\\Users\\shuruiz\\Documents\\PRISM-CR\\MCS61_CR\\result";
+//        String outputfile = "C:\\Users\\shuruiz\\Documents\\PRISM-CR\\MCS61_CR\\forkAddedCode.txt";
+//        String dir = "/Users/shuruiz/Work/Open\\ Source\\ Project/Suricata/suricata";
+        String dir = "/Users/shuruiz/Work/Open Source Project/Suricata/suricata";
+        String outputfile = "/Users/shuruiz/Work/Open Source Project/Suricata/suricata/forkAddedCode.txt";
         iof.rewriteFile("", outputfile);
-        final int[] i = {1};
-        try {
-            Files.walk(Paths.get(dir)).forEach(filePath -> {
-                if (Files.isRegularFile(filePath)) {
-                    if (filePath.toString().endsWith("txt")) {
-                        iof.writeTofile(switchCRsToGroundTruth(filePath.toString(), i[0]), outputfile);
-                        i[0]++;
-                    }
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        ArrayList<String> commitSHAList = new ArrayList<>();
+        commitSHAList.add("xxx");
+        commitSHAList.add("81c8149");
+
+        ArrayList<String> changedFileList = new ArrayList<>();
+//        changedFileList.add("src/detect-engine-address.c");
+//        changedFileList.add("src/detect-engine-address.h");
+//        changedFileList.add("src/detect-engine-port.c");
+//        changedFileList.add("src/detect-engine-port.h");
+//        changedFileList.add("src/detect-engine-proto.c");
+//        changedFileList.add("src/detect-engine-proto.h");
+//        changedFileList.add("src/detect-pcre.c");
+//        changedFileList.add("src/detect-recursive.c");
+//        changedFileList.add("src/detect-recursive.h");
+        changedFileList.add("src/detect.c");
+//        changedFileList.add("src/detect.h");
+//        changedFileList.add("src/suricata.c");
+//        changedFileList.add("src/detect-engine-analyzer.c");
+//        changedFileList.add("src/detect-engine-analyzer.h");
+
+        for (String changedFile : changedFileList) {
+            new GetForkAddedCode().identifyChangedCodeBySHA(dir, changedFile, commitSHAList);
+
         }
+
     }
 }

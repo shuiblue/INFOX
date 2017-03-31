@@ -18,7 +18,8 @@ import java.util.stream.Stream;
 public class AnalyzingCommunityDetectionResult {
 
     String analysisDir, testCaseDir, sourcecodeDir, testDir;
-    String nodeListTxt = "/NodeList.txt";
+    //    String nodeListTxt = "/NodeList.txt";
+    String nodeListTxt = "NodeList.txt";
     String forkAddedNodeTxt = "forkAddedNode.txt";
     String expectTxt = "expectCluster.txt";
     String forkAddedNode = "";
@@ -44,7 +45,7 @@ public class AnalyzingCommunityDetectionResult {
     }
 
 
-    public void generatingClusteringTable(String testCaseDir, String testDir, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold) {
+    public void generatingClusteringTable(String testCaseDir, String testDir, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold, HashMap<Integer, HashSet<Integer>> current_clustering_result, boolean hasGroundTruth) {
         ProcessingText processingText = new ProcessingText();
         this.analysisDir = testCaseDir + testDir + FS;
         this.testCaseDir = testCaseDir;
@@ -62,37 +63,57 @@ public class AnalyzingCommunityDetectionResult {
             String[] colorArray = cssString.split("\n");
             ArrayList<String> nodeColorList = new ArrayList(Arrays.asList(colorArray));
             ArrayList<String> communityColorList = new ArrayList<>();
+            HashMap<String, ArrayList<String>> color_nodeLabel = new HashMap<>();
+
             for (String node : nodeColorList) {
                 if (node.length() > 0) {
 
                     String[] nodeInfo = node.split(",");
                     String id = nodeInfo[0];
                     String bgColor = nodeInfo[1];
-                    String expectColor = nodeInfo[2];
                     if (!communityColorList.contains(bgColor)) {
                         communityColorList.add(bgColor);
                     }
 
-                    HashMap<String, Integer> distributedColor = resultTable.get(expectColor.trim());
-                    if (distributedColor != null) {
-                        if (distributedColor.get(bgColor) == null) {
-                            distributedColor.put(bgColor, 1);
-                        } else {
-                            int num = distributedColor.get(bgColor);
-                            distributedColor.put(bgColor, num + 1);
-                        }
-                    } else {
-                        distributedColor = new HashMap<>();
-                        distributedColor.put(bgColor, 1);
-                    }
-                    resultTable.put(expectColor.trim(), distributedColor);
+                    if (hasGroundTruth) {
+                        String expectColor = nodeInfo[2];
 
+                        HashMap<String, Integer> distributedColor = resultTable.get(expectColor.trim());
+                        if (distributedColor != null) {
+                            if (distributedColor.get(bgColor) == null) {
+                                distributedColor.put(bgColor, 1);
+                            } else {
+                                int num = distributedColor.get(bgColor);
+                                distributedColor.put(bgColor, num + 1);
+                            }
+                        } else {
+                            distributedColor = new HashMap<>();
+                            distributedColor.put(bgColor, 1);
+                        }
+                        resultTable.put(expectColor.trim(), distributedColor);
+                    } else {
+
+                        ArrayList<String> nodeLabelList;
+                        nodeLabelList = color_nodeLabel.get(bgColor);
+                        if (nodeLabelList != null) {
+                            nodeLabelList.add(id);
+                        } else {
+                            nodeLabelList = new ArrayList<>();
+                            nodeLabelList.add(id);
+                            color_nodeLabel.put(bgColor, nodeLabelList);
+                        }
+
+
+                    }
                 }
             }
-///**** testing
-            printResultTable(resultTable, communityColorList, numberOfCommunities, isJoiningTable, clusterSizeThreshold);
-//            printResultTable(resultTable, communityColorList, numberOfCommunities, macroList);
-//**/
+
+            if (hasGroundTruth) {
+                printResultTable(resultTable, communityColorList, numberOfCommunities, isJoiningTable, clusterSizeThreshold, hasGroundTruth);
+            } else {
+                printResultTable_noGroundTruth(color_nodeLabel, numberOfCommunities, isJoiningTable, clusterSizeThreshold, current_clustering_result);
+            }
+
             if (!isMS_CLUSTERCHANGES) {
                 printClusterDistanceTable(numberOfCommunities);
             }
@@ -103,6 +124,65 @@ public class AnalyzingCommunityDetectionResult {
 
     }
 
+    private void printResultTable_noGroundTruth(HashMap<String, ArrayList<String>> color_nodeLabel, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold, HashMap<Integer, HashSet<Integer>> current_clustering_result) {
+        ProcessingText processingText = new ProcessingText();
+        StringBuffer sb = new StringBuffer();
+
+        HashMap<String, String> clusterIdToColorMap = getIdToColorMap(numberOfCommunities, isJoiningTable);
+        Map<String, String> colorToClusterIdMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : clusterIdToColorMap.entrySet()) {
+            colorToClusterIdMap.put(entry.getValue(), entry.getKey());
+        }
+
+        HashMap<Integer, Integer> clusterid_size_map = new HashMap<>();
+        for (Map.Entry<Integer, HashSet<Integer>> entry : current_clustering_result.entrySet()) {
+            clusterid_size_map.put(entry.getKey(), entry.getValue().size());
+        }
+        final int[] clusterID = new int[1];
+        final int[] size = new int[1];
+        final String[] color = {""};
+        //print 1st line
+        sb.append("<table id=\"cluster\">\n" +
+                "    <tr>\n" +
+                "       <th>LOC</th>\n" +
+                "       <th>Keywords</th>\n" +
+                "    </tr>\n");
+
+        /** sort clusters by size **/
+        clusterid_size_map.entrySet().stream()
+                .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
+                .limit(10)
+                .forEach(k -> {
+                            clusterID[0] = Integer.parseInt(k.toString().split("=")[0]);
+                            size[0] = Integer.parseInt(k.toString().split("=")[1]);
+                            color[0] = clusterIdToColorMap.get(clusterID[0] + "");
+                            sb.append("<table id=\"cluster\">\n" +
+                                    "    <tr>\n" +
+                                    "       <td bgcolor=\"#" + color[0] + "\">" +size[0] + "</td>\n" +
+                                    "       <td>" + clusterID[0] + "</td>\n" +
+                                    "    </tr>\n");
+
+
+                            System.out.println("Item : " + k.toString().split("=")[0] + " Count : " + k.toString().split("=")[1]);
+                        }
+                );
+
+
+        sb.append("</table>");
+        if (!isJoiningTable) {
+            processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + ".color");
+
+        } else {
+            processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + "_join_bigSize-" + clusterSizeThreshold + ".color");
+        }
+
+    }
+
+    /**
+     * This function generate the cluster distance table
+     *
+     * @param numberOfCommunities
+     */
     private void printClusterDistanceTable(int numberOfCommunities) {
         StringBuffer sb = new StringBuffer();
         HashMap<String, String[]> distanceTable = new HashMap<>();
@@ -125,9 +205,7 @@ public class AnalyzingCommunityDetectionResult {
             }
 
             // TODO: table color
-///**testing remove
             HashMap<String, String> idToColorMap = getIdToColorMap(numberOfCommunities, false);
-// **/
             distanceList = processingText.readResult(analysisDir + numberOfCommunities + "_distanceBetweenCommunityies.txt").split("\n");
             for (String d : distanceList) {
                 String[] content = d.split(",");
@@ -135,7 +213,6 @@ public class AnalyzingCommunityDetectionResult {
                 array[Integer.valueOf(clusterIDList.indexOf(content[1]))] = content[2];
                 distanceTable.put(content[0], array);
             }
-///**testing remove
             sb.append("<table id=\"distance\"> <tr> <td> </td>\n");
             for (String id : clusterIDList) {
                 sb.append("<td bgcolor=\"#" + idToColorMap.get(id) + "\">" + id + "</td>\n");
@@ -158,14 +235,8 @@ public class AnalyzingCommunityDetectionResult {
                 }
                 sb.append("</tr>\n");
             }
-
-
             sb.append("</table>\n");
-//**/
-
             processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + ".distanceTable");
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,13 +244,11 @@ public class AnalyzingCommunityDetectionResult {
     }
 
     //    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, ArrayList<String> macroList) {
-    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold) {
+    private void printResultTable(HashMap<String, HashMap<String, Integer>> resultTable, ArrayList<String> communityColorList, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold, boolean hasGroundTruth) {
         ProcessingText processingText = new ProcessingText();
         StringBuffer sb = new StringBuffer();
-        Iterator it = resultTable.keySet().iterator();
-
-        ArrayList<String> featureList = getFeatureList();
-
+        ArrayList<String> featureList = null;
+        featureList = getFeatureList();
 
         String[] colorList = null;
         try {
@@ -234,7 +303,6 @@ public class AnalyzingCommunityDetectionResult {
                 System.out.println("distributedMap is null: " + expectColor);
             }
         }
-
         sb.append("</table>");
         if (!isJoiningTable) {
             processingText.rewriteFile(sb.toString(), analysisDir + numberOfCommunities + ".color");
@@ -258,8 +326,6 @@ public class AnalyzingCommunityDetectionResult {
             String[] content = c.split(",");
             String id = content[0];
             String current_color = content[1];
-            String expect_color = content[2];
-
             colorTable.put(id, current_color);
         }
         return colorTable;
@@ -285,16 +351,18 @@ public class AnalyzingCommunityDetectionResult {
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
         //----for Marlin repo structure----
       */
-    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(int clusterSizeThreshold) {
+    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(int clusterSizeThreshold, boolean hasGroundTruth) {
         clusterResultMap = new HashMap<>();
-        ProcessingText processingText = new ProcessingText();
         String clusterFilePath = analysisDir + "clusterTMP.txt";
         String clusterResultListString = "";
+
+        ProcessingText processingText = new ProcessingText();
         processingText.rewriteFile("", analysisDir + "edgeCuttingRecord.txt");
         processingText.rewriteFile("", analysisDir + "LOC_split.txt");
         processingText.rewriteFile("", analysisDir + "accuracy.txt");
         processingText.rewriteFile("", analysisDir + "joined_accuracy.txt");
-        //get fork added node
+
+        /** get fork added node **/
         File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
         if (forkAddedFile.exists()) {
             try {
@@ -303,29 +371,25 @@ public class AnalyzingCommunityDetectionResult {
                 e.printStackTrace();
             }
         }
-        ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir, forkAddedNode, isMS_CLUSTERCHANGES);
-//      /**   testing purpose  removed contemperary
-        try {
-            colorCode.createSourceFileHtml();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-//       **/
+        ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir, forkAddedNode, isMS_CLUSTERCHANGES);
         try {
+            /** add tags for each line of source code in order to generate html page later **/
+            colorCode.createSourceFileHtml();
             clusterResultListString = processingText.readResult(clusterFilePath);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         int pre_numberOfCommunites = 0;
         int previous_cutted_edge_num = 0;
         String weight_List = "";
+        /** split edge cutting result  **/
         String[] resultArray = clusterResultListString.split("--------Graph-------");
 
         for (int i = 0; i < resultArray.length; i++) {
+            /**  one edge cutting result **/
             String result = resultArray[i];
-
-
             if (result.contains("communities")) {
                 /**     calculating cluster info, such as modularity, #edge cut ..  **/
                 double[] clusterInfo = getClusterInfo(result.split("communities")[0]);
@@ -352,32 +416,35 @@ public class AnalyzingCommunityDetectionResult {
                         /** calculating accuracy for clustering result
                          * 0 - true_positive,1 - false_positive, 2 - true_negtive, 3 - false_negtive, 4- accuracy
                          * **/
-                        calculatingAccuracy(groundTruthClusters, current_clustering_result, false);
-
+                        if (hasGroundTruth) {
+                            calculatingAccuracy(groundTruthClusters, current_clustering_result, false);
+                        }
                         if (!isMS_CLUSTERCHANGES) {
                             /**   get joined clusters   **/
                             HashMap<Integer, HashSet<Integer>> joined_clusters = getJoinedClusters(colorCode, numberOfCommunities, clusters, current_clustering_result, clusterSizeThreshold);
 
-                            /** calculate accuracy result for joined clusters **/
-                            calculatingAccuracy(groundTruthClusters, joined_clusters, true);
+                            if (hasGroundTruth) {
+                                /** calculate accuracy result for joined clusters **/
+                                calculatingAccuracy(groundTruthClusters, joined_clusters, true);
+                            }
                             /**   write to css file        **/
-                            colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap, clusterSizeThreshold);
+//                            colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap, clusterSizeThreshold);
+                            colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap, clusterSizeThreshold, joined_clusters, hasGroundTruth);
 
                             /** generating clustering table  **/
-                            generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true, clusterSizeThreshold);
+                            generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, true, clusterSizeThreshold, current_clustering_result, hasGroundTruth);
 
 //
                         }
-                        if(isMS_CLUSTERCHANGES) {
+                        if (isMS_CLUSTERCHANGES) {
                             /**   write to css file        **/
-                            colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap, clusterSizeThreshold);
+                            colorCode.writeClusterToCSS(clusters, numberOfCommunities, clusterResultMap, nodeMap, expectNodeMap, clusterSizeThreshold, null, hasGroundTruth);
                         }
                         /** generating clustering table for MS approach **/
-                        generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false, 0);
+                        generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false, 0, current_clustering_result, hasGroundTruth);
 
                         /**  combining multifles in order to generate html files **/
                         colorCode.combineFiles(numberOfCommunities, clusterSizeThreshold);
-
 
 
 //
@@ -405,7 +472,7 @@ public class AnalyzingCommunityDetectionResult {
             }
         }
         /** generating cutting summary table **/
-        generateCuttingSummaryTable(clusterSizeThreshold);
+        generateCuttingSummaryTable(clusterSizeThreshold, hasGroundTruth);
         return clusterResultMap;
     }
 
@@ -448,7 +515,7 @@ public class AnalyzingCommunityDetectionResult {
     /**
      * This function generate nodeMap from node list text, key -- node id; value -- node label
      */
-    private void getNodeMap_id_to_label() {
+    public void getNodeMap_id_to_label() {
         nodeMap = new HashMap<>();
         BufferedReader br;
         String line;
@@ -553,10 +620,6 @@ public class AnalyzingCommunityDetectionResult {
         }
 
 
-//        Iterator node_iter = nodeMap.entrySet().iterator();
-        Iterator node_iter = nodeIDSet.iterator();
-//        Iterator node_iter = expectNodeMap.entrySet().iterator();
-
         HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination().getAllPairs(nodeIDSet);
         Iterator nodePair_iterator = nodePairSet.iterator();
 
@@ -629,7 +692,7 @@ public class AnalyzingCommunityDetectionResult {
         groundTruthClusters = new HashMap<>();
         /**get node map  id-> label**/
         //todo :refactoring
-        getNodeMap_id_to_label();
+
         generatingExpectNodeMap();
 
         for (Integer nodeId : nodeMap.keySet()) {
@@ -664,7 +727,7 @@ public class AnalyzingCommunityDetectionResult {
         return new int[]{avgFeatureSize, maxSize};
     }
 
-    private void generateCuttingSummaryTable(int clusterSizeThreshold) {
+    private void generateCuttingSummaryTable(int clusterSizeThreshold, boolean hasGroundTruth) {
         ProcessingText processingText = new ProcessingText();
         StringBuilder sb_csv = new StringBuilder();
         sb_csv.append("Clusters,RemovedEdges,modularity,latest betweenness,LOC Split,weight of cut edges,accuracy,Joined accuracy\n");
@@ -675,7 +738,9 @@ public class AnalyzingCommunityDetectionResult {
         try {
             edgeCuttingRecord = processingText.readResult(analysisDir + "edgeCuttingRecord.txt");
             loc_splitting = processingText.readResult(analysisDir + "LOC_split.txt");
-            accuracyStr = processingText.readResult(analysisDir + "accuracy.txt");
+            if (hasGroundTruth) {
+                accuracyStr = processingText.readResult(analysisDir + "accuracy.txt");
+            }
             joined_accuracyStr = processingText.readResult(analysisDir + "joined_accuracy.txt");
 
         } catch (IOException e) {
@@ -683,8 +748,13 @@ public class AnalyzingCommunityDetectionResult {
         }
         String[] edgeCuttingArray = edgeCuttingRecord.split("\n");
         String[] loc_splittingArray = loc_splitting.split("\n");
-        String[] accuracy_Array = accuracyStr.split("\n");
-        String[] joined_accuracy_Array = joined_accuracyStr.split("\n");
+
+        String[] accuracy_Array = null;
+        String[] joined_accuracy_Array = null;
+        if (hasGroundTruth) {
+            accuracy_Array = accuracyStr.split("\n");
+            joined_accuracy_Array = joined_accuracyStr.split("\n");
+        }
         for (int i = 0; i < edgeCuttingArray.length; i++) {
             String cut = edgeCuttingArray[i];
             String[] cut_content = cut.split(",");
@@ -707,34 +777,37 @@ public class AnalyzingCommunityDetectionResult {
              * (true_positive + true_negtive) / (true_positive + false_positive + false_negtive + true_negtive)
              * 0 + 2 / 0+1+3+2
              * **/
+            String joined_accruacy = "", accruacy = "";
+            if (hasGroundTruth) {
 
-
-            String[] accuracy_oneCut = accuracy_Array[i].split(",");
+                String[] accuracy_oneCut = accuracy_Array[i].split(",");
 //            int TP = Integer.parseInt(accuracy_oneCut[0]);
 //            int FP = Integer.parseInt(accuracy_oneCut[1]);
 //            int TN = Integer.parseInt(accuracy_oneCut[2]);
 //            int FN = Integer.parseInt(accuracy_oneCut[3]);
-            String AC = accuracy_oneCut[4];
-            String accruacy = AC;
+                String AC = accuracy_oneCut[4];
+                accruacy = AC;
 //                    + " = " + TP + " + " + TN
 //                    + " / "
 //                    + TP + " + " + FP + " + " + FN + " + " + TN;
-            String joined_accruacy = "";
-            if (!isMS_CLUSTERCHANGES) {
-                String[] joined_accuracy_oneCut = joined_accuracy_Array[i].split(",");
 
-                int joined_TP = Integer.parseInt(joined_accuracy_oneCut[0]);
-                int joined_FP = Integer.parseInt(joined_accuracy_oneCut[1]);
-                int joined_TN = Integer.parseInt(joined_accuracy_oneCut[2]);
-                int joined_FN = Integer.parseInt(joined_accuracy_oneCut[3]);
-                float joined_AC = Float.parseFloat(joined_accuracy_oneCut[4]);
 
-                joined_accruacy = joined_AC + "";
+                if (!isMS_CLUSTERCHANGES) {
+                    String[] joined_accuracy_oneCut = joined_accuracy_Array[i].split(",");
+
+                    int joined_TP = Integer.parseInt(joined_accuracy_oneCut[0]);
+                    int joined_FP = Integer.parseInt(joined_accuracy_oneCut[1]);
+                    int joined_TN = Integer.parseInt(joined_accuracy_oneCut[2]);
+                    int joined_FN = Integer.parseInt(joined_accuracy_oneCut[3]);
+                    float joined_AC = Float.parseFloat(joined_accuracy_oneCut[4]);
+
+                    joined_accruacy = joined_AC + "";
 //                    + " = " + joined_TP + " + " + joined_TN
 //                    + " / "
 //                    + joined_TP + " + " + joined_FP + " + " + joined_FN + " + " + joined_TN;
-            } else {
-                joined_accruacy = "MS_no_join";
+                } else {
+                    joined_accruacy = "MS_no_join";
+                }
             }
             sb_csv.append(numOfClusters + "," + numOfRemovedEdges + "," + modularity + "," + betweenness + "," + numOfLOCSplit + "," + weight_list + "," + accruacy + "," + joined_accruacy + "\n");
         }

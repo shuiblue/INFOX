@@ -44,9 +44,14 @@ public class ParsingMacros {
 
         /**   print macro size **/
         StringBuilder sb = new StringBuilder();
+        int num_of_macro = 0;
+        int total_size = 0;
         for (Map.Entry<String, ArrayList<String>> entry : macro_to_locArray.entrySet()) {
             sb.append(entry.getKey() + " : " + entry.getValue().size() + "\n");
+            num_of_macro++;
+            total_size+=entry.getValue().size();
         }
+        sb.append("average size = "+total_size/num_of_macro+"\n");
         iof.rewriteFile(sb.toString(), sourcecodeDir + "macroSize.txt");
     }
 
@@ -104,7 +109,7 @@ public class ParsingMacros {
                     //----cherokee-------
                     //"Cherokee~cherokee~utilC" -> " size = 29"
                     //"Cherokee~cherokee~socketC" -> " size = 17"
-                    String fileName = "Cherokee~cherokee~utilC";
+                    String fileName = "cherokee~utilC";
                     keys = new ArrayList(file_to_MacroList.get(fileName));
                     for (String k : keys) {
                         totalSize += macro_to_locArray.get(k).size();
@@ -123,29 +128,15 @@ public class ParsingMacros {
                 }
 
                 int size = macro_to_locArray.get(key).size();
+                targetMacroList.add(key);
 
-
-                if (!key.startsWith("__AVR_AT") && !targetMacroList.contains(key)) {
-                    if (size > sizeThreshold) {
-                        if (bigMacros.size() == 0 || (bigMacros.size() < num_bigSize_Macro && noFeatureInteraction(targetMacroList, key))) {
-                            bigMacros.add(key);
-                            targetMacroList.add(key);
-                            System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
-                        }
-                    } else if (size < sizeThreshold) {
-                        if (smallMacros.size() == 0 || (smallMacros.size() < num_smallSize_Macro && noFeatureInteraction(targetMacroList, key))) {
-                            smallMacros.add(key);
-                            targetMacroList.add(key);
-                            System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
-                        }
-                    }
-                }
+//                if (!key.startsWith("__AVR_AT") && !targetMacroList.contains(key))
                 /*  for testing Marlin*/
 //                targetMacroList = new ArrayList<>();
-//                targetMacroList.add("E2_IS_TMC");
+//                targetMacroList.add("FILAMENT_SENSOR");
 //                targetMacroList.add("MESH_BED_LEVELING");
-//                targetMacroList.add("REVERSE_MENU_DIRECTION");
-//                targetMacroList.add("Z_PROBE_ALLEN_KEY_DEPLOY_3_X");
+//                targetMacroList.add("ADVANCE");
+//                targetMacroList.add("ULTRA_LCD");
 
             }
         }
@@ -371,11 +362,16 @@ public class ParsingMacros {
     public static void main(String[] args) {
 
         generatingTestCases_differentMacroCombination();
+
+
     }
+
+
 
     public static void generatingTestCases_differentMacroCombination() {
         String analysisDirName = "DPGraph";
-        String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin";
+//        String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin";
+        String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testCherokee";
         ParsingMacros parsingMacros = new ParsingMacros();
         try {
             Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
@@ -384,12 +380,12 @@ public class ParsingMacros {
                     sourcecodeDir = filePath.toString() + FS;
                     parsingMacros.createMacroList(sourcecodeDir);
 
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 3; numOfTargetMacro++) {
-                        for (int i = 3; i <= 3; i++) {
-//                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-//                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <=10; numOfTargetMacro++) {
+                        for (int i = 1; i <= 6; i++) {
+                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
+                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
 
-                         String   testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
+                            testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                             parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
                         }
                     }
