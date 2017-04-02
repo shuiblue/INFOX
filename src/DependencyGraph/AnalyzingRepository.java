@@ -128,15 +128,14 @@ public class AnalyzingRepository {
                     clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0,hasGroundTruth);
                 }
 //        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
-
-                /** parse commit msg for each node **/
+//
+//                /** parse commit msg for each node **/
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
-
-
-                /**  calculate tfidf  to identifing keywords from each cluster**/
-//        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
 //
+//
+//                /**  calculate tfidf  to identifing keywords from each cluster**/
+//        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
 //        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
 //        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
 

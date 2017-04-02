@@ -19,6 +19,9 @@ public class ColorCode {
     static String upstreamNodeTxt = "upstreamNode.txt";
     static String jsFileHeader = "/jshead.txt";
 
+    static String htmlfilePath = "/Users/shuruiz/Work/MarlinRepo/visualizeHtml/";
+    //        String htmlfilePath = "C:\\Users\\shuruiz\\Documents\\visualizeHtml\\";
+
     static HashMap<Integer, String> nodeMap;
 
     HashMap<Integer, String> colorMap = new HashMap<>();
@@ -47,11 +50,13 @@ public class ColorCode {
     }
 
     public void parseSourceCodeFromFile(String fileName) {
+        String togglejsPath = "/toggle.js";
+        String join_togglejsPath = "/join-toggle.js";
+
         File currentFile = new File(sourcecodeDir + fileName);
         //            if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
         if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c") || fileName.endsWith(".pde")) {
-            String newFileName;
-            newFileName = iofunc.changeFileName(fileName);
+            String newFileName = iofunc.changeFileName(fileName);
             if (forkAddedNode.contains(newFileName)) {
                 String fileName_forHTML = "";
                 fileName_forHTML = newFileName.replace("~", "-");
@@ -78,10 +83,9 @@ public class ColorCode {
 */
                         sb.append(line.replace("<", "&lt;").replace(">", "&gt;"));
                         sb.append("</front>\n");
-                        if (old_lable.contains("utilC-17")) {
-                            System.out.print("");
-                        }
-                        if (!forkAddedNode.contains(old_lable) || line.trim().startsWith("//") || line.trim().startsWith("/*") || line.trim().startsWith("*")) {
+
+                        boolean isNewCode = forkAddedNode.contains(old_lable+"\n");
+                        if (!isNewCode || (isNewCode &&(line.trim().startsWith("//") || line.trim().startsWith("/*") || line.trim().startsWith("*")))){
                             jsContent.append("$(\"#" + lable + "\").toggle()\n");
                         }
 
@@ -112,8 +116,25 @@ public class ColorCode {
             }
 
         }
+
+        //toggle js
+        try {
+            iofunc.rewriteFile(iofunc.readResult(htmlfilePath + jsFileHeader), analysisDir + togglejsPath);
+            iofunc.rewriteFile(iofunc.readResult(htmlfilePath + jsFileHeader), analysisDir + join_togglejsPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        iofunc.writeTofile(jsContent.toString() + "\n}", analysisDir + togglejsPath);
+        iofunc.writeTofile(jsContent.toString() + "\n}", analysisDir + join_togglejsPath);
+
+
     }
 
+    /**
+     * This function parses Source Code From reporistory and generate html file
+     *
+     * @throws IOException
+     */
     public void createSourceFileHtml() throws IOException {
         File dir = new File(sourcecodeDir);
         String[] names = dir.list();
@@ -497,27 +518,28 @@ public class ColorCode {
 
     }
 
-    public void combineFiles(int numberOfClusters, int clusterSizeThreshold) {
-        String htmlfilePath = "/Users/shuruiz/Work/MarlinRepo/visualizeHtml/";
-//        String htmlfilePath = "C:\\Users\\shuruiz\\Documents\\visualizeHtml\\";
+    public void combineFiles(int numberOfClusters, int clusterSizeThreshold, boolean isJoinCluster) {
         String headtxt = "head.txt";
         String bodyPreTxt = "body_pre.txt";
         String endtxt = "end.txt";
-        String togglejsPath = "/toggle.js";
-        String html = numberOfClusters + ".html";
+
+        String html = isJoinCluster ? "join-" + numberOfClusters + ".html" : numberOfClusters + ".html";
+        String css = isJoinCluster ? numberOfClusters + "_join_bigSize-" + clusterSizeThreshold+".css"  : numberOfClusters + ".css";
+        String colorFile = isJoinCluster ? numberOfClusters + "_join_bigSize-" + clusterSizeThreshold + ".color" : numberOfClusters + ".color";
         try {
             //write code.html
-            iofunc.rewriteFile(iofunc.readResult(htmlfilePath + headtxt).replace("style.css", numberOfClusters + ".css"), analysisDir + html);
-            iofunc.writeTofile(iofunc.readResult(analysisDir + numberOfClusters + ".color"), analysisDir + html);
-            iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt), analysisDir + html);
+            iofunc.rewriteFile(iofunc.readResult(htmlfilePath + headtxt).replace("style.css", css), analysisDir + html);
+            iofunc.writeTofile(iofunc.readResult(analysisDir + colorFile), analysisDir + html);
+            if (isJoinCluster) {
+                iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt).replace("toggle.js", "join-toggle.js"), analysisDir + html);
+            } else {
+                iofunc.writeTofile(iofunc.readResult(htmlfilePath + bodyPreTxt), analysisDir + html);
+
+            }
             iofunc.writeTofile(iofunc.readResult(analysisDir + sourceCodeTxt), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + endtxt), analysisDir + html);
 
-            //toggle js
-            iofunc.rewriteFile(iofunc.readResult(htmlfilePath + jsFileHeader), analysisDir + togglejsPath);
-            iofunc.writeTofile(jsContent.toString() + "\n});", analysisDir + togglejsPath);
-
-            if (!isMS_CLUSTERCHANGES) {
+            if (!isMS_CLUSTERCHANGES && !isJoinCluster) {
                 //write color table
                 iofunc.rewriteFile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
                 iofunc.writeTofile("<h3> ----------------Before Joining-----------------", analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
