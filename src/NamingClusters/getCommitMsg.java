@@ -11,7 +11,7 @@ import java.util.*;
 public class GetCommitMsg {
     static final String FS = File.separator;
 
-    public GetCommitMsg( String testCaseDir, String testDir, HashMap<Integer, ArrayList<String>> clusterList, int n_gram) {
+    public GetCommitMsg( String testCaseDir, String testDir, HashMap<Integer, ArrayList<String>> clusterList, int n_gram,String repoPath) {
 
 
         String analysisDir = testCaseDir + testDir + FS;
@@ -38,7 +38,6 @@ public class GetCommitMsg {
             StringBuffer sb_origin = new StringBuffer();
             sb.append(k + " clusters: \n");
             sb_origin.append(k + " clusters: \n");
-            System.out.println("#element:----" + clusterList.get(k).size());
             for (String cl : v) {
                 if (cl.length() > 0) {
 
@@ -49,7 +48,6 @@ public class GetCommitMsg {
 
                     sb.append("\n[" + clusterID + "]");
                     sb_origin.append("\n[" + clusterID + "]");
-                    System.out.print("---" + clusterID + "\n");
                     String[] elementList = cl.trim().split(",");
                     int length = elementList.length;
                     for (int j = 0; j < length; j++) {
@@ -62,7 +60,7 @@ public class GetCommitMsg {
 //                                fileName = fileName.substring(index-8);
                                 String lineNumber = nodeLable.split("-")[1];
 
-                                String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram);
+                                String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram,repoPath);
 
 
                                 if (!clusterCommitMsg.keySet().contains(commit[0])) {
@@ -112,13 +110,13 @@ public class GetCommitMsg {
      * @param lineNumber
      * @return commit msg
      */
-    public static String[] getCommitMsgForEachNode(String fileName, String lineNumber, int n_gram) {
+    public static String[] getCommitMsgForEachNode(String fileName, String lineNumber, int n_gram,String repoPath) {
+        String dir = "Marlin/";
         Stemmer stemmer = new Stemmer();
         Tokenizer tokenizer = new Tokenizer();
-        String lineInfo = lineNumber + "," + lineNumber + ":" + fileName;
+        String lineInfo = lineNumber + "," + lineNumber + ":"+dir + fileName;
         ProcessBuilder processBuilder = new ProcessBuilder("git", "log", "--pretty=medium", "-L", lineInfo);
-        processBuilder.directory(new File("/Users/shuruiz/Work/originMarlin/upstream/Marlin/.git").getParentFile()); // this is where you set the root folder for the executable to run with
-       System.out.print(fileName+"-"+lineNumber+"\n");
+        processBuilder.directory(new File(repoPath).getParentFile()); // this is where you set the root folder for the executable to run with
 
         processBuilder.redirectErrorStream(true);
         Process process = null;

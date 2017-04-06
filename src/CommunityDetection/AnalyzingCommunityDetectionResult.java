@@ -76,6 +76,7 @@ public class AnalyzingCommunityDetectionResult {
                     }
 
                     if (hasGroundTruth) {
+                        System.out.println(id);
                         String expectColor = nodeInfo[2];
 
                         HashMap<String, Integer> distributedColor = resultTable.get(expectColor.trim());
@@ -151,7 +152,7 @@ public class AnalyzingCommunityDetectionResult {
         /** sort clusters by size **/
         clusterid_size_map.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-                .limit(3)
+                .limit(5)
                 .forEach(k -> {
                             clusterID[0] = Integer.parseInt(k.toString().split("=")[0]);
                             size[0] = Integer.parseInt(k.toString().split("=")[1]);
@@ -499,7 +500,7 @@ public class AnalyzingCommunityDetectionResult {
 
         current_clustering_result.forEach((k, v) -> {
             nodeNeedToBeToggled[0] = forkAddedNode;
-            if (v.size() >= 50) {
+            if (v.size() >= 9) {
 
                 newToggleFile[0] = "\n$( \"#"+numberOfClusters + "-cluster-" + k+"\" ).click(function() {\n"
                                    +"myFunction();\n";

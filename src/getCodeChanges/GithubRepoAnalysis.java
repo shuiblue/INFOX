@@ -103,7 +103,7 @@ public class GithubRepoAnalysis {
     }
 
     public static void main(String[] args) {
-        String dir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/";
+        String dir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/";
         String diffFilePath = "diff.txt";
         String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();

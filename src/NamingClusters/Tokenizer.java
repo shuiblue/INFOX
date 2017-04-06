@@ -23,7 +23,6 @@ public class Tokenizer {
      *
      * @param sourcecodeDir path of the repostiroy
      */
-
     public void tokenizeSourceCode(String sourcecodeDir, String testCaseDir) {
         Stemmer stemmer = new Stemmer();
         ProcessingText processingText = new ProcessingText();
@@ -78,8 +77,13 @@ public class Tokenizer {
                                                 twoGram_newLine += tg + " ";
                                             }
                                         } else {
-                                            oneGram_newLine += s + " ";
-                                            twoGram_newLine += s + " ";
+
+                                            if (s.trim().length() != 1 && (!s.equals("x") && !s.equals("y") && !s.equals("z")) ) {
+                                                oneGram_newLine += s + " ";
+                                                twoGram_newLine += s + " ";
+                                            }
+
+
                                         }
                                     }
                                 }
@@ -154,9 +158,13 @@ public class Tokenizer {
                     s = s + "_" + word;
                 }
             }
+
             //Add n-gram to a list
-            ngramList.add(s);
+            if (s.trim().length() != 1 && (!s.equals("x") && !s.equals("y") && !s.equals("z")) ) {
+                ngramList.add(s);
+            }
         }
         return ngramList;
     }
+
 }

@@ -56,6 +56,10 @@ public class StopWords {
         stopWordList.add("final");
         stopWordList.add("is");
         stopWordList.add("it");
+        stopWordList.add("at");
+        stopWordList.add("there");
+        stopWordList.add("are");
+        stopWordList.add("fatal");
     }
 
     public String removeStopWord(String string) {

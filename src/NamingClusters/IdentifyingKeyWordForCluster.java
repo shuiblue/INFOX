@@ -50,12 +50,10 @@ public class IdentifyingKeyWordForCluster {
                 doc.add(s.split(":")[1]);
             }
 
-            System.out.print("");
             /** get commit msg
              * other commit msg added into all
              * cluster -related commit add to cluster
              * **/
-
 
             docs.add(doc);
         } catch (IOException e) {
@@ -70,6 +68,7 @@ public class IdentifyingKeyWordForCluster {
                 if (cl.length() > 0) {
                     List<String> clusterString = new ArrayList<>();
                     String clusterID = cl.substring(0, cl.trim().indexOf(")"));
+
                     String[] elementList = cl.trim().split(",");
                     int length = elementList.length;
                     for (int j = 0; j < length; j++) {

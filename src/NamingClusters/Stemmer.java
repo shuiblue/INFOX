@@ -530,7 +530,9 @@ public class Stemmer {
         Stemmer s = new Stemmer();
         s.add(word.toCharArray(), word.length());
         s.stem();
+        System.out.println(s.toString());
         return s.toString();
+
     }
 
 
@@ -595,9 +597,6 @@ public class Stemmer {
      * Usage: Stemmer file-name file-name ...
      */
     public static void main(String[] args) {
-//        stemmingFile("");
-        stemmingAWord("meas ");
-        stemmingAWord("advance ");
-        stemmingAWord("advanc ");
+        stemmingAWord("printing ");
     }
 }

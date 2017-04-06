@@ -17,6 +17,12 @@ public class Main {
 
     static final String FS = File.separator;
 
+//    static String repoPath = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/.git";
+//    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/Marlin/";
+    static boolean hasGroundTruth = false;
+    static  String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/Marlin/";
+   static String repoPath = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/.git";
+
     /**
      * Main method for testing the INFOX method
      *
@@ -25,8 +31,7 @@ public class Main {
     public static void main(String[] args) {
 //        ifdefBasedTest();
 //        realProjectTest_withGroundTruth();
-
-        clusteringChangedCodeFromFork();
+        clusteringChangedCodeFromFork(repoPath, hasGroundTruth);
 
 
     }
@@ -34,7 +39,7 @@ public class Main {
     /**
      * This function cluster changed code from a fork
      */
-    private static void clusteringChangedCodeFromFork() {
+    private static void clusteringChangedCodeFromFork(String repoPath, boolean hasGroundTruth) {
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {
             System.out.println("Cannot load R");
@@ -44,17 +49,16 @@ public class Main {
         AnalyzingRepository analyzeRepo = new AnalyzingRepository();
         /**  parse different repositories under testCasesDir  **/
 
-            String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/Marlin/";
 
 //            Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
 //                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
-                String sourcecodeDir = testCasesDir;
-                String analysisDirName = "INFOX_output";
-                int approachIndex = 1; //INFOX ==1
+        String sourcecodeDir = testCasesDir;
+        String analysisDirName = "INFOX_output";
+        int approachIndex = 1; //INFOX ==1
 
-                String testCaseDir = sourcecodeDir + analysisDirName + FS;
+        String testCaseDir = sourcecodeDir + analysisDirName + FS;
 
-                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re,false);
+        analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
 //            });
 
 
@@ -71,8 +75,9 @@ public class Main {
         /**  parse different repositories under testCasesDir  **/
         try {
 
-            String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testSuricata/suricata/src/";
+//            String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testSuricata/suricata/src/";
 
+            String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/Marlin/";
             Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
 //                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                 String sourcecodeDir = filePath.toString() + FS;
@@ -112,7 +117,7 @@ public class Main {
 
                 String testCaseDir = sourcecodeDir + analysisDirName + FS;
                 System.out.println(testCaseDir);
-                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re,hasGroundTruth);
+                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -186,9 +191,9 @@ public class Main {
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                                 System.out.println(testCaseDir);
-                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re,hasGroundTruth);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re, hasGroundTruth);
                                 System.out.println(testCaseDir_macrosFromOneFile);
-                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re,hasGroundTruth);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re, hasGroundTruth);
                             }
                         }
                     }

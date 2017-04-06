@@ -14,14 +14,14 @@ import java.nio.file.Paths;
  */
 public class analyzingResult {
     //    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testINFOX/Marlin/DPGraph/";
-//    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin/Marlin/";
-    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testCherokee/Cherokee/";
+    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin/Marlin/";
+//    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testCherokee/Cherokee/";
     static final String FS = File.separator;
     static String dpPath = "";
     static int total_num_of_cuts = 5;
     static boolean isMs = false;
     static String csvPathList_txt = "csvPath_List.txt";
-    static String outputFile = "maxAcc.csv";
+    static String outputFile = "maxAcc-best.csv";
     static ProcessingText processingText = new ProcessingText();
     static int STOP_CRITERIA = 50;
 
@@ -102,6 +102,49 @@ public class analyzingResult {
 
 
     private static void findMaxAccuracyPoint(String[] listOfCSV, String analysisDirName, boolean isMs) {
+        new ProcessingText().rewriteFile("filePath, num_cluster_inc, num_edgeRemoved, maxAcc\n", testCasesDir + analysisDirName + FS + outputFile);
+        StringBuilder sb = new StringBuilder();
+        String line;
+        for (String csvFile : listOfCSV) {
+
+            double maxAcc = 0;
+            int clusterInc = -1;
+            try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+                System.out.println(csvFile);
+                int edgeRemoved_total = 0;
+                while ((line = br.readLine()) != null) {
+                    if (!line.contains("Clusters")) {
+                        String[] cutList = line.split(",");
+                        double acc = Double.valueOf(cutList[6].split("=")[0]);
+                        int edgeRemoved_current = Integer.valueOf(cutList[1]);
+                        if (!isMs) {
+                            double join_acc = Double.valueOf(cutList[7].split("=")[0]);
+                            if (maxAcc < acc || maxAcc < join_acc) {
+                                maxAcc = acc > join_acc ? acc : join_acc;
+                                edgeRemoved_total += edgeRemoved_current;
+                                clusterInc++;
+                            } else {
+                                sb.append(csvFile + "," + clusterInc + "," + edgeRemoved_total + "," + maxAcc + "\n");
+                                System.out.println(edgeRemoved_total + "," + maxAcc);
+                                break;
+                            }
+                        } else {
+                            sb.append(csvFile + "," + acc + "\n");
+                            System.out.println(edgeRemoved_total + "," + maxAcc);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+//        }
+        new ProcessingText().writeTofile(sb.toString(), testCasesDir + analysisDirName + FS + outputFile);
+    }
+
+
+
+    private static void selectDataPointBasedOnStopCriteria(String[] listOfCSV, String analysisDirName, boolean isMs) {
 
         if (isMs) {
             new ProcessingText().rewriteFile("filePath, accuracy\n", testCasesDir + analysisDirName + FS + outputFile);
@@ -239,7 +282,7 @@ public class analyzingResult {
 
 
             /** collect all the csv file path **/
-            collect_AllCSV_to_oneplace(analysisDirName);
+//            collect_AllCSV_to_oneplace(analysisDirName);
 
             String[] listOfCSV = new String[]{};
             try {
@@ -250,8 +293,8 @@ public class analyzingResult {
 
 
             /**  generate a csv to find the max acc and corresponding 1)  #cluster_inc  and 2) #edgeRemoved. **/
-            findMaxAccuracyPoint(listOfCSV, analysisDirName, isMs);
-
+//            selectDataPointBasedOnStopCriteria(listOfCSV, analysisDirName, isMs);
+            findMaxAccuracyPoint(listOfCSV,analysisDirName,isMs);
 
 //        for (String csv : listOfCSV) {
 //
