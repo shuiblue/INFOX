@@ -397,7 +397,7 @@ public class R_CommunityDetection {
         String analysisDir = testCaseDir + testDir + FS;
         ioFunc.rewriteFile(sb.toString(), analysisDir + numOfClusters + "_distanceBetweenCommunityies.txt");
         ioFunc.rewriteFile(clusterIDList.toString(), analysisDir + numOfClusters + "_clusterIdList.txt");
-        ioFunc.rewriteFile(sb_shortestPath_node.toString(), analysisDir + numOfClusters + "_shortestPath.txt");
+//        ioFunc.rewriteFile(sb_shortestPath_node.toString(), analysisDir + numOfClusters + "_shortestPath.txt");
     }
 
     /**

@@ -84,7 +84,7 @@ public class GithubRepoAnalysis {
         return changedFile_line_map;
     }
 
-    private void generateForkAddedNodeFile(HashMap<String, ArrayList<Integer>> changedFile_line_map,String output) {
+    public void generateForkAddedNodeFile(HashMap<String, ArrayList<Integer>> changedFile_line_map, String output) {
         StringBuilder sb = new StringBuilder();
 
         Iterator it = changedFile_line_map.entrySet().iterator();

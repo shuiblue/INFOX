@@ -1,3 +1,5 @@
+package ClusteringCodeChanges;
+
 import DependencyGraph.AnalyzingRepository;
 import Util.ParsingMacros;
 import org.rosuda.JRI.Rengine;
@@ -12,16 +14,16 @@ import java.util.ArrayList;
 /**
  * Created by shuruiz on 6/2/2016.
  */
-public class Main {
+public class ClusterCodeChanges {
 
 
     static final String FS = File.separator;
 
-//    static String repoPath = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/.git";
+    //    static String repoPath = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/.git";
 //    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/Marlin/";
     static boolean hasGroundTruth = false;
-    static  String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/Marlin/";
-   static String repoPath = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/.git";
+    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/Marlin/";
+     String repoPath="" ;
 
     /**
      * Main method for testing the INFOX method
@@ -29,9 +31,11 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
+
+
 //        ifdefBasedTest();
 //        realProjectTest_withGroundTruth();
-        clusteringChangedCodeFromFork(repoPath, hasGroundTruth);
+//        clusteringChangedCodeFromFork(repoPath, hasGroundTruth);
 
 
     }
@@ -39,7 +43,7 @@ public class Main {
     /**
      * This function cluster changed code from a fork
      */
-    private static void clusteringChangedCodeFromFork(String repoPath, boolean hasGroundTruth) {
+    public void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth) {
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {
             System.out.println("Cannot load R");
@@ -47,24 +51,18 @@ public class Main {
         }
 
         AnalyzingRepository analyzeRepo = new AnalyzingRepository();
-        /**  parse different repositories under testCasesDir  **/
-
-
-//            Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
-//                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
-        String sourcecodeDir = testCasesDir;
+        String sourcecodeDir = localSourceCodeDirPath;
+       this.repoPath = localSourceCodeDirPath+".git";
         String analysisDirName = "INFOX_output";
         int approachIndex = 1; //INFOX ==1
 
         String testCaseDir = sourcecodeDir + analysisDirName + FS;
-
         analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
-//            });
 
 
     }
 
-    private static void realProjectTest_withGroundTruth() {
+    private  void realProjectTest_withGroundTruth() {
         boolean hasGroundTruth = true;
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {

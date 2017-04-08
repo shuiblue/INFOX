@@ -268,7 +268,11 @@ public class DependencyGraph {
      * @return dependency graph, no edge label stored.
      */
     public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String testCaseDir, String testDir) {
-        this.analysisDir = testCaseDir + testDir + FS;
+        if(testDir.equals("")){
+            this.analysisDir=testCaseDir;
+        }else {
+            this.analysisDir = testCaseDir + testDir + FS;
+        }
         this.sourcecodeDir = sourcecodeDir;
         this.testCaseDir = testCaseDir;
         this.testDir = testDir;
@@ -353,6 +357,32 @@ public class DependencyGraph {
         /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
              ------ similarity calculation purpose---------     */
         writeStringsToFile(sourceCodeLocMap);
+
+
+        // get forkAddedNodeId LIST
+        String graphPath = testCaseDir + "/complete.pajek.net";
+        String completeGraph = null;
+        try {
+            completeGraph = processingText.readResult(graphPath);
+            String nodeListString = completeGraph.split("\\*arcs")[0];
+            String[] nodeList = nodeListString.split("\n");
+            for (String line : nodeList) {
+                if (!line.startsWith("*")) {
+                    label_to_id.put(line.split(" ")[1], line.split(" ")[0]);
+                }
+            }
+            StringBuilder sb_forkAddedNode_id = new StringBuilder();
+            for (String s : forkaddedNodeList) {
+                if (label_to_id.get("\"" + s + "\"") != null) {
+                    sb_forkAddedNode_id.append(label_to_id.get("\"" + s + "\"") + ",");
+                }
+            }
+            processingText.rewriteFile(sb_forkAddedNode_id.toString(), testCaseDir + "forkAddedNodeID.txt");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
 
         return edgeList;

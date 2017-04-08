@@ -10,6 +10,8 @@ import nu.xom.Document;
 import nu.xom.ParsingException;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -378,10 +380,11 @@ public class ProcessingText {
     }
 
     public boolean isPdeFile(String filePath) {
-        return  filePath.endsWith(".pde");
+        return filePath.endsWith(".pde");
     }
-    public boolean isCFile_general(String filePath){
-        return isCFile(filePath)||isHeaderFile(filePath)||isPdeFile(filePath);
+
+    public boolean isCFile_general(String filePath) {
+        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath);
     }
 
     public String removeUselessLine(String line) {
@@ -422,15 +425,40 @@ public class ProcessingText {
 
     /**
      * This function check current line is code or comment
+     *
      * @param line the content of current line
      * @return true== if it is code; false=== it is comment
      */
-    public boolean isCode (String line){
-           if (line.startsWith("*") || line.startsWith("//")||line.startsWith("/*") ||line.endsWith("*/")||line.trim().length()==0) {
+    public boolean isCode(String line) {
+        if (line.startsWith("*") || line.startsWith("//") || line.startsWith("/*") || line.endsWith("*/") || line.trim().length() == 0) {
             return false;
         }
         return true;
     }
+
+
+    public void ReadTextFromURL(String urlStr, String outputFile) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            URL url = new URL(urlStr);
+            // read text returned by server
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+
+            String line;
+            while ((line = in.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            in.close();
+
+        } catch (MalformedURLException e) {
+            System.out.println("Malformed URL: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("I/O Error: " + e.getMessage());
+        }
+
+        rewriteFile(sb.toString(), outputFile);
+    }
+
 
     public static void main(String[] args) {
         String path = "C:\\Users\\shuruiz\\Documents\\LineCounter\\txt\\";

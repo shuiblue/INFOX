@@ -94,7 +94,9 @@ public class ParseHtml {
         //git clone repo to local dir
         JgitUtility jgitUtility = new JgitUtility();
         String uri = github_page+forkName+".git";
-        jgitUtility.cloneRepo(uri,forkName);
+        String localDirPath = "/Users/shuruiz/Work/GithubProject/"+forkName;
+        jgitUtility.cloneRepo(uri,localDirPath);
+
 
         // hack github page
         parseHtml.generateMocGithubForkPage(diffPageUrl, forkName);
