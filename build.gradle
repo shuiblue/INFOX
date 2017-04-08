@@ -16,9 +16,21 @@ dependencies {
     compile 'com.github.lucarosellini.rJava:JRIEngine:0.9-7'
     compile 'com.github.lucarosellini.rJava:REngine:0.9-7'
     compile 'com.github.lucarosellini.rJava:JRI:0.9-7'
+    // https://mvnrepository.com/artifact/info.debatty/java-string-similarity
+    compile group: 'info.debatty', name: 'java-string-similarity', version: '0.18'
+    // jsoup HTML parser library @ http://jsoup.org/
+    compile 'org.jsoup:jsoup:1.10.2'
+    // https://mvnrepository.com/artifact/org.json/json
+    compile group: 'org.json', name: 'json', version: '20160810'
+    // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.6.1.201703071140-r'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.6.2'
+
     compile('com.io7m.xom:xom:1.2.10') {
         transitive = false
     }
+
 }
 sourceSets {
     main {
