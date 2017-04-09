@@ -181,17 +181,25 @@ public class DependencyGraph {
         String graphPath = sourcecodeDir + analysisDirName + "/complete.pajek.net";
         try {
             String completeGraph = processingText.readResult(graphPath);
+
+            //get node list
+            StringBuilder stringBuilder = new StringBuilder();
             String nodeListString = completeGraph.split("\\*arcs")[0];
             String[] nodeList = nodeListString.split("\n");
-            String edgeListString = completeGraph.split("\\*arcs")[1];
-
-            String[] edgeList = edgeListString.split("\n");
-
             for (String line : nodeList) {
                 if (!line.startsWith("*")) {
-                    label_to_id.put(line.split(" ")[1], line.split(" ")[0]);
+                    String label = line.split(" ")[1];
+                    String id = line.split(" ")[0];
+                    label_to_id.put(label, id);
+                    stringBuilder.append(label + ":" + id + "\n");
                 }
             }
+            processingText.rewriteFile(stringBuilder.toString(), analysisDir + "nodeLable2IdMap.txt");
+
+            //get edgelist
+            String edgeListString = completeGraph.split("\\*arcs")[1];
+            String[] edgeList = edgeListString.split("\n");
+
 
             /** Check whether forkAddedNode file exists **/
             changedFiles = new HashSet<>();
@@ -226,7 +234,6 @@ public class DependencyGraph {
             re.eval("oldg<-read_graph(\"" + graphPath + "\", format=\'pajek\')");
             re.eval("subv <- c(" + sb_forkAddedNode.toString().substring(0, sb_forkAddedNode.toString().length() - 1) + ")");
             re.eval("subg<-induced.subgraph(graph=oldg,vids=subv)");
-            re.eval(" write_graph(subg,\"/Users/shuruiz/Box Sync/community detection tool/igraph/22.pajek.net\", format=\"pajek\")");
 
 
             REXP edgelist_R = re.eval("cbind( get.edgelist(subg) , round( E(subg)$weight, 3 ))", true);
@@ -268,11 +275,7 @@ public class DependencyGraph {
      * @return dependency graph, no edge label stored.
      */
     public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String testCaseDir, String testDir) {
-        if(testDir.equals("")){
-            this.analysisDir=testCaseDir;
-        }else {
-            this.analysisDir = testCaseDir + testDir + FS;
-        }
+
         this.sourcecodeDir = sourcecodeDir;
         this.testCaseDir = testCaseDir;
         this.testDir = testDir;
@@ -332,7 +335,7 @@ public class DependencyGraph {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
 //                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
 /**  need to parse pde file as well for real fork**/
-                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString())||processingText.isPdeFile(filePath.toString()))) {
+                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString()) || processingText.isPdeFile(filePath.toString()))) {
 
                     parseSingleFile(filePath);
                 }
@@ -364,13 +367,26 @@ public class DependencyGraph {
         String completeGraph = null;
         try {
             completeGraph = processingText.readResult(graphPath);
+
+            //get node list
+            StringBuilder stringBuilder = new StringBuilder();
             String nodeListString = completeGraph.split("\\*arcs")[0];
             String[] nodeList = nodeListString.split("\n");
             for (String line : nodeList) {
                 if (!line.startsWith("*")) {
-                    label_to_id.put(line.split(" ")[1], line.split(" ")[0]);
+                    String label = line.split(" ")[1];
+                    String id = line.split(" ")[0];
+                    label_to_id.put(label, id);
+                    stringBuilder.append(label + ":" + id + "\n");
                 }
             }
+            processingText.rewriteFile(stringBuilder.toString(), analysisDir + "nodeLable2IdMap.txt");
+
+            //get edgelist
+            String edgeListString = completeGraph.split("\\*arcs")[1];
+            String[] edgeList = edgeListString.split("\n");
+
+
             StringBuilder sb_forkAddedNode_id = new StringBuilder();
             for (String s : forkaddedNodeList) {
                 if (label_to_id.get("\"" + s + "\"") != null) {
@@ -382,7 +398,6 @@ public class DependencyGraph {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
 
         return edgeList;
@@ -431,7 +446,7 @@ public class DependencyGraph {
 //        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
 //        if (fileName.endsWith(".h")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
         /**for real fork **/
-        if (fileName.endsWith(".h")||fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
+        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
             tmpFilePath += ".cpp";
         }
         try {
@@ -1862,7 +1877,7 @@ public class DependencyGraph {
             String var_name = variable.getName();
             String var_alias = variable.getAlias();
             if (!var_alias.equals("unknowntype") && !var_name.equals("unknowntype")
-                    &&!var_name.equals("ret_error")&&!var_name.equals("ret_ok")&&!var_name.equals("ret")) {
+                    && !var_name.equals("ret_error") && !var_name.equals("ret_ok") && !var_name.equals("ret")) {
 //            if (!var_alias.equals("unknowntype") && !var_name.equals("unknowntype")) {
                 String var = "";
                 int scope = variable.getScope();
@@ -2301,5 +2316,7 @@ public class DependencyGraph {
         }
 
     }
+
+
 
 }

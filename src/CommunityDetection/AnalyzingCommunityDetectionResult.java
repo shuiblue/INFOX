@@ -6,11 +6,7 @@ import Util.GenerateCombination;
 import Util.ProcessingText;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 /**
  * Created by shuruiz on 8/29/16.
@@ -36,12 +32,86 @@ public class AnalyzingCommunityDetectionResult {
 
     static boolean isMS_CLUSTERCHANGES = false;
 
+    HashMap<Integer, HashMap<Integer, HashMap<Integer, HashSet<Integer>>>> topClustersSplittingResult = new HashMap<>();
+    HashMap<Integer, HashMap<Integer, HashSet<Integer>>> originalCluster = new HashMap<>();
+
+
     public AnalyzingCommunityDetectionResult(String sourcecodeDir, String testCaseDir, String testDir, boolean isMS_CLUSTERCHANGES) {
         this.sourcecodeDir = sourcecodeDir;
-        this.analysisDir = testCaseDir + testDir + FS;
+        if (testDir.equals("")) {
+            this.analysisDir = testCaseDir;
+        } else {
+            this.analysisDir = testCaseDir + testDir + FS;
+        }
         this.testCaseDir = testCaseDir;
         this.testDir = testDir;
         this.isMS_CLUSTERCHANGES = isMS_CLUSTERCHANGES;
+    }
+
+    public HashMap<Integer, HashMap<Integer, HashSet<Integer>>> getClusteringResultMap(int clusterSizeThreshold, boolean hasGroundTruth, String clusterFile) {
+        HashMap<Integer, HashMap<Integer, HashSet<Integer>>> clusterResultMap = new HashMap<>();
+        String clusterFilePath = analysisDir + clusterFile;
+        String clusterResultListString = "";
+
+        ProcessingText processingText = new ProcessingText();
+
+        /** get fork added node **/
+        File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
+        if (forkAddedFile.exists()) {
+            try {
+                forkAddedNode = processingText.readResult(testCaseDir + forkAddedNodeTxt);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            clusterResultListString = processingText.readResult(clusterFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int pre_numberOfCommunites = 0;
+        int index = 1;
+        /** split edge cutting result  **/
+        String[] resultArray = clusterResultListString.split("--------Graph-------");
+
+        for (int i = 0; i < resultArray.length; i++) {
+            /**  one edge cutting result **/
+            String result = resultArray[i];
+            if (result.contains("communities")) {
+                /**     calculating cluster info, such as modularity, #edge cut ..  **/
+                double[] clusterInfo = getClusterInfo(result.split("communities")[0]);
+
+                int numberOfCommunities = (int) clusterInfo[0];
+                if (numberOfCommunities > 1) {
+
+                    if (pre_numberOfCommunites != numberOfCommunities) {
+                        result = result.split("communities")[1];
+                        String[] clusterArray = result.split("\n");
+
+                        ArrayList<String> clusters = new ArrayList(Arrays.asList(clusterArray));
+
+                        if (clusterResultMap.size() == 0) {
+                            initialNumOfClusters = numberOfCommunities;
+                            processingText.writeTofile(initialNumOfClusters + ",0\n", analysisDir + "LOC_split.txt");
+                        }
+//                        clusterResultMap.put(numberOfCommunities, clusters);
+
+                        /** generates current clustering result map
+                         * #index  -> hashset of nodeid  **/
+                        HashMap<Integer, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters);
+                        clusterResultMap.put(index, current_clustering_result);
+
+                        pre_numberOfCommunites = numberOfCommunities;
+                        index++;
+                    }
+                }
+            }
+
+        }
+        return clusterResultMap;
+
     }
 
 
@@ -348,6 +418,82 @@ public class AnalyzingCommunityDetectionResult {
         return null;
     }
 
+
+    public void generateClusteringResult() {
+        ProcessingText protext = new ProcessingText();
+// todo
+        boolean hasGroundTruth = false;
+        int clusterSizeThreshold = 10;
+        String originClusterFile = "clusterTMP.txt";
+        parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, originClusterFile);
+
+        topClustersSplittingResult = new HashMap<>();
+        originalCluster = getClusteringResultMap(clusterSizeThreshold, hasGroundTruth, originClusterFile);
+
+
+        String[] topClusters = null;
+        try {
+            topClusters = protext.readResult(analysisDir + "topClusters.txt").split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //TODO: community detection, more than 5 cuts
+        for (String clusterID : topClusters) {
+            String currentClusterFile = clusterID + "_" + originClusterFile;
+            topClustersSplittingResult.put(Integer.valueOf(clusterID), getClusteringResultMap(clusterSizeThreshold, hasGroundTruth, currentClusterFile));
+        }
+
+        ArrayList<ArrayList<Integer>> combination = getCombinations();
+        int start = 0;
+        for(ArrayList<Integer> com : combination){
+            if(start++==0){
+                continue;
+            }
+            generateClusteringResult_ByCombiningSplittingStep(com);
+        }
+
+
+
+    }
+
+    //todo
+
+    /**
+     * This function generate different clustering result by combining differernt splitting steps
+     */
+    private void generateClusteringResult_ByCombiningSplittingStep(ArrayList<Integer> combination) {
+String outputFile = combination.toString().replace("[","").replace("]","").replace(",","_")+".txt";
+        System.out.print("");
+
+
+
+    }
+
+    private ArrayList<ArrayList<Integer>> getCombinations() {
+        ArrayList<ArrayList<Integer>> combination = new ArrayList<>();
+
+
+        for (int i = 1; i <= 5; i++) {
+            for (int j = 1; j <= 5; j++) {
+                for (int t = 1; t <= 5; t++) {
+                    for (int s = 1; s <= 5; s++) {
+                        for (int m = 1; m <= 5; m++) {
+                            ArrayList<Integer> current_combinaton = new ArrayList<>();
+                            current_combinaton.add(i);
+                            current_combinaton.add(j);
+                            current_combinaton.add(t);
+                            current_combinaton.add(s);
+                            current_combinaton.add(m);
+                            combination.add(current_combinaton);
+                        }
+                    }
+                }
+            }
+        }
+        return combination;
+    }
+
     /**
      * This function parse the cluster.txt file, to analyze each clustering result after removing a bridge
      */
@@ -357,9 +503,9 @@ public class AnalyzingCommunityDetectionResult {
     public void parseEachUsefulClusteringResult(String sourcecodeDir, String analysisDir, ArrayList<String> macroList) {
         //----for Marlin repo structure----
       */
-    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(int clusterSizeThreshold, boolean hasGroundTruth) {
+    public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(int clusterSizeThreshold, boolean hasGroundTruth, String clusterFile) {
         clusterResultMap = new HashMap<>();
-        String clusterFilePath = analysisDir + "clusterTMP.txt";
+        String clusterFilePath = analysisDir + clusterFile;
         String clusterResultListString = "";
 
         ProcessingText processingText = new ProcessingText();
@@ -422,7 +568,7 @@ public class AnalyzingCommunityDetectionResult {
                         HashMap<Integer, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters);
 
                         /** generateing toggle.js file for each cluster **/
-                        generateToggleFileForEachCluster(current_clustering_result, false,numberOfCommunities);
+                        generateToggleFileForEachCluster(current_clustering_result, false, numberOfCommunities);
 
                         /** calculating accuracy for clustering result
                          * 0 - true_positive,1 - false_positive, 2 - true_negtive, 3 - false_negtive, 4- accuracy
@@ -435,7 +581,7 @@ public class AnalyzingCommunityDetectionResult {
                             HashMap<Integer, HashSet<Integer>> joined_clusters = getJoinedClusters(colorCode, numberOfCommunities, clusters, current_clustering_result, clusterSizeThreshold);
 
                             /** generateing toggle.js file for each cluster **/
-                            generateToggleFileForEachCluster(joined_clusters, true,numberOfCommunities);
+                            generateToggleFileForEachCluster(joined_clusters, true, numberOfCommunities);
 
 
                             if (hasGroundTruth) {
@@ -484,7 +630,7 @@ public class AnalyzingCommunityDetectionResult {
         return clusterResultMap;
     }
 
-    private void generateToggleFileForEachCluster(HashMap<Integer, HashSet<Integer>> current_clustering_result, boolean isJoinCluster,int numberOfClusters ) {
+    private void generateToggleFileForEachCluster(HashMap<Integer, HashSet<Integer>> current_clustering_result, boolean isJoinCluster, int numberOfClusters) {
         String origin_togglejsPath = "toggle.js";
         String affix = "\n});\n";
         String isJoin = isJoinCluster ? "join-" : "";
@@ -502,12 +648,12 @@ public class AnalyzingCommunityDetectionResult {
             nodeNeedToBeToggled[0] = forkAddedNode;
             if (v.size() >= 9) {
 
-                newToggleFile[0] = "\n$( \"#"+numberOfClusters + "-cluster-" + k+"\" ).click(function() {\n"
-                                   +"myFunction();\n";
+                newToggleFile[0] = "\n$( \"#" + numberOfClusters + "-cluster-" + k + "\" ).click(function() {\n"
+                        + "myFunction();\n";
                 System.out.println(isJoin + numberOfClusters + "-cluster-" + k);
                 v.forEach(nodeid -> {
                     String nodeLabel = nodeMap.get(nodeid);
-                    nodeNeedToBeToggled[0] =    nodeNeedToBeToggled[0].replace(nodeLabel + "\n", "");
+                    nodeNeedToBeToggled[0] = nodeNeedToBeToggled[0].replace(nodeLabel + "\n", "");
                 });
 
                 String[] forkAddedNodeArray = nodeNeedToBeToggled[0].split("\n");
@@ -519,7 +665,7 @@ public class AnalyzingCommunityDetectionResult {
 
             }
         });
-System.out.print("");
+        System.out.print("");
 
     }
 
@@ -544,19 +690,19 @@ System.out.print("");
             HashSet<Integer> tmp = new HashSet<>();
             Iterator it = closeClusters.iterator();
             int current_index = 0;
-            int pre_index=0;
+            int pre_index = 0;
             while (it.hasNext()) {
                 current_index = Integer.valueOf((String) it.next());
-                if (current_clustering_result.get(current_index).size() < clusterSizeThreshold ||tmp.size()<clusterSizeThreshold) {
+                if (current_clustering_result.get(current_index).size() < clusterSizeThreshold || tmp.size() < clusterSizeThreshold) {
                     tmp.addAll(current_clustering_result.get(current_index));
                     joined_clusters.remove(current_index);
-                    pre_index=current_index;
-                }else{
-                    current_index=pre_index;
+                    pre_index = current_index;
+                } else {
+                    current_index = pre_index;
                 }
 
             }
-            if(current_index!=0) {
+            if (current_index != 0) {
                 joined_clusters.put(current_index, tmp);
             }
         }

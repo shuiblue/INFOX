@@ -459,7 +459,26 @@ public class ProcessingText {
         rewriteFile(sb.toString(), outputFile);
     }
 
+    public HashMap<String, String> getNodeLabel_to_id_map(String filePath) {
+        HashMap<String, String> label_to_id = new HashMap<>();
 
+        String[] nodeList = new String[0];
+        try {
+            nodeList = readResult(filePath).split("\n");
+            for (String line : nodeList) {
+                if (!line.startsWith("*")) {
+                    String label = line.split(":")[0];
+                    String id = line.split(":")[1];
+                    if(!label.equals("")) {
+                        label_to_id.put(label, id);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return label_to_id;
+    }
     public static void main(String[] args) {
         String path = "C:\\Users\\shuruiz\\Documents\\LineCounter\\txt\\";
         final int[] lines = {0};
