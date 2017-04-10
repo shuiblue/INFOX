@@ -2,11 +2,13 @@ package CommunityDetection;
 
 import ColorCode.BackgroundColor;
 import ColorCode.ColorCode;
+import DependencyGraph.DependencyGraph;
 import Util.GenerateCombination;
 import Util.ProcessingText;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by shuruiz on 8/29/16.
@@ -33,7 +35,10 @@ public class AnalyzingCommunityDetectionResult {
     static boolean isMS_CLUSTERCHANGES = false;
 
     HashMap<Integer, HashMap<Integer, HashMap<Integer, HashSet<Integer>>>> topClustersSplittingResult = new HashMap<>();
-    HashMap<Integer, HashMap<Integer, HashSet<Integer>>> originalCluster = new HashMap<>();
+
+    HashMap<Integer, HashSet<Integer>> originalClusterMap = new HashMap<>();
+
+    HashMap<String, HashMap<String, HashSet<Integer>>> allClusteringResult = new HashMap<>();
 
 
     public AnalyzingCommunityDetectionResult(String sourcecodeDir, String testCaseDir, String testDir, boolean isMS_CLUSTERCHANGES) {
@@ -48,7 +53,19 @@ public class AnalyzingCommunityDetectionResult {
         this.isMS_CLUSTERCHANGES = isMS_CLUSTERCHANGES;
     }
 
-    public HashMap<Integer, HashMap<Integer, HashSet<Integer>>> getClusteringResultMap(int clusterSizeThreshold, boolean hasGroundTruth, String clusterFile) {
+    public AnalyzingCommunityDetectionResult() {
+
+    }
+
+    /**
+     * This function get Cluster result map
+     *
+     * @param clusterSizeThreshold
+     * @param hasGroundTruth
+     * @param clusterFile
+     * @return
+     */
+    public HashMap<Integer, HashMap<Integer, HashSet<Integer>>> getClusteringResultMap(int clusterSizeThreshold, boolean hasGroundTruth, String clusterFile, String clusterID) {
         HashMap<Integer, HashMap<Integer, HashSet<Integer>>> clusterResultMap = new HashMap<>();
         String clusterFilePath = analysisDir + clusterFile;
         String clusterResultListString = "";
@@ -114,11 +131,19 @@ public class AnalyzingCommunityDetectionResult {
 
     }
 
-
+    /**
+     * This function generates clustering html table
+     *
+     * @param testCaseDir
+     * @param testDir
+     * @param numberOfCommunities
+     * @param isJoiningTable
+     * @param clusterSizeThreshold
+     * @param current_clustering_result
+     * @param hasGroundTruth
+     */
     public void generatingClusteringTable(String testCaseDir, String testDir, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold, HashMap<Integer, HashSet<Integer>> current_clustering_result, boolean hasGroundTruth) {
         ProcessingText processingText = new ProcessingText();
-        this.analysisDir = testCaseDir + testDir + FS;
-        this.testCaseDir = testCaseDir;
         HashMap<String, HashMap<String, Integer>> resultTable = new HashMap<>();
 
         String filePath;
@@ -195,6 +220,15 @@ public class AnalyzingCommunityDetectionResult {
 
     }
 
+    /**
+     * Print result table without ground truth
+     *
+     * @param color_nodeLabel
+     * @param numberOfCommunities
+     * @param isJoiningTable
+     * @param clusterSizeThreshold
+     * @param current_clustering_result
+     */
     private void printResultTable_noGroundTruth(HashMap<String, ArrayList<String>> color_nodeLabel, int numberOfCommunities, boolean isJoiningTable, int clusterSizeThreshold, HashMap<Integer, HashSet<Integer>> current_clustering_result) {
         ProcessingText processingText = new ProcessingText();
         StringBuffer sb = new StringBuffer();
@@ -220,9 +254,10 @@ public class AnalyzingCommunityDetectionResult {
                 "    </tr>\n");
 
         /** sort clusters by size **/
+        //todo limit
         clusterid_size_map.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-                .limit(5)
+                .limit(2)
                 .forEach(k -> {
                             clusterID[0] = Integer.parseInt(k.toString().split("=")[0]);
                             size[0] = Integer.parseInt(k.toString().split("=")[1]);
@@ -428,7 +463,12 @@ public class AnalyzingCommunityDetectionResult {
         parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, originClusterFile);
 
         topClustersSplittingResult = new HashMap<>();
-        originalCluster = getClusteringResultMap(clusterSizeThreshold, hasGroundTruth, originClusterFile);
+        HashMap<Integer, HashMap<Integer, HashSet<Integer>>> originalCluster = getClusteringResultMap(clusterSizeThreshold, hasGroundTruth, originClusterFile, "origin");
+        originalClusterMap = new HashMap<>();
+
+        for (Map.Entry<Integer, HashMap<Integer, HashSet<Integer>>> entry : originalCluster.entrySet()) {
+            originalClusterMap = entry.getValue();
+        }
 
 
         String[] topClusters = null;
@@ -441,54 +481,165 @@ public class AnalyzingCommunityDetectionResult {
         //TODO: community detection, more than 5 cuts
         for (String clusterID : topClusters) {
             String currentClusterFile = clusterID + "_" + originClusterFile;
-            topClustersSplittingResult.put(Integer.valueOf(clusterID), getClusteringResultMap(clusterSizeThreshold, hasGroundTruth, currentClusterFile));
+            topClustersSplittingResult.put(Integer.valueOf(clusterID), getClusteringResultMap(clusterSizeThreshold, hasGroundTruth, currentClusterFile, clusterID));
         }
 
         ArrayList<ArrayList<Integer>> combination = getCombinations();
         int start = 0;
-        for(ArrayList<Integer> com : combination){
-            if(start++==0){
-                continue;
+        for (ArrayList<Integer> com : combination) {
+            if (start++ == 0) {
+                HashMap<String, HashSet<Integer>> origialClusters = getCopyOfOriginalClusters();
+                if (allClusteringResult.size() == 0) {
+                    allClusteringResult.put("1-1-1-1-1", origialClusters);
+                }
             }
             generateClusteringResult_ByCombiningSplittingStep(com);
         }
 
-
-
     }
 
+
+    private HashMap<String, HashSet<Integer>> getCopyOfOriginalClusters() {
+        HashMap<String, HashSet<Integer>> currentCluster = new HashMap<>();
+        for (Map.Entry<Integer, HashSet<Integer>> entry : originalClusterMap.entrySet()) {
+            currentCluster.put(String.valueOf(entry.getKey()),
+                    // Or whatever List implementation you'd like here.
+                    new HashSet<>(entry.getValue()));
+        }
+        return currentCluster;
+    }
     //todo
 
     /**
      * This function generate different clustering result by combining differernt splitting steps
      */
-    private void generateClusteringResult_ByCombiningSplittingStep(ArrayList<Integer> combination) {
-String outputFile = combination.toString().replace("[","").replace("]","").replace(",","_")+".txt";
-        System.out.print("");
+    private HashMap<String, HashSet<Integer>> generateClusteringResult_ByCombiningSplittingStep(ArrayList<Integer> combination) {
+        String splitStep = combination.toString().replace("[", "").replace("]", "").replace(", ", "_");
+        System.out.println(splitStep);
+        ProcessingText pt = new ProcessingText();
+        String[] topCluster = null;
+        try {
+            topCluster = pt.readResult(analysisDir + "topClusters.txt").split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        HashMap<String, HashSet<Integer>> currentCluster = getCopyOfOriginalClusters();
+        for (int i = 0; i < topCluster.length; i++) {
+            int cutNum = combination.get(i);
+            if (cutNum > 1) {
+                int clusterID = Integer.parseInt(topCluster[i]);
+                HashMap<Integer, HashSet<Integer>> newCluster = topClustersSplittingResult.get(clusterID).get(cutNum);
+
+                Set<Integer> cluster_keySet = newCluster.keySet();
+                Iterator<Integer> itr = cluster_keySet.iterator();
+                while (itr.hasNext()) {
+                    int cluster_index = itr.next();
+                    currentCluster.remove(String.valueOf(clusterID));
+                    String newIndex = clusterID + "_" + cutNum--;
+                    currentCluster.put(newIndex, newCluster.get(cluster_index));
+                }
+
+                // modify color for current split result
+                generateColorTable_4CurrentCluteringResult(clusterID, newCluster, splitStep);
+            }
+
+
+        }
+        allClusteringResult.put(splitStep, currentCluster);
+
+
+        return currentCluster;
+    }
+
+    /**
+     * This function generates color table for current Clustering result,
+     * specificall, it will modify the color of the cluster that was split.
+     */
+    private void generateColorTable_4CurrentCluteringResult(int clusterID, HashMap<Integer, HashSet<Integer>> newCluster, String splitStep) {
+        ProcessingText pt = new ProcessingText();
+        HashMap<Integer, String> nodeID_label = new DependencyGraph().getNodeid2LableMap(analysisDir);
+
+        int originalClusterSize = originalClusterMap.size();
+
+        HashMap<String, String> clusterIdToColorMap = getIdToColorMap(originalClusterSize, false);
+
+
+        /**get code to color map**/
+        HashMap<String, String> originalCodeColorMap = new HashMap<>();
+        try {
+            String[] originalCodeColorArray = pt.readResult(analysisDir + originalClusterSize + "_colorTable.txt").split("\n");
+            for (String s : originalCodeColorArray) {
+                String[] tmpstr = s.split(",");
+                originalCodeColorMap.put(tmpstr[0], tmpstr[1]);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        Set<Integer> cluster_keySet = newCluster.keySet();
+        int clusterSize = cluster_keySet.size();
+        Iterator<Integer> itr = cluster_keySet.iterator();
+        StringBuilder sb = new StringBuilder();
+
+        while (itr.hasNext()) {
+            int cluster_index = itr.next();
+            String currentColor = new ColorCode().randomColor();
+            while (clusterIdToColorMap.values().contains(currentColor)) {
+                currentColor = new ColorCode().randomColor();
+            }
+            clusterIdToColorMap.put(clusterID + "_" + clusterSize--, currentColor);
+            sb.append(clusterID + "_" + clusterSize + "," + currentColor + ",\n ");
+
+            HashSet<Integer> currentCluster = newCluster.get(cluster_index);
+            Iterator<Integer> cc = currentCluster.iterator();
+
+            //replace new color
+            while (cc.hasNext()) {
+                int nodeID = cc.next();
+                originalCodeColorMap.put(nodeID_label.get(nodeID), currentColor);
+            }
+        }
+
+        printNewColorTable(originalCodeColorMap, splitStep);
 
 
     }
 
-    private ArrayList<ArrayList<Integer>> getCombinations() {
+    private void printNewColorTable(HashMap<String, String> codeColorMap, String splitStep) {
+        System.out.print("");
+        StringBuilder sb = new StringBuilder();
+        codeColorMap.forEach((k, v) -> {
+            sb.append(k + "," + v + ",\n");
+        });
+
+
+        new ProcessingText().rewriteFile(sb.toString(), analysisDir + splitStep + "_colorTable.txt");
+    }
+
+
+    public ArrayList<ArrayList<Integer>> getCombinations() {
         ArrayList<ArrayList<Integer>> combination = new ArrayList<>();
 
-
-        for (int i = 1; i <= 5; i++) {
-            for (int j = 1; j <= 5; j++) {
-                for (int t = 1; t <= 5; t++) {
-                    for (int s = 1; s <= 5; s++) {
-                        for (int m = 1; m <= 5; m++) {
+        int maxSplit = 2;
+//
+//        for (int i = 1; i <= maxSplit; i++) {
+//            for (int j = 1; j <= maxSplit; j++) {
+//                for (int t = 1; t <= maxSplit; t++) {
+                    for (int s = 1; s <= maxSplit; s++) {
+                        for (int m = 1; m <= maxSplit; m++) {
                             ArrayList<Integer> current_combinaton = new ArrayList<>();
-                            current_combinaton.add(i);
-                            current_combinaton.add(j);
-                            current_combinaton.add(t);
-                            current_combinaton.add(s);
                             current_combinaton.add(m);
+                            current_combinaton.add(s);
+//                            current_combinaton.add(t);
+//                            current_combinaton.add(j);
+//                            current_combinaton.add(i);
                             combination.add(current_combinaton);
-                        }
-                    }
-                }
+//                        }
+//                    }
+//                }
             }
         }
         return combination;

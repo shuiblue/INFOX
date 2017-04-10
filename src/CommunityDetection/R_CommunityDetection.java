@@ -397,12 +397,17 @@ public class R_CommunityDetection {
             clusterID_size.put(k, v.size());
         });
 
+        StringBuilder sb_sortCluster = new StringBuilder();
         //sork clusterID_SIZE map by size
+        //todo  limit
         Map<Integer, Integer> result = new LinkedHashMap<>();
         clusterID_size.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-                .limit(5)
-                .forEachOrdered(x -> result.put(x.getKey(), x.getValue()));
+                .limit(2)
+                .forEachOrdered(x -> {
+                    result.put(x.getKey(), x.getValue());
+
+                });
 
         final Iterator<Integer> cursor = result.keySet().iterator();
         StringBuilder sb_topClusters = new StringBuilder();

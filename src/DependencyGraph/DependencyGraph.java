@@ -149,7 +149,7 @@ public class DependencyGraph {
      * 7--INFOX-(Consecutive)
      * 8--MS-(Consecutive)
      **/
-    DependencyGraph(int compared_method_parameter) {
+    public DependencyGraph(int compared_method_parameter) {
         if (compared_method_parameter == 2) {
             HIERACHICAL = false;
             CONTROL_FLOW = false;
@@ -174,10 +174,20 @@ public class DependencyGraph {
 
     }
 
+    public DependencyGraph() {
+
+    }
+
 
     public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re) {
-        this.analysisDir = testCaseDir + testDir + FS;
+        this.sourcecodeDir = sourcecodeDir;
+        if (testDir.equals("")) {
+            this.analysisDir = testCaseDir;
+        } else {
+            this.analysisDir = testCaseDir + testDir + FS;
+        }
         this.testCaseDir = testCaseDir;
+        this.testDir = testDir;
         String graphPath = sourcecodeDir + analysisDirName + "/complete.pajek.net";
         try {
             String completeGraph = processingText.readResult(graphPath);
@@ -269,14 +279,38 @@ public class DependencyGraph {
     }
 
     /**
+     * This function get nodeid to label map
+     * @return hashmap  nodeid_label
+     */
+    public HashMap<Integer,String> getNodeid2LableMap(String analysisDir){
+        HashMap<Integer,String> nodeID_label= new HashMap<>();
+        try {
+            String[] nodeArray = processingText.readResult(analysisDir+"NodeList.txt").split("\n");
+            for(String node :nodeArray){
+                String[] nodeInfo = node.split("---------");
+                if(nodeInfo.length>1){
+                    nodeID_label.put(Integer.valueOf(nodeInfo[0]),nodeInfo[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return nodeID_label;
+    }
+
+    /**
      * This function just call the create Dependency Graph, used for cluster nodes.
      * TODO modify compareTwoGraphs return type
      *
      * @return dependency graph, no edge label stored.
      */
     public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String testCaseDir, String testDir) {
-
         this.sourcecodeDir = sourcecodeDir;
+        if (testDir.equals("")) {
+            this.analysisDir = testCaseDir;
+        } else {
+            this.analysisDir = testCaseDir + testDir + FS;
+        }
         this.testCaseDir = testCaseDir;
         this.testDir = testDir;
         gotoMap = new HashMap<>();

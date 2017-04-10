@@ -45,28 +45,45 @@ public class GithubRepoAnalysis {
                                     String[] lineArray = hunk.split("\n");
                                     int startLineNum = Integer.valueOf(rangeDetail[0].trim());
                                     System.out.println(startLineNum);
-                                    if (rangeDetail.length > 1) {
-                                        int i = 0;
-                                        for (String line : lineArray) {
-                                            if (line.startsWith("+")) {
-                                                line = line.replace("+", "");
-                                                if (processingText.isCode(line)) {
-                                                    lineNumberList.add(startLineNum + i);
+                                    int i = 0;
+                                    for (String line : lineArray) {
+                                        if (!line.contains("@@")) {
+                                            if (!line.startsWith("-")) {
+                                                if (line.startsWith("+")) {
+                                                    line = line.replace("+", "");
+                                                    if (processingText.isCode(line)) {
+                                                        lineNumberList.add(startLineNum + i);
+                                                    }
                                                 }
+
                                                 i++;
                                             }
 
                                         }
-                                    } else {
-                                        for (String line : lineArray) {
-                                            if (line.startsWith("+")) {
-                                                if (processingText.isCode(line.substring(1))) {
-                                                    lineNumberList.add(startLineNum);
-                                                }
-                                            }
-                                        }
-
                                     }
+
+//                                    if (rangeDetail.length > 1) {
+//                                        int i = 0;
+//                                        for (String line : lineArray) {
+//                                            if (line.startsWith("+")) {
+//                                                line = line.replace("+", "");
+//                                                if (processingText.isCode(line)) {
+//                                                    lineNumberList.add(startLineNum + i);
+//                                                }
+//                                                i++;
+//                                            }
+//
+//                                        }
+//                                    } else {
+//                                        for (String line : lineArray) {
+//                                            if (line.startsWith("+")) {
+//                                                if (processingText.isCode(line.substring(1))) {
+//                                                    lineNumberList.add(startLineNum);
+//                                                }
+//                                            }
+//                                        }
+//
+//                                    }
                                 }
                             }
                         }
@@ -84,7 +101,8 @@ public class GithubRepoAnalysis {
         return changedFile_line_map;
     }
 
-    public void generateForkAddedNodeFile(HashMap<String, ArrayList<Integer>> changedFile_line_map, String output) {
+    public void generateForkAddedNodeFile(HashMap<String, ArrayList<Integer>> changedFile_line_map, String
+            output) {
         StringBuilder sb = new StringBuilder();
 
         Iterator it = changedFile_line_map.entrySet().iterator();
@@ -93,11 +111,11 @@ public class GithubRepoAnalysis {
             String fileName = (String) pair.getKey();
             String newFileName = processingText.changeFileName(fileName);
             ArrayList<Integer> lineNumList = (ArrayList<Integer>) pair.getValue();
-            for(Integer lineNum : lineNumList){
-                sb.append(newFileName+"-"+lineNum+"\n");
+            for (Integer lineNum : lineNumList) {
+                sb.append(newFileName + "-" + lineNum + "\n");
             }
         }
-        processingText.rewriteFile(sb.toString(),output);
+        processingText.rewriteFile(sb.toString(), output);
 
 
     }
@@ -107,8 +125,8 @@ public class GithubRepoAnalysis {
         String diffFilePath = "diff.txt";
         String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir+diffFilePath);
-        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map,dir+forkAddedNode_file);
+        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
+        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, dir + forkAddedNode_file);
     }
 
 

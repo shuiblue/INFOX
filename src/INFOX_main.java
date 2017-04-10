@@ -1,7 +1,5 @@
 import ClusteringCodeChanges.ClusterCodeChanges;
 import MocGithub.ParseHtml;
-import Util.JgitUtility;
-import Util.ProcessingText;
 import getCodeChanges.GithubRepoAnalysis;
 
 import java.io.File;
@@ -27,33 +25,38 @@ public class INFOX_main {
         String forkName = "malx122/Marlin";
         boolean hasGroundTruth = false;
         String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName+FS;
-//
-//        /***  get origin diff github page  ***/
-//        ParseHtml parseHtml = new ParseHtml();
-//        String diffPageUrl = parseHtml.getDiffPageUrl(forkName);
-//
-//        ProcessingText processingText = new ProcessingText();
-//        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
-////
+
 //        /***git clone repo to local dir***/
 //        JgitUtility jgitUtility = new JgitUtility();
 //        String uri = github_page + forkName + ".git";
-//          jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
+//        jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
 
-        /***   get fork added node, generate ForkAddedNode.txt file   ***/
+
+        /***  get origin diff github page  ***/
+        ParseHtml parseHtml = new ParseHtml();
+//        String diffPageUrl = parseHtml.getDiffPageUrl(forkName);
+//        String diffPageUrl ="https://github.com/MarlinFirmware/Marlin/compare/3814bbb529e47d0f7388618c1e5bcb114135e09d...malx122:85afc64790e6be61176113f03acaf2a19a5a0b84";
+//        String diffPageUrl ="https://github.com/MarlinFirmware/Marlin/compare/3814bbb529e47d0f7388618c1e5bcb114135e09d...malx122:85afc64790e6be61176113f03acaf2a19a5a0b84?diff=split#files_bucket";
+        String diffPageUrl ="https://github.com/MarlinFirmware/Marlin/compare/3814bbb529e47d0f7388618c1e5bcb114135e09d...malx122:85afc64790e6be61176113f03acaf2a19a5a0b84#files_bucket";
+
+//        ProcessingText processingText = new ProcessingText();
+//        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
+//
+//        /***   get fork added node, generate ForkAddedNode.txt file   ***/
 //        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath+"INFOX_output/diff.txt");
 //        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map,localSourceCodeDirPath+"INFOX_output/forkAddedNode.txt");
 
 
 
-        /*** start clustering code  ***/
-        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges();
-        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
-
+//        /*** start clustering code  ***/
+//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges();
+//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+//
 
         /*** hack github page   ***/
-//        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName);
+//        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
+        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
 
 
     }

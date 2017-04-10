@@ -49,6 +49,10 @@ public class ColorCode {
         this.isMS_CLUSTERCHANGES = isMS_CLUSTERCHANGES;
     }
 
+    public ColorCode() {
+
+    }
+
     public void parseSourceCodeFromFile(String fileName) {
         String togglejsPath = "/toggle.js";
         String join_togglejsPath = "/join-toggle.js";
@@ -502,7 +506,7 @@ public class ColorCode {
     }
 
 
-    private String randomColor() {
+    public String randomColor() {
         Random rand = new Random();
         float r = (float) (rand.nextFloat() / 2f + 0.5);
         float g = (float) (rand.nextFloat() / 2f + 0.5);
