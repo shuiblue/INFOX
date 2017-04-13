@@ -43,7 +43,11 @@ public class ColorCode {
 
     public ColorCode(String sourcecodeDir, String testCaseDir, String testDir, String forkAddedNode, boolean isMS_CLUSTERCHANGES) {
         this.sourcecodeDir = sourcecodeDir;
-        this.analysisDir = testCaseDir + testDir + FS;
+        if (testDir.equals("")) {
+            this.analysisDir = testCaseDir;
+        } else {
+            this.analysisDir = testCaseDir + testDir + FS;
+        }
         this.testCaseDir = testCaseDir;
         this.forkAddedNode = forkAddedNode;
         this.isMS_CLUSTERCHANGES = isMS_CLUSTERCHANGES;
@@ -158,10 +162,10 @@ public class ColorCode {
      * @param nodeMap
      * @param expectNodeMap
      * @param clusterSizeThreshold
-     * @param joined_clusters
+
      * @param hasGroundTruth
      */
-    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap, HashMap<Integer, String> nodeMap, HashMap<String, String> expectNodeMap, int clusterSizeThreshold, HashMap<Integer, HashSet<Integer>> joined_clusters, boolean hasGroundTruth) {
+    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap, HashMap<Integer, String> nodeMap, HashMap<String, String> expectNodeMap, int clusterSizeThreshold, boolean hasGroundTruth,String originalCombination) {
 //    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap, HashMap<Integer, String> nodeMap, HashMap<String, String> expectNodeMap, int clusterSizeThreshold) {
 
         BackgroundColor bgcolor = new BackgroundColor();
@@ -408,13 +412,13 @@ public class ColorCode {
             }
         }
 
-        iofunc.rewriteFile(sb.toString(), analysisDir + numberOfClusters + CSS);
-        iofunc.rewriteFile(colorTable.toString(), analysisDir + numberOfClusters + "_colorTable.txt");
-        iofunc.rewriteFile(clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor.txt");
+        iofunc.rewriteFile(sb.toString(), analysisDir + originalCombination + CSS);
+        iofunc.rewriteFile(colorTable.toString(), analysisDir + originalCombination + "_colorTable.txt");
+        iofunc.rewriteFile(clusterSB.toString(), analysisDir + originalCombination + "_clusterColor.txt");
 
-        iofunc.rewriteFile(joining_sb.toString(), analysisDir + numberOfClusters + "_join_bigSize-" + clusterSizeThreshold + CSS);
-        iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + numberOfClusters + "_colorTable_join_bigSize-" + clusterSizeThreshold + ".txt");
-        iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + numberOfClusters + "_clusterColor_join_bigSize-" + clusterSizeThreshold + ".txt");
+        iofunc.rewriteFile(joining_sb.toString(), analysisDir + originalCombination + "_join_bigSize-" + clusterSizeThreshold + CSS);
+        iofunc.rewriteFile(joining_colorTable.toString(), analysisDir + originalCombination + "_colorTable_join_bigSize-" + clusterSizeThreshold + ".txt");
+        iofunc.rewriteFile(joining_clusterSB.toString(), analysisDir + originalCombination + "_clusterColor_join_bigSize-" + clusterSizeThreshold + ".txt");
 
     }
 
@@ -426,7 +430,7 @@ public class ColorCode {
      * @param clusters
      * @param numberOfClusters
      */
-    public ArrayList<HashSet<String>> joiningCloseClusters(ArrayList<String> clusters, int numberOfClusters, int clusterSizeThreshold) {
+    public ArrayList<HashSet<String>> joiningCloseClusters(ArrayList<String> clusters, String numberOfClusters, int clusterSizeThreshold) {
         bigSizeClusterList = new HashSet<>();
         ArrayList<String> distanceArray;
         String distanceFile = analysisDir + numberOfClusters + "_distanceBetweenCommunityies.txt";
@@ -522,7 +526,7 @@ public class ColorCode {
 
     }
 
-    public void combineFiles(int numberOfClusters, int clusterSizeThreshold, boolean isJoinCluster) {
+    public void combineFiles(String numberOfClusters, int clusterSizeThreshold, boolean isJoinCluster) {
         String headtxt = "head.txt";
         String bodyPreTxt = "body_pre.txt";
         String endtxt = "end.txt";
@@ -543,7 +547,7 @@ public class ColorCode {
             iofunc.writeTofile(iofunc.readResult(analysisDir + sourceCodeTxt), analysisDir + html);
             iofunc.writeTofile(iofunc.readResult(htmlfilePath + endtxt), analysisDir + html);
 
-            if (!isMS_CLUSTERCHANGES && !isJoinCluster) {
+            if (!isMS_CLUSTERCHANGES && isJoinCluster) {
                 //write color table
                 iofunc.rewriteFile(iofunc.readResult(analysisDir + numberOfClusters + ".distanceTable"), analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");
                 iofunc.writeTofile("<h3> ----------------Before Joining-----------------", analysisDir + numberOfClusters + "_joiningTable_bigSize-" + clusterSizeThreshold + ".html");

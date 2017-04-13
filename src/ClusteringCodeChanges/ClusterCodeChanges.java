@@ -1,5 +1,6 @@
 package ClusteringCodeChanges;
 
+import CommunityDetection.AnalyzingCommunityDetectionResult;
 import DependencyGraph.AnalyzingRepository;
 import Util.ParsingMacros;
 import org.rosuda.JRI.Rengine;
@@ -16,53 +17,47 @@ import java.util.ArrayList;
  */
 public class ClusterCodeChanges {
 
-
+    int max_numberOfCut;
+    int numberOfBiggestClusters;
     static final String FS = File.separator;
 
     //    static String repoPath = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/.git";
 //    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/Marlin/";
     static boolean hasGroundTruth = false;
     static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/malx122_Marlin/Marlin/";
-     String repoPath="" ;
+    String repoPath = "";
 
-    /**
-     * Main method for testing the INFOX method
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-
-
-//        ifdefBasedTest();
-//        realProjectTest_withGroundTruth();
-//        clusteringChangedCodeFromFork(repoPath, hasGroundTruth);
-
-
+    public ClusterCodeChanges(int max_numberOfCut, int numberOfBiggestClusters) {
+        this.max_numberOfCut = max_numberOfCut;
+        this.numberOfBiggestClusters = numberOfBiggestClusters;
     }
+
 
     /**
      * This function cluster changed code from a fork
      */
     public void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth) {
+
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {
             System.out.println("Cannot load R");
             return;
         }
 
-        AnalyzingRepository analyzeRepo = new AnalyzingRepository();
-        String sourcecodeDir = localSourceCodeDirPath;
-       this.repoPath = localSourceCodeDirPath+".git";
-        String analysisDirName = "INFOX_output";
         int approachIndex = 1; //INFOX ==1
-
+        String sourcecodeDir = localSourceCodeDirPath;
+        this.repoPath = localSourceCodeDirPath + ".git";
+        String analysisDirName = "INFOX_output";
         String testCaseDir = sourcecodeDir + analysisDirName + FS;
-        analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
 
+        /** start ... **/
+        AnalyzingRepository ap = new AnalyzingRepository();
+        ap.setNumberOfCut_numberOfBiggestClusters(max_numberOfCut,numberOfBiggestClusters);
+        ap.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
 
     }
 
-    private  void realProjectTest_withGroundTruth() {
+    private void realProjectTest_withGroundTruth() {
         boolean hasGroundTruth = true;
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {

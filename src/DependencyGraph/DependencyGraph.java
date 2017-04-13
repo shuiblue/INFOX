@@ -180,14 +180,8 @@ public class DependencyGraph {
 
 
     public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re) {
-        this.sourcecodeDir = sourcecodeDir;
-        if (testDir.equals("")) {
-            this.analysisDir = testCaseDir;
-        } else {
-            this.analysisDir = testCaseDir + testDir + FS;
-        }
+        this.analysisDir = testCaseDir + testDir + FS;
         this.testCaseDir = testCaseDir;
-        this.testDir = testDir;
         String graphPath = sourcecodeDir + analysisDirName + "/complete.pajek.net";
         try {
             String completeGraph = processingText.readResult(graphPath);
@@ -305,12 +299,12 @@ public class DependencyGraph {
      * @return dependency graph, no edge label stored.
      */
     public HashSet<String> getDependencyGraphForProject(String sourcecodeDir, String testCaseDir, String testDir) {
-        this.sourcecodeDir = sourcecodeDir;
         if (testDir.equals("")) {
             this.analysisDir = testCaseDir;
         } else {
             this.analysisDir = testCaseDir + testDir + FS;
         }
+        this.sourcecodeDir = sourcecodeDir;
         this.testCaseDir = testCaseDir;
         this.testDir = testDir;
         gotoMap = new HashMap<>();
@@ -386,8 +380,10 @@ public class DependencyGraph {
         }
 
         /****   Write dependency graphs into pajek files  ****/
-        processingText.writeToPajekFile(dependencyGraph, nodeList, testCaseDir, testDir, "changedCode.pajek.net", forkaddedNodeList);
+
         processingText.writeToPajekFile(completeGraph, nodeList, testCaseDir, testDir, "complete.pajek.net", forkaddedNodeList);
+        processingText.writeToPajekFile(dependencyGraph, nodeList, testCaseDir, testDir, "changedCode.pajek.net", forkaddedNodeList);
+
         processingText.writeToPajekFile(compactGraph, compact_nodeList, testCaseDir, testDir, "compact.pajek.net", forkaddedNodeList);
 
 
@@ -449,7 +445,7 @@ public class DependencyGraph {
         ArrayList<String> forkAddedNodeList = new ArrayList<>();
         for (String s : lines) {
             String node = s.split(" ")[0];
-            if (!forkAddedNodeList.contains(node)) {
+            if (!forkAddedNodeList.contains(node)&&!node.equals("")) {
                 forkAddedNodeList.add(node);
             }
             String filename = node.split("-")[0];
@@ -1777,6 +1773,7 @@ public class DependencyGraph {
     }
 
     private String getLocationOfElement(Element element, String fileName) {
+
         return fileName + "-" + getLineNumOfElement(element);
     }
 
@@ -1787,11 +1784,13 @@ public class DependencyGraph {
      * @param exprLocation
      */
     private void storeIntoNodeList(String exprLocation) {
+        if(exprLocation.equals("")){
+            System.out.println("");
+        }
         // -----------for dependency graph
         if (!nodeList.containsKey(exprLocation)) {
             id++;
             nodeList.put(exprLocation, id);
-            //TODO: Fork added node
             if (forkaddedNodeList.contains(exprLocation)) {
                 dependencyGraph.put(exprLocation, new HashSet<>());
             }
@@ -2164,7 +2163,6 @@ public class DependencyGraph {
                     tmpEdge = new String[]{depen_position, edgeLabel, "5"};
                 }
 
-//TODO:  FORK ADDED NODE
                 if (forkaddedNodeList.contains(depen_position) && forkaddedNodeList.contains(decl_position)) {
                     dependNodes.add(tmpEdge);
                     dependencyGraph.put(decl_position, dependNodes);

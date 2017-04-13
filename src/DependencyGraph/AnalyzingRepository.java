@@ -6,6 +6,7 @@ import CommunityDetection.R_CommunityDetection;
 import NamingClusters.GetCommitMsg;
 import NamingClusters.IdentifyingKeyWordForCluster;
 import NamingClusters.Tokenizer;
+import Util.GenerateCombination;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
@@ -19,7 +20,16 @@ public class AnalyzingRepository {
     static final String FS = File.separator;
     String repoPath = "";
     String testDir = "";
-    //        String testDir = "test";
+
+    //todo user input
+    int max_numberOfCut;
+    int numberOfBiggestClusters;
+
+    public void setNumberOfCut_numberOfBiggestClusters(int max_numberOfCut, int numberOfBiggestClusters) {
+        this.max_numberOfCut = max_numberOfCut;
+        this.numberOfBiggestClusters = numberOfBiggestClusters;
+    }
+
 
     public void analyzeRepository(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean hasGroundTruth, String repoPath) {
         boolean isMS_CLUSTERCHANGES;
@@ -91,10 +101,6 @@ public class AnalyzingRepository {
         executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, parameters[5], re, isMS_CLUSTERCHANGES, numOfCuts, directedGraph, testDir, hasGroundTruth);
     }
 
-    private void executeINFOX4RealFork(String sourcecodeDir, String analysisDirName) {
-
-    }
-
 
     private void executeINFOX(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean isMS_CLUSTERCHANGES, int numOfCuts, boolean directedGraph, String testDir, boolean hasGroundTruth) {
         if (!directedGraph) {
@@ -106,8 +112,13 @@ public class AnalyzingRepository {
             dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
         }
         /** Community Detection  **/
+//
+        String[] combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
+        String originCombination = combination_list[0];
+////
+//
         R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
-        boolean hasEdge = communityDetection.clustering_CodeChanges(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph);
+        boolean hasEdge = communityDetection.clustering_CodeChanges(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph,originCombination);
 
         if (hasEdge) {
 //        if (true) {
@@ -122,7 +133,7 @@ public class AnalyzingRepository {
                 avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
             }
 
-            HashMap<Integer, ArrayList<String>> clusterList=null;
+            HashMap<Integer, ArrayList<String>> clusterList = null;
             String clusterFile = "clusterTMP.txt";
             if (!isMS_CLUSTERCHANGES) {
                 //Marlin - 50
@@ -136,10 +147,11 @@ public class AnalyzingRepository {
                 // for original only one clustering result
 //                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth,clusterFile);
 
-                // for new INFOX, splitting clusters one by one
-                analyzingCommunityDetectionResult.generateClusteringResult();
-            } else {
-                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0, hasGroundTruth,clusterFile);
+                /** for  *new INFOX*, --- splitting clusters one by one  **/
+                //todo
+                analyzingCommunityDetectionResult.generateClusteringResult(max_numberOfCut, numberOfBiggestClusters);
+            } else { /**  MS approach**/
+                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0, hasGroundTruth, clusterFile,true);
             }
 //            new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
 

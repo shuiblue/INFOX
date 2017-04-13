@@ -2,6 +2,7 @@ package CommunityDetection;
 
 import DependencyGraph.DependencyGraph;
 import DependencyGraph.Graph;
+import Util.GenerateCombination;
 import Util.ProcessingText;
 import com.sun.org.apache.regexp.internal.RE;
 import org.rosuda.JRI.REXP;
@@ -53,6 +54,10 @@ public class R_CommunityDetection {
         forkAddedNode = new HashSet<>();
         modularityMap = new HashMap<>();
         this.re = re;
+    }
+
+    public R_CommunityDetection(String analysisDir) {
+        this.analysisDir = analysisDir;
     }
 
     /**
@@ -132,7 +137,7 @@ public class R_CommunityDetection {
                 checkedEdges.put(i + 1, false);
             }
             re.end();
-            System.out.println("\nBye.");
+            System.out.println("\n ------finished reading changed code graph------");
             return true;
         }
         re.end();
@@ -150,16 +155,16 @@ public class R_CommunityDetection {
      * @param re
      * @return
      */
-    public boolean clustering_CodeChanges(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph) {
+    public boolean clustering_CodeChanges(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph, String originCombination) {
+
         getCompleteGraph(directedGraph);
 
-        String outputFile = "clusterTMP.txt";
+        String outputFile = originCombination + "_clusterTMP.txt";
         String inputFile = "changedCode.pajek.net";
         boolean hasEdge = getCodeChangeGraph(testCaseDir, testDir, directedGraph, inputFile);
 
         if (hasEdge) {
             int cutNum = 1;
-            boolean isOriginGraph = true;
             while (checkedEdges.values().contains(false)) {
                 //todo: if?
                 if (listOfNumberOfCommunities.size() <= numOfcut) {
@@ -202,19 +207,24 @@ public class R_CommunityDetection {
                         currentGraph = new Graph(nodelist, current_edgelist, betweenness, modularity);
                     }
 
+                    if (currentGraph.getEdgelist().size() > 0) {
 //        minimizeUpstreamEdgeBetweenness(currentGraph);
 
-                    //modularity find removableEdge
-                    String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
-                    calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, clusters.keySet().size(), directedGraph);
+                        //modularity find removableEdge
+                        String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
+//                        calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, originCombination, directedGraph);
 
-                    ioFunc.rewriteFile("", analysisDir + outputFile);
-                    printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
-                    printMemebershipOfCurrentGraph(clusters, analysisDir, outputFile);
+                        ioFunc.rewriteFile("", analysisDir + outputFile);
+                        printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
+                        printMemebershipOfCurrentGraph(clusters, outputFile, true);
 
-                    clusteringSubgraphs(clusters, re, testCaseDir, testDir, cutNum, directedGraph, numOfcut);
+                        /** split sub-clusters step by step  **/
+                        clusteringSubgraphs(clusters, re, testCaseDir, testDir, cutNum, directedGraph, numOfcut);
 
-                    cutNum++;
+                        cutNum++;
+                    } else {
+                        break;
+                    }
                 } else {
                     break;
                 }
@@ -349,7 +359,9 @@ public class R_CommunityDetection {
         String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
 //        if (pre_numberOfCommunities != current_numberOfCommunities) {
         printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
-        printMemebershipOfCurrentGraph(clusters, analysisDir, outputFile);
+
+        /**  print clusterTMP.txt file  **/
+        printMemebershipOfCurrentGraph(clusters, outputFile, false);
 //        }
         modularityMap.put(cutNum, new double[]{modularity, Double.parseDouble(edgeID_maxBetweenness[1])});
         modularityArray.add(modularity);
@@ -397,7 +409,8 @@ public class R_CommunityDetection {
             clusterID_size.put(k, v.size());
         });
 
-        StringBuilder sb_sortCluster = new StringBuilder();
+
+        /** get top clusters: sorting clusters by size**/
         //sork clusterID_SIZE map by size
         //todo  limit
         Map<Integer, Integer> result = new LinkedHashMap<>();
@@ -430,31 +443,33 @@ public class R_CommunityDetection {
             REXP edgelist_R = re.eval("cbind( get.edgelist(subg) , round( E(subg)$weight, 3 ))", true);
             REXP nodelist_R = re.eval("get.vertex.attribute(subg)$id", true);
             double[][] edgelist = edgelist_R.asDoubleMatrix();
-            String[] old_nodelist = (String[]) nodelist_R.getContent();
+            if (edgelist.length > 1) {
+                String[] old_nodelist = (String[]) nodelist_R.getContent();
 
 
-            StringBuilder sub_edgelist_sb = new StringBuilder();
-            HashMap<String, String> label_to_id = new ProcessingText().getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
-            for (double[] edge : edgelist) {
-                String from = label_to_id.get("\"" + old_nodelist[(int) edge[0] - 1] + "\"");
-                String to = label_to_id.get("\"" + old_nodelist[(int) edge[1] - 1] + "\"");
+                StringBuilder sub_edgelist_sb = new StringBuilder();
+                HashMap<String, String> label_to_id = new ProcessingText().getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
+                for (double[] edge : edgelist) {
+                    String from = label_to_id.get("\"" + old_nodelist[(int) edge[0] - 1] + "\"");
+                    String to = label_to_id.get("\"" + old_nodelist[(int) edge[1] - 1] + "\"");
 
-                sub_edgelist_sb.append(from + " " + to + " 5\n");
+                    sub_edgelist_sb.append(from + " " + to + " 5\n");
 
-            }
+                }
 
-            String completeGraph = null;
-            try {
-                completeGraph = processText.readResult(analysisDir + "/complete.pajek.net");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                String completeGraph = null;
+                try {
+                    completeGraph = processText.readResult(analysisDir + "/complete.pajek.net");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-            //get node list
-            String nodeListString = completeGraph.split("\\*arcs")[0];
-            processText.rewriteFile(nodeListString + "*Arcs\n" + sub_edgelist_sb.toString(), testCaseDir + currentGraphPath);
-            while (current_numofCut <= 5) {
-                current_numofCut = calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numofCut, false, outputFile, clusterID, current_numofCut);
+                //get node list
+                String nodeListString = completeGraph.split("\\*arcs")[0];
+                processText.rewriteFile(nodeListString + "*Arcs\n" + sub_edgelist_sb.toString(), testCaseDir + currentGraphPath);
+                while (current_numofCut < 5) {
+                    current_numofCut = calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numofCut, false, outputFile, clusterID, current_numofCut);
+                }
             }
         }
         processText.rewriteFile(sb_topClusters.toString(), analysisDir + "topClusters.txt");
@@ -469,7 +484,7 @@ public class R_CommunityDetection {
      * @param testDir
      * @param numOfClusters
      */
-    private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String testCaseDir, String testDir, int numOfClusters, boolean directedGraph) {
+    private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String testCaseDir, String testDir, String numOfClusters, boolean directedGraph) {
 
         ArrayList<ArrayList<Integer>> combination = getPairsOfCommunities(clusters);
         HashMap<ArrayList<Integer>, Integer> distanceMatrix = new HashMap<>();
@@ -600,7 +615,7 @@ public class R_CommunityDetection {
         return clusters;
     }
 
-    private void printMemebershipOfCurrentGraph(HashMap<Integer, ArrayList<Integer>> clusters, String fileDir, String outputFile) {
+    private void printMemebershipOfCurrentGraph(HashMap<Integer, ArrayList<Integer>> clusters, String outputFile, boolean isOriginalGraph) {
         //print
         StringBuffer membership_print = new StringBuffer();
 
@@ -609,7 +624,7 @@ public class R_CommunityDetection {
         while (it.hasNext()) {
             Map.Entry cluster = (Map.Entry) it.next();
             ArrayList<Integer> cluster_content = (ArrayList<Integer>) cluster.getValue();
-            if (outputFile.equals("clusterTMP.txt") || cluster_content.size() > 1) {
+            if (isOriginalGraph || (!isOriginalGraph && cluster_content.size() > 1)) {
 
                 ArrayList<Integer> mem = (ArrayList<Integer>) cluster.getValue();
                 membership_print.append(cluster.getKey() + ") ");
@@ -621,10 +636,34 @@ public class R_CommunityDetection {
             }
         }
         //print old edge
-        ioFunc.writeTofile(membership_print.toString(), fileDir + outputFile);
-
-
+        ioFunc.writeTofile(membership_print.toString(), analysisDir + outputFile);
     }
+
+
+    public void printMemebershipOfCurrentGraph_new(HashMap<String, HashSet<Integer>> clusters, String outputFile) {
+        //print
+        StringBuffer membership_print = new StringBuffer();
+
+        membership_print.append("\n---" + clusters.entrySet().size() + " communities\n");
+        Iterator it = clusters.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry cluster = (Map.Entry) it.next();
+            HashSet<Integer> cluster_content = (HashSet<Integer>) cluster.getValue();
+            if (outputFile.equals("clusterTMP.txt") || cluster_content.size() > 1) {
+
+                HashSet<Integer> mem = (HashSet<Integer>) cluster.getValue();
+                membership_print.append(cluster.getKey() + ") ");
+                membership_print.append("[");
+                for (Integer m : mem) {
+                    membership_print.append(m + " , ");
+                }
+                membership_print.append("]\n");
+            }
+        }
+        //print old edge
+        ioFunc.writeTofile(membership_print.toString(), analysisDir + outputFile);
+    }
+
 
     /**
      * This function is finding next edge to be removed by finding the edge has largest betweenness
@@ -633,6 +672,7 @@ public class R_CommunityDetection {
      * @return
      */
     public String[] findRemovableEdge(Graph g) {
+
         String[] edgeID_maxBetweenness = new String[2];
         edgeID_maxBetweenness = findMaxNumberLocation(g.getBetweenness());
 //        int maxBetEdgeID = Integer.parseInt(edgeID_maxBetweenness[0]) + 1;

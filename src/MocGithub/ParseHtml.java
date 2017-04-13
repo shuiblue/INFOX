@@ -2,6 +2,7 @@ package MocGithub;
 
 
 import CommunityDetection.AnalyzingCommunityDetectionResult;
+import Util.GenerateCombination;
 import Util.JgitUtility;
 import Util.JsonUtility;
 import Util.ProcessingText;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by shuruiz on 4/5/17.
@@ -29,7 +31,14 @@ public class ParseHtml {
     static String github_page = "https://github.com/";
     Document doc, currentDoc;
     String analysisDir = "";
-    String originalPage = "zzz.html";
+    String originalPage = "orginial.html";
+    int max_numberOfCut;
+    int numberOfBiggestClusters;
+
+    public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters) {
+        this.max_numberOfCut = max_numberOfCut;
+        this.numberOfBiggestClusters = numberOfBiggestClusters;
+    }
 
     public void getOriginalDiffPage(String diffPageUrl, String localSourceCodeDirPath) {
         this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
@@ -44,7 +53,7 @@ public class ParseHtml {
 
         HtmlPage page = null;
         try {
-            page = webClient.getPage(diffPageUrl);
+            page = webClient.getPage(diffPageUrl+ "#files_bucket");
         } catch (Exception e) {
             System.out.println("Get page error");
         }
@@ -53,7 +62,6 @@ public class ParseHtml {
 
 
         new ProcessingText().rewriteFile(page.asXml(), analysisDir + originalPage);
-        new ProcessingText().rewriteFile(page.getWebResponse().getContentAsString(), analysisDir + "html.txt");
     }
 
     public void generateMocGithubForkPage(String diffPageUrl, String forkName, String localSourceCodeDirPath) {
@@ -66,6 +74,26 @@ public class ParseHtml {
             //modify title-- code changes of fork : ...
             Element fork_title = doc.getElementsByClass("gh-header-title").first();
             fork_title.text(fork_title.text().replaceAll("Comparing changes", "Code Changes of fork: " + forkName));
+
+            doc.getElementsByClass("range-editor text-gray js-range-editor is-cross-repo").remove();
+            doc.getElementsByClass("gh-header-meta").first().text("Comparing..<h1>parent of the first commit</h1> to  <h1>the latest commit</h1>");
+
+
+            //remove background color for line-number columns
+            String css ="<style type=\"text/css\">\n" +
+                    ".blob-num-deletion {\n" +
+                    "  background-color:#fff;\n" +
+                    "  border-color:#f1c0c0\n" +
+                    "}\n" +
+                    ".blob-num-addition {\n" +
+                    "  background-color:#fff;\n" +
+                    "  border-color:#f1c0c0\n" +
+                    "}"+
+                    "</style>\n";
+            doc.getElementsByTag("header").append(css);
+
+            System.out.print("");
+
             Elements fileList_elements = doc.getElementsByClass("file-header");
             generateHtml(fileList_elements);
 
@@ -74,9 +102,6 @@ public class ParseHtml {
             e.printStackTrace();
         }
     }
-
-//    Jsoup.parse( new WebClient(BrowserVersion.CHROME).getPage("http://www.manning.com")
-//                        .asInstanceOf[HtmlPage].asXml ).select("div.dotdbox").text
 
 
     /**
@@ -90,23 +115,28 @@ public class ParseHtml {
      * @param fileList_elements
      */
     private void generateHtml(Elements fileList_elements) {
-        currentDoc = doc;
+        currentDoc = doc.clone();
         ProcessingText pt = new ProcessingText();
-        ArrayList<ArrayList<Integer>> combinationArrayList = new AnalyzingCommunityDetectionResult().getCombinations();
-        //todo ,+space
+        String[] combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
 
-
-
-        for (ArrayList<Integer> com : combinationArrayList) {
-            String splitStep = com.toString().replace("[", "").replace("]", "").replace(", ", "_");
-            if (!splitStep.equals("1_1")) {
+        for (String splitStep : combination_list) {
+            if (splitStep.replaceAll("1", "").length() != 0) {
                 try {
                     String[] sourceCode_to_color_array = pt.readResult(analysisDir + splitStep + "_colorTable.txt").split("\n");
-                    modifyEachLine(sourceCode_to_color_array, com);
+                    modifyEachLine(sourceCode_to_color_array);
                     pt.rewriteFile(currentDoc.toString(), analysisDir + splitStep + ".html");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else {
+//                try {
+//                    //todo 68?  1_1
+//                    String[] sourceCode_to_color_array = pt.readResult(analysisDir + "68_colorTable.txt").split("\n");
+//                    modifyEachLine(sourceCode_to_color_array, com);
+//                    pt.rewriteFile(currentDoc.toString(), analysisDir + splitStep + ".html");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
 
@@ -117,9 +147,9 @@ public class ParseHtml {
      * This function modify each line, add id
      *
      * @param sourceCode_to_color_array
-     * @param com
      */
-    private void modifyEachLine(String[] sourceCode_to_color_array, ArrayList<Integer> com) {
+
+    private void modifyEachLine(String[] sourceCode_to_color_array) {
         ProcessingText pt = new ProcessingText();
         for (String str : sourceCode_to_color_array) {
             String[] map = str.split(",");
@@ -129,20 +159,24 @@ public class ParseHtml {
             String lineNumber = tmpstr[1];
             String color = map[1];
 
-            System.out.println(str);
-            doc.getElementsByAttributeValue("data-path", fileName);
-            Element currentFile = doc.getElementsByAttributeValue("data-path", fileName).next().first();
+            currentDoc.getElementsByAttributeValue("data-path", fileName);
+            Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
             if (!currentFile.toString().contains("Load diff")) {
-                currentFile.getElementsByClass("blob-num blob-num-empty empty-cell").remove();
-                currentFile.getElementsByClass("blob-code blob-code-empty empty-cell").remove();
                 Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
                 Element lineElement;
                 if (lineElements.size() > 1) {
-                    lineElement = lineElements.get(1);
+                    if (lineElements.get(0).toString().contains("addition")) {
+                        lineElement = lineElements.get(0);
+                    } else {
+                        lineElement = lineElements.get(1);
+                    }
                 } else {
                     lineElement = lineElements.first();
                 }
-                lineElement.siblingElements().get(1).attr("bgcolor", "#" + color).attr("class", map[0]);
+                //todo
+                lineElement.attr("bgcolor", "#" + color).attr("class", "infox_"+map[0]).attr("style","font-size: 10px;").attr("align","right").text(lineNumber);
+                //style="font-size: 10px;" align="right"
+                System.out.print("");
             } else {
                 System.out.println(fileName + " is bigger than the github diff limits..");
 
@@ -172,7 +206,7 @@ public class ParseHtml {
             String upstreamName = upstreamInfo.getString("full_name");
             JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + upstreamName + "/commits?until=" + firstCommitTimeStamp));
             String SHA_beforeForkCreated = upstream_jsonObj.getString("sha");
-            return github_page + upstreamName + "/compare/" + SHA_beforeForkCreated + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA + "#files_bucket";
+            return github_page + upstreamName + "/compare/" + SHA_beforeForkCreated + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA ;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,15 +216,15 @@ public class ParseHtml {
     public static void main(String[] args) {
         String forkName = "malx122/Marlin";
 
-        //get origin diff github page
-        ParseHtml parseHtml = new ParseHtml();
-        String diffPageUrl = parseHtml.getDiffPageUrl(forkName);
-
-        //git clone repo to local dir
-        JgitUtility jgitUtility = new JgitUtility();
-        String uri = github_page + forkName + ".git";
-        String localDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName;
-        jgitUtility.cloneRepo(uri, localDirPath);
+//        //get origin diff github page
+//        ParseHtml parseHtml = new ParseHtml();
+//        String diffPageUrl = parseHtml.getDiffPageUrl(forkName);
+//
+//        //git clone repo to local dir
+//        JgitUtility jgitUtility = new JgitUtility();
+//        String uri = github_page + forkName + ".git";
+//        String localDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName;
+//        jgitUtility.cloneRepo(uri, localDirPath);
 
 
         // hack github page

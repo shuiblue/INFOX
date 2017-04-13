@@ -44,7 +44,6 @@ public class GithubRepoAnalysis {
                                     String[] rangeDetail = range.split(",");
                                     String[] lineArray = hunk.split("\n");
                                     int startLineNum = Integer.valueOf(rangeDetail[0].trim());
-                                    System.out.println(startLineNum);
                                     int i = 0;
                                     for (String line : lineArray) {
                                         if (!line.contains("@@")) {
