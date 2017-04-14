@@ -12,6 +12,7 @@ import org.rosuda.JRI.Rengine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by shuruiz on 8/29/16.
@@ -42,7 +43,6 @@ public class AnalyzingRepository {
             isMS_CLUSTERCHANGES = false;
         }
         this.repoPath = repoPath;
-
         executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, isMS_CLUSTERCHANGES, numOfCuts, directedGraph, testDir, hasGroundTruth);
     }
 
@@ -103,69 +103,60 @@ public class AnalyzingRepository {
 
 
     private void executeINFOX(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean isMS_CLUSTERCHANGES, int numOfCuts, boolean directedGraph, String testDir, boolean hasGroundTruth) {
-        if (!directedGraph) {
-            DependencyGraph dependencyGraph = new DependencyGraph(approachIndex);
-            /**  this function extract changed_code_dependency_graph from complete graph**/
-//            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
-
-            /**  this function generate all the graph at the same time **/
-            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
-        }
-        /** Community Detection  **/
+//        if (!directedGraph) {
+//            DependencyGraph dependencyGraph = new DependencyGraph(approachIndex);
+//            /**  this function extract changed_code_dependency_graph from complete graph**/
+////            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
 //
+//            /**  this function generate all the graph at the same time **/
+//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
+//        }
+        /** Community Detection  **/
+
         String[] combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
         String originCombination = combination_list[0];
-////
 //
-        R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
-        boolean hasEdge = communityDetection.clustering_CodeChanges(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph,originCombination);
+//      R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
+//        communityDetection.clustering_CodeChanges(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph,originCombination);
 
-        if (hasEdge) {
-//        if (true) {
-            /** Generating html to visualize source code, set background and left side bar color for new code  **/
-            AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES);
-            int[] avgFeatureSize_maxSize = null;
-            /** get nodeMap: id -- lable  **/
-            analyzingCommunityDetectionResult.getNodeMap_id_to_label();
 
-            /**   if this test has ground Truth, then generate the ground Truth map for later comparing **/
-            if (hasGroundTruth) {
-                avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
-            }
-
-            HashMap<Integer, ArrayList<String>> clusterList = null;
-            String clusterFile = "clusterTMP.txt";
-            if (!isMS_CLUSTERCHANGES) {
-                //Marlin - 50
-                //Cherokee - 38
-                int clusterSizeThreshold = 50;
-                if (hasGroundTruth) {
-                    int avgFeatureSize = avgFeatureSize_maxSize[0];
-                    int maxFeatureSize = avgFeatureSize_maxSize[1];
-                }
-                /** starts to analyze each clustering result  ***/
-                // for original only one clustering result
-//                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth,clusterFile);
-
-                /** for  *new INFOX*, --- splitting clusters one by one  **/
-                //todo
-                analyzingCommunityDetectionResult.generateClusteringResult(max_numberOfCut, numberOfBiggestClusters);
-            } else { /**  MS approach**/
-                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0, hasGroundTruth, clusterFile,true);
-            }
-//            new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
-
-            /** parse commit msg for each node **/
-            //todo: redundant repoPath
-//            new GetCommitMsg(testCaseDir, testDir, clusterList, 1,repoPath);
-//            new GetCommitMsg(testCaseDir, testDir, clusterList, 2,repoPath);
+        /** Generating html to visualize source code, set background and left side bar color for new code  **/
+//        AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES, max_numberOfCut, numberOfBiggestClusters);
+//        int[] avgFeatureSize_maxSize = null;
+//        /** get nodeMap: id -- lable  **/
+//        analyzingCommunityDetectionResult.getNodeMap_id_to_label();
 //
+//        /**   if this test has ground Truth, then generate the ground Truth map for later comparing **/
+//        if (hasGroundTruth) {
+//            avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
+//        }
 //
-//            /**  calculate tfidf  to identifing keywords from each cluster**/
-//            IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
-//            identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
-//            identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
+//        HashMap<Integer, ArrayList<String>> clusterList = null;
+//        String clusterFile = "clusterTMP.txt";
+//        if (!isMS_CLUSTERCHANGES) {
+//            //Marlin - 50
+//            //Cherokee - 38
+//            int clusterSizeThreshold = 50;
+//            if (hasGroundTruth) {
+//                int avgFeatureSize = avgFeatureSize_maxSize[0];
+//                int maxFeatureSize = avgFeatureSize_maxSize[1];
+//            }
+//            /** starts to analyze each clustering result  ***/
+//            // for original only one clustering result
+////                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth,clusterFile);
+//
+//            /** for  *new INFOX*, --- splitting clusters one by one  **/
+//            //todo
+//           analyzingCommunityDetectionResult.generateClusteringResult(max_numberOfCut, numberOfBiggestClusters);
+//        } else { /**  MS approach**/
+//            clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0, hasGroundTruth, clusterFile, true);
+//        }
 
+        for(String splitStep:combination_list) {
+            IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
+            identifyingKeyWordForCluster.findKeyWordForEachSplit(sourcecodeDir, testCaseDir, testDir, splitStep,repoPath);
         }
+
+
     }
 }

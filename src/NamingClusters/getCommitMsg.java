@@ -11,9 +11,92 @@ import java.util.*;
 public class GetCommitMsg {
     static final String FS = File.separator;
 
-    public GetCommitMsg( String testCaseDir, String testDir, HashMap<Integer, ArrayList<String>> clusterList, int n_gram,String repoPath) {
+
+    public void getCommitMsg_currentSplit(String testCaseDir, String testDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String repoPath, String splitStep) {
+        String analysisDir = testCaseDir;
+        HashMap<String, String> nodeIdMap = new HashMap<>();
+        ProcessingText processingText = new ProcessingText();
+        processingText.rewriteFile("", analysisDir + "commitMsgPerCluster.txt");
+
+        String nodeIdList = null;
+        try {
+            nodeIdList = processingText.readResult(analysisDir + "NodeList.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String[] nodeIdArray = nodeIdList.split("\n");
+        for (String s : nodeIdArray) {
+            if (s.split("---------").length > 1) {
+                nodeIdMap.put(s.split("---------")[0], s.split("---------")[1]);
+            }
+        }
+        int clusterSize = clusterList.size();
+        StringBuffer sb = new StringBuffer();
+        StringBuffer sb_origin = new StringBuffer();
+        sb.append(clusterSize + " clusters: \n");
+        sb_origin.append(clusterSize + " clusters: \n");
+        clusterList.forEach((clusterID, v) -> {
+            sb.append("\n[" + clusterID + "]");
+            sb_origin.append("\n[" + clusterID + "]");
+
+            for (Integer cl_int : v) {
+                String cl = cl_int.toString();
+                if (cl.length() > 0 && !cl.contains("-")) {
+                    HashMap<String, String> clusterCommitMsg = new HashMap<>();
+                    Set<String> clusterString = new HashSet<>();
+                    Set<String> origin_clusterString = new HashSet<>();
+
+                    v.forEach(nodeId -> {
+                        String nodeLable = nodeIdMap.get(nodeId+"");
+                        System.out.println(nodeId+"");
+
+                        if (nodeLable != null) {
+                            String fileName = processingText.getOriginFileName(nodeLable);
+                            String lineNumber = nodeLable.split("-")[1];
+
+                            String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram, repoPath);
+                            if (!clusterCommitMsg.keySet().contains(commit[0])) {
+                                clusterCommitMsg.put(commit[0], commit[1]);
+                                clusterString.add(commit[1]);
+                                origin_clusterString.add(commit[2]);
+                            }
+
+                        }
+
+                    });
+
+                    // create an iterator
+                    Iterator iterator = clusterString.iterator();
+                    Iterator iterator_origin = origin_clusterString.iterator();
+
+                    // check values
+                    while (iterator.hasNext()) {
+                        String str = iterator.next().toString();
+                        sb.append(str + " ");
+                    }
+                    while (iterator_origin.hasNext()) {
+                        String str = iterator_origin.next().toString();
+                        sb_origin.append(str + " ");
+                    }
+
+                }
+            }
+
+            /** generate file name based on n-gram's n **/
+            String fileName_prefix = "";
+            if (n_gram == 1) {
+                fileName_prefix = "_one";
+            } else if (n_gram == 2) {
+                fileName_prefix = "_two";
+            }
+            processingText.rewriteFile(sb.toString(), analysisDir + splitStep + fileName_prefix + "_commitMsgPerCluster.txt");
+            processingText.rewriteFile(sb_origin.toString(), analysisDir + splitStep + fileName_prefix + "_commitMsgPerCluster_originCommit.txt");
+
+        });
+    }
 
 
+    public GetCommitMsg(String testCaseDir, String testDir, HashMap<Integer, ArrayList<String>> clusterList, int n_gram, String repoPath) {
         String analysisDir = testCaseDir + testDir + FS;
         HashMap<String, String> nodeIdMap = new HashMap<>();
         ProcessingText processingText = new ProcessingText();
@@ -34,17 +117,18 @@ public class GetCommitMsg {
 
 
         clusterList.forEach((k, v) -> {
+
             StringBuffer sb = new StringBuffer();
             StringBuffer sb_origin = new StringBuffer();
             sb.append(k + " clusters: \n");
             sb_origin.append(k + " clusters: \n");
             for (String cl : v) {
-                if (cl.length() > 0) {
-
+                if (cl.length() > 0 && !cl.contains("-")) {
                     HashMap<String, String> clusterCommitMsg = new HashMap<String, String>();
                     Set<String> clusterString = new HashSet<>();
                     Set<String> origin_clusterString = new HashSet<>();
                     String clusterID = cl.substring(0, cl.trim().indexOf(")"));
+                    System.out.println(clusterID);
 
                     sb.append("\n[" + clusterID + "]");
                     sb_origin.append("\n[" + clusterID + "]");
@@ -60,7 +144,7 @@ public class GetCommitMsg {
 //                                fileName = fileName.substring(index-8);
                                 String lineNumber = nodeLable.split("-")[1];
 
-                                String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram,repoPath);
+                                String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram, repoPath);
 
 
                                 if (!clusterCommitMsg.keySet().contains(commit[0])) {
@@ -103,6 +187,10 @@ public class GetCommitMsg {
         });
     }
 
+    public GetCommitMsg() {
+
+    }
+
     /**
      * This function parses commit msg for each line of code based on filename and linenumber by git blame cmd
      *
@@ -110,11 +198,10 @@ public class GetCommitMsg {
      * @param lineNumber
      * @return commit msg
      */
-    public static String[] getCommitMsgForEachNode(String fileName, String lineNumber, int n_gram,String repoPath) {
-        String dir = "Marlin/";
+    public static String[] getCommitMsgForEachNode(String fileName, String lineNumber, int n_gram, String repoPath) {
         Stemmer stemmer = new Stemmer();
         Tokenizer tokenizer = new Tokenizer();
-        String lineInfo = lineNumber + "," + lineNumber + ":"+dir + fileName;
+        String lineInfo = lineNumber + "," + lineNumber + ":" + fileName;
         ProcessBuilder processBuilder = new ProcessBuilder("git", "log", "--pretty=medium", "-L", lineInfo);
         processBuilder.directory(new File(repoPath).getParentFile()); // this is where you set the root folder for the executable to run with
 
@@ -158,8 +245,8 @@ public class GetCommitMsg {
                                     normalized_line += s + " ";
                                 }
                             } else {
-                               word = new StopWords().removeStopWord(word);
-                                if(word.trim().length()>0) {
+                                word = new StopWords().removeStopWord(word);
+                                if (word.trim().length() > 0) {
                                     normalized_line += stemmer.stemmingAWord(word) + " ";
                                 }
                             }
@@ -170,7 +257,7 @@ public class GetCommitMsg {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             try {
                 inputStream.close();
             } catch (IOException e) {
@@ -178,7 +265,7 @@ public class GetCommitMsg {
             }
         }
 
-        String[] commit = new String[]{commitSHA, normalized_line,originCommit};
+        String[] commit = new String[]{commitSHA, normalized_line, originCommit};
 
         return commit;
     }

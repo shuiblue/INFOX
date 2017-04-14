@@ -7,6 +7,7 @@ import getCodeChanges.GithubRepoAnalysis;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by shuruiz on 4/7/17.
@@ -36,24 +37,24 @@ public class INFOX_main {
 //        jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
 
 
-//        /***  get origin diff github page  ***/
+        /***  get origin diff github page  ***/
         ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(forkName);
         String diffPageUrl ="https://github.com/MarlinFirmware/Marlin/compare/3814bbb529e47d0f7388618c1e5bcb114135e09d...malx122:85afc64790e6be61176113f03acaf2a19a5a0b84#files_bucket";
 //
-//        ProcessingText processingText = new ProcessingText();
+        ProcessingText processingText = new ProcessingText();
 //        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
 //
-//        /***   get fork added node, generate ForkAddedNode.txt file   ***/
-//        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
+        /***   get fork added node, generate ForkAddedNode.txt file   ***/
+        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath+"INFOX_output/diff.txt");
 //        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map,localSourceCodeDirPath+"INFOX_output/forkAddedNode.txt");
-
-
-
-        /*** start clustering code  ***/
-        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
-        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+//
+//
+//
+//        /*** start clustering code  ***/
+//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
+//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
 
 
         /*** hack github page   ***/

@@ -530,7 +530,6 @@ public class Stemmer {
         Stemmer s = new Stemmer();
         s.add(word.toCharArray(), word.length());
         s.stem();
-        System.out.println(s.toString());
         return s.toString();
 
     }

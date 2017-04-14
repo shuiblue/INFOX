@@ -40,8 +40,10 @@ public class R_CommunityDetection {
     int pre_numberOfCommunities = 0;
     int current_numberOfCommunities = 0;
     ArrayList<Integer> listOfNumberOfCommunities = new ArrayList<>();
+    int max_numberOfCut;
+    int numberOfBiggestClusters;
 
-    public R_CommunityDetection(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re) {
+    public R_CommunityDetection(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re, int max_numberOfCut, int numberOfBiggestClusters) {
         this.sourcecodeDir = sourcecodeDir;
         if (testDir.equals("")) {
             this.analysisDir = testCaseDir;
@@ -54,6 +56,8 @@ public class R_CommunityDetection {
         forkAddedNode = new HashSet<>();
         modularityMap = new HashMap<>();
         this.re = re;
+        this.max_numberOfCut = max_numberOfCut;
+        this.numberOfBiggestClusters = numberOfBiggestClusters;
     }
 
     public R_CommunityDetection(String analysisDir) {
@@ -212,7 +216,7 @@ public class R_CommunityDetection {
 
                         //modularity find removableEdge
                         String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
-//                        calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, originCombination, directedGraph);
+                        calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, originCombination, directedGraph);
 
                         ioFunc.rewriteFile("", analysisDir + outputFile);
                         printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
@@ -411,12 +415,11 @@ public class R_CommunityDetection {
 
 
         /** get top clusters: sorting clusters by size**/
-        //sork clusterID_SIZE map by size
-        //todo  limit
+
         Map<Integer, Integer> result = new LinkedHashMap<>();
         clusterID_size.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-                .limit(2)
+                .limit(numberOfBiggestClusters)
                 .forEachOrdered(x -> {
                     result.put(x.getKey(), x.getValue());
 
@@ -467,7 +470,7 @@ public class R_CommunityDetection {
                 //get node list
                 String nodeListString = completeGraph.split("\\*arcs")[0];
                 processText.rewriteFile(nodeListString + "*Arcs\n" + sub_edgelist_sb.toString(), testCaseDir + currentGraphPath);
-                while (current_numofCut < 5) {
+                while (current_numofCut < max_numberOfCut) {
                     current_numofCut = calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numofCut, false, outputFile, clusterID, current_numofCut);
                 }
             }
@@ -649,7 +652,7 @@ public class R_CommunityDetection {
         while (it.hasNext()) {
             Map.Entry cluster = (Map.Entry) it.next();
             HashSet<Integer> cluster_content = (HashSet<Integer>) cluster.getValue();
-            if (outputFile.equals("clusterTMP.txt") || cluster_content.size() > 1) {
+            if (outputFile.equals("clusterTMP.txt") || cluster_content.size() > 0) {
 
                 HashSet<Integer> mem = (HashSet<Integer>) cluster.getValue();
                 membership_print.append(cluster.getKey() + ") ");

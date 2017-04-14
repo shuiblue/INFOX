@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 
 /**
@@ -36,12 +38,12 @@ public class ClusterCodeChanges {
     /**
      * This function cluster changed code from a fork
      */
-    public void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth) {
+    public    void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth) {
 
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {
             System.out.println("Cannot load R");
-            return;
+            return ;
         }
 
         int approachIndex = 1; //INFOX ==1
@@ -54,7 +56,6 @@ public class ClusterCodeChanges {
         AnalyzingRepository ap = new AnalyzingRepository();
         ap.setNumberOfCut_numberOfBiggestClusters(max_numberOfCut,numberOfBiggestClusters);
         ap.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
-
     }
 
     private void realProjectTest_withGroundTruth() {
