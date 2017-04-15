@@ -1,10 +1,7 @@
 package CommunityDetection;
 
-import DependencyGraph.DependencyGraph;
 import DependencyGraph.Graph;
-import Util.GenerateCombination;
 import Util.ProcessingText;
-import com.sun.org.apache.regexp.internal.RE;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
 
@@ -42,7 +39,8 @@ public class R_CommunityDetection {
     ArrayList<Integer> listOfNumberOfCommunities = new ArrayList<>();
     int max_numberOfCut;
     int numberOfBiggestClusters;
-
+    int current_numberOfCut = 0;
+    HashMap<String, ArrayList<Integer>> new_clusters = new HashMap<>();
     public R_CommunityDetection(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re, int max_numberOfCut, int numberOfBiggestClusters) {
         this.sourcecodeDir = sourcecodeDir;
         if (testDir.equals("")) {
@@ -155,23 +153,21 @@ public class R_CommunityDetection {
      *
      * @param testCaseDir
      * @param testDir
-     * @param numOfcut
      * @param re
      * @return
      */
-    public boolean clustering_CodeChanges(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, int numOfcut, Rengine re, boolean directedGraph, String originCombination) {
+    public boolean clustering_CodeChanges(String testCaseDir, String testDir, Rengine re, boolean directedGraph, boolean isOriginalGraph, String fileprefix) {
 
         getCompleteGraph(directedGraph);
 
-        String outputFile = originCombination + "_clusterTMP.txt";
+        String outputFile = fileprefix + "_clusterTMP.txt";
         String inputFile = "changedCode.pajek.net";
         boolean hasEdge = getCodeChangeGraph(testCaseDir, testDir, directedGraph, inputFile);
 
         if (hasEdge) {
             int cutNum = 1;
             while (checkedEdges.values().contains(false)) {
-                //todo: if?
-                if (listOfNumberOfCommunities.size() <= numOfcut) {
+                if (listOfNumberOfCommunities.size() <= max_numberOfCut) {
                     //count betweenness for current graph
 //                    calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numOfcut, isOriginGraph, outputFile);
 
@@ -200,7 +196,7 @@ public class R_CommunityDetection {
 
 
                     /** get current clusters **/
-                    HashMap<Integer, ArrayList<Integer>> clusters = getCurrentClusters(membership, nodeIdList);
+                    HashMap<String, ArrayList<Integer>> clusters = getCurrentClusters(membership, nodeIdList);
                     REXP modularity_R = re.eval("modularity(originalg,cl)");
                     double modularity = modularity_R.asDoubleArray()[0];
 
@@ -216,14 +212,15 @@ public class R_CommunityDetection {
 
                         //modularity find removableEdge
                         String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
-                        calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, originCombination, directedGraph);
-
+                        if (isOriginalGraph) {
+                            calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, fileprefix, directedGraph);
+                        }
                         ioFunc.rewriteFile("", analysisDir + outputFile);
                         printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
                         printMemebershipOfCurrentGraph(clusters, outputFile, true);
 
                         /** split sub-clusters step by step  **/
-                        clusteringSubgraphs(clusters, re, testCaseDir, testDir, cutNum, directedGraph, numOfcut);
+                        clusterToplusters(clusters, re, testCaseDir, testDir, cutNum, directedGraph);
 
                         cutNum++;
                     } else {
@@ -298,12 +295,10 @@ public class R_CommunityDetection {
     /**
      * This function is calling community detection algorithm through igraph lib
      *
-     * @param re
-     * @param testCaseDir
-     * @param testDir
      * @param cutNum
      */
-    public int calculateEachGraph(Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph, int numofCut, boolean isOriginGraph, String outputFile, int clusterID, int current_numofCut) {
+    public int calculateEachGraph(Rengine re, int cutNum, boolean directedGraph, String outputFile, int current_numofCut) {
+
         ArrayList<Integer> nodeIdList = new ArrayList<>();
         for (int i = 0; i < nodelist.length; i++) {
             if (forkAddedNode.contains(nodelist[i])) {
@@ -330,14 +325,14 @@ public class R_CommunityDetection {
         Graph currentGraph;
 
         /** get current clusters **/
-        HashMap<Integer, ArrayList<Integer>> clusters = getCurrentClusters(membership, nodeIdList);
+        HashMap<String, ArrayList<Integer>> clusters = getCurrentClusters(membership, nodeIdList);
 
         current_numberOfCommunities = clusters.keySet().size();
         if (!listOfNumberOfCommunities.contains(current_numberOfCommunities)) {
             listOfNumberOfCommunities.add(current_numberOfCommunities);
 
         }
-        if (pre_numberOfCommunities != current_numberOfCommunities && numofCut > 0 && clusters.size() > 1) {
+        if (pre_numberOfCommunities < current_numberOfCommunities && pre_numberOfCommunities > 0) {
             current_numofCut++;
         }
         //todo
@@ -406,9 +401,9 @@ public class R_CommunityDetection {
      *
      * @param clusters
      */
-    private void clusteringSubgraphs(HashMap<Integer, ArrayList<Integer>> clusters, Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph, int numofCut) {
+    private void clusterToplusters(HashMap<String, ArrayList<Integer>> clusters, Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph) {
         ProcessingText processText = new ProcessingText();
-        HashMap<Integer, Integer> clusterID_size = new HashMap<>();
+        HashMap<String, Integer> clusterID_size = new HashMap<>();
         clusters.forEach((k, v) -> {
             clusterID_size.put(k, v.size());
         });
@@ -416,66 +411,125 @@ public class R_CommunityDetection {
 
         /** get top clusters: sorting clusters by size**/
 
-        Map<Integer, Integer> result = new LinkedHashMap<>();
+        Map<String, Integer> result = new LinkedHashMap<>();
         clusterID_size.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(numberOfBiggestClusters)
                 .forEachOrdered(x -> {
                     result.put(x.getKey(), x.getValue());
 
                 });
 
-        final Iterator<Integer> cursor = result.keySet().iterator();
+        final Iterator<String> cursor = result.keySet().iterator();
         StringBuilder sb_topClusters = new StringBuilder();
 
         while (cursor.hasNext()) {
-            final Integer clusterID = cursor.next();
+            final String clusterID = cursor.next();
             sb_topClusters.append(clusterID + "\n");
 
-            int current_numofCut = 0;
-            ArrayList<Integer> currentCluster = clusters.get(clusterID);
 
-            String outputFile = clusterID + "_clusterTMP.txt";
-            ioFunc.rewriteFile("", analysisDir + outputFile);
-
-            String currentGraphPath = clusterID + "_changedCode.pajek.net";
-            getCodeChangeGraph(testCaseDir, testDir, directedGraph, currentGraphPath);
-
-            re.eval("subg<-induced.subgraph(graph=oldg,vids=c(" + currentCluster.toString().replace("[", "").replace("]", "" + "))"));
-
-            REXP edgelist_R = re.eval("cbind( get.edgelist(subg) , round( E(subg)$weight, 3 ))", true);
-            REXP nodelist_R = re.eval("get.vertex.attribute(subg)$id", true);
-            double[][] edgelist = edgelist_R.asDoubleMatrix();
-            if (edgelist.length > 1) {
-                String[] old_nodelist = (String[]) nodelist_R.getContent();
-
-
-                StringBuilder sub_edgelist_sb = new StringBuilder();
-                HashMap<String, String> label_to_id = new ProcessingText().getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
-                for (double[] edge : edgelist) {
-                    String from = label_to_id.get("\"" + old_nodelist[(int) edge[0] - 1] + "\"");
-                    String to = label_to_id.get("\"" + old_nodelist[(int) edge[1] - 1] + "\"");
-
-                    sub_edgelist_sb.append(from + " " + to + " 5\n");
-
-                }
-
-                String completeGraph = null;
-                try {
-                    completeGraph = processText.readResult(analysisDir + "/complete.pajek.net");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                //get node list
-                String nodeListString = completeGraph.split("\\*arcs")[0];
-                processText.rewriteFile(nodeListString + "*Arcs\n" + sub_edgelist_sb.toString(), testCaseDir + currentGraphPath);
-                while (current_numofCut < max_numberOfCut) {
-                    current_numofCut = calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numofCut, false, outputFile, clusterID, current_numofCut);
-                }
+            if (current_numberOfCut <= max_numberOfCut) {
+                clusterSubGraphs(clusters, re, testCaseDir, testDir, cutNum, directedGraph, clusterID + "");
             }
         }
         processText.rewriteFile(sb_topClusters.toString(), analysisDir + "topClusters.txt");
+    }
+
+    /**
+     * This function split one of the top cluster step by step, each step only has 1 cut
+     *
+     * @param clusters
+     * @param re
+     * @param testCaseDir
+     * @param testDir
+     * @param cutNum
+     * @param directedGraph
+     * @param clusterID
+     */
+    private void clusterSubGraphs(HashMap<String, ArrayList<Integer>> clusters, Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph, String clusterID) {
+
+        ProcessingText pt = new ProcessingText();
+        int current_numofCut = 0;
+        System.out.println(clusterID);
+        ArrayList<Integer> currentClusterNodeList = clusters.get(clusterID);
+
+        String outputFile = clusterID + "_clusterTMP.txt";
+        ioFunc.rewriteFile("", analysisDir + outputFile);
+
+        String currentGraphPath = clusterID + "_changedCode.pajek.net";
+
+
+        re.eval("subg<-induced.subgraph(graph=oldg,vids=c(" + currentClusterNodeList.toString().replace("[", "").replace("]", "" + "))"));
+
+        REXP edgelist_R = re.eval("cbind( get.edgelist(subg) , round( E(subg)$weight, 3 ))", true);
+        REXP nodelist_R = re.eval("get.vertex.attribute(subg)$id", true);
+        double[][] edgelist = edgelist_R.asDoubleMatrix();
+        if (edgelist.length > 1) {
+            String[] old_nodelist = (String[]) nodelist_R.getContent();
+            StringBuilder sub_edgelist_sb = new StringBuilder();
+            HashMap<String, String> label_to_id = new ProcessingText().getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
+            for (double[] edge : edgelist) {
+                String from = label_to_id.get("\"" + old_nodelist[(int) edge[0] - 1] + "\"");
+                String to = label_to_id.get("\"" + old_nodelist[(int) edge[1] - 1] + "\"");
+                sub_edgelist_sb.append(from + " " + to + " 5\n");
+            }
+
+            String completeGraph = null;
+            try {
+                completeGraph = pt.readResult(analysisDir + "/complete.pajek.net");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //get node list
+            String nodeListString = completeGraph.split("\\*arcs")[0];
+            pt.rewriteFile(nodeListString + "*Arcs\n" + sub_edgelist_sb.toString(), testCaseDir + currentGraphPath);
+
+            getCodeChangeGraph(testCaseDir, testDir, directedGraph, currentGraphPath);
+
+
+            while (current_numofCut == 0) {
+                current_numofCut = calculateEachGraph(re, cutNum, directedGraph, outputFile, current_numofCut);
+            }
+
+
+
+            HashMap<String, HashSet<Integer>> current_clusters = getCluster(clusterID);
+
+            final int[] splitNum = {1};
+            current_clusters.forEach((k, v) -> {
+
+                generateCurrentEdgeCuttingResult();
+
+                if (k.split("_").length <max_numberOfCut+1) {
+                    String current_clusterID = k + "_" + (splitNum[0]++);
+                    pre_numberOfCommunities = 0;
+
+                    clusterSubGraphs(new_clusters, re, testCaseDir, testDir, cutNum, false, current_clusterID);
+                }
+
+            });
+
+        }
+    }
+public  HashMap<String, HashSet<Integer>>  getCluster(String clusterID){
+    HashMap<String, HashSet<Integer>> current_clusters = getCurrentClusters(clusterID ).get(2);
+
+
+    current_clusters.forEach((k, v) -> {
+
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        v.forEach(str -> {
+            list.add(Integer.valueOf(str));
+        });
+        new_clusters.put(k, list);
+    });
+    return  current_clusters;
+}
+
+
+    private HashMap<Integer, HashMap<String, HashSet<Integer>>> getCurrentClusters(String clusterID) {
+        return new AnalyzingCommunityDetectionResult(analysisDir).getClusteringResultMap(clusterID, false);
+
     }
 
 
@@ -487,10 +541,10 @@ public class R_CommunityDetection {
      * @param testDir
      * @param numOfClusters
      */
-    private void calculateDistanceBetweenCommunities(HashMap<Integer, ArrayList<Integer>> clusters, String testCaseDir, String testDir, String numOfClusters, boolean directedGraph) {
+    private void calculateDistanceBetweenCommunities(HashMap<String, ArrayList<Integer>> clusters, String testCaseDir, String testDir, String numOfClusters, boolean directedGraph) {
 
-        ArrayList<ArrayList<Integer>> combination = getPairsOfCommunities(clusters);
-        HashMap<ArrayList<Integer>, Integer> distanceMatrix = new HashMap<>();
+        ArrayList<ArrayList<String>> combination = getPairsOfCommunities(clusters);
+        HashMap<ArrayList<String>, Integer> distanceMatrix = new HashMap<>();
         StringBuffer sb = new StringBuffer();
         StringBuffer sb_shortestPath_node = new StringBuffer();
         HashMap<Integer, double[]> shortestDistanceOfNodes = new HashMap<>();
@@ -504,7 +558,7 @@ public class R_CommunityDetection {
 //            REXP g = re.eval("completeGraph<-scomGraph");
 //        }
 
-        for (ArrayList<Integer> pair : combination) {
+        for (ArrayList<String> pair : combination) {
             ArrayList<Integer> cluster_1 = clusters.get(pair.get(0));
             ArrayList<Integer> cluster_2 = clusters.get(pair.get(1));
             double shortestPath = 999999;
@@ -533,7 +587,6 @@ public class R_CommunityDetection {
                             shortestPath = c1_c2;
                             if (shortestPath == 10) {
 
-                                System.out.println("c1: " + nodelist[c1 - 1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2);
                                 sb_shortestPath_node.append("c1: " + nodelist[c1 - 1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2 + "\n");
                             }
                         }
@@ -549,15 +602,15 @@ public class R_CommunityDetection {
 
         StringBuffer clusterIDList = new StringBuffer();
 
-        for (Integer index : clusters.keySet()) {
+        for (String index : clusters.keySet()) {
             ArrayList<Integer> nodelist = clusters.get(index);
             clusterIDList.append(index + ",");
         }
 
         //print distance
-        for (ArrayList<Integer> s : distanceMatrix.keySet()) {
+        for (ArrayList<String> s : distanceMatrix.keySet()) {
 
-            for (Integer i : s) {
+            for (String i : s) {
                 sb.append(i + ",");
             }
             sb.append(distanceMatrix.get(s) + "\n");
@@ -579,19 +632,19 @@ public class R_CommunityDetection {
      * @param clusters
      * @return
      */
-    private ArrayList<ArrayList<Integer>> getPairsOfCommunities(HashMap<Integer, ArrayList<Integer>> clusters) {
+    private ArrayList<ArrayList<String>> getPairsOfCommunities(HashMap<String, ArrayList<Integer>> clusters) {
 
-        ArrayList<HashSet<Integer>> combination_Set = new ArrayList<>();
-        ArrayList<ArrayList<Integer>> combination_List = new ArrayList<>();
-        Set<Integer> keyset = clusters.keySet();
-        for (Integer s : keyset) {
-            for (Integer c : keyset) {
-                HashSet<Integer> pair = new HashSet<>();
+        ArrayList<HashSet<String>> combination_Set = new ArrayList<>();
+        ArrayList<ArrayList<String>> combination_List = new ArrayList<>();
+        Set<String> keyset = clusters.keySet();
+        for (String s : keyset) {
+            for (String c : keyset) {
+                HashSet<String> pair = new HashSet<>();
                 if (!s.equals(c)) {
                     pair.add(s);
                     pair.add(c);
                     if (!combination_Set.contains(pair)) {
-                        ArrayList<Integer> pairList = new ArrayList<>();
+                        ArrayList<String> pairList = new ArrayList<>();
                         pairList.addAll(pair);
                         combination_Set.add(pair);
                         combination_List.add(pairList);
@@ -602,23 +655,23 @@ public class R_CommunityDetection {
         return combination_List;
     }
 
-    private HashMap<Integer, ArrayList<Integer>> getCurrentClusters(double[] membership, ArrayList<Integer> nodeIdList) {
-        HashMap<Integer, ArrayList<Integer>> clusters = new HashMap<>();
+    private HashMap<String, ArrayList<Integer>> getCurrentClusters(double[] membership, ArrayList<Integer> nodeIdList) {
+        HashMap<String, ArrayList<Integer>> clusters = new HashMap<>();
 
         for (int i = 0; i < membership.length; i++) {
             if (nodeIdList.contains(i + 1)) {
-                ArrayList<Integer> member = clusters.get((int) membership[i]);
+                ArrayList<Integer> member = clusters.get(((int) membership[i]) + "");
                 if (member == null) {
                     member = new ArrayList<>();
                 }
                 member.add(i + 1);
-                clusters.put((int) membership[i], member);
+                clusters.put(((int) membership[i]) + "", member);
             }
         }
         return clusters;
     }
 
-    private void printMemebershipOfCurrentGraph(HashMap<Integer, ArrayList<Integer>> clusters, String outputFile, boolean isOriginalGraph) {
+    private void printMemebershipOfCurrentGraph(HashMap<String, ArrayList<Integer>> clusters, String outputFile, boolean isOriginalGraph) {
         //print
         StringBuffer membership_print = new StringBuffer();
 
@@ -652,7 +705,7 @@ public class R_CommunityDetection {
         while (it.hasNext()) {
             Map.Entry cluster = (Map.Entry) it.next();
             HashSet<Integer> cluster_content = (HashSet<Integer>) cluster.getValue();
-            if (outputFile.equals("clusterTMP.txt") || cluster_content.size() > 0) {
+            if (outputFile.equals("clusterTMP.txt") || cluster_content.size() > 1) {
 
                 HashSet<Integer> mem = (HashSet<Integer>) cluster.getValue();
                 membership_print.append(cluster.getKey() + ") ");

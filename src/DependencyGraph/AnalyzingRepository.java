@@ -34,16 +34,15 @@ public class AnalyzingRepository {
 
     public void analyzeRepository(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean hasGroundTruth, String repoPath) {
         boolean isMS_CLUSTERCHANGES;
-        int numOfCuts = 5;
+
         boolean directedGraph = false;
         if (approachIndex == 2 || approachIndex == 3 || approachIndex == 8) {
-            numOfCuts = 0;
             isMS_CLUSTERCHANGES = true;
         } else {
             isMS_CLUSTERCHANGES = false;
         }
         this.repoPath = repoPath;
-        executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, isMS_CLUSTERCHANGES, numOfCuts, directedGraph, testDir, hasGroundTruth);
+        executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, isMS_CLUSTERCHANGES, max_numberOfCut, directedGraph, testDir, hasGroundTruth);
     }
 
     /**
@@ -102,7 +101,7 @@ public class AnalyzingRepository {
     }
 
 
-    private void executeINFOX(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean isMS_CLUSTERCHANGES, int numOfCuts, boolean directedGraph, String testDir, boolean hasGroundTruth) {
+    private void executeINFOX(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean isMS_CLUSTERCHANGES, int max_numberOfCut, boolean directedGraph, String testDir, boolean hasGroundTruth) {
 //        if (!directedGraph) {
 //            DependencyGraph dependencyGraph = new DependencyGraph(approachIndex);
 //            /**  this function extract changed_code_dependency_graph from complete graph**/
@@ -115,9 +114,9 @@ public class AnalyzingRepository {
 
         String[] combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
         String originCombination = combination_list[0];
-//
-//      R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
-//        communityDetection.clustering_CodeChanges(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph,originCombination);
+
+      R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
+        communityDetection.clustering_CodeChanges(testCaseDir, testDir, re, directedGraph,true,"original");
 
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/

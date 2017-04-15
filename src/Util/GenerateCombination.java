@@ -72,6 +72,12 @@ public class GenerateCombination {
         }
     }
 
+    /**
+     * This function generate all the possible combination given number of number of element of each spot and length of LIST
+     * @param numOfElement
+     * @param lengthOfList
+     * @return
+     */
     public static String[] getAllLists(int numOfElement, int lengthOfList) {
         String[] element = new String[numOfElement];
         for (int i = 0; i < numOfElement; i++) {

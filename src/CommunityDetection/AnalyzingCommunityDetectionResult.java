@@ -65,16 +65,16 @@ public class AnalyzingCommunityDetectionResult {
     /**
      * This function get Cluster result map
      *
-     * @param filePrefix
+     * @param clusterID
      * @param isOriginalGraph
      * @return
      */
-    public HashMap<Integer, HashMap<String, HashSet<Integer>>> getClusteringResultMap(String filePrefix, boolean isOriginalGraph) {
+    public HashMap<Integer, HashMap<String, HashSet<Integer>>> getClusteringResultMap(String clusterID, boolean isOriginalGraph) {
 //    public HashMap<Integer, HashMap<String, HashSet<Integer>>> getClusteringResultMap(int clusterSizeThreshold,  boolean hasGroundTruth, String filePrefix, boolean isOriginalGraph) {
         HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap = new HashMap<>();
 
 
-        String clusterFilePath = analysisDir + filePrefix + suffix_ClusterFile;
+        String clusterFilePath = analysisDir + clusterID + suffix_ClusterFile;
         String clusterResultListString = "";
 
         ProcessingText processingText = new ProcessingText();
@@ -121,13 +121,13 @@ public class AnalyzingCommunityDetectionResult {
 
                         if (clusterResultMap.size() == 0) {
                             initialNumOfClusters = numberOfCommunities;
-                            processingText.writeTofile(initialNumOfClusters + ",0\n", analysisDir + filePrefix + "_LOC_split.txt");
+                            processingText.writeTofile(initialNumOfClusters + ",0\n", analysisDir + clusterID + "_LOC_split.txt");
                         }
 //                        clusterResultMap.put(numberOfCommunities, clusters);
 
                         /** generates current clustering result map
                          * #index  -> hashset of nodeid  **/
-                        HashMap<String, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters);
+                        HashMap<String, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters, clusterID);
                         clusterResultMap.put(index, current_clustering_result);
 
                         pre_numberOfCommunites = numberOfCommunities;
@@ -753,8 +753,8 @@ public class AnalyzingCommunityDetectionResult {
                         clusterResultMap.put(numberOfCommunities, clusters);
 
                         /** generates current clustering result map
-                         * #index  -> hashset of nodeid  **/
-                        HashMap<String, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters);
+                         * #index  -> hashset of nodeid  **/ //todo  clusterid
+                        HashMap<String, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters, "??");
 
                         /** generateing toggle.js file for each cluster **/
                         generateToggleFileForEachCluster(current_clustering_result, false, numberOfCommunities);
@@ -916,25 +916,46 @@ public class AnalyzingCommunityDetectionResult {
      * @param clusters a list of clusters
      * @return hash map of current_clustering_result
      */
-    private HashMap<String, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters) {
+    private HashMap<String, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters, String clusterID) {
 
         HashMap<String, HashSet<Integer>> current_clustering_result = new HashMap<>();
-        for (String s : clusters) {
-            if (!s.equals("") && s.contains(")")) {
-                String index = s.substring(0, s.indexOf(")"));
-                String str = s.substring(s.indexOf("[") + 1).replace("]", "");
-                String[] nodeList = str.split(",");
-                HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
-                HashSet<Integer> cluster_nodeid_Set = new HashSet<>();
-                Iterator<String> it = cluster_nodeSet.iterator();
-                while (it.hasNext()) {
-                    String istr = it.next().trim();
-                    if (istr.length() > 0) {
-                        cluster_nodeid_Set.add(Integer.valueOf(istr));
+        if (clusters.size() > 2) {
+
+            for (int i = 0; i < clusters.size(); i++) {
+                String s = clusters.get(i);
+                if (!s.equals("") && s.contains(")")) {
+                    String index = clusterID + "_" + i;
+
+                    String str = s.substring(s.indexOf("[") + 1).replace("]", "");
+                    String[] nodeList = str.split(",");
+                    HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
+                    HashSet<Integer> cluster_nodeid_Set = new HashSet<>();
+                    Iterator<String> it = cluster_nodeSet.iterator();
+                    while (it.hasNext()) {
+                        String istr = it.next().trim();
+                        if (istr.length() > 0) {
+                            cluster_nodeid_Set.add(Integer.valueOf(istr));
+                        }
                     }
+                    current_clustering_result.put(index, cluster_nodeid_Set);
                 }
-                current_clustering_result.put(index, cluster_nodeid_Set);
             }
+        } else {
+            String s = clusters.get(1);
+            String index = clusterID;
+
+            String str = s.substring(s.indexOf("[") + 1).replace("]", "");
+            String[] nodeList = str.split(",");
+            HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
+            HashSet<Integer> cluster_nodeid_Set = new HashSet<>();
+            Iterator<String> it = cluster_nodeSet.iterator();
+            while (it.hasNext()) {
+                String istr = it.next().trim();
+                if (istr.length() > 0) {
+                    cluster_nodeid_Set.add(Integer.valueOf(istr));
+                }
+            }
+            current_clustering_result.put(index, cluster_nodeid_Set);
         }
         return current_clustering_result;
     }

@@ -99,16 +99,29 @@ public class ParseHtml {
             doc.getElementsByTag("header").append(css);
 
 
+            String js = pt.readResult("/Users/shuruiz/Work/GithubProject/jsFile.txt");
+
+            doc.getElementsByTag("html").last().after(js);
+
             Elements fileList_elements = doc.getElementsByClass("file-header");
             combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
             for (String splitStep : combination_list) {
 
                 HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep);
+                HashMap<String, List<String>> cluster_keyword = new HashMap<>();
+                String keyword[] = pt.readResult(analysisDir + splitStep + "_keyword.txt").split("\n");
+                for (String kw : keyword) {
+                    kw = kw.replace("[", "").replace("]", "");
+                    String cid = kw.split(":")[0].trim();
 
-                generateClusterSummaryTable(splitStep);
+                    List<String> list = Arrays.asList(kw.split(":")[1].split(","));
+                    cluster_keyword.put(cid, list);
+                }
+
+                HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword);
 
 
-                generateHtml(fileList_elements, nodeId_to_clusterID, splitStep);
+                generateHtml(fileList_elements, nodeId_to_clusterID, splitStep, cluster_color, cluster_keyword);
             }
 
 
@@ -117,36 +130,51 @@ public class ParseHtml {
         }
     }
 
-    private void generateClusterSummaryTable(String splitStep) throws IOException {
+    private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword) throws IOException {
+        HashMap<String, String> cluster_color = new HashMap<>();
+
         ProcessingText pt = new ProcessingText();
         BackgroundColor cc = new BackgroundColor();
 
         ArrayList<ArrayList<String>> colorfamiliy_List = cc.getColorFamilyList();
-        HashMap<String, List<String>> cluster_keyword = new HashMap<>();
-        String keyword[] = pt.readResult(analysisDir + splitStep + "_keyword.txt").split("\n");
-        for (String kw : keyword) {
-            kw=kw.replace("[","").replace("]","");
-            String cid = kw.split(":")[0].trim();
-
-            List<String> list = Arrays.asList(kw.split(":")[1].split(","));
-            cluster_keyword.put(cid,list);
-        }
-
 
 
         StringBuilder sb = new StringBuilder();
-        sb.append(" sb.append(\"<table id=\\\"cluster\\\"  border=1 frame=void rules=rows>\\n\" +\n" +
-                "                \"  <tr> \\n\" +\n" +
-                "                \"    <td> <button id=\\\"btn_hide_non_cluster_rows\\\" onclick=\\\"hide_non_cluster_rows()\\\">Hide non cluster code</button>\\n\" +\n" +
-                "                \"    </td> \\n\" +\n" +
-                "                \"  </tr>\\n\" +\n" +
-                "                \"  <tr>\\n\" +\n" +
-                "                \"       <th>Cluster</th>\\n\" +\n" +
-                "                \"       <th>Keywords</th>\\n\" +\n" +
-                "                \"       <th>LOC</th>\\n\" +\n" +
-                "                \"       <th>Split Cluster </th>\\n\" +\n" +
-                "                \"        <th> keyword is representative?</th>\\n\" +\n" +
-                "                \"    </tr>\");\n");
+        sb.append("<style>\n" +
+                "#cluster{\n" +
+                "  background-color: #fff;\n" +
+                "  border: 1px solid #000;\n" +
+                " position:fixed;\n" +
+                "  right: 0;\n" +
+                "  left: 0;\n" +
+                "  width: 980px;\n" +
+                "  margin-right: auto;\n" +
+                "  margin-left: auto;\n" +
+                "  top:19px;\n" +
+                "  /*right:461px;*/\n" +
+                "  z-index:99999;\n" +
+                "  td, th {\n" +
+                "  background-color: #fff;\n" +
+                "  color: #000;\n" +
+                "}\n" +
+                "\n" +
+                "}\n" +
+                ".test_me:hover {\n" +
+                "  max-width : initial;\n" +
+                "  overflow: show;\n" +
+                "}\n" +
+                "</style>" +
+                "<table id=\"cluster\"  border=1 frame=void rules=rows>\n" +
+                "  <tr> \n" +
+                "    <td> <button id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
+                "    </td> \n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "       <th>Cluster</th>\n" +
+                "       <th>Keywords</th>\n" +
+                "       <th>LOC</th>\n" +
+                "       <th>Split Cluster </th>\n" +
+                "    </tr>\n");
 
 
         try {
@@ -156,31 +184,72 @@ public class ParseHtml {
                 String clusterID = topClusterID[i];
                 String cluster[] = clusterID.split("_");
                 int clusterIndex = cluster.length == 1 ? 1 : Integer.parseInt(cluster[1]);
-                String color = colorfamiliy_List.get(i).get(Integer.parseInt(String.valueOf(clusterIndex)) - 1);
-                final String[] clusterSize = {""};
-                clusterResultMap.forEach((k, v) -> {
-                    HashMap<String, HashSet<Integer>> currentClusterMap = v;
-                    clusterSize[0] = String.valueOf(currentClusterMap.get(clusterID));
-                });
+
 
                 String[] splitArray = splitStep.split("");
-                splitArray[clusterIndex] = String.valueOf(Integer.valueOf(splitArray[clusterIndex]) + 1);
+                String[] nextSplit = Arrays.copyOf(splitArray, splitArray.length);
+                nextSplit[i] = String.valueOf(Integer.valueOf(splitArray[clusterIndex]) + 1);
                 String nextStep = "";
-                for (String s : splitArray) {
-                    nextStep += s;
+                String nextStepStr="";
+                if (Integer.valueOf(nextSplit[i]) <=max_numberOfCut) {
+                    for (String s : nextSplit) {
+                        nextStep += s;
+                    }
+                     nextStepStr = "       <td width=\"100\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
+                }else{
+                    nextStepStr = "       <td width=\"100\"></td>\n";
                 }
 
 
 
 
-                String keyword_suffix = cluster_keyword.get(clusterID).toString();
+                int current_split = Integer.valueOf(splitArray[i]);
+                if (current_split > 1) {
+                    for (int s = 1; s <= current_split; s++) {
+                        String current_clusterID = clusterID + "_" + s;
+                        String keyword_long = cluster_keyword.get(current_clusterID).toString();
+                        String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
+                        String color = colorfamiliy_List.get(i).get(s - 1);
 
-                sb.append("<tr> \n" +
-                        "       <td style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + clusterID + "\")'>" + keyword_suffix + "</td>\n" +
-                        "       <td class=\"test_me\" style=\"max-width:4px;\"> liquidcryst_i2c, command, displaycontrol, row, displaymod, value, write4bits, expanderwrite, delaymicroseconds, </td>\n" +
-                        "       <td><div id='" + clusterID + "'>" + clusterSize[0] + "</div></td>\n" +
-                        "       <td><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n" +
-                        "   </tr>");
+                        final String[] clusterSize = {""};
+                        clusterResultMap.forEach((k, v) -> {
+                            HashMap<String, HashSet<Integer>> currentClusterMap = v;
+                            clusterSize[0] = String.valueOf(currentClusterMap.get(current_clusterID).size());
+                        });
+
+                        cluster_color.put(current_clusterID, color);
+                        sb.append("<tr> \n" +
+                                "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
+                                "        <td width=\"600\">" + keyword_long + "</td>\n" +
+                                "       <td width=\"50\">" + clusterSize[0] + "</td>\n" +
+                                nextStepStr +
+                                "   </tr>");
+
+                    }
+                } else {
+                    String color = colorfamiliy_List.get(i).get(0);
+                    String keyword_long = cluster_keyword.get(clusterID).toString();
+                    String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
+
+                    final String[] clusterSize = {""};
+                    clusterResultMap.forEach((k, v) -> {
+                        HashMap<String, HashSet<Integer>> currentClusterMap = v;
+                        clusterSize[0] = String.valueOf(currentClusterMap.get(clusterID).size());
+                    });
+
+                    sb.append("<tr> \n" +
+                            "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + clusterID + "\")'>" + keyword_suffix + "</td>\n" +
+                            "        <td width=\"600\">" + keyword_long + "</td>\n" +
+                            "       <td width=\"50\">" + clusterSize[0] + "</td>\n" +
+                            nextStepStr +
+                            "   </tr>");
+
+
+                    cluster_color.put(clusterID, color);
+
+                }
+
+
             }
 
 
@@ -192,9 +261,10 @@ public class ParseHtml {
         sb.append("</table>");
 
         pt.rewriteFile(sb.toString(), analysisDir + splitStep + ".color");
-
+        return cluster_color;
 
     }
+
 
     private HashMap<String, String> genrate_NodeId_to_clusterIDList_Map(String splitStep) {
 
@@ -248,44 +318,64 @@ public class ParseHtml {
      *
      * @param fileList_elements
      */
-    private void generateHtml(Elements fileList_elements, HashMap<String, String> nodeId_to_clusterID, String splitStep) {
+    private void generateHtml(Elements fileList_elements, HashMap<String, String> nodeId_to_clusterID, String splitStep, HashMap<String, String> cluster_color, HashMap<String, List<String>> cluster_keyword) {
+
 
         currentDoc = doc.clone();
         ProcessingText pt = new ProcessingText();
-        String styleStr = "background-color:red;font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
-                "  font-size:12px;\n" +
-                "  line-height:20px;\n" +
-                "  text-align:right;\"";
+
+        String summaryTable;
+        try {
+            summaryTable = pt.readResult(analysisDir + splitStep + ".color");
+            currentDoc.getElementsByTag("html").first().children().first().before(summaryTable);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         for (String changedCodeLabel : forkAddedNodeList) {
             if (label_to_id.get("\"" + changedCodeLabel + "\"") != null) {
                 String nodeId = label_to_id.get("\"" + changedCodeLabel + "\"");
                 String clusterid = nodeId_to_clusterID.get(nodeId);
+
+
                 String nodeLable[] = changedCodeLabel.split("-");
                 String filename_tag = nodeLable[0];
                 String fileName = pt.getOriginFileName(filename_tag);
                 String lineNumber = nodeLable[1];
 
-                currentDoc.getElementsByAttributeValue("data-path", fileName);
-                Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
-                if (!currentFile.toString().contains("Load diff")) {
-                    Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
-                    Element lineElement;
-                    if (lineElements.size() > 1) {
-                        if (lineElements.get(0).toString().contains("addition")) {
-                            lineElement = lineElements.get(0);
+                String styleStr = "background-color:"
+                        + cluster_color.get(clusterid)
+                        + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
+                        "  font-size:12px;\n" +
+                        "  line-height:20px;\n" +
+                        "  text-align:right;\"";
+
+                boolean isTopCluster = cluster_keyword.get(clusterid) != null ? true : false;
+                if (isTopCluster) {
+                    String keywod_prefex = cluster_keyword.get(clusterid).get(0).substring(0, 6).trim();
+
+                    currentDoc.getElementsByAttributeValue("data-path", fileName);
+                    Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
+                    if (!currentFile.toString().contains("Load diff")) {
+                        Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
+                        Element lineElement;
+                        if (lineElements.size() > 1) {
+                            if (lineElements.get(0).toString().contains("addition")) {
+                                lineElement = lineElements.get(0);
+                            } else {
+                                lineElement = lineElements.get(1);
+                            }
                         } else {
-                            lineElement = lineElements.get(1);
+                            lineElement = lineElements.first();
                         }
+//todo keyword
+                        lineElement.attr("class", "infox_" + clusterid.trim()).attr("style", styleStr).text(keywod_prefex);
                     } else {
-                        lineElement = lineElements.first();
+                        System.out.println(fileName + " is bigger than the github diff limits..");
+
+
                     }
-
-                    lineElement.attr("class", "infox_" + clusterid).attr("style", styleStr).text("keyword!");
-                } else {
-                    System.out.println(fileName + " is bigger than the github diff limits..");
-
-
                 }
             }
         }
