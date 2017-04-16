@@ -129,7 +129,6 @@ public class IdentifyingKeyWordForCluster {
             /**  add commit msg of changed code **/
 
             ArrayList<String> words = cluster_to_commit_map.get(clusterID);
-            System.out.println(clusterID);
             words.forEach(w -> {
                 if (w.trim().length() > 1) {
                     clusterString.add(w);
@@ -368,24 +367,32 @@ public class IdentifyingKeyWordForCluster {
 
         AnalyzingCommunityDetectionResult acdr = new AnalyzingCommunityDetectionResult(analysisDir);
         boolean isOriginalGraph = false;
-        if (splitStep.replace("1", "").equals("")) {
-            isOriginalGraph = true;
-        }
+
         HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap = acdr.getClusteringResultMap(splitStep, isOriginalGraph);
 
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
-//            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
-//
-//            /** parse commit msg for each node **/
-//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 1, repoPath, splitStep);
-//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 2, repoPath, splitStep);
-//
-//
-//            /**  calculate tfidf  to identifing keywords from each cluster**/
-//            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 1,splitStep);
-//            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 2,splitStep);
 
+            /**  tokenization **/
+            System.out.println("        Tokenizing source code...");
+            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
+
+            /** parse commit msg for each node **/
+            System.out.println("        getting commit messages for current split...");
+            System.out.println("        generating one gram term ...");
+            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 1, repoPath, splitStep);
+            System.out.println("        generating two gram term ...");
+            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 2, repoPath, splitStep);
+
+
+            /**  calculate tfidf  to identifing keywords from each cluster**/
+            System.out.println("        identifying keywords from one gram list...");
+            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 1,splitStep);
+            System.out.println("        identifying keywords from two gram list...");
+            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 2,splitStep);
+
+            /**  merging one-gram and two-gram result**/
+            System.out.println("        merging one-gram and two-gram result.. removing redundancy...");
             mergeOne_two_gram(analysisDir, splitStep);
 
 //            findKeyWordsForEachCut(analysisDir, testDir, currentClusterMap, 2);

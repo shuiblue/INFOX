@@ -50,19 +50,23 @@ public class BackgroundColor {
         //Red
         ArrayList<String> colorList_1 = new ArrayList<>();
         colorList_1.add("#ff0000");
+        colorList_1.add("#E84040");
         colorList_1.add("#cc0000");
         colorList_1.add("#ff3300");
         colorList_1.add("#990033");
         colorList_1.add("#ff1a66");
+        colorList_1.add("#DC2846");
         colorfamiliy_List.add(colorList_1);
 
         //Blue
         ArrayList<String> colorList_2 = new ArrayList<>();
-        colorList_2.add("#0000ff");
-        colorList_2.add("#9999ff");
-        colorList_2.add("#00ccff");
+        colorList_2.add("#3B56F0");
+        colorList_2.add("#2A47EB");
+        colorList_2.add("#8695E5");
         colorList_2.add("#3366cc");
         colorList_2.add("#66ccff");
+        colorList_2.add("#4159DA");
+        colorList_2.add("#636DA4");
         colorfamiliy_List.add(colorList_2);
 
         //Yellow

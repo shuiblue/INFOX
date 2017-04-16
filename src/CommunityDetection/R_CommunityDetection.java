@@ -465,14 +465,15 @@ public class R_CommunityDetection {
 
 
             current_clusters.forEach((k, v) -> {
+                System.out.println("v size:"+v.size());
+
                 final int[] splitNum = {1};
                 if (k.split("_").length < max_numberOfCut + 1) {
                     String current_clusterID = k + "_" + (splitNum[0]++);
-                    System.out.println(current_clusterID);
                     ArrayList<Integer> new_clusterNodeList = new_clusters.get(k);
                     if (new_clusterNodeList.size() > minimumClusterSize) {
                         generateCurrentSplittingResult(k, new_clusterNodeList, testCaseDir, testDir, directedGraph, re, cutNum);
-                        clusterSubGraphs(new_clusters.get(current_clusterID), re, testCaseDir, testDir, cutNum, false, current_clusterID);
+                        clusterSubGraphs(new_clusters.get(current_clusterID.split("_")[0]), re, testCaseDir, testDir, cutNum, false, current_clusterID);
                     } else {
                         noSplitting_step.append(k + "\n");
                     }
@@ -734,7 +735,7 @@ public class R_CommunityDetection {
             }
         }
         //print old edge
-        ioFunc.writeTofile(membership_print.toString(), analysisDir + outputFile);
+        ioFunc.rewriteFile(membership_print.toString(), analysisDir + outputFile);
     }
 
 

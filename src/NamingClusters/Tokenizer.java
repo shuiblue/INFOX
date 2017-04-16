@@ -40,7 +40,6 @@ public class Tokenizer {
                     String fileName = processingText.getFileNameFromDir(filePath.toString(), sourcecodeDir);
                     String newFileName = processingText.changeFileName(fileName);
 
-                    System.out.println("_______file    :" + newFileName);
                     // read source code
                     BufferedReader result_br = null;
 

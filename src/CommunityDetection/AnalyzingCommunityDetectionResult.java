@@ -575,12 +575,12 @@ public class AnalyzingCommunityDetectionResult {
                 if (cid.split("_").length == 1) {
                     isOriginalGraph = true;
                 }
-                int cutNum ;
+                int cutNum;
                 if (cid.contains("_")) {
-                     cutNum = cid.split("_").length - 1;
+                    cutNum = cid.split("_").length - 1;
                     clusterID = cid.split("_")[0];
-                }else{
-                    cutNum=1;
+                } else {
+                    cutNum = 1;
                 }
 
                 HashMap<String, HashSet<Integer>> newCluster = topClustersSplittingResult.get(Integer.valueOf(clusterID)).get(cutNum);
@@ -591,15 +591,16 @@ public class AnalyzingCommunityDetectionResult {
                 while (itr.hasNext()) {
                     String cluster_index = itr.next();
                     String newIndex;
-                    if (isOriginalGraph) {
-
-                        newIndex = clusterID;
-                        isOriginalGraph = false;
-                    } else {
-                        currentCluster.remove(String.valueOf(clusterID));
-                        newIndex = clusterID + "_" + cutNum--;
-                    }
-                    currentCluster.put(newIndex, newCluster.get(cluster_index));
+//                    if (isOriginalGraph) {
+//
+//                        newIndex = clusterID;
+//                        isOriginalGraph = false;
+//                    } else {
+//                        currentCluster.remove(String.valueOf(clusterID));
+//                        newIndex = clusterID + "_" + cutNum--;
+//                    }
+                    currentCluster.put(cid, newCluster.get(cluster_index));
+//                    currentCluster.put(newIndex, newCluster.get(cluster_index));
 
                 }
 
@@ -941,20 +942,53 @@ public class AnalyzingCommunityDetectionResult {
      * @param clusters a list of clusters
      * @return hash map of current_clustering_result
      */
-    private HashMap<String, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters, String clusterID) {
-
+    private HashMap<String, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters, String splitStep) {
         HashMap<String, HashSet<Integer>> current_clustering_result = new HashMap<>();
-        if (clusters.size() > 2 || (clusters.size() == 2 && clusterID.contains("_"))) {
 
-            for (int i = 0; i < clusters.size(); i++) {
-                String s = clusters.get(i);
-                if (!s.equals("") && s.contains(")")) {
-                    String index = "";
-                    if (clusterID.equals("original")) {
-                        index = s.substring(0, s.indexOf(")")).trim();
-                    } else {
-                        index = clusterID + "_" + i;
+        String[] splitArray = splitStep.split("--");
+        System.out.println(splitStep);
+        for (String cluster : splitArray) {
+            String[] tmp = cluster.split("~");
+            for (String cid : tmp) {
+                String clusterID = cid;
+                boolean isOriginal = true;
+
+                int cutNum;
+                if (cid.contains("_")) {
+                    cutNum = cid.split("_").length - 1;
+                    clusterID = cid.split("_")[0];
+                } else {
+                    cutNum = 1;
+                }
+                if (clusters.size() > 2 || (clusters.size() == 2 && clusterID.contains("_"))) {
+
+                    for (int i = 0; i < clusters.size(); i++) {
+                        String s = clusters.get(i);
+                        if (!s.equals("") && s.contains(")")) {
+                            String index = "";
+                            if (isOriginal) {
+                                index = s.substring(0, s.indexOf(")")).trim();
+                            } else {
+                                index = clusterID + "_" + i;
+                            }
+                            String str = s.substring(s.indexOf("[") + 1).replace("]", "");
+                            String[] nodeList = str.split(",");
+                            HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
+                            HashSet<Integer> cluster_nodeid_Set = new HashSet<>();
+                            Iterator<String> it = cluster_nodeSet.iterator();
+                            while (it.hasNext()) {
+                                String istr = it.next().trim();
+                                if (istr.length() > 0) {
+                                    cluster_nodeid_Set.add(Integer.valueOf(istr));
+                                }
+                            }
+                            current_clustering_result.put(index, cluster_nodeid_Set);
+                        }
                     }
+                } else {
+                    String s = clusters.get(1);
+                    String index = clusterID;
+
                     String str = s.substring(s.indexOf("[") + 1).replace("]", "");
                     String[] nodeList = str.split(",");
                     HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
@@ -969,22 +1003,6 @@ public class AnalyzingCommunityDetectionResult {
                     current_clustering_result.put(index, cluster_nodeid_Set);
                 }
             }
-        } else {
-            String s = clusters.get(1);
-            String index = clusterID;
-
-            String str = s.substring(s.indexOf("[") + 1).replace("]", "");
-            String[] nodeList = str.split(",");
-            HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
-            HashSet<Integer> cluster_nodeid_Set = new HashSet<>();
-            Iterator<String> it = cluster_nodeSet.iterator();
-            while (it.hasNext()) {
-                String istr = it.next().trim();
-                if (istr.length() > 0) {
-                    cluster_nodeid_Set.add(Integer.valueOf(istr));
-                }
-            }
-            current_clustering_result.put(index, cluster_nodeid_Set);
         }
         return current_clustering_result;
     }

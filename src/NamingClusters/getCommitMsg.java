@@ -48,12 +48,10 @@ public class GetCommitMsg {
 
                     v.forEach(nodeId -> {
                         String nodeLable = nodeIdMap.get(nodeId+"");
-                        System.out.println(nodeId+"");
 
                         if (nodeLable != null) {
                             String fileName = processingText.getOriginFileName(nodeLable);
                             String lineNumber = nodeLable.split("-")[1];
-
                             String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram, repoPath);
                             if (!clusterCommitMsg.keySet().contains(commit[0])) {
                                 clusterCommitMsg.put(commit[0], commit[1]);
@@ -128,7 +126,6 @@ public class GetCommitMsg {
                     Set<String> clusterString = new HashSet<>();
                     Set<String> origin_clusterString = new HashSet<>();
                     String clusterID = cl.substring(0, cl.trim().indexOf(")"));
-                    System.out.println(clusterID);
 
                     sb.append("\n[" + clusterID + "]");
                     sb_origin.append("\n[" + clusterID + "]");
