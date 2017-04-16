@@ -30,7 +30,7 @@ public class ParseHtml {
     static String github_api = "https://api.github.com/repos/";
     static String github_page = "https://github.com/";
     Document doc, currentDoc;
-    String analysisDir = "";
+    static String analysisDir = "";
     String originalPage = "original.html";
     int max_numberOfCut;
     int numberOfBiggestClusters;
@@ -40,10 +40,12 @@ public class ParseHtml {
     HashMap<String, String> label_to_id;
     ArrayList<String> forkAddedNodeList;
     HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap;
+    static ArrayList<String> all_splitStep_list = new ArrayList<>();
 
-    public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters) {
+    public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters,String analysisDir) {
         this.max_numberOfCut = max_numberOfCut;
         this.numberOfBiggestClusters = numberOfBiggestClusters;
+        this.analysisDir=analysisDir;
     }
 
     public void getOriginalDiffPage(String diffPageUrl, String localSourceCodeDirPath) {
@@ -104,8 +106,23 @@ public class ParseHtml {
             doc.getElementsByTag("html").last().after(js);
 
             Elements fileList_elements = doc.getElementsByClass("file-header");
-            combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
-            for (String splitStep : combination_list) {
+
+
+//            HashMap<Integer, List<String>> allSplitSteps_map = new GenerateCombination(analysisDir).getAllSplitSteps(max_numberOfCut);
+//            String[] topClusters = new String[]{};
+//            try {
+//                topClusters = pt.readResult(analysisDir + "topClusters.txt").split("\n");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            String[] currentClusterList = topClusters;
+//            //todo  max is wrong ,should be 2
+//            combination_list = GenerateCombination.getAllLists(2, numberOfBiggestClusters);
+//            ArrayList<String> all_splitStep_list = generateAllCombineResult(allSplitSteps_map, combination_list, currentClusterList);
+            ArrayList<String> splitStepList = generateAllCombineResult(analysisDir, max_numberOfCut);
+
+
+            for (String splitStep : splitStepList) {
 
                 HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep);
                 HashMap<String, List<String>> cluster_keyword = new HashMap<>();
@@ -118,6 +135,7 @@ public class ParseHtml {
                     cluster_keyword.put(cid, list);
                 }
 
+
                 HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword);
 
 
@@ -128,6 +146,71 @@ public class ParseHtml {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @param analysisDir
+     * @param max_numberOfCut
+     */
+    public ArrayList<String> generateAllCombineResult(String analysisDir, int max_numberOfCut) {
+        ProcessingText pt = new ProcessingText();
+        ArrayList<String> topClusters = null;
+        try {
+            topClusters = new ArrayList<>(Arrays.asList(pt.readResult(analysisDir + "topClusters.txt").split("\n")));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir).getAllSplitSteps(max_numberOfCut, (ArrayList<String>) topClusters);
+        return generateCombineResult_4CurrentClusterList(allSplitSteps_map, topClusters, max_numberOfCut);
+
+    }
+
+
+    private ArrayList<String> generateCombineResult_4CurrentClusterList(HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map, ArrayList<String> topClusters, int max_numberOfCut) {
+        HashMap<String, ArrayList<String>> cluster_possibleSplitStep = getPossileSplitStepForeachCluster(allSplitSteps_map, topClusters, max_numberOfCut);
+
+        List<List<String>> totalList = new ArrayList<>();
+        for (String originalCluster : topClusters) {
+            totalList.add(cluster_possibleSplitStep.get(originalCluster));
+        }
+        return new GenerateCombination(analysisDir).printAllCases(totalList);
+
+    }
+
+    private static HashMap<String, ArrayList<String>> getPossileSplitStepForeachCluster(HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map, ArrayList<String> topClusters, int max_numberOfCut) {
+        HashMap<String, ArrayList<String>> cluster_possibleSplitStep = new HashMap<>();
+
+        for (String originalCluster : topClusters) {
+            ArrayList<String> list = new ArrayList<>();
+            list.add(originalCluster);
+            cluster_possibleSplitStep.put(originalCluster, list);
+            HashMap<Integer, ArrayList<String>> map = allSplitSteps_map.get(originalCluster);
+
+            ArrayList<String> current_list = cluster_possibleSplitStep.get(originalCluster);
+            for (int split = 1; split <= max_numberOfCut; split++) {
+                ArrayList<String> nextSplit = allSplitSteps_map.get(originalCluster).get(split);
+
+                String thisSplit = "";
+
+                for (String parentCluster : allSplitSteps_map.get(originalCluster).get(split - 1)) {
+                    if (nextSplit.size() > 0) {
+                        String child1 = parentCluster + "_1";
+                        String child2 = parentCluster + "_2";
+                        if (nextSplit.contains(child1) && nextSplit.contains(child2)) {
+                            thisSplit += child1 + "~" + child2;
+                        } else {
+                            thisSplit += "~" + parentCluster;
+                        }
+                    }
+                }
+                if (thisSplit.length() > 0) {
+                    current_list.add(thisSplit);
+                }
+            }
+            cluster_possibleSplitStep.put(originalCluster, current_list);
+        }
+        return cluster_possibleSplitStep;
     }
 
     private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword) throws IOException {
@@ -190,17 +273,15 @@ public class ParseHtml {
                 String[] nextSplit = Arrays.copyOf(splitArray, splitArray.length);
                 nextSplit[i] = String.valueOf(Integer.valueOf(splitArray[clusterIndex]) + 1);
                 String nextStep = "";
-                String nextStepStr="";
-                if (Integer.valueOf(nextSplit[i]) <=max_numberOfCut) {
+                String nextStepStr = "";
+                if (Integer.valueOf(nextSplit[i]) <= max_numberOfCut) {
                     for (String s : nextSplit) {
                         nextStep += s;
                     }
-                     nextStepStr = "       <td width=\"100\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
-                }else{
+                    nextStepStr = "       <td width=\"100\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
+                } else {
                     nextStepStr = "       <td width=\"100\"></td>\n";
                 }
-
-
 
 
                 int current_split = Integer.valueOf(splitArray[i]);

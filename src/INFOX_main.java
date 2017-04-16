@@ -28,6 +28,7 @@ public class INFOX_main {
         String forkName = "malx122/Marlin";
         boolean hasGroundTruth = false;
         String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName+FS;
+        String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName+FS+"INFOX_text/";
         int max_numberOfCut = 2;
         int numberOfBiggestClusters = 2;
 
@@ -38,7 +39,7 @@ public class INFOX_main {
 
 
         /***  get origin diff github page  ***/
-        ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters);
+        ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters,analysisDir);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(forkName);
         String diffPageUrl ="https://github.com/MarlinFirmware/Marlin/compare/3814bbb529e47d0f7388618c1e5bcb114135e09d...malx122:85afc64790e6be61176113f03acaf2a19a5a0b84#files_bucket";
 //
@@ -59,7 +60,7 @@ public class INFOX_main {
 
         /*** hack github page   ***/
 //        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
-//        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
+        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
 
 
     }

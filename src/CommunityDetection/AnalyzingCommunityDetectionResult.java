@@ -3,6 +3,7 @@ package CommunityDetection;
 import ColorCode.BackgroundColor;
 import ColorCode.ColorCode;
 import DependencyGraph.DependencyGraph;
+import MocGithub.ParseHtml;
 import Util.GenerateCombination;
 import Util.ProcessingText;
 
@@ -80,10 +81,10 @@ public class AnalyzingCommunityDetectionResult {
         ProcessingText processingText = new ProcessingText();
 
         /** get fork added node **/
-        File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
+        File forkAddedFile = new File(analysisDir + forkAddedNodeTxt);
         if (forkAddedFile.exists()) {
             try {
-                forkAddedNode = processingText.readResult(testCaseDir + forkAddedNodeTxt);
+                forkAddedNode = processingText.readResult(analysisDir + forkAddedNodeTxt);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -480,11 +481,14 @@ public class AnalyzingCommunityDetectionResult {
         int clusterSizeThreshold = 10;
 
         /**  generate combinations if split steps of sub-cluster **/
-        String[] combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
+//        String[] combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
+        ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
+
+
         for (String s : combination_list) {
             allClusteringResult.put(s, new HashMap<>());
         }
-        originCombination = combination_list[0];
+        originCombination = "original";
 
         /** for original clustering result , generate corresponding table, html ...**/
         parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, originCombination, true);
@@ -529,8 +533,6 @@ public class AnalyzingCommunityDetectionResult {
 
     private void generateCompleteClusteringFiles(HashMap<String, HashSet<Integer>> currentCluster, String combination) {
 
-        System.out.print("");
-
         new R_CommunityDetection(analysisDir).printMemebershipOfCurrentGraph_new(currentCluster, combination + "_clusterTMP.txt");
 
 
@@ -562,29 +564,52 @@ public class AnalyzingCommunityDetectionResult {
 
         HashMap<String, HashSet<Integer>> currentCluster = getCopyOfOriginalClusters();
 
+        String[] splitArray = splitStep.split("--");
+        System.out.println(splitStep);
+        for (String cluster : splitArray) {
+            String[] tmp = cluster.split("~");
 
-        for (int i = 0; i < topCluster.length; i++) {
-            int cutNum = Integer.parseInt(splitStep.split("")[i]);
-            if (cutNum > 1) {
-                int clusterID = Integer.parseInt(topCluster[i]);
-                HashMap<String, HashSet<Integer>> newCluster = topClustersSplittingResult.get(clusterID).get(cutNum);
+            for (String cid : tmp) {
+                String clusterID = cid;
+                boolean isOriginalGraph = false;
+                if (cid.split("_").length == 1) {
+                    isOriginalGraph = true;
+                }
+                int cutNum ;
+                if (cid.contains("_")) {
+                     cutNum = cid.split("_").length - 1;
+                    clusterID = cid.split("_")[0];
+                }else{
+                    cutNum=1;
+                }
+
+                HashMap<String, HashSet<Integer>> newCluster = topClustersSplittingResult.get(Integer.valueOf(clusterID)).get(cutNum);
 
                 Set<String> cluster_keySet = newCluster.keySet();
                 Iterator<String> itr = cluster_keySet.iterator();
+
                 while (itr.hasNext()) {
                     String cluster_index = itr.next();
-                    currentCluster.remove(String.valueOf(clusterID));
-                    String newIndex = clusterID + "_" + cutNum--;
+                    String newIndex;
+                    if (isOriginalGraph) {
+
+                        newIndex = clusterID;
+                        isOriginalGraph = false;
+                    } else {
+                        currentCluster.remove(String.valueOf(clusterID));
+                        newIndex = clusterID + "_" + cutNum--;
+                    }
                     currentCluster.put(newIndex, newCluster.get(cluster_index));
 
                 }
 
                 // modify color for current split result
 //                generateColorTable_4CurrentCluteringResult(clusterID, newCluster, splitStep);
+
             }
-
-
         }
+
+
         allClusteringResult.put(splitStep, currentCluster);
 
 
@@ -754,10 +779,10 @@ public class AnalyzingCommunityDetectionResult {
 
                         /** generates current clustering result map
                          * #index  -> hashset of nodeid  **/ //todo  clusterid
-                        HashMap<String, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters, "??");
+                        HashMap<String, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters, "original");
 
                         /** generateing toggle.js file for each cluster **/
-                        generateToggleFileForEachCluster(current_clustering_result, false, numberOfCommunities);
+//                        generateToggleFileForEachCluster(current_clustering_result, false, numberOfCommunities);
 
                         /** calculating accuracy for clustering result
                          * 0 - true_positive,1 - false_positive, 2 - true_negtive, 3 - false_negtive, 4- accuracy
@@ -919,13 +944,17 @@ public class AnalyzingCommunityDetectionResult {
     private HashMap<String, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters, String clusterID) {
 
         HashMap<String, HashSet<Integer>> current_clustering_result = new HashMap<>();
-        if (clusters.size() > 2) {
+        if (clusters.size() > 2 || (clusters.size() == 2 && clusterID.contains("_"))) {
 
             for (int i = 0; i < clusters.size(); i++) {
                 String s = clusters.get(i);
                 if (!s.equals("") && s.contains(")")) {
-                    String index = clusterID + "_" + i;
-
+                    String index = "";
+                    if (clusterID.equals("original")) {
+                        index = s.substring(0, s.indexOf(")")).trim();
+                    } else {
+                        index = clusterID + "_" + i;
+                    }
                     String str = s.substring(s.indexOf("[") + 1).replace("]", "");
                     String[] nodeList = str.split(",");
                     HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
@@ -1038,7 +1067,7 @@ public class AnalyzingCommunityDetectionResult {
         }
 
 
-        HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination().getAllPairs(nodeIDSet);
+        HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination(analysisDir).getAllPairs(nodeIDSet);
         Iterator nodePair_iterator = nodePairSet.iterator();
 
 
