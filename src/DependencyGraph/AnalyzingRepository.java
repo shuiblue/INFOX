@@ -112,14 +112,14 @@ public class AnalyzingRepository {
 //            /**  this function generate all the graph at the same time **/
 //            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
 //        }
-
-
-
-  /** Community Detection  **/
-        R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
-        communityDetection.clustering_CodeChanges(testCaseDir, testDir, re, directedGraph,true,"original");
-
-
+//
+//
+//
+////  /** Community Detection  **/
+//        R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
+//        communityDetection.clustering_CodeChanges(testCaseDir, testDir, re, directedGraph,true,"original");
+//////
+//
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
         AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES, max_numberOfCut, numberOfBiggestClusters);
         int[] avgFeatureSize_maxSize = null;

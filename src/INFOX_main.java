@@ -28,8 +28,8 @@ public class INFOX_main {
         String forkName = "malx122/Marlin";
         boolean hasGroundTruth = false;
         String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName+FS;
-        String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName+FS+"INFOX_text/";
-        int max_numberOfCut = 2;
+        String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName+FS+"INFOX_output/";
+        int max_numberOfCut = 3;
         int numberOfBiggestClusters = 2;
 
         /***git clone repo to local dir***/
@@ -53,9 +53,9 @@ public class INFOX_main {
 //
 //
 //
-//        /*** start clustering code  ***/
-        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
-        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+////        /*** start clustering code  ***/
+//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
+//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
 
 
         /*** hack github page   ***/

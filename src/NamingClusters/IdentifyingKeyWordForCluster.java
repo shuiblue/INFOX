@@ -368,7 +368,7 @@ public class IdentifyingKeyWordForCluster {
         AnalyzingCommunityDetectionResult acdr = new AnalyzingCommunityDetectionResult(analysisDir);
         boolean isOriginalGraph = false;
 
-        HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap = acdr.getClusteringResultMap(splitStep, isOriginalGraph);
+        HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap = acdr.getClusteringResultMapforClusterID(splitStep, isOriginalGraph);
 
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
