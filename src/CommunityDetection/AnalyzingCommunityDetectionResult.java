@@ -598,11 +598,8 @@ public class AnalyzingCommunityDetectionResult {
 
                             HashMap<Integer, HashMap<String, HashSet<Integer>>> map = topClustersSplittingResult.get(originalClusterID);
                             map.get(index).put(k1, v1);
-                            System.out.println();
                         });
                     });
-                } else {
-                    System.out.println();
                 }
             }
         }
@@ -633,9 +630,6 @@ public class AnalyzingCommunityDetectionResult {
      * This function generate different clustering result by combining differernt splitting steps
      */
     private HashMap<String, HashSet<Integer>> generateClusteringResult_ByCombiningSplittingStep(String splitStep) {
-        if(splitStep.contains("_1_1_1")){
-            System.out.println();
-        }
         ProcessingText pt = new ProcessingText();
         String[] topCluster = null;
         try {
@@ -647,7 +641,6 @@ public class AnalyzingCommunityDetectionResult {
         HashMap<String, HashSet<Integer>> currentCluster = getCopyOfOriginalClusters();
 
         String[] splitArray = splitStep.split("--");
-        System.out.println(splitStep);
         for (String cluster : splitArray) {
             String[] tmp = cluster.split("~");
 
@@ -684,7 +677,7 @@ public class AnalyzingCommunityDetectionResult {
 //                        currentCluster.remove(String.valueOf(clusterID));
 //                        newIndex = clusterID + "_" + cutNum--;
 //                    }
-                    currentCluster.put(cid, newCluster.get(cluster_index));
+                    currentCluster.put(cid, newCluster.get(cid));
 //                    currentCluster.put(newIndex, newCluster.get(cluster_index));
 
                 }

@@ -355,6 +355,7 @@ public class R_CommunityDetection {
         double modularity = modularity_R.asDoubleArray()[0];
 
 
+//        currentGraph = new Graph(nodelist, edgelist, betweenness, modularity);
         if (current_edgelist == null) {
             currentGraph = new Graph(nodelist, edgelist, betweenness, modularity);
         } else {
@@ -382,6 +383,9 @@ public class R_CommunityDetection {
             edge_from_to = (int) edgelist[edgeID - 1][0] + "%--%" + (int) edgelist[edgeID - 1][1];
 
         }
+
+        edge_from_to = (int) edgelist[edgeID - 1][0] + "%--%" + (int) edgelist[edgeID - 1][1];
+
         //remove edge
         re.eval("g<-g-E(g)[" + edge_from_to + "]");
 
@@ -443,7 +447,7 @@ public class R_CommunityDetection {
             if (current_numberOfCut <= max_numberOfCut) {
 
                 ArrayList<Integer> clusterNodeList = clusters.get(clusterID);
-                clusterSubGraphs(clusterNodeList, re, testCaseDir, testDir, cutNum, directedGraph, clusterID, 0);
+                clusterSubGraphs(clusterNodeList, re, testCaseDir, testDir, cutNum, directedGraph, clusterID, 1);
             }
         }
         processText.rewriteFile(sb_topClusters.toString(), analysisDir + "topClusters.txt");
@@ -521,6 +525,8 @@ public class R_CommunityDetection {
 
         REXP edgelist_R = re.eval("cbind( get.edgelist(subg) , round( E(subg)$weight, 3 ))", true);
         REXP nodelist_R = re.eval("get.vertex.attribute(subg)$id", true);
+
+
         double[][] edgelist = edgelist_R.asDoubleMatrix();
         if (edgelist.length > 1) {
             String[] old_nodelist = (String[]) nodelist_R.getContent();
