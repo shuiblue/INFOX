@@ -387,14 +387,14 @@ public class IdentifyingKeyWordForCluster {
 
             /**  tokenization **/
             System.out.println("        Tokenizing source code...");
-//            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
-//
-//            /** parse commit msg for each node **/
-//            System.out.println("        getting commit messages for current split...");
-//            System.out.println("        generating one gram term ...");
-//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 1, repoPath, splitStep,topClusterList);
-//            System.out.println("        generating two gram term ...");
-//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 2, repoPath, splitStep,topClusterList);
+            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
+
+            /** parse commit msg for each node **/
+            System.out.println("        getting commit messages for current split...");
+            System.out.println("        generating one gram term ...");
+            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 1, repoPath, splitStep,topClusterList);
+            System.out.println("        generating two gram term ...");
+            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 2, repoPath, splitStep,topClusterList);
 
 
             /**  calculate tfidf  to identifing keywords from each cluster**/
