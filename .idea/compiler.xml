@@ -18,7 +18,7 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8">
+    <bytecodeTargetLevel>
       <module name="INFOX_main" target="1.8" />
       <module name="INFOX_test" target="1.8" />
     </bytecodeTargetLevel>
