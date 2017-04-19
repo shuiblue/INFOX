@@ -22,6 +22,7 @@ project
 # building
 target
 build
+.build
 null
 tmp*
 temp*
