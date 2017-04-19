@@ -77,6 +77,7 @@ public class ParseHtml {
             "  </tr>\n" +
             "  <tr>\n" +
             "       <th>Cluster</th>\n" +
+            "       <th>Navigation</th>\n" +
             "       <th>Keywords</th>\n" +
             "       <th>LOC</th>\n" +
             "       <th>Split Cluster </th>\n" +
