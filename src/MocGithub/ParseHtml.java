@@ -106,29 +106,15 @@ public class ParseHtml {
                     "</style>\n";
             doc.getElementsByTag("header").append(css);
 
-
             String jqueryLink = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>";
             doc.getElementsByTag("header").append(jqueryLink);
 
 
             String js = pt.readResult("/Users/shuruiz/Work/GithubProject/jsFile.txt");
-
             doc.getElementsByTag("html").last().after(js);
-
             Elements fileList_elements = doc.getElementsByClass("file-header");
 
 
-//            HashMap<Integer, List<String>> allSplitSteps_map = new GenerateCombination(analysisDir).getAllSplitSteps(max_numberOfCut);
-//            String[] topClusters = new String[]{};
-//            try {
-//                topClusters = pt.readResult(analysisDir + "topClusters.txt").split("\n");
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            String[] currentClusterList = topClusters;
-//            //todo  max is wrong ,should be 2
-//            combination_list = GenerateCombination.getAllLists(2, numberOfBiggestClusters);
-//            ArrayList<String> all_splitStep_list = generateAllCombineResult(allSplitSteps_map, combination_list, currentClusterList);
             ArrayList<String> topClusterList = new ArrayList<>();
             String[] topClusters = null;
             try {
@@ -162,6 +148,8 @@ public class ParseHtml {
 
 
                 List<String> stopSplitClusters = Arrays.asList(new ProcessingText().readResult(analysisDir + "noSplittingStepList.txt").split("\n"));
+
+
                 HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword, stopSplitClusters);
 
 
