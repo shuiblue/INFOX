@@ -12,7 +12,7 @@ public class GetCommitMsg {
     static final String FS = File.separator;
 
 
-    public void getCommitMsg_currentSplit(String testCaseDir, String testDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String repoPath, String splitStep) {
+    public void getCommitMsg_currentSplit(String testCaseDir, String testDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String repoPath, String splitStep, ArrayList<String> topClusterList) {
         String analysisDir = testCaseDir;
         HashMap<String, String> nodeIdMap = new HashMap<>();
         ProcessingText processingText = new ProcessingText();
@@ -36,61 +36,65 @@ public class GetCommitMsg {
         sb.append(clusterSize + " clusters: \n");
         sb_origin.append(clusterSize + " clusters: \n");
         clusterList.forEach((clusterID, v) -> {
-            sb.append("\n[" + clusterID + "]");
-            sb_origin.append("\n[" + clusterID + "]");
+            if (topClusterList.contains(clusterID.split("_")[0])) {
+                sb.append("\n[" + clusterID + "]");
+                sb_origin.append("\n[" + clusterID + "]");
+                System.out.println("cluster id: " + clusterID);
+                for (Integer cl_int : v) {
+                    String cl = cl_int.toString();
+                    if (cl.length() > 0 && !cl.contains("-")) {
+                        HashMap<String, String> clusterCommitMsg = new HashMap<>();
+                        Set<String> clusterString = new HashSet<>();
+                        Set<String> origin_clusterString = new HashSet<>();
 
-            for (Integer cl_int : v) {
-                String cl = cl_int.toString();
-                if (cl.length() > 0 && !cl.contains("-")) {
-                    HashMap<String, String> clusterCommitMsg = new HashMap<>();
-                    Set<String> clusterString = new HashSet<>();
-                    Set<String> origin_clusterString = new HashSet<>();
+                        v.forEach(nodeId -> {
+                            String nodeLable = nodeIdMap.get(nodeId + "");
 
-                    v.forEach(nodeId -> {
-                        String nodeLable = nodeIdMap.get(nodeId+"");
+                            if (nodeLable != null) {
+                                String fileName = processingText.getOriginFileName(nodeLable);
+                                String lineNumber = nodeLable.split("-")[1];
+                                String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram, repoPath);
+                                if (!clusterCommitMsg.keySet().contains(commit[0])) {
+                                    clusterCommitMsg.put(commit[0], commit[1]);
+                                    clusterString.add(commit[1]);
+                                    origin_clusterString.add(commit[2]);
+                                }
 
-                        if (nodeLable != null) {
-                            String fileName = processingText.getOriginFileName(nodeLable);
-                            String lineNumber = nodeLable.split("-")[1];
-                            String commit[] = getCommitMsgForEachNode(fileName, lineNumber, n_gram, repoPath);
-                            if (!clusterCommitMsg.keySet().contains(commit[0])) {
-                                clusterCommitMsg.put(commit[0], commit[1]);
-                                clusterString.add(commit[1]);
-                                origin_clusterString.add(commit[2]);
                             }
 
+                        });
+
+                        // create an iterator
+                        Iterator iterator = clusterString.iterator();
+                        Iterator iterator_origin = origin_clusterString.iterator();
+
+                        // check values
+                        while (iterator.hasNext()) {
+                            String str = iterator.next().toString();
+                            sb.append(str + " ");
+//                        System.out.println("str:" + str);
+                        }
+                        while (iterator_origin.hasNext()) {
+                            String str = iterator_origin.next().toString();
+                            sb_origin.append(str + " ");
                         }
 
-                    });
-
-                    // create an iterator
-                    Iterator iterator = clusterString.iterator();
-                    Iterator iterator_origin = origin_clusterString.iterator();
-
-                    // check values
-                    while (iterator.hasNext()) {
-                        String str = iterator.next().toString();
-                        sb.append(str + " ");
                     }
-                    while (iterator_origin.hasNext()) {
-                        String str = iterator_origin.next().toString();
-                        sb_origin.append(str + " ");
-                    }
-
                 }
-            }
 
-            /** generate file name based on n-gram's n **/
-            String fileName_prefix = "";
-            if (n_gram == 1) {
-                fileName_prefix = "_one";
-            } else if (n_gram == 2) {
-                fileName_prefix = "_two";
             }
-            processingText.rewriteFile(sb.toString(), analysisDir + splitStep + fileName_prefix + "_commitMsgPerCluster.txt");
-            processingText.rewriteFile(sb_origin.toString(), analysisDir + splitStep + fileName_prefix + "_commitMsgPerCluster_originCommit.txt");
-
         });
+        /** generate file name based on n-gram's n **/
+        String fileName_prefix = "";
+        if (n_gram == 1) {
+            fileName_prefix = "_one";
+        } else if (n_gram == 2) {
+            fileName_prefix = "_two";
+        }
+        processingText.rewriteFile(sb.toString(), analysisDir + splitStep + fileName_prefix + "_commitMsgPerCluster.txt");
+        processingText.rewriteFile(sb_origin.toString(), analysisDir + splitStep + fileName_prefix + "_commitMsgPerCluster_originCommit.txt");
+        System.out.println("writing to file commitMsgPerCluster.txt , done.");
+
     }
 
 

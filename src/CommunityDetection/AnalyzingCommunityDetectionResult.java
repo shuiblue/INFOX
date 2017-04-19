@@ -487,28 +487,26 @@ public class AnalyzingCommunityDetectionResult {
         int clusterSizeThreshold = 10;
 
         /**  generate combinations if split steps of sub-cluster **/
-//        String[] combination_list = GenerateCombination.getAllLists(max_numberOfCut, numberOfBiggestClusters);
+        System.out.println("    generating all the possible splitting steps... E.g,. ABC, A1A2BC, ABC1C2");
         ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
-
-
         for (String s : combination_list) {
             allClusteringResult.put(s, new HashMap<>());
         }
+
+
         originCombination = "original";
-
         /** for original clustering result , generate corresponding table, html ...**/
+        System.out.println("    analyzing original chenged code graph, get original cluster mapping...");
         parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, originCombination, true);
-
-
         HashMap<Integer, HashMap<String, HashSet<Integer>>> originalCluster = getClusteringResultMapforClusterID(originCombination, true);
         for (Map.Entry<Integer, HashMap<String, HashSet<Integer>>> entry : originalCluster.entrySet()) {
             originalClusterMap = entry.getValue();
         }
 
 
+        System.out.println("    list top X biggest cluster id");
         String[] topClusters = null;
         ArrayList<String> topClusterList = new ArrayList<>();
-
         try {
             topClusters = protext.readResult(analysisDir + "topClusters.txt").split("\n");
         } catch (IOException e) {
@@ -518,14 +516,7 @@ public class AnalyzingCommunityDetectionResult {
             topClusterList.add(tc);
         }
 
-//        topClustersSplittingResult = new HashMap<>();
-//        for (String clusterID : topClusters) {
-//            String currentClusterFile = originCombination + "_" + suffix_ClusterFile;
-//            topClustersSplittingResult.put(Integer.valueOf(clusterID), getClusteringResultMapforClusterID(clusterID, false));
-//        }
-
-
-//        HashMap<Integer, HashMap<Integer, HashMap<String, HashSet<Integer>>>>
+        /**get all splitting result mapping , storing in 'topClustersSplittingResult'.**/
         getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
 
@@ -536,11 +527,10 @@ public class AnalyzingCommunityDetectionResult {
                 continue;
             }
 
-//            HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir).getAllSplitSteps(max_numberOfCut, topClist);
-
-
+            System.out.println("generate Clustering Result By Combining Splitting Steps ...:");
             HashMap<String, HashSet<Integer>> currentCluster = generateClusteringResult_ByCombiningSplittingStep(com);
 
+            /****/
             generateCompleteClusteringFiles(currentCluster, com);
             parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, com, false);
 
@@ -548,7 +538,15 @@ public class AnalyzingCommunityDetectionResult {
         return clusterResultMap;
     }
 
+    /**
+     * get all splitting result mapping , storing in 'topClustersSplittingResult'
+     * * @param max_numberOfCut
+     * @param topClusterList
+     * @param combination_list
+     * @return
+     */
     public HashMap<Integer, HashMap<Integer, HashMap<String, HashSet<Integer>>>> getAllSplittingResult(int max_numberOfCut, ArrayList<String> topClusterList, ArrayList<String> combination_list) {
+        System.out.println("get all splitting result mapping , storing in 'topClustersSplittingResult' ...");
         topClustersSplittingResult = new HashMap<>();
 
         List<String> noSplittingNode = new ArrayList<>();
@@ -630,13 +628,8 @@ public class AnalyzingCommunityDetectionResult {
      * This function generate different clustering result by combining differernt splitting steps
      */
     private HashMap<String, HashSet<Integer>> generateClusteringResult_ByCombiningSplittingStep(String splitStep) {
+        System.out.println("current splitting step :"+splitStep);
         ProcessingText pt = new ProcessingText();
-        String[] topCluster = null;
-        try {
-            topCluster = pt.readResult(analysisDir + "topClusters.txt").split("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         HashMap<String, HashSet<Integer>> currentCluster = getCopyOfOriginalClusters();
 
@@ -661,37 +654,20 @@ public class AnalyzingCommunityDetectionResult {
                 if (cutNum > 1) {
                     currentCluster.remove(cid.split("_")[0]);
                 }
+
                 HashMap<String, HashSet<Integer>> newCluster = topClustersSplittingResult.get(Integer.valueOf(clusterID)).get(cutNum - 1);
 
-                Set<String> cluster_keySet = newCluster.keySet();
-                Iterator<String> itr = cluster_keySet.iterator();
-
-                while (itr.hasNext()) {
-                    String cluster_index = itr.next();
-                    String newIndex;
-//                    if (isOriginalGraph) {
+//                Set<String> cluster_keySet = newCluster.keySet();
+//                Iterator<String> itr = cluster_keySet.iterator();
 //
-//                        newIndex = clusterID;
-//                        isOriginalGraph = false;
-//                    } else {
-//                        currentCluster.remove(String.valueOf(clusterID));
-//                        newIndex = clusterID + "_" + cutNum--;
-//                    }
+//                while (itr.hasNext()) {
+
                     currentCluster.put(cid, newCluster.get(cid));
-//                    currentCluster.put(newIndex, newCluster.get(cluster_index));
-
-                }
-
-                // modify color for current split result
-//                generateColorTable_4CurrentCluteringResult(clusterID, newCluster, splitStep);
-
+//                }
             }
         }
 
-
         allClusteringResult.put(splitStep, currentCluster);
-
-
         return currentCluster;
     }
 
@@ -800,12 +776,12 @@ public class AnalyzingCommunityDetectionResult {
         String clusterResultListString = "";
 
         ProcessingText processingText = new ProcessingText();
-        processingText.rewriteFile("", analysisDir + combination + "_edgeCuttingRecord.txt");
-        processingText.rewriteFile("", analysisDir + combination + "_LOC_split.txt");
+//        processingText.rewriteFile("", analysisDir + combination + "_edgeCuttingRecord.txt");
+//        processingText.rewriteFile("", analysisDir + combination + "_LOC_split.txt");
 
         if (hasGroundTruth) {
-            processingText.rewriteFile("", analysisDir + combination + "_accuracy.txt");
-            processingText.rewriteFile("", analysisDir + combination + "_joined_accuracy.txt");
+//            processingText.rewriteFile("", analysisDir + combination + "_accuracy.txt");
+//            processingText.rewriteFile("", analysisDir + combination + "_joined_accuracy.txt");
         }
         /** get fork added node **/
         File forkAddedFile = new File(testCaseDir + forkAddedNodeTxt);
@@ -820,7 +796,7 @@ public class AnalyzingCommunityDetectionResult {
         ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir, forkAddedNode, isMS_CLUSTERCHANGES);
         try {
             /** add tags for each line of source code in order to generate html page later, and it also generates toggle.js file  **/
-            colorCode.createSourceFileHtml();
+//            colorCode.createSourceFileHtml();
 
             clusterResultListString = processingText.readResult(clusterFilePath);
         } catch (IOException e) {
@@ -850,10 +826,10 @@ public class AnalyzingCommunityDetectionResult {
 
                         ArrayList<String> clusters = new ArrayList(Arrays.asList(clusterArray));
 
-                        if (clusterResultMap.size() == 0) {
-                            initialNumOfClusters = numberOfCommunities;
-                            processingText.writeTofile(initialNumOfClusters + ",0\n", analysisDir + combination + "_LOC_split.txt");
-                        }
+//                        if (clusterResultMap.size() == 0) {
+//                            initialNumOfClusters = numberOfCommunities;
+////                            processingText.writeTofile(initialNumOfClusters + ",0\n", analysisDir + combination + "_LOC_split.txt");
+//                        }
                         clusterResultMap.put(numberOfCommunities, clusters);
 
                         /** generates current clustering result map
@@ -922,7 +898,7 @@ public class AnalyzingCommunityDetectionResult {
                         double modularity = clusterInfo[2];
                         double betweenness = clusterInfo[4];
 
-                        processingText.writeTofile(numberOfCommunities + "," + (numberOfCutEdges - previous_cutted_edge_num) + "," + modularity + "," + weight_List + "," + betweenness + "\n", analysisDir + combination + "_edgeCuttingRecord.txt");
+//                        processingText.writeTofile(numberOfCommunities + "," + (numberOfCutEdges - previous_cutted_edge_num) + "," + modularity + "," + weight_List + "," + betweenness + "\n", analysisDir + combination + "_edgeCuttingRecord.txt");
                         weight_List = weight + "->";
                         previous_cutted_edge_num = numberOfCutEdges;
                     } else {
@@ -932,7 +908,7 @@ public class AnalyzingCommunityDetectionResult {
             }
         }
         /** generating cutting summary table **/
-        generateCuttingSummaryTable(clusterSizeThreshold, hasGroundTruth, combination);
+//        generateCuttingSummaryTable(clusterSizeThreshold, hasGroundTruth, combination);
         return clusterResultMap;
     }
 
@@ -1025,7 +1001,6 @@ public class AnalyzingCommunityDetectionResult {
         HashMap<String, HashSet<Integer>> current_clustering_result = new HashMap<>();
 
         String[] splitArray = splitStep.split("--");
-        System.out.println(splitStep);
         for (String cluster : splitArray) {
             String[] tmp = cluster.split("~");
             for (String cid : tmp) {

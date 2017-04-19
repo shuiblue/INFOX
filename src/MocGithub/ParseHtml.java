@@ -138,9 +138,8 @@ public class ParseHtml {
             }
             for (String tc : topClusters) {
                 topClusterList.add(tc);
-                usedColorIndex.put(tc,0);
+                usedColorIndex.put(tc, 0);
             }
-
 
 
             allSplittingResult = new AnalyzingCommunityDetectionResult(analysisDir).getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
@@ -273,7 +272,7 @@ public class ParseHtml {
                     if (child.split("_").length > max_numberOfCut) {
                         nextStr += "~" + child;
                         stopCluster++;
-                    }else {
+                    } else {
                         if (!stopSplitClusters.contains(child)) {
                             nextStr += "~" + getChildren(child);
 
@@ -286,11 +285,11 @@ public class ParseHtml {
                     }
 
                 }
-                    String next = nextStr.substring(1, nextStr.length());
-                    thisCombinelist.add(next);
+                String next = nextStr.substring(1, nextStr.length());
+                thisCombinelist.add(next);
 
-                    children = next.split("~");
-                    nextStr = "";
+                children = next.split("~");
+                nextStr = "";
 
 
             }
@@ -345,7 +344,7 @@ public class ParseHtml {
                 "    </td> \n" +
                 "  </tr>\n" +
                 "  <tr>\n" +
-                "       <th>Cluster</th>\n" +
+                "       <th>Cluster/Feature</th>\n" +
                 "       <th>Keywords</th>\n" +
                 "       <th>LOC</th>\n" +
                 "       <th>Split Cluster </th>\n" +
@@ -409,7 +408,7 @@ public class ParseHtml {
 
         sb.append("<tr> \n" +
                 "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + clusterID + "\")'>" + keyword_prefix + "</td>\n" +
-                "       <td width=\"100\"><button onclick=\"next_in_cluster(\'infox_"+clusterID+"\')\" >next</button><button onclick=\"prev_in_cluster(\'infox_"+clusterID+"\')\">prev</button></td>" +
+                "       <td width=\"100\"><button onclick=\"next_in_cluster(\'infox_" + clusterID + "\')\" >next</button><button onclick=\"prev_in_cluster(\'infox_" + clusterID + "\')\">prev</button></td>" +
                 "        <td width=\"600\">" + keyword_long + "</td>\n" +
                 "       <td width=\"50\">" + clusterSize + "</td>\n" +
                 nextStepStr +
@@ -581,8 +580,8 @@ public class ParseHtml {
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
             currentClusterMap.forEach((clusterID, nodeSet) -> {
-                nodeSet.forEach(nodeId-> {
-                            nodeId_to_clusterID_Map.put(nodeId+"", clusterID);
+                nodeSet.forEach(nodeId -> {
+                            nodeId_to_clusterID_Map.put(nodeId + "", clusterID);
                         }
                 );
 
@@ -669,26 +668,78 @@ public class ParseHtml {
 
     }
 
+    /**
+     * This function get diff url of github fork
+     * @param forkName
+     * @param timeWindowSize "begining" -- , "x months"
+     * @return
+     */
+    public String getDiffPageUrl(String forkName, String timeWindowSize) {
 
-    public String getDiffPageUrl(String forkName) {
+        HashMap<String,String> one_month_ago_map=new HashMap<>();
+        one_month_ago_map.put("01","12");
+        one_month_ago_map.put("02","01");
+        one_month_ago_map.put("03","02");
+        one_month_ago_map.put("04","03");
+        one_month_ago_map.put("05","04");
+        one_month_ago_map.put("06","05");
+        one_month_ago_map.put("07","06");
+        one_month_ago_map.put("08","07");
+        one_month_ago_map.put("09","08");
+        one_month_ago_map.put("10","09");
+        one_month_ago_map.put("11","10");
+        one_month_ago_map.put("12","11");
+
+
         String forkUrl = github_api + forkName;
         JsonUtility jsonUtility = new JsonUtility();
         try {
             // get latest commit sha
             String[] todayTimeStamp = new Timestamp(System.currentTimeMillis()).toString().split(" ");
             String format_current_time = todayTimeStamp[0] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
-            JSONObject fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + forkName + "/commits?until=") + format_current_time);
+            JSONObject fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + forkName + "/commits?until=" + format_current_time));
             String latestCommitSHA = fork_commit_jsonObj.getString("sha");
 
             //get general fork information
             JSONObject fork_jsonObj = new JSONObject(jsonUtility.readUrl(forkUrl));
+
+
             //get commit before fork was created
-            String firstCommitTimeStamp = fork_jsonObj.getString("created_at");
-            JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
-            String upstreamName = upstreamInfo.getString("full_name");
-            JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + upstreamName + "/commits?until=" + firstCommitTimeStamp));
-            String SHA_beforeForkCreated = upstream_jsonObj.getString("sha");
-            return github_page + upstreamName + "/compare/" + SHA_beforeForkCreated + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
+            String comparedFork = "";
+            String previousCommitSHA = "";
+
+           if (timeWindowSize.equals("beginning")) {
+                String firstCommitTimeStamp = fork_jsonObj.getString("created_at");
+                JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
+                comparedFork = upstreamInfo.getString("full_name");
+                JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + firstCommitTimeStamp));
+                previousCommitSHA = upstream_jsonObj.getString("sha");
+
+
+
+           }else if(timeWindowSize.equals("1 month")){
+                comparedFork = forkName;
+               String month= one_month_ago_map.get(todayTimeStamp[0].split("-")[1]);
+                String previousTimeStamp =todayTimeStamp[0].split("-")[0]+"-"+month+"-"+todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z" ;
+               // get latest commit sha
+               fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + previousTimeStamp));
+               previousCommitSHA = fork_commit_jsonObj.getString("sha");
+
+
+            }else if(timeWindowSize.equals("1 year")){
+               comparedFork = forkName;
+               String month= one_month_ago_map.get(todayTimeStamp[0].split("-")[1]);
+               String previousTimeStamp =(Integer.valueOf(todayTimeStamp[0].split("-")[0])-1)+"-"+todayTimeStamp[0].split("-")[1]+"-"+todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z" ;
+               // get latest commit sha
+               fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + previousTimeStamp));
+               previousCommitSHA = fork_commit_jsonObj.getString("sha");
+
+           }
+
+            String diffURL=github_page + comparedFork + "/compare/" + previousCommitSHA + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
+            new ProcessingText().rewriteFile(diffURL,analysisDir+"diffurl.txt");
+            System.out.println("diff url:"+ diffURL);
+            return  diffURL;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -697,19 +748,8 @@ public class ParseHtml {
 
     public static void main(String[] args) {
         String forkName = "malx122/Marlin";
-
-//        //get origin diff github page
-//        ParseHtml parseHtml = new ParseHtml();
-//        String diffPageUrl = parseHtml.getDiffPageUrl(forkName);
-//
-//        //git clone repo to local dir
-//        JgitUtility jgitUtility = new JgitUtility();
-//        String uri = github_page + forkName + ".git";
-//        String localDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName;
-//        jgitUtility.cloneRepo(uri, localDirPath);
-
-
-        // hack github page
-//        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName);
+        for (int i = 0; i < 11; i++) {
+            System.out.println(i + " - " + ((i - 3) < 0 ? (i + 12 - 3) : i - 3));
+        }
     }
 }

@@ -119,7 +119,12 @@ public class GenerateCombination {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        noFurtherSplittingStepSet = new HashSet<>(Arrays.asList(noSplitStepList));
+        noFurtherSplittingStepSet = new HashSet<>();
+        for(String s:noSplitStepList){
+            if(s.length()>0){
+                noFurtherSplittingStepSet.add(s);
+            }
+        }
 
 
         for (int split = 0; split < lengthOfList; split++) {
@@ -142,16 +147,17 @@ public class GenerateCombination {
                 }
             }
         }
-        noFurtherSplittingStepSet.forEach(stopCluster -> {
-            String[] clusterid = stopCluster.split("_");
-            int index = clusterid.length - 1;
-            String cluster = clusterid[0];
+        if(noFurtherSplittingStepSet.size()>0) {
+            noFurtherSplittingStepSet.forEach(stopCluster -> {
+                String[] clusterid = stopCluster.split("_");
+                int index = clusterid.length - 1;
+                String cluster = clusterid[0];
 
-            HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
-            split_nodelist.get(index).add(stopCluster);
-            resultMap.put(cluster, split_nodelist);
-        });
-
+                HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
+                split_nodelist.get(index).add(stopCluster);
+                resultMap.put(cluster, split_nodelist);
+            });
+        }
         return resultMap;
     }
 

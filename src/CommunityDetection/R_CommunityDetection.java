@@ -43,7 +43,7 @@ public class R_CommunityDetection {
     StringBuilder noSplitting_step = new StringBuilder();
 
     //todo: user input
-    int minimumClusterSize = 5;
+    int minimumClusterSize = 50;
 
     public R_CommunityDetection(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re, int max_numberOfCut, int numberOfBiggestClusters) {
         this.sourcecodeDir = sourcecodeDir;
@@ -384,7 +384,6 @@ public class R_CommunityDetection {
 
         }
 
-        edge_from_to = (int) edgelist[edgeID - 1][0] + "%--%" + (int) edgelist[edgeID - 1][1];
 
         //remove edge
         re.eval("g<-g-E(g)[" + edge_from_to + "]");
@@ -447,6 +446,8 @@ public class R_CommunityDetection {
             if (current_numberOfCut <= max_numberOfCut) {
 
                 ArrayList<Integer> clusterNodeList = clusters.get(clusterID);
+                current_edgelist = null;
+                previous_edgelist = null;
                 clusterSubGraphs(clusterNodeList, re, testCaseDir, testDir, cutNum, directedGraph, clusterID, 1);
             }
         }
@@ -465,6 +466,8 @@ public class R_CommunityDetection {
      * @param clusterID
      */
     private void clusterSubGraphs(ArrayList<Integer> clusterNodeList, Rengine re, String testCaseDir, String testDir, int cutNum, boolean directedGraph, String clusterID, int current_numofCut) {
+        current_edgelist = null;
+        previous_edgelist = null;
 
         if (clusterNodeList.size() > minimumClusterSize) {
             System.out.println("  spliting subgraph: " + clusterID + "...");
@@ -520,6 +523,9 @@ public class R_CommunityDetection {
 
         String currentGraphPath = clusterID + "_changedCode.pajek.net";
 
+        /** read original changed code graph, preparing for cluster this subgraph  **/
+        String inputFile = "changedCode.pajek.net";
+        getCodeChangeGraph(testCaseDir, testDir, directedGraph, inputFile);
 
         re.eval("subg<-induced.subgraph(graph=oldg,vids=c(" + clusterNodeList.toString().replace("[", "").replace("]", "" + "))"));
 
@@ -571,19 +577,19 @@ public class R_CommunityDetection {
             });
             if (nodeNumer[0] < clusterNodeList.size()) {
                 for (Integer nodeid : currentNodeSet) {
-                  clusterNodeList  .remove(nodeid);
+                    clusterNodeList.remove(nodeid);
                 }
             }
 
 
-            for(int i =1;i<=2;i++){
-                String missClusterID = clusterID+"_"+i;
-                if(current_clusters.get(missClusterID)==null){
-                    int missNode =clusterNodeList.get(0);
+            for (int i = 1; i <= 2; i++) {
+                String missClusterID = clusterID + "_" + i;
+                if (current_clusters.get(missClusterID) == null) {
+                    int missNode = clusterNodeList.get(0);
                     HashSet<Integer> missCluster = new HashSet<>();
                     missCluster.add(missNode);
-                    current_clusters.put(missClusterID,missCluster);
-                    pt.writeTofile(missClusterID+") ["+missNode+",]",analysisDir+clusterID+"_clusterTMP.txt" );
+                    current_clusters.put(missClusterID, missCluster);
+                    pt.writeTofile(missClusterID + ") [" + missNode + ",]", analysisDir + clusterID + "_clusterTMP.txt");
                     break;
                 }
             }
@@ -747,12 +753,14 @@ public class R_CommunityDetection {
 
             if (isOriginalGraph || (!isOriginalGraph && cluster_content.size() > 1)) {
                 ArrayList<Integer> mem = (ArrayList<Integer>) cluster.getValue();
-                membership_print.append(cluster.getKey() + ") ");
-                membership_print.append("[");
-                for (Integer m : mem) {
-                    membership_print.append(m + " , ");
+                if (mem != null) {
+                    membership_print.append(cluster.getKey() + ") ");
+                    membership_print.append("[");
+                    for (Integer m : mem) {
+                        membership_print.append(m + " , ");
+                    }
+                    membership_print.append("]\n");
                 }
-                membership_print.append("]\n");
             }
         }
         //print old edge
@@ -761,9 +769,8 @@ public class R_CommunityDetection {
 
 
     public void printMemebershipOfCurrentGraph_new(HashMap<String, HashSet<Integer>> clusters, String outputFile) {
-        if (outputFile.contains("5258_1_1_1")) {
-            System.out.println();
-        }
+        System.out.println("generating clustering result file, clusterTMP file: " + outputFile.replace(analysisDir, ""));
+
         //print
         StringBuffer membership_print = new StringBuffer();
 
@@ -771,20 +778,21 @@ public class R_CommunityDetection {
         Iterator it = clusters.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry cluster = (Map.Entry) it.next();
-            HashSet<Integer> cluster_content = (HashSet<Integer>) cluster.getValue();
-//            if (outputFile.equals("clusterTMP.txt") || cluster_content.size() > 1) {
-
-                HashSet<Integer> mem = (HashSet<Integer>) cluster.getValue();
+            HashSet<Integer> mem = (HashSet<Integer>) cluster.getValue();
+            if (mem != null) {
                 membership_print.append(cluster.getKey() + ") ");
                 membership_print.append("[");
                 for (Integer m : mem) {
                     membership_print.append(m + " , ");
                 }
+
                 membership_print.append("]\n");
-//            }
+            }
         }
-        //print old edge
+
         ioFunc.rewriteFile(membership_print.toString(), analysisDir + outputFile);
+        //print old edge
+        System.out.println("writing to file:  done.");
     }
 
 

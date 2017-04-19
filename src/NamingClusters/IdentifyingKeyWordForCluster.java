@@ -364,6 +364,18 @@ public class IdentifyingKeyWordForCluster {
 
     public void findKeyWordForEachSplit(String sourcecodeDir, String analysisDir, String testDir, String splitStep, String repoPath) {
 
+        System.out.println("    list top X biggest cluster id");
+        String[] topClusters = null;
+        ArrayList<String> topClusterList = new ArrayList<>();
+        try {
+            topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (String tc : topClusters) {
+            topClusterList.add(tc);
+        }
+
 
         AnalyzingCommunityDetectionResult acdr = new AnalyzingCommunityDetectionResult(analysisDir);
         boolean isOriginalGraph = false;
@@ -375,14 +387,14 @@ public class IdentifyingKeyWordForCluster {
 
             /**  tokenization **/
             System.out.println("        Tokenizing source code...");
-            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
-
-            /** parse commit msg for each node **/
-            System.out.println("        getting commit messages for current split...");
-            System.out.println("        generating one gram term ...");
-            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 1, repoPath, splitStep);
-            System.out.println("        generating two gram term ...");
-            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 2, repoPath, splitStep);
+//            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
+//
+//            /** parse commit msg for each node **/
+//            System.out.println("        getting commit messages for current split...");
+//            System.out.println("        generating one gram term ...");
+//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 1, repoPath, splitStep,topClusterList);
+//            System.out.println("        generating two gram term ...");
+//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 2, repoPath, splitStep,topClusterList);
 
 
             /**  calculate tfidf  to identifing keywords from each cluster**/
