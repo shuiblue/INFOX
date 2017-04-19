@@ -55,13 +55,13 @@ public class INFOX_main {
 //
 //
 //        /*** start clustering code  ***/
-        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
-        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
+//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
 
 
         /*** hack github page   ***/
-//        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
-//        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
+        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
+        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
 
 
     }

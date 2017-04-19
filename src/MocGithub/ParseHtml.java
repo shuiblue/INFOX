@@ -109,8 +109,8 @@ public class ParseHtml {
             String jqueryLink = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>";
             doc.getElementsByTag("header").append(jqueryLink);
 
-
-            String js = pt.readResult("/Users/shuruiz/Work/GithubProject/jsFile.txt");
+            String workingDir = System.getProperty("user.dir");
+            String js = pt.readResult(workingDir+"/src/files/jsFile.txt");
             doc.getElementsByTag("html").last().after(js);
             Elements fileList_elements = doc.getElementsByClass("file-header");
 
