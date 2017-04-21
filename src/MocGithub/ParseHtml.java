@@ -548,9 +548,8 @@ public class ParseHtml {
 
         label_to_id = pt.getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
 
-        DependencyGraph dp = new DependencyGraph();
         try {
-            forkAddedNodeList = dp.getForkAddedNodeList(analysisDir + "forkAddedNode.txt");
+            forkAddedNodeList = pt.getForkAddedNodeList(analysisDir + "forkAddedNode.txt");
             for (String nodeLabel : forkAddedNodeList) {
                 String nodeID = label_to_id.get("\"" + nodeLabel + "\"");
                 if (nodeID != null) {

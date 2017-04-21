@@ -11,8 +11,10 @@ import java.util.*;
 public class GetCommitMsg {
     static final String FS = File.separator;
 
+    static HashMap<String, String> label_to_id = null;
 
-    public void getCommitMsg_currentSplit(String testCaseDir, String testDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String repoPath, String splitStep, ArrayList<String> topClusterList) {
+
+    public void getCommitMsg_currentSplit(String testCaseDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String repoPath, String splitStep, ArrayList<String> topClusterList) {
         String analysisDir = testCaseDir;
         HashMap<String, String> nodeIdMap = new HashMap<>();
         ProcessingText processingText = new ProcessingText();
@@ -191,6 +193,48 @@ public class GetCommitMsg {
     public GetCommitMsg() {
 
     }
+
+
+    public void getCommitMsgForChangedCode(String analysisDir, String repoPath) {
+        label_to_id = new ProcessingText().getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
+
+        HashMap<String, String> original_nodeid_to_commitMessage = new HashMap();
+        HashMap<String, String> one_gram_nodeid_to_commitMessage = new HashMap();
+        HashMap<String, String> two_gram_nodeid_to_commitMessage = new HashMap();
+        HashMap<String, String> nodeid_to_SHA = new HashMap();
+
+
+        String forkAddedNodeTxt = "forkAddedNode.txt";
+        ArrayList<String> forkaddedNodeList = null;
+        if (new File(forkAddedNodeTxt).exists()) {
+            try {
+                ProcessingText processingText = new ProcessingText();
+                forkaddedNodeList = processingText.getForkAddedNodeList(forkAddedNodeTxt);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            System.out.println("file forkAddedNode.txt does not exist!");
+            forkaddedNodeList = new ArrayList<>();
+        }
+
+        for (String changedCode : forkaddedNodeList) {
+            String fileName = changedCode.split("-")[0];
+            String lineNumber = changedCode.split("-")[1];
+
+            //commit[] ={commitSHA, normalized_line, originCommit}
+            String one_commit[] = getCommitMsgForEachNode(fileName, lineNumber, 1, repoPath);
+            String two_commit[] = getCommitMsgForEachNode(fileName, lineNumber, 2, repoPath);
+            String nodeId = label_to_id.get(fileName);
+
+            nodeid_to_SHA.put(nodeId, one_commit[0]);
+            original_nodeid_to_commitMessage.put(nodeId, one_commit[2]);
+            one_gram_nodeid_to_commitMessage.put(nodeId, one_commit[1]);
+            two_gram_nodeid_to_commitMessage.put(nodeId, two_commit[1]);
+        }
+    }
+
 
     /**
      * This function parses commit msg for each line of code based on filename and linenumber by git blame cmd

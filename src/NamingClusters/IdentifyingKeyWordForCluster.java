@@ -15,6 +15,15 @@ public class IdentifyingKeyWordForCluster {
 
     TFIDF tfidf = new TFIDF();
     static final String FS = File.separator;
+    public IdentifyingKeyWordForCluster(String sourcecodeDir, String analysisDir,String repoPath) {
+        /**  tokenization **/
+        System.out.println("        Tokenizing source code...");
+        new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
+
+
+        new GetCommitMsg().getCommitMsgForChangedCode( analysisDir,repoPath);
+
+    }
 
 
     public HashMap<String, ArrayList<String>> findKeyWordsFor_eachSplitStep(String testCaseDir, String testDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String splitStep) {
@@ -385,23 +394,19 @@ public class IdentifyingKeyWordForCluster {
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
 
-            /**  tokenization **/
-            System.out.println("        Tokenizing source code...");
-            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
 
             /** parse commit msg for each node **/
             System.out.println("        getting commit messages for current split...");
             System.out.println("        generating one gram term ...");
-            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 1, repoPath, splitStep,topClusterList);
+            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, currentClusterMap, 1, repoPath, splitStep, topClusterList);
             System.out.println("        generating two gram term ...");
-            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, testDir, currentClusterMap, 2, repoPath, splitStep,topClusterList);
-
+            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, currentClusterMap, 2, repoPath, splitStep, topClusterList);
 
             /**  calculate tfidf  to identifing keywords from each cluster**/
             System.out.println("        identifying keywords from one gram list...");
-            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 1,splitStep);
+            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 1, splitStep);
             System.out.println("        identifying keywords from two gram list...");
-            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 2,splitStep);
+            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 2, splitStep);
 
             /**  merging one-gram and two-gram result**/
             System.out.println("        merging one-gram and two-gram result.. removing redundancy...");
@@ -422,13 +427,13 @@ public class IdentifyingKeyWordForCluster {
         try {
             String[] topClusterID = pt.readResult(analysisDir + "topClusters.txt").split("\n");
 
-            for (String cl:topClusterID) {
+            for (String cl : topClusterID) {
                 String twoGramList[] = pt.readResult(analysisDir + splitStep + "_two_keyWord.txt").split("\n");
                 HashSet<String> keywordSet = new HashSet<>();
                 HashSet<String> one_wordSet = new HashSet<>();
 
                 for (String two : twoGramList) {
-                    if (two.startsWith(cl )) {
+                    if (two.startsWith(cl)) {
                         String clusterID = two.split(":")[0];
                         int start = two.indexOf("[");
                         int end = two.indexOf("]");
@@ -437,7 +442,7 @@ public class IdentifyingKeyWordForCluster {
                         for (String s : keywords) {
                             if (s.split("_").length > 1) {
                                 one_wordSet.addAll(new HashSet<String>(Arrays.asList(s.split("_"))));
-                            }else{
+                            } else {
                                 one_wordSet.add(s);
                             }
                         }
@@ -471,7 +476,7 @@ public class IdentifyingKeyWordForCluster {
         StringBuffer sb = new StringBuffer();
         clusterID_keyword.forEach((k, v) -> {
 
-            sb.append(k + ": "+v.toString());
+            sb.append(k + ": " + v.toString());
 
             sb.append("\n");
         });

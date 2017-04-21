@@ -116,6 +116,31 @@ public class ProcessingText {
     }
 
     /**
+     * This function will collect all the fork added node from  "forkAddedNode.txt", and generate a list of forkAddedNode
+     *
+     * @return Arraylist of fork Added Nodes
+     * @throws IOException
+     */
+    public ArrayList getForkAddedNodeList(String forkAddedNodeTxt) throws IOException {
+        String[] lines = readResult(forkAddedNodeTxt).split("\n");
+        ArrayList<String> forkAddedNodeList = new ArrayList<>();
+        for (String s : lines) {
+            String node = s.split(" ")[0];
+
+            if(node.equals("")){
+                System.out.println();
+            }
+            if (!forkAddedNodeList.contains(node)&&!node.equals("")) {
+                forkAddedNodeList.add(node);
+            }
+            String filename = node.split("-")[0];
+
+
+        }
+        return forkAddedNodeList;
+    }
+
+    /**
      * this function read the content of the file from filePath, and ready for comparing
      *
      * @param filePath file path

@@ -203,7 +203,7 @@ public class DependencyGraph {
             forkAddedNodeTxt =  "forkAddedNode.txt";
             if (new File(forkAddedNodeTxt).exists()) {
                 try {
-                    forkaddedNodeList = getForkAddedNodeList(forkAddedNodeTxt);
+                    forkaddedNodeList = processingText.getForkAddedNodeList(forkAddedNodeTxt);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -321,7 +321,7 @@ public class DependencyGraph {
         /** Check whether forkAddedNode file exists **/
         if (new File(forkAddedNodeTxt).exists()) {
             try {
-                forkaddedNodeList = getForkAddedNodeList(forkAddedNodeTxt);
+                forkaddedNodeList = new ProcessingText().getForkAddedNodeList(forkAddedNodeTxt);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -446,30 +446,6 @@ ProcessingText processingText = new ProcessingText() ;
     }
 
 
-    /**
-     * This function will collect all the fork added node from  "forkAddedNode.txt", and generate a list of forkAddedNode
-     *
-     * @return Arraylist of fork Added Nodes
-     * @throws IOException
-     */
-    public ArrayList getForkAddedNodeList(String forkAddedNodeTxt) throws IOException {
-        String[] lines = processingText.readResult(forkAddedNodeTxt).split("\n");
-        ArrayList<String> forkAddedNodeList = new ArrayList<>();
-        for (String s : lines) {
-            String node = s.split(" ")[0];
-
-            if(node.equals("")){
-                System.out.println();
-            }
-            if (!forkAddedNodeList.contains(node)&&!node.equals("")) {
-                forkAddedNodeList.add(node);
-            }
-            String filename = node.split("-")[0];
-
-
-        }
-        return forkAddedNodeList;
-    }
 
 
     /**
