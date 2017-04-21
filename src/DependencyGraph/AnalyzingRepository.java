@@ -114,11 +114,11 @@ public class AnalyzingRepository {
 //        }
 //
 //
-//        /** Community Detection  **/
+////        /** Community Detection  **/
 //        R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
 //        communityDetection.clustering_CodeChanges(testCaseDir, testDir, re, directedGraph,true,"original");
-//
-//        /** Generating html to visualize source code, set background and left side bar color for new code  **/
+////
+        /** Generating html to visualize source code, set background and left side bar color for new code  **/
 //        AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES, max_numberOfCut, numberOfBiggestClusters);
 //        int[] avgFeatureSize_maxSize = null;
 //        /** get nodeMap: id -- lable  **/
@@ -149,12 +149,15 @@ public class AnalyzingRepository {
 //        } else { /**  MS approach**/
 //            clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0, hasGroundTruth, clusterFile, true);
 //        }
-//
+
         ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
 
-            for (String splitStep : combination_list) {
-            System.out.println("identifying keywords for Splitting Steps ..: "+splitStep);
-            IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster(sourcecodeDir,testCaseDir,repoPath);
+
+
+        HashMap<String, HashMap<String, String>> allKindsOf_unifiedCommits =   new GetCommitMsg().getCommitMsgForChangedCode(testCaseDir, repoPath);
+        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster(sourcecodeDir, testCaseDir,allKindsOf_unifiedCommits);
+        for (String splitStep : combination_list) {
+            System.out.println("identifying keywords for Splitting Steps ..: " + splitStep);
             identifyingKeyWordForCluster.findKeyWordForEachSplit(sourcecodeDir, testCaseDir, testDir, splitStep, repoPath);
         }
 

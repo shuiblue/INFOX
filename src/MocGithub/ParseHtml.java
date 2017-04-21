@@ -474,6 +474,8 @@ public class ParseHtml {
                     String keyword_long = cluster_keyword.get(clusterID).toString();
                     String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
 
+
+
                     final String[] clusterSize = {""};
                     clusterResultMap.forEach((k, v) -> {
                         HashMap<String, HashSet<Integer>> currentClusterMap = v;
@@ -582,9 +584,11 @@ public class ParseHtml {
                         "  line-height:20px;\n" +
                         "  text-align:right;\"";
 
-                boolean isTopCluster = cluster_keyword.get(clusterid) != null ? true : false;
-                if (isTopCluster) {
-                    String keywod_prefix = cluster_keyword.get(clusterid).get(0).trim().substring(0, 6).replace("[", "") + ".";
+                AnalyzingCommunityDetectionResult an = new AnalyzingCommunityDetectionResult(analysisDir);
+
+                if (an.isTopCluster(clusterid)) {
+                    String keywod_prefix = cluster_keyword.get(clusterid).get(0).trim();
+                    keywod_prefix=  keywod_prefix.split("").length>3?keywod_prefix .substring(0, 2).replace("[", "") + ".":keywod_prefix;
 
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
                     Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();

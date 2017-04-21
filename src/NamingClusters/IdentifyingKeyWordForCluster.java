@@ -15,13 +15,29 @@ public class IdentifyingKeyWordForCluster {
 
     TFIDF tfidf = new TFIDF();
     static final String FS = File.separator;
-    public IdentifyingKeyWordForCluster(String sourcecodeDir, String analysisDir,String repoPath) {
+    static HashMap<String, HashMap<String, String>> allKindsOf_unifiedCommits;
+    static ArrayList<String> topClusterList = new ArrayList<>();
+
+    public IdentifyingKeyWordForCluster(String sourcecodeDir, String analysisDir, HashMap<String, HashMap<String, String>> allKindsOf_unifiedCommits) {
         /**  tokenization **/
         System.out.println("        Tokenizing source code...");
+
         new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
+        this.allKindsOf_unifiedCommits = allKindsOf_unifiedCommits;
 
 
-        new GetCommitMsg().getCommitMsgForChangedCode( analysisDir,repoPath);
+        System.out.println("    list top X biggest cluster id");
+        String[] topClusters = null;
+
+        try {
+            topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (String tc : topClusters) {
+            topClusterList.add(tc);
+        }
+
 
     }
 
@@ -35,6 +51,9 @@ public class IdentifyingKeyWordForCluster {
         List<List<String>> docs = new ArrayList<>();
         HashMap<Integer, String> clusterIndexToID = new HashMap<>();
         StringBuffer sb = new StringBuffer();
+
+        String n_gram_str = n_gram == 1 ? "one_gram" : "two_gram";
+
         try {
             /**   get node id -  node location (label)**/
             String nodeIdList = processingText.readResult(analysisDir + "NodeList.txt");
@@ -45,6 +64,8 @@ public class IdentifyingKeyWordForCluster {
                 }
             }
             String sourceCode = "";
+
+            // doc stores all the documents
             List<String> doc = new ArrayList<>();
             /** get node label -- node content **/
             if (n_gram == 1) {
@@ -71,121 +92,80 @@ public class IdentifyingKeyWordForCluster {
             e.printStackTrace();
         }
 
-
+        AnalyzingCommunityDetectionResult an = new AnalyzingCommunityDetectionResult(analysisDir);
         clusterList.forEach((clusterID, v) -> {
-            for (Integer cl_int : v) {
-                String cl = cl_int.toString();
-                if (cl.length() > 0 && !cl.contains("-")) {
-                    HashMap<String, String> clusterCommitMsg = new HashMap<>();
-                    Set<String> clusterString = new HashSet<>();
-                    Set<String> origin_clusterString = new HashSet<>();
+            if (an.isTopCluster(clusterID)) {
+                System.out.println(clusterID);
+                /** add source code **/
+                List<List<String>> newCode_docs = new ArrayList<>();
+                List<String> clusterString = new ArrayList<>();
 
-                    v.forEach(nodeId -> {
-                        String nodeLable = nodeIdMap.get(nodeId + "");
+                for (Integer cl_int : v) {
+                    String cl = cl_int.toString();
+                    if (cl.length() > 0 && !cl.contains("-")) {
+                        v.forEach(nodeId -> {
+                            String nodeLable = nodeIdMap.get(nodeId + "");
 
-                        String nodeContent = sourceCodeLocMap.get(nodeIdMap.get(nodeId + ""));
-                        if (nodeContent != null) {
-                            for (String word : nodeContent.split(" ")) {
-                                if (word.length() > 0) clusterString.add(word);
-                            }
-                        }
-                    });
-
-
-                }
-            }
-
-            /** add source code **/
-            List<List<String>> newCode_docs = new ArrayList<>();
-            List<String> clusterString = new ArrayList<>();
-            newCode_docs.add(clusterString);
+                            String nodeContent = sourceCodeLocMap.get(nodeIdMap.get(nodeId + ""));
+                            if (nodeContent != null) {
+                                for (String word : nodeContent.split(" ")) {
+                                    if (word.length() > 0) clusterString.add(word);
+                                }
 
 
-            /**get all the commit msg for changed code **/
-
-            HashMap<String, ArrayList<String>> cluster_to_commit_map = new HashMap<>();
-
-            String fileName_prefix = "";
-            if (n_gram == 1) {
-                fileName_prefix = "one";
-            } else if (n_gram == 2) {
-                fileName_prefix = "two";
-            }
-
-            try {
-                ArrayList<String> commitForAllNewCode = null;
-                String commitMsg = processingText.readResult(analysisDir + splitStep + "_" + fileName_prefix + "_commitMsgPerCluster.txt");
-
-                String[] clusterCommitArray = commitMsg.split("\n");
-                for (String s : clusterCommitArray) {
-                    if (s.trim().startsWith("[")) {
-                        int index = s.indexOf("]");
-                        String clusterNumber = s.trim().substring(1, index);
-                        String msg = s.substring(index + 1);
-                        commitForAllNewCode = new ArrayList<String>();
-                        commitForAllNewCode.addAll(new ArrayList<String>(Arrays.asList(msg.split(" "))));
-                        cluster_to_commit_map.put(clusterNumber, commitForAllNewCode);
-                        newCode_docs.add(commitForAllNewCode);
-                    }
-                }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            /**  add commit msg of changed code **/
-
-            ArrayList<String> words = cluster_to_commit_map.get(clusterID);
-            words.forEach(w -> {
-                if (w.trim().length() > 1) {
-                    clusterString.add(w);
-                }
-            });
-
-            clusterIndexToID.put(docs.size() - 1, clusterID);
-
-            HashMap<String, Double> topTerms = new HashMap<>();
-            HashSet<String> clusterSet = new HashSet<>(clusterString);
-
-            for (String term : clusterSet) {
-                List<List<String>> all_docs = new ArrayList<List<String>>();
-                all_docs.addAll(docs);
-                all_docs.addAll(newCode_docs);
-
-                double weight = tfidf.calculateTfIdf(clusterString, all_docs, term);
-                final double[] maxDiff = new double[1];
-                final String[] minWeightTerm = new String[1];
-                if (!topTerms.keySet().contains(term)) {
-                    if (topTerms.keySet().size() <= 9) {
-                        topTerms.put(term, weight);
-                    } else {
-                        topTerms.forEach((a, b) -> {
-                            boolean findSmallerWeightTerm = (weight - b) > maxDiff[0];
-                            if (findSmallerWeightTerm) {
-                                maxDiff[0] = weight - b;
-                                minWeightTerm[0] = a;
+                                String commit = allKindsOf_unifiedCommits.get(n_gram_str).get(nodeId + "");
+                                for (String c : commit.split(" ")) {
+                                    if (c.length() > 0) clusterString.add(c);
+                                }
                             }
                         });
-                        if (minWeightTerm[0] != null) {
-                            topTerms.remove(minWeightTerm[0]);
-                            topTerms.put(term, weight);
-                        }
                     }
-
                 }
+
+                newCode_docs.add(clusterString);
+
+                clusterIndexToID.put(docs.size() - 1, clusterID);
+
+                HashMap<String, Double> topTerms = new HashMap<>();
+                HashSet<String> clusterSet = new HashSet<>(clusterString);
+
+                for (String term : clusterSet) {
+                    List<List<String>> all_docs = new ArrayList<>();
+                    all_docs.addAll(docs);
+                    all_docs.addAll(newCode_docs);
+
+                    double weight = tfidf.calculateTfIdf(clusterString, all_docs, term);
+                    final double[] maxDiff = new double[1];
+                    final String[] minWeightTerm = new String[1];
+                    if (!topTerms.keySet().contains(term)) {
+                        if (topTerms.keySet().size() <= 9) {
+                            topTerms.put(term, weight);
+                        } else {
+                            topTerms.forEach((a, b) -> {
+                                boolean findSmallerWeightTerm = (weight - b) > maxDiff[0];
+                                if (findSmallerWeightTerm) {
+                                    maxDiff[0] = weight - b;
+                                    minWeightTerm[0] = a;
+                                }
+                            });
+                            if (minWeightTerm[0] != null) {
+                                topTerms.remove(minWeightTerm[0]);
+                                topTerms.put(term, weight);
+                            }
+                        }
+
+                    }
+                }
+                sb.append(clusterID + ":  [");
+
+
+                topTerms.entrySet().stream()
+                        .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                        .limit(10)
+                        .forEach(item -> sb.append(item.getKey() + ", "));
+                sb.append("]\n");
+
             }
-            sb.append(clusterID + ":  [");
-
-
-            topTerms.entrySet().stream()
-                    .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-                    .limit(10)
-                    .forEach(item -> sb.append(item.getKey() + ", "));
-            sb.append("]\n");
-
-
         });
 
 
@@ -374,16 +354,6 @@ public class IdentifyingKeyWordForCluster {
     public void findKeyWordForEachSplit(String sourcecodeDir, String analysisDir, String testDir, String splitStep, String repoPath) {
 
         System.out.println("    list top X biggest cluster id");
-        String[] topClusters = null;
-        ArrayList<String> topClusterList = new ArrayList<>();
-        try {
-            topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (String tc : topClusters) {
-            topClusterList.add(tc);
-        }
 
 
         AnalyzingCommunityDetectionResult acdr = new AnalyzingCommunityDetectionResult(analysisDir);
@@ -394,13 +364,12 @@ public class IdentifyingKeyWordForCluster {
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
 
-
-            /** parse commit msg for each node **/
-            System.out.println("        getting commit messages for current split...");
-            System.out.println("        generating one gram term ...");
-            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, currentClusterMap, 1, repoPath, splitStep, topClusterList);
-            System.out.println("        generating two gram term ...");
-            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, currentClusterMap, 2, repoPath, splitStep, topClusterList);
+//            /** parse commit msg for each node **/
+//            System.out.println("        getting commit messages for current split...");
+//            System.out.println("        generating one gram term ...");
+//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, currentClusterMap, 1, repoPath, splitStep, topClusterList);
+//            System.out.println("        generating two gram term ...");
+//            new GetCommitMsg().getCommitMsg_currentSplit(analysisDir, currentClusterMap, 2, repoPath, splitStep, topClusterList);
 
             /**  calculate tfidf  to identifing keywords from each cluster**/
             System.out.println("        identifying keywords from one gram list...");

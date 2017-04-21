@@ -24,6 +24,7 @@ public class Tokenizer {
      * @param sourcecodeDir path of the repostiroy
      */
     public void tokenizeSourceCode(String sourcecodeDir, String testCaseDir) {
+
         Stemmer stemmer = new Stemmer();
         ProcessingText processingText = new ProcessingText();
         processingText.rewriteFile("", testCaseDir + "tokenizedSouceCode_oneGram.txt");
@@ -77,7 +78,7 @@ public class Tokenizer {
                                             }
                                         } else {
 
-                                            if (s.trim().length() != 1 && (!s.equals("x") && !s.equals("y") && !s.equals("z")) ) {
+                                            if (s.trim().length() != 1 && (!s.equals("x") && !s.equals("y") && !s.equals("z"))) {
                                                 oneGram_newLine += s + " ";
                                                 twoGram_newLine += s + " ";
                                             }
@@ -125,10 +126,6 @@ public class Tokenizer {
         processingText.writeTofile(sb_one.toString(), testCaseDir + "tokenizedSouceCode_oneGram.txt");
         processingText.writeTofile(sb_two.toString(), testCaseDir + "tokenizedSouceCode_twoGram.txt");
 
-        /**stemming tokens**/
-
-//        new Stemmer().stemmingFile(testCaseDir + "tokenizedSouceCode_oneGram.txt");
-//        new Stemmer().stemmingFile(testCaseDir + "tokenizedSouceCode_twoGram.txt");
 
     }
 
@@ -159,7 +156,7 @@ public class Tokenizer {
             }
 
             //Add n-gram to a list
-            if (s.trim().length() != 1 && (!s.equals("x") && !s.equals("y") && !s.equals("z")) ) {
+            if (s.trim().length() != 1 && (!s.equals("x") && !s.equals("y") && !s.equals("z"))) {
                 ngramList.add(s);
             }
         }

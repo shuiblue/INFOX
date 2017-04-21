@@ -494,6 +494,10 @@ public class R_CommunityDetection {
         } else {
             noSplitting_step.append(clusterID + "\n");
             System.out.println("    subcluster " + clusterID + " is too small, stop splitting next time");
+            HashMap<String, HashSet<Integer>> currentCluster = new HashMap<>();
+            HashSet<Integer> set = new HashSet<>(clusterNodeList);
+            currentCluster.put(clusterID, set);
+            printMemebershipOfCurrentGraph_new(currentCluster, clusterID + "_clusterTMP.txt");
 
         }
     }

@@ -40,9 +40,9 @@ public class INFOX_main {
 //
 //
 //        /***  get origin diff github page  ***/
-//        ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters,analysisDir);
+        ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters,analysisDir);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(forkName,"1 year");
-////        String diffPageUrl ="https://github.com/malx122/Marlin/compare/956cf39ef52108079daf838b72ae5d12eb725f8e...malx122:1ed7937709daf4d3a6fce5cefbab78e49f118ced";
+        String diffPageUrl ="https://github.com/malx122/Marlin/compare/956cf39ef52108079daf838b72ae5d12eb725f8e...malx122:1ed7937709daf4d3a6fce5cefbab78e49f118ced";
 //
 //        ProcessingText processingText = new ProcessingText();
 //        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
@@ -55,13 +55,13 @@ public class INFOX_main {
 
 
         /*** start clustering code  ***/
-        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
-        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
+//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
 
 
         /*** hack github page   ***/
-//        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
-//        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
+        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
+        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
 
 
     }

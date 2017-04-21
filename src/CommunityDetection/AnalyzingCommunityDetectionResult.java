@@ -117,7 +117,7 @@ public class AnalyzingCommunityDetectionResult {
                 double[] clusterInfo = getClusterInfo(result.split("communities")[0], tmp_isOriginalGraph);
                 int numberOfCommunities = (int) clusterInfo[0];
 
-                if (numberOfCommunities > 1) {
+                if (numberOfCommunities >= 1) {
 
                     if (pre_numberOfCommunites != numberOfCommunities) {
 
@@ -581,7 +581,7 @@ public class AnalyzingCommunityDetectionResult {
         }
         for (String clusterID : topClist) {
             int originalClusterID = Integer.valueOf(clusterID.split("_")[0]);
-            if (!noSplittingNode.contains(clusterID)) {
+//            if (!noSplittingNode.contains(clusterID)) {
                 if (clusterID.split("_").length < max_numberOfCut + 1) {
                     boolean isOriginal = false;
                     if (!clusterID.contains("_")) {
@@ -598,7 +598,7 @@ public class AnalyzingCommunityDetectionResult {
                             map.get(index).put(k1, v1);
                         });
                     });
-                }
+//                }
             }
         }
 
@@ -612,6 +612,30 @@ public class AnalyzingCommunityDetectionResult {
 
     }
 
+    public boolean isTopCluster(String clusterID) {
+        String[] topClusters = null;
+        ArrayList<String> topClusterList = new ArrayList<>();
+        try {
+            topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (String tc : topClusters) {
+            topClusterList.add(tc);
+        }
+
+        if (topClusterList.contains(clusterID)) {
+            return true;
+        }
+        for (String cl : topClusterList) {
+
+            if (clusterID.matches(cl+"(_[0-9])+")) {
+                return true;
+            }
+
+        }
+        return false;
+    }
 
     private HashMap<String, HashSet<Integer>> getCopyOfOriginalClusters() {
         HashMap<String, HashSet<Integer>> currentCluster = new HashMap<>();

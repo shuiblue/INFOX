@@ -195,21 +195,23 @@ public class GetCommitMsg {
     }
 
 
-    public void getCommitMsgForChangedCode(String analysisDir, String repoPath) {
+    public HashMap<String, HashMap<String, String>> getCommitMsgForChangedCode(String analysisDir, String repoPath) {
+        System.out.println("        getting commit messages for current split...");
         label_to_id = new ProcessingText().getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
+        HashMap<String, HashMap<String, String>> allKindsOf_unifiedCommits = new HashMap<>();
 
         HashMap<String, String> original_nodeid_to_commitMessage = new HashMap();
         HashMap<String, String> one_gram_nodeid_to_commitMessage = new HashMap();
         HashMap<String, String> two_gram_nodeid_to_commitMessage = new HashMap();
         HashMap<String, String> nodeid_to_SHA = new HashMap();
-
+        ProcessingText processingText = new ProcessingText();
 
         String forkAddedNodeTxt = "forkAddedNode.txt";
         ArrayList<String> forkaddedNodeList = null;
-        if (new File(forkAddedNodeTxt).exists()) {
+        if (new File(analysisDir + forkAddedNodeTxt).exists()) {
             try {
-                ProcessingText processingText = new ProcessingText();
-                forkaddedNodeList = processingText.getForkAddedNodeList(forkAddedNodeTxt);
+
+                forkaddedNodeList = processingText.getForkAddedNodeList(analysisDir + forkAddedNodeTxt);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -219,20 +221,31 @@ public class GetCommitMsg {
             forkaddedNodeList = new ArrayList<>();
         }
 
-        for (String changedCode : forkaddedNodeList) {
-            String fileName = changedCode.split("-")[0];
-            String lineNumber = changedCode.split("-")[1];
+        for (String nodeLabel : forkaddedNodeList) {
+            String fileName = nodeLabel.split("-")[0];
+            String originFileName = processingText.getOriginFileName(nodeLabel);
+            String lineNumber = nodeLabel.split("-")[1];
 
             //commit[] ={commitSHA, normalized_line, originCommit}
-            String one_commit[] = getCommitMsgForEachNode(fileName, lineNumber, 1, repoPath);
-            String two_commit[] = getCommitMsgForEachNode(fileName, lineNumber, 2, repoPath);
-            String nodeId = label_to_id.get(fileName);
-
-            nodeid_to_SHA.put(nodeId, one_commit[0]);
-            original_nodeid_to_commitMessage.put(nodeId, one_commit[2]);
-            one_gram_nodeid_to_commitMessage.put(nodeId, one_commit[1]);
-            two_gram_nodeid_to_commitMessage.put(nodeId, two_commit[1]);
+            String one_commit[] = getCommitMsgForEachNode(originFileName, lineNumber, 1, repoPath);
+            String two_commit[] = getCommitMsgForEachNode(originFileName, lineNumber, 2, repoPath);
+            String nodeId = label_to_id.get("\"" + nodeLabel + "\"");
+            if (nodeId != null) {
+                nodeid_to_SHA.put(nodeId, one_commit[0]);
+                original_nodeid_to_commitMessage.put(nodeId, one_commit[2]);
+                one_gram_nodeid_to_commitMessage.put(nodeId, one_commit[1]);
+                two_gram_nodeid_to_commitMessage.put(nodeId, two_commit[1]);
+            }
         }
+
+        System.out.println("        generating one gram term ...");
+        allKindsOf_unifiedCommits.put("one_gram", one_gram_nodeid_to_commitMessage);
+
+        System.out.println("        generating two gram term ...");
+        allKindsOf_unifiedCommits.put("two_gram", two_gram_nodeid_to_commitMessage);
+        allKindsOf_unifiedCommits.put("origin", original_nodeid_to_commitMessage);
+        allKindsOf_unifiedCommits.put("nodeSHA", nodeid_to_SHA);
+        return allKindsOf_unifiedCommits;
     }
 
 

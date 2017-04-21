@@ -133,31 +133,33 @@ public class GenerateCombination {
                 ArrayList<String> clusters = resultMap.get(cluster).get(split);
                 if (clusters != null && clusters.size() > 0) {
                     for (String cl : clusters) {
-                        for (int i = 1; i <= 2; i++) {
-                            String next = cl + "_" + i;
+                        if (!noFurtherSplittingStepSet.contains(cl)) {
+                            for (int i = 1; i <= 2; i++) {
+                                String next = cl + "_" + i;
 
-                            if (!noFurtherSplittingStepSet.contains(next)) {
+                                if (!noFurtherSplittingStepSet.contains(next)) {
 
-                                HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
-                                split_nodelist.get(split + 1).add(next);
-                                resultMap.put(cluster, split_nodelist);
+                                    HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
+                                    split_nodelist.get(split + 1).add(next);
+                                    resultMap.put(cluster, split_nodelist);
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        if(noFurtherSplittingStepSet.size()>0) {
-            noFurtherSplittingStepSet.forEach(stopCluster -> {
-                String[] clusterid = stopCluster.split("_");
-                int index = clusterid.length - 1;
-                String cluster = clusterid[0];
-
-                HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
-                split_nodelist.get(index).add(stopCluster);
-                resultMap.put(cluster, split_nodelist);
-            });
-        }
+//        if(noFurtherSplittingStepSet.size()>0) {
+//            noFurtherSplittingStepSet.forEach(stopCluster -> {
+//                String[] clusterid = stopCluster.split("_");
+//                int index = clusterid.length - 1;
+//                String cluster = clusterid[0];
+//
+//                HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
+//                split_nodelist.get(index).add(stopCluster);
+//                resultMap.put(cluster, split_nodelist);
+//            });
+//        }
         return resultMap;
     }
 
