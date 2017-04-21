@@ -45,6 +45,45 @@ public class ParseHtml {
     HashMap<String, String> cluster_color = new HashMap<>();
     static HashMap<Integer, HashMap<Integer, HashMap<String, HashSet<Integer>>>> allSplittingResult;
 
+
+
+    private String table_header = "<style>\n" +
+            "#cluster{\n" +
+            "  background-color: #fff;\n" +
+            "  border: 1px solid #000;\n" +
+            "  position:fixed;\n" +
+            "  right: 0;\n" +
+            "  left: 0;\n" +
+            "  width: 980px;\n" +
+            "  margin-right: auto;\n" +
+            "  margin-left: auto;\n" +
+            "  top:0px;\n" +
+            "  z-index:99999;\n" +
+            "  td, th {\n" +
+            "  background-color: #fff;\n" +
+            "  color: #000;\n" +
+            "}\n" +
+            "\n" +
+            "}\n" +
+            ".test_me:hover {\n" +
+            "  max-width : initial;\n" +
+            "  overflow: show;\n" +
+            "}\n" +
+            "</style>" +
+            "<table id=\"cluster\"  border=1 frame=void rules=rows>\n" +
+            "  <tr> \n" +
+            "    <td> <button id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
+            "    </td> \n" +
+            "  </tr>\n" +
+            "  <tr>\n" +
+            "       <th>Cluster</th>\n" +
+            "       <th>Navigation</th>\n" +
+            "       <th>Keywords</th>\n" +
+            "       <th>LOC</th>\n" +
+            "       <th>Split Cluster </th>\n" +
+            "    </tr>\n";
+
+
     public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters, String analysisDir) {
         this.max_numberOfCut = max_numberOfCut;
         this.numberOfBiggestClusters = numberOfBiggestClusters;
@@ -302,41 +341,7 @@ public class ParseHtml {
 
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<style>\n" +
-                "#cluster{\n" +
-                "  background-color: #fff;\n" +
-                "  border: 1px solid #000;\n" +
-                " position:fixed;\n" +
-                "  right: 0;\n" +
-                "  left: 0;\n" +
-                "  width: 980px;\n" +
-                "  margin-right: auto;\n" +
-                "  margin-left: auto;\n" +
-                "  top:19px;\n" +
-                "  /*right:461px;*/\n" +
-                "  z-index:99999;\n" +
-                "  td, th {\n" +
-                "  background-color: #fff;\n" +
-                "  color: #000;\n" +
-                "}\n" +
-                "\n" +
-                "}\n" +
-                ".test_me:hover {\n" +
-                "  max-width : initial;\n" +
-                "  overflow: show;\n" +
-                "}\n" +
-                "</style>" +
-                "<table id=\"cluster\"  border=1 frame=void rules=rows>\n" +
-                "  <tr> \n" +
-                "    <td> <button id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
-                "    </td> \n" +
-                "  </tr>\n" +
-                "  <tr>\n" +
-                "       <th>Cluster/Feature</th>\n" +
-                "       <th>Keywords</th>\n" +
-                "       <th>LOC</th>\n" +
-                "       <th>Split Cluster </th>\n" +
-                "    </tr>\n");
+        sb.append(table_header);
 
 
         String[] clusters = splitStep.split("--");
@@ -394,14 +399,17 @@ public class ParseHtml {
 
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
 
-        sb.append("<tr> \n" +
-                "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + clusterID + "\")'>" + keyword_prefix + "</td>\n" +
-                "       <td width=\"100\"><button onclick=\"next_in_cluster(\'infox_" + clusterID + "\')\" >next</button><button onclick=\"prev_in_cluster(\'infox_" + clusterID + "\')\">prev</button></td>" +
+        sb.append(generateRow(color,clusterID,keyword_prefix,keyword_long,clusterSize,nextStepStr));
+        return sb.toString();
+    }
+
+    private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr) {
+       return "<tr> \n" +
+                "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
                 "        <td width=\"600\">" + keyword_long + "</td>\n" +
                 "       <td width=\"50\">" + clusterSize + "</td>\n" +
                 nextStepStr +
-                "   </tr>");
-        return sb.toString();
+                "   </tr>";
     }
 
 
@@ -415,41 +423,7 @@ public class ParseHtml {
 
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<style>\n" +
-                "#cluster{\n" +
-                "  background-color: #fff;\n" +
-                "  border: 1px solid #000;\n" +
-                " position:fixed;\n" +
-                "  right: 0;\n" +
-                "  left: 0;\n" +
-                "  width: 980px;\n" +
-                "  margin-right: auto;\n" +
-                "  margin-left: auto;\n" +
-                "  top:19px;\n" +
-                "  /*right:461px;*/\n" +
-                "  z-index:99999;\n" +
-                "  td, th {\n" +
-                "  background-color: #fff;\n" +
-                "  color: #000;\n" +
-                "}\n" +
-                "\n" +
-                "}\n" +
-                ".test_me:hover {\n" +
-                "  max-width : initial;\n" +
-                "  overflow: show;\n" +
-                "}\n" +
-                "</style>" +
-                "<table id=\"cluster\"  border=1 frame=void rules=rows>\n" +
-                "  <tr> \n" +
-                "    <td> <button id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
-                "    </td> \n" +
-                "  </tr>\n" +
-                "  <tr>\n" +
-                "       <th>Cluster</th>\n" +
-                "       <th>Keywords</th>\n" +
-                "       <th>LOC</th>\n" +
-                "       <th>Split Cluster </th>\n" +
-                "    </tr>\n");
+        sb.append(table_header);
 
 
         try {
@@ -492,12 +466,7 @@ public class ParseHtml {
                         });
 
                         cluster_color.put(current_clusterID, color);
-                        sb.append("<tr> \n" +
-                                "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
-                                "        <td width=\"600\">" + keyword_long + "</td>\n" +
-                                "       <td width=\"50\">" + clusterSize[0] + "</td>\n" +
-                                nextStepStr +
-                                "   </tr>");
+                        sb.append(generateRow(color,current_clusterID,keyword_suffix,keyword_long,Integer.parseInt(clusterSize[0]),nextStepStr));
 
                     }
                 } else {
@@ -511,16 +480,8 @@ public class ParseHtml {
                         clusterSize[0] = String.valueOf(currentClusterMap.get(clusterID).size());
                     });
 
-                    sb.append("<tr> \n" +
-                            "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + clusterID + "\")'>" + keyword_suffix + "</td>\n" +
-                            "        <td width=\"600\">" + keyword_long + "</td>\n" +
-                            "       <td width=\"50\">" + clusterSize[0] + "</td>\n" +
-                            nextStepStr +
-                            "   </tr>");
-
-
+                    sb.append(generateRow(color,clusterID,keyword_suffix,keyword_long,Integer.parseInt(clusterSize[0]),nextStepStr));
                     cluster_color.put(clusterID, color);
-
                 }
 
 
@@ -724,6 +685,7 @@ public class ParseHtml {
            }
 
             String diffURL=github_page + comparedFork + "/compare/" + previousCommitSHA + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
+            System.out.println(diffURL);
             new ProcessingText().rewriteFile(diffURL,analysisDir+"diffurl.txt");
             System.out.println("diff url:"+ diffURL);
             return  diffURL;

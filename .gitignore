@@ -1,0 +1,40 @@
+	# use glob syntax.
+syntax: glob
+*.ser
+*.class
+*~
+*.bak
+#*.off
+*.old
+
+# eclipse conf file
+.settings
+.classpath
+.project
+.manager
+.scala_dependencies
+
+# idea
+.idea
+*.iml
+project
+
+# building
+target
+build
+.build
+null
+tmp*
+temp*
+dist
+test-output
+build.log
+
+#jar files
+out/
+*.jar
+
+# other scm
+.svn
+.CVS
+.hg*

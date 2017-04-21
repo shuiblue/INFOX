@@ -1,4 +1,24 @@
 <script type="text/javascript">
+
+window.onload = refreshPage();
+
+function refreshPage(){
+  var table_height = $("#cluster").height();
+  // console.log(table_height);
+  var container = document.getElementById("js-repo-pjax-container");
+  container.style.top= table_height-80 +"px";
+  container.style.position="relative";
+  var tabs = document.getElementsByClassName("tabnav-tab");
+  tabs[0].className = "tabnav-tab";
+  tabs[1].className= "tabnav-tab selected";
+
+  var commits_bucket = document.getElementById("commits_bucket");
+  var files_bucket = document.getElementById("files_bucket");
+  commits_bucket.style.display="none";
+  files_bucket.style.display="block";
+  $(".pagehead").remove();
+}
+
 function hide_non_cluster_rows() {
   
   var table_rows = document.getElementsByTagName('tr');
@@ -37,7 +57,8 @@ function hide_cluster_rows(cluster_id) {
 }
 function go_to_row(row) {
 if ($(row).length){
-        $(window).scrollTop( $(row).offset().top -190);
+        var table_height = $("#cluster").height();
+        $(window).scrollTop( $(row).offset().top - table_height - 20);
     }
 }
 
