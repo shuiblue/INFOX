@@ -394,7 +394,7 @@ public class ParseHtml {
 
         /**  keyword **/
         String keyword_long = cluster_keyword.get(clusterID).toString();
-        String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
+        String keyword_prefix = keyword_long.trim().substring(0, 5).replace("[", "") + ".";
 
 
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
@@ -456,7 +456,7 @@ public class ParseHtml {
                     for (int s = 1; s <= current_split; s++) {
                         String current_clusterID = clusterID + "_" + s;
                         String keyword_long = cluster_keyword.get(current_clusterID).toString();
-                        String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
+                        String keyword_suffix = keyword_long.trim().substring(0, 5).replace("[", "") + ".";
                         String color = colorfamiliy_List.get(i).get(s - 1);
 
                         final String[] clusterSize = {""};
@@ -472,7 +472,7 @@ public class ParseHtml {
                 } else {
                     String color = colorfamiliy_List.get(i).get(0);
                     String keyword_long = cluster_keyword.get(clusterID).toString();
-                    String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
+                    String keyword_suffix = keyword_long.trim().substring(0, 5).replace("[", "") + ".";
 
 
 
@@ -588,7 +588,7 @@ public class ParseHtml {
 
                 if (an.isTopCluster(clusterid)) {
                     String keywod_prefix = cluster_keyword.get(clusterid).get(0).trim();
-                    keywod_prefix=  keywod_prefix.split("").length>3?keywod_prefix .substring(0, 2).replace("[", "") + ".":keywod_prefix;
+                    keywod_prefix=  keywod_prefix.split("").length>3?keywod_prefix .substring(0, 3).replace("[", "") + ".":keywod_prefix;
 
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
                     Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
