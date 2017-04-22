@@ -17,6 +17,7 @@ public class R_CommunityDetection {
     HashSet<String> forkAddedNode;
     //    HashSet<String> upstreamEdge;
     HashMap<Integer, Boolean> checkedEdges;
+    HashMap<String, Boolean> stopedTopCluster;
     Graph originGraph;
     String sourcecodeDir = "", analysisDir = "";
     String upstreamNodeTxt = "/upstreamNode.txt";
@@ -54,6 +55,7 @@ public class R_CommunityDetection {
         }
         modularityArray = new ArrayList<>();
         checkedEdges = new HashMap<>();
+        stopedTopCluster = new HashMap<>();
         cutSequence = new ArrayList<>();
         forkAddedNode = new HashSet<>();
         modularityMap = new HashMap<>();
@@ -174,7 +176,7 @@ public class R_CommunityDetection {
 
         if (hasEdge) {
             int cutNum = 1;
-            while (checkedEdges.values().contains(false)) {
+//            while (checkedEdges.values().contains(false)) {
                 if (listOfNumberOfCommunities.size() <= max_numberOfCut) {
                     //count betweenness for current graph
 //                    calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numOfcut, isOriginGraph, outputFile);
@@ -231,16 +233,19 @@ public class R_CommunityDetection {
                         clusterToplusters(clusters, re, testCaseDir, testDir, cutNum, directedGraph);
 
                         cutNum++;
-                    } else {
-                        break;
                     }
-                } else {
-                    break;
+//                    else {
+//                        break;
+//                    }
                 }
-            }
-        } else {
-            return false;
+//                else {
+//                    break;
+//                }
+//            }
         }
+//        else {
+//            return false;
+//        }
 
         /** find best modularity but not fit for INFOX ***
          findBestClusterResult(originGraph, cutSequence, analysisDir);
@@ -438,6 +443,7 @@ public class R_CommunityDetection {
         while (cursor.hasNext()) {
             final String clusterID = cursor.next();
             sb_topClusters.append(clusterID + "\n");
+            stopedTopCluster.put(clusterID,false);
 
             /** read original changed code graph, preparing for cluster this subgraph  **/
             String inputFile = "changedCode.pajek.net";
@@ -498,6 +504,7 @@ public class R_CommunityDetection {
             HashSet<Integer> set = new HashSet<>(clusterNodeList);
             currentCluster.put(clusterID, set);
             printMemebershipOfCurrentGraph_new(currentCluster, clusterID + "_clusterTMP.txt");
+            stopedTopCluster.put(clusterID,true);
 
         }
     }

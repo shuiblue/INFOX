@@ -25,7 +25,6 @@ public class Tokenizer {
      */
     public void tokenizeSourceCode(String sourcecodeDir, String testCaseDir) {
 
-        Stemmer stemmer = new Stemmer();
         ProcessingText processingText = new ProcessingText();
         processingText.rewriteFile("", testCaseDir + "tokenizedSouceCode_oneGram.txt");
         processingText.rewriteFile("", testCaseDir + "tokenizedSouceCode_twoGram.txt");

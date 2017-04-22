@@ -27,7 +27,7 @@ public class GithubRepoAnalysis {
                 if (!changedFile.equals("")) {
                     if (currentFileName.equals("")) {
                         String[] content = changedFile.split("\n");
-                        currentFileName = content[0].split(" ")[1].replace("a/", "");
+                        currentFileName = content[0].split(" ")[2].replace("b/", "");
 
                         if (processingText.isCFile_general(currentFileName)) {
                             lineNumberList = new ArrayList<>();
@@ -60,29 +60,6 @@ public class GithubRepoAnalysis {
 
                                         }
                                     }
-
-//                                    if (rangeDetail.length > 1) {
-//                                        int i = 0;
-//                                        for (String line : lineArray) {
-//                                            if (line.startsWith("+")) {
-//                                                line = line.replace("+", "");
-//                                                if (processingText.isCode(line)) {
-//                                                    lineNumberList.add(startLineNum + i);
-//                                                }
-//                                                i++;
-//                                            }
-//
-//                                        }
-//                                    } else {
-//                                        for (String line : lineArray) {
-//                                            if (line.startsWith("+")) {
-//                                                if (processingText.isCode(line.substring(1))) {
-//                                                    lineNumberList.add(startLineNum);
-//                                                }
-//                                            }
-//                                        }
-//
-//                                    }
                                 }
                             }
                         }

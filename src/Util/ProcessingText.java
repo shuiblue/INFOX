@@ -407,9 +407,12 @@ public class ProcessingText {
     public boolean isPdeFile(String filePath) {
         return filePath.endsWith(".pde");
     }
+    public boolean isInoFile(String filePath) {
+        return filePath.endsWith(".ino");
+    }
 
     public boolean isCFile_general(String filePath) {
-        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath);
+        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath)||isInoFile(filePath);
     }
 
     public String removeUselessLine(String line) {

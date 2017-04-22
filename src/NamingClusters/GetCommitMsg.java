@@ -13,6 +13,10 @@ public class GetCommitMsg {
 
     static HashMap<String, String> label_to_id = null;
 
+    public GetCommitMsg() {
+
+    }
+
 
     public void getCommitMsg_currentSplit(String testCaseDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String repoPath, String splitStep, ArrayList<String> topClusterList) {
         String analysisDir = testCaseDir;
@@ -190,9 +194,6 @@ public class GetCommitMsg {
         });
     }
 
-    public GetCommitMsg() {
-
-    }
 
 
     public HashMap<String, HashMap<String, String>> getCommitMsgForChangedCode(String analysisDir, String repoPath) {
@@ -303,9 +304,12 @@ public class GetCommitMsg {
                                     normalized_line += s + " ";
                                 }
                             } else {
-                                word = new StopWords().removeStopWord(word);
-                                if (word.trim().length() > 0) {
-                                    normalized_line += stemmer.stemmingAWord(word) + " ";
+                                if (!word.matches(("[0-9]*"))){
+                                    ;
+                                    word = new StopWords().removeStopWord(word);
+                                    if (word.trim().length() > 0) {
+                                        normalized_line += stemmer.stemmingAWord(word) + " ";
+                                    }
                                 }
                             }
                         }

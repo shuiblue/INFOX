@@ -10,6 +10,7 @@ import Util.ProcessingText;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -44,7 +45,6 @@ public class ParseHtml {
     HashMap<String, Integer> usedColorIndex = new HashMap<>();
     HashMap<String, String> cluster_color = new HashMap<>();
     static HashMap<Integer, HashMap<Integer, HashMap<String, HashSet<Integer>>>> allSplittingResult;
-
 
 
     private String table_header = "<style>\n" +
@@ -106,11 +106,15 @@ public class ParseHtml {
         HtmlPage page = null;
         try {
             page = webClient.getPage(diffPageUrl + "#files_bucket");
+
+            HtmlButton loadDiff = (HtmlButton) page.getElementById("buttonId");
+            loadDiff.click();
         } catch (Exception e) {
             System.out.println("Get page error");
         }
         webClient.waitForBackgroundJavaScriptStartingBefore(200);
         webClient.waitForBackgroundJavaScript(50000);
+
 
 
         new ProcessingText().rewriteFile(page.asXml(), analysisDir + originalPage);
@@ -149,7 +153,7 @@ public class ParseHtml {
             doc.getElementsByTag("header").append(jqueryLink);
 
             String workingDir = System.getProperty("user.dir");
-            String js = pt.readResult(workingDir+"/src/files/jsFile.txt");
+            String js = pt.readResult(workingDir + "/src/files/jsFile.txt");
             doc.getElementsByTag("html").last().after(js);
             Elements fileList_elements = doc.getElementsByClass("file-header");
 
@@ -399,12 +403,12 @@ public class ParseHtml {
 
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
 
-        sb.append(generateRow(color,clusterID,keyword_prefix,keyword_long,clusterSize,nextStepStr));
+        sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr));
         return sb.toString();
     }
 
     private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr) {
-       return "<tr> \n" +
+        return "<tr> \n" +
                 "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
                 "        <td width=\"600\">" + keyword_long + "</td>\n" +
                 "       <td width=\"50\">" + clusterSize + "</td>\n" +
@@ -466,7 +470,7 @@ public class ParseHtml {
                         });
 
                         cluster_color.put(current_clusterID, color);
-                        sb.append(generateRow(color,current_clusterID,keyword_suffix,keyword_long,Integer.parseInt(clusterSize[0]),nextStepStr));
+                        sb.append(generateRow(color, current_clusterID, keyword_suffix, keyword_long, Integer.parseInt(clusterSize[0]), nextStepStr));
 
                     }
                 } else {
@@ -475,14 +479,13 @@ public class ParseHtml {
                     String keyword_suffix = keyword_long.trim().substring(0, 5).replace("[", "") + ".";
 
 
-
                     final String[] clusterSize = {""};
                     clusterResultMap.forEach((k, v) -> {
                         HashMap<String, HashSet<Integer>> currentClusterMap = v;
                         clusterSize[0] = String.valueOf(currentClusterMap.get(clusterID).size());
                     });
 
-                    sb.append(generateRow(color,clusterID,keyword_suffix,keyword_long,Integer.parseInt(clusterSize[0]),nextStepStr));
+                    sb.append(generateRow(color, clusterID, keyword_suffix, keyword_long, Integer.parseInt(clusterSize[0]), nextStepStr));
                     cluster_color.put(clusterID, color);
                 }
 
@@ -588,7 +591,7 @@ public class ParseHtml {
 
                 if (an.isTopCluster(clusterid)) {
                     String keywod_prefix = cluster_keyword.get(clusterid).get(0).trim();
-                    keywod_prefix=  keywod_prefix.split("").length>3?keywod_prefix .substring(0, 3).replace("[", "") + ".":keywod_prefix;
+                    keywod_prefix = keywod_prefix.split("").length > 3 ? keywod_prefix.substring(0, 3).replace("[", "") + "." : keywod_prefix;
 
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
                     Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
@@ -622,27 +625,12 @@ public class ParseHtml {
 
     /**
      * This function get diff url of github fork
+     *
      * @param forkName
      * @param timeWindowSize "begining" -- , "x months"
      * @return
      */
     public String getDiffPageUrl(String forkName, String timeWindowSize) {
-
-        HashMap<String,String> one_month_ago_map=new HashMap<>();
-        one_month_ago_map.put("01","12");
-        one_month_ago_map.put("02","01");
-        one_month_ago_map.put("03","02");
-        one_month_ago_map.put("04","03");
-        one_month_ago_map.put("05","04");
-        one_month_ago_map.put("06","05");
-        one_month_ago_map.put("07","06");
-        one_month_ago_map.put("08","07");
-        one_month_ago_map.put("09","08");
-        one_month_ago_map.put("10","09");
-        one_month_ago_map.put("11","10");
-        one_month_ago_map.put("12","11");
-
-
         String forkUrl = github_api + forkName;
         JsonUtility jsonUtility = new JsonUtility();
         try {
@@ -651,6 +639,9 @@ public class ParseHtml {
             String format_current_time = todayTimeStamp[0] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
             JSONObject fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + forkName + "/commits?until=" + format_current_time));
             String latestCommitSHA = fork_commit_jsonObj.getString("sha");
+            String latestCommitDate = fork_commit_jsonObj.getJSONObject("commit").getJSONObject("author").get("date").toString();
+            int latestMonth = Integer.parseInt(latestCommitDate.split("-")[1]);
+            int latestYear = Integer.parseInt(latestCommitDate.split("-")[0]);
 
             //get general fork information
             JSONObject fork_jsonObj = new JSONObject(jsonUtility.readUrl(forkUrl));
@@ -660,7 +651,7 @@ public class ParseHtml {
             String comparedFork = "";
             String previousCommitSHA = "";
 
-           if (timeWindowSize.equals("beginning")) {
+            if (timeWindowSize.equals("beginning")) {
                 String firstCommitTimeStamp = fork_jsonObj.getString("created_at");
                 JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
                 comparedFork = upstreamInfo.getString("full_name");
@@ -668,31 +659,30 @@ public class ParseHtml {
                 previousCommitSHA = upstream_jsonObj.getString("sha");
 
 
+            } else if (timeWindowSize.contains("month")) {
+                int[] monthArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+                int diffMonth = Integer.parseInt(timeWindowSize.split(" ")[0]);
 
-           }else if(timeWindowSize.equals("1 month")){
+                int delta = latestMonth-diffMonth;
+                int previousMonth = delta>0?delta:delta+12;
+                String previousMonthStr = (previousMonth+"").split("").length==2?previousMonth+"":"0"+previousMonth;
+
+                int previousYear = delta>0?latestYear:latestYear-1;
+
                 comparedFork = forkName;
-               String month= one_month_ago_map.get(todayTimeStamp[0].split("-")[1]);
-                String previousTimeStamp =todayTimeStamp[0].split("-")[0]+"-"+month+"-"+todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z" ;
-               // get latest commit sha
-               fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + previousTimeStamp));
-               previousCommitSHA = fork_commit_jsonObj.getString("sha");
+                String previousTimeStamp = previousYear+ "-" + previousMonthStr + "-" + todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
+                // get latest commit sha
+                fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + previousTimeStamp));
+                previousCommitSHA = fork_commit_jsonObj.getString("sha");
 
 
-            }else if(timeWindowSize.equals("1 year")){
-               comparedFork = forkName;
-               String month= one_month_ago_map.get(todayTimeStamp[0].split("-")[1]);
-               String previousTimeStamp =(Integer.valueOf(todayTimeStamp[0].split("-")[0])-1)+"-"+todayTimeStamp[0].split("-")[1]+"-"+todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z" ;
-               // get latest commit sha
-               fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + previousTimeStamp));
-               previousCommitSHA = fork_commit_jsonObj.getString("sha");
+            }
 
-           }
-
-            String diffURL=github_page + comparedFork + "/compare/" + previousCommitSHA + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
+            String diffURL = github_page + comparedFork + "/compare/" + previousCommitSHA + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
             System.out.println(diffURL);
-            new ProcessingText().rewriteFile(diffURL,analysisDir+"diffurl.txt");
-            System.out.println("diff url:"+ diffURL);
-            return  diffURL;
+            new ProcessingText().rewriteFile(diffURL, analysisDir + "diffurl.txt");
+            System.out.println("diff url:" + diffURL);
+            return diffURL;
         } catch (Exception e) {
             e.printStackTrace();
         }
