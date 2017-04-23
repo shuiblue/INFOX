@@ -17,7 +17,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.w3c.dom.Node;
 
 import java.io.File;
 import java.io.IOException;
@@ -323,40 +322,58 @@ public class ParseHtml {
             String nextStr = "";
             String[] children = new String[]{clusterID};
 
-            int stopCluster = 1;
-            while (children.length > 0 && (stopCluster <= children.length || stopCluster == 1)) {
-
-                for (String child : children) {
-
-                    if (child.split("_").length > max_numberOfCut) {
-                        nextStr += "~" + child;
-                        stopCluster++;
-                    } else {
-                        if (!stopSplitClusters.contains(child)) {
-                            nextStr += "~" + getChildren(child);
-
-                        } else {
-                            nextStr += "~" + child;
-                            stopCluster++;
-                        }
-
-
-                    }
-
-                }
-                String next = nextStr.substring(1, nextStr.length());
-                thisCombinelist.add(next);
-
-                children = next.split("~");
-                nextStr = "";
-
-
-            }
+            int num_stopCluster = 1;
+            thisCombinelist = getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children, num_stopCluster);
             all_cluster_combineList.add(new ArrayList<String>(thisCombinelist));
 
         }
         return all_cluster_combineList;
     }
+
+    public HashSet<String> getNextSteps(List<String> stopSplitClusters, HashSet<String> thisCombinelist, String nextStr, String[] children, int num_stopCluster) {
+        while (children.length > 0 && (num_stopCluster <= children.length || num_stopCluster == 1)) {
+
+            HashSet<String> tmpCombinelist = new HashSet<>();
+            for (int i = 0; i < children.length; i++) {
+
+                String child = children[i];
+                if (child.split("_").length <= max_numberOfCut) {
+                    if (!stopSplitClusters.contains(child)) {
+                        nextStr += "~" + getChildren(child);
+
+                    } else {
+                        nextStr += "~" + child;
+                        num_stopCluster++;
+                    }
+                    while(nextStr.startsWith("~")) {
+                        nextStr = nextStr.substring(1, nextStr.length());
+                    }
+
+                    String[] next = Arrays.copyOf(children, children.length);;
+                    next[i] = nextStr;
+                    String nextStep = "";
+                    for (String n : next) {
+                        nextStep += "~"+n;
+                    }
+                    while(nextStep.startsWith("~")) {
+                        nextStep = nextStep.substring(1, nextStep.length());
+                    }
+                    tmpCombinelist.add(nextStep);
+                    children = nextStep.split("~");
+                    nextStr = "";
+                    tmpCombinelist.addAll(getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children, num_stopCluster));
+                }
+
+            }
+            if(tmpCombinelist.size()>0) {
+                thisCombinelist.addAll(tmpCombinelist);
+            }else{
+                break;
+            }
+        }
+        return thisCombinelist;
+    }
+
 
     private String getChildren(String cluster) {
         String nextSplit = "";
@@ -426,7 +443,7 @@ public class ParseHtml {
 
         /**  keyword **/
         String keyword_long = cluster_keyword.get(clusterID).toString();
-        String keyword_prefix = keyword_long.trim().substring(0, 5).replace("[", "") + ".";
+        String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
 
 
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
@@ -488,7 +505,7 @@ public class ParseHtml {
                     for (int s = 1; s <= current_split; s++) {
                         String current_clusterID = clusterID + "_" + s;
                         String keyword_long = cluster_keyword.get(current_clusterID).toString();
-                        String keyword_suffix = keyword_long.trim().substring(0, 5).replace("[", "") + ".";
+                        String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
                         String color = colorfamiliy_List.get(i).get(s - 1);
 
                         final String[] clusterSize = {""};
@@ -504,7 +521,7 @@ public class ParseHtml {
                 } else {
                     String color = colorfamiliy_List.get(i).get(0);
                     String keyword_long = cluster_keyword.get(clusterID).toString();
-                    String keyword_suffix = keyword_long.trim().substring(0, 5).replace("[", "") + ".";
+                    String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
 
 
                     final String[] clusterSize = {""};
