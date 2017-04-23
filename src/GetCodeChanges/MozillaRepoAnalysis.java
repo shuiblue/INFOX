@@ -1,4 +1,4 @@
-package getCodeChanges;
+package GetCodeChanges;
 
 import Util.ProcessingText;
 

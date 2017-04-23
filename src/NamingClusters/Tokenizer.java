@@ -34,7 +34,7 @@ public class Tokenizer {
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
                 int lineNumber = 0;
-                if (Files.isRegularFile(filePath) && (processingText.isHeaderFile(filePath.toString()) || processingText.isCFile(filePath.toString()))) {
+                if (Files.isRegularFile(filePath) && (processingText.isCFile_general(filePath.toString()))) {
 
                     //get fileName
                     String fileName = processingText.getFileNameFromDir(filePath.toString(), sourcecodeDir);

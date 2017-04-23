@@ -3,25 +3,27 @@ package MocGithub;
 
 import ColorCode.BackgroundColor;
 import CommunityDetection.AnalyzingCommunityDetectionResult;
-import DependencyGraph.DependencyGraph;
 import Util.GenerateCombination;
 import Util.JsonUtility;
 import Util.ProcessingText;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
+import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.w3c.dom.Node;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Created by shuruiz on 4/5/17.
@@ -96,7 +98,9 @@ public class ParseHtml {
         this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
         // turn off htmlunit warnings
-
+        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
+        java.util.logging.Logger.getLogger("org.apache.commons.httpclient").setLevel(Level.OFF);
         webClient.getOptions().setUseInsecureSSL(true); //ignore ssl certificate
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setJavaScriptEnabled(true);
@@ -104,20 +108,44 @@ public class ParseHtml {
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
 
         HtmlPage page = null;
+        HashMap<String, String> loadDiffId_to_content = new HashMap<>();
         try {
             page = webClient.getPage(diffPageUrl + "#files_bucket");
+            webClient.waitForBackgroundJavaScriptStartingBefore(200);
+            webClient.waitForBackgroundJavaScript(50000);
 
-            HtmlButton loadDiff = (HtmlButton) page.getElementById("buttonId");
-            loadDiff.click();
+
+            ArrayList<HtmlDivision> buttonList = (ArrayList<HtmlDivision>) page.getByXPath("//div[@class='js-diff-load-container']");
+            for (HtmlDivision hd : buttonList) {
+
+                String loadDiffUrl = hd.getElementsByTagName("include-fragment").get(0).getAttribute("data-fragment-url");
+                String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
+
+                HtmlPage currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+                loadDiffId_to_content.put(diffID, currentDiffPage.asXml());
+
+            }
+
         } catch (Exception e) {
             System.out.println("Get page error");
         }
-        webClient.waitForBackgroundJavaScriptStartingBefore(200);
-        webClient.waitForBackgroundJavaScript(50000);
 
 
+        Document currentPage = Jsoup.parse(page.asXml());
+        loadDiffId_to_content.forEach((diffID, xml) -> {
+            Document xmldoc = Jsoup.parse(xml);
+            Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
+//            Element currentDiff= currentPage.getElementById("diff-"+diffID);
+//            Element replaceBlock = currentDiff.getElementsByClass("js-file-content Details-content--shown").first();
+//            replaceBlock.getElementsByTag("div").remove();
 
-        new ProcessingText().rewriteFile(page.asXml(), analysisDir + originalPage);
+//           replaceBlock.append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
+            currentDiff.getElementsByClass("js-diff-load-container").remove();
+            System.out.println();
+        });
+
+
+        new ProcessingText().rewriteFile(currentPage.toString(), analysisDir + originalPage);
     }
 
     public void generateMocGithubForkPage(String diffPageUrl, String forkName, String localSourceCodeDirPath) {
@@ -663,14 +691,14 @@ public class ParseHtml {
                 int[] monthArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
                 int diffMonth = Integer.parseInt(timeWindowSize.split(" ")[0]);
 
-                int delta = latestMonth-diffMonth;
-                int previousMonth = delta>0?delta:delta+12;
-                String previousMonthStr = (previousMonth+"").split("").length==2?previousMonth+"":"0"+previousMonth;
+                int delta = latestMonth - diffMonth;
+                int previousMonth = delta > 0 ? delta : delta + 12;
+                String previousMonthStr = (previousMonth + "").split("").length == 2 ? previousMonth + "" : "0" + previousMonth;
 
-                int previousYear = delta>0?latestYear:latestYear-1;
+                int previousYear = delta > 0 ? latestYear : latestYear - 1;
 
                 comparedFork = forkName;
-                String previousTimeStamp = previousYear+ "-" + previousMonthStr + "-" + todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
+                String previousTimeStamp = previousYear + "-" + previousMonthStr + "-" + todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
                 // get latest commit sha
                 fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + previousTimeStamp));
                 previousCommitSHA = fork_commit_jsonObj.getString("sha");
@@ -688,6 +716,7 @@ public class ParseHtml {
         }
         return "";
     }
+
 
     public static void main(String[] args) {
         String forkName = "malx122/Marlin";

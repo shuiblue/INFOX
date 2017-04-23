@@ -1,9 +1,8 @@
-package getCodeChanges;
+package GetCodeChanges;
 
 import Util.ProcessingText;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,7 +13,6 @@ import java.util.Map;
  */
 public class GithubRepoAnalysis {
     ProcessingText processingText = new ProcessingText();
-
     public HashMap<String, ArrayList<Integer>> getChangedCodeForGithubRepo(String diffFilePath) {
         ProcessingText processingText = new ProcessingText();
         HashMap<String, ArrayList<Integer>> changedFile_line_map = new HashMap<>();

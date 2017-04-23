@@ -353,7 +353,7 @@ public class DependencyGraph {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
 //                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
 /**  need to parse pde file as well for real fork**/
-                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString()) || processingText.isPdeFile(filePath.toString()))) {
+                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString()) || processingText.isPdeFile(filePath.toString())||processingText.isInoFile(filePath.toString()))) {
 
                     parseSingleFile(filePath);
                 }
@@ -465,7 +465,7 @@ ProcessingText processingText = new ProcessingText() ;
 //        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
 //        if (fileName.endsWith(".h")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
         /**for real fork **/
-        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
+        if (fileName.endsWith(".h") || fileName.endsWith(".pde")||fileName.endsWith(".ino")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
             tmpFilePath += ".cpp";
         }
         try {
