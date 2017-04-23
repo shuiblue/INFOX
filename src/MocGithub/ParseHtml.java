@@ -455,6 +455,7 @@ public class ParseHtml {
     private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr) {
         return "<tr> \n" +
                 "       <td width=\"130\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
+                "       <td width=\"100\"><button onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >next</button><button onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">prev</button></td>" +
                 "        <td width=\"600\">" + keyword_long + "</td>\n" +
                 "       <td width=\"50\">" + clusterSize + "</td>\n" +
                 nextStepStr +
