@@ -46,7 +46,7 @@ public class ParseHtml {
     HashMap<String, Integer> usedColorIndex = new HashMap<>();
     HashMap<String, String> cluster_color = new HashMap<>();
     static HashMap<Integer, HashMap<Integer, HashMap<String, HashSet<Integer>>>> allSplittingResult;
-
+    static int otherClusterSize = 0;
 
     private String table_header = "<style>\n" +
             "#cluster{\n" +
@@ -345,17 +345,18 @@ public class ParseHtml {
                         nextStr += "~" + child;
                         num_stopCluster++;
                     }
-                    while(nextStr.startsWith("~")) {
+                    while (nextStr.startsWith("~")) {
                         nextStr = nextStr.substring(1, nextStr.length());
                     }
 
-                    String[] next = Arrays.copyOf(children, children.length);;
+                    String[] next = Arrays.copyOf(children, children.length);
+                    ;
                     next[i] = nextStr;
                     String nextStep = "";
                     for (String n : next) {
-                        nextStep += "~"+n;
+                        nextStep += "~" + n;
                     }
-                    while(nextStep.startsWith("~")) {
+                    while (nextStep.startsWith("~")) {
                         nextStep = nextStep.substring(1, nextStep.length());
                     }
                     tmpCombinelist.add(nextStep);
@@ -365,9 +366,9 @@ public class ParseHtml {
                 }
 
             }
-            if(tmpCombinelist.size()>0) {
+            if (tmpCombinelist.size() > 0) {
                 thisCombinelist.addAll(tmpCombinelist);
-            }else{
+            } else {
                 break;
             }
         }
@@ -410,8 +411,16 @@ public class ParseHtml {
                 }
                 generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID);
             }
-
         }
+
+        sb.append("<tr> \n" +
+                "       <td width=\"130\" style=\"cursor: pointer; background:grey\" onclick='hide_cluster_rows(\"infox_other\")'> other </td>\n" +
+                "       <td width=\"100\"><button onclick=\"next_in_cluster(\'infox_other\')\" >next</button><button onclick=\"prev_in_cluster(\'infox_other\')\">prev</button></td>" +
+                "       <td width=\"600\"> other small clusters </td>\n" +
+                "       <td width=\"50\">" + otherClusterSize + "</td>\n" +
+                "       <td width=\"100\">no more splitting</td>\n" +
+                "   </tr>");
+        cluster_color.put("other", "grey");
 
         sb.append("</table>");
 
@@ -426,7 +435,7 @@ public class ParseHtml {
 
         String originalClusterID = clusterID.split("_")[0];
         /**   color  **/
-        String color = "";
+        String color;
         if (clusterID.equals(originalClusterID)) {
             usedColorIndex.put(clusterID, 0);
             color = colorfamiliy_List.get(i).get(0);
@@ -553,6 +562,8 @@ public class ParseHtml {
 
 
     private HashMap<String, String> genrate_NodeId_to_clusterIDList_Map(String splitStep) {
+        Set<String> topClusterSet = new HashSet<String>(Arrays.asList(splitStep.replaceAll("--", "~").split("~")));
+
 
         nodeId_to_clusterID_Map = new HashMap<>();
         ProcessingText pt = new ProcessingText();
@@ -580,12 +591,17 @@ public class ParseHtml {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
             currentClusterMap.forEach((clusterID, nodeSet) -> {
                 nodeSet.forEach(nodeId -> {
-                            nodeId_to_clusterID_Map.put(nodeId + "", clusterID);
-                        }
-                );
+                    nodeId_to_clusterID_Map.put(nodeId + "", clusterID);
+                });
+
+                if (!topClusterSet.contains(clusterID)) {
+                    otherClusterSize += nodeSet.size();
+                }
 
             });
         });
+
+
         return nodeId_to_clusterID_Map;
     }
 
@@ -626,12 +642,6 @@ public class ParseHtml {
                 String fileName = pt.getOriginFileName(filename_tag);
                 String lineNumber = nodeLable[1];
 
-                String styleStr = "background-color:"
-                        + cluster_color.get(clusterid)
-                        + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
-                        "  font-size:12px;\n" +
-                        "  line-height:20px;\n" +
-                        "  text-align:right;\"";
 
                 AnalyzingCommunityDetectionResult an = new AnalyzingCommunityDetectionResult(analysisDir);
 
@@ -641,25 +651,50 @@ public class ParseHtml {
 
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
                     Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
-                    if (!currentFile.toString().contains("Load diff")) {
-                        Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
-                        Element lineElement;
-                        if (lineElements.size() > 1) {
-                            if (lineElements.get(0).toString().contains("addition")) {
-                                lineElement = lineElements.get(0);
-                            } else {
-                                lineElement = lineElements.get(1);
-                            }
+                    Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
+                    Element lineElement;
+                    if (lineElements.size() > 1) {
+                        if (lineElements.get(0).toString().contains("addition")) {
+                            lineElement = lineElements.get(0);
                         } else {
-                            lineElement = lineElements.first();
+                            lineElement = lineElements.get(1);
                         }
-//todo keyword
-                        lineElement.attr("class", "infox_" + clusterid.trim()).attr("style", styleStr).text(keywod_prefix);
                     } else {
-                        System.out.println(fileName + " is bigger than the github diff limits..");
-
-
+                        lineElement = lineElements.first();
                     }
+
+                    String styleStr = "background-color:"
+                            + cluster_color.get(clusterid)
+                            + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
+                            "  font-size:12px;\n" +
+                            "  line-height:20px;\n" +
+                            "  text-align:right;\"";
+
+                    lineElement.attr("class", "infox_" + clusterid.trim()).attr("style", styleStr).text(keywod_prefix);
+
+                } else {
+                    String keywod_prefix = "other";
+                    currentDoc.getElementsByAttributeValue("data-path", fileName);
+                    Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
+                    Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
+                    Element lineElement;
+                    if (lineElements.size() > 1) {
+                        if (lineElements.get(0).toString().contains("addition")) {
+                            lineElement = lineElements.get(0);
+                        } else {
+                            lineElement = lineElements.get(1);
+                        }
+                    } else {
+                        lineElement = lineElements.first();
+                    }
+
+                    String styleStr = "background-color:grey"
+                            + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
+                            "  font-size:12px;\n" +
+                            "  line-height:20px;\n" +
+                            "  text-align:right;\"";
+                    lineElement.attr("class", "infox_other").attr("style", styleStr).text(keywod_prefix);
+
                 }
             }
         }
