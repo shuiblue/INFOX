@@ -8,9 +8,11 @@ import NamingClusters.GetCommitMsg;
 import NamingClusters.IdentifyingKeyWordForCluster;
 import NamingClusters.Tokenizer;
 import Util.GenerateCombination;
+import Util.ProcessingText;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -104,21 +106,21 @@ public class AnalyzingRepository {
 
 
     private void executeINFOX(String sourcecodeDir, String analysisDirName, String testCaseDir, int approachIndex, Rengine re, boolean isMS_CLUSTERCHANGES, int max_numberOfCut, boolean directedGraph, String testDir, boolean hasGroundTruth) {
-        if (!directedGraph) {
-            DependencyGraph dependencyGraph = new DependencyGraph(approachIndex);
-            /**  this function extract changed_code_dependency_graph from complete graph**/
-//            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
-
-            /**  this function generate all the graph at the same time **/
-            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
-        }
-
-
-        /** Community Detection  **/
-        R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
-        communityDetection.clustering_CodeChanges(testCaseDir, testDir, re, directedGraph,true,"original");
+//        if (!directedGraph) {
+//            DependencyGraph dependencyGraph = new DependencyGraph(approachIndex);
+//            /**  this function extract changed_code_dependency_graph from complete graph**/
+////            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
 //
-//        /** Generating html to visualize source code, set background and left side bar color for new code  **/
+//            /**  this function generate all the graph at the same time **/
+//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
+//        }
+//
+//
+//        /** Community Detection  **/
+//        R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters);
+//        communityDetection.clustering_CodeChanges(testCaseDir, testDir, re, directedGraph,true,"original");
+
+        /** Generating html to visualize source code, set background and left side bar color for new code  **/
         AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES, max_numberOfCut, numberOfBiggestClusters);
         int[] avgFeatureSize_maxSize = null;
         /** get nodeMap: id -- lable  **/
@@ -150,12 +152,20 @@ public class AnalyzingRepository {
             clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0, hasGroundTruth, clusterFile, true);
         }
 
-        ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
+//        ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
+        ArrayList<String> combination_list = new ArrayList<>();
+        try {
+            String[] splitSteps = new ProcessingText().readResult(testCaseDir + "splittingSteps.txt").split("\n");
+            for (String s : splitSteps) {
+                combination_list.add(s);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
-
-        HashMap<String, HashMap<String, String>> allKindsOf_unifiedCommits =   new GetCommitMsg().getCommitMsgForChangedCode(testCaseDir, repoPath);
-        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster(sourcecodeDir, testCaseDir,allKindsOf_unifiedCommits);
+        HashMap<String, HashMap<String, String>> allKindsOf_unifiedCommits = new GetCommitMsg().getCommitMsgForChangedCode(testCaseDir, repoPath);
+        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster(sourcecodeDir, testCaseDir, allKindsOf_unifiedCommits);
         for (String splitStep : combination_list) {
             System.out.println("identifying keywords for Splitting Steps ..: " + splitStep);
             identifyingKeyWordForCluster.findKeyWordForEachSplit(sourcecodeDir, testCaseDir, testDir, splitStep, repoPath);

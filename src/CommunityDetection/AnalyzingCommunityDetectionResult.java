@@ -489,6 +489,18 @@ public class AnalyzingCommunityDetectionResult {
         /**  generate combinations if split steps of sub-cluster **/
         System.out.println("    generating all the possible splitting steps... E.g,. ABC, A1A2BC, ABC1C2");
         ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
+
+//        ArrayList<String> combination_list = new ArrayList<>();
+//        try {
+//            String[] splitSteps = new ProcessingText().readResult(testCaseDir + "splittingSteps.txt").split("\n");
+//            for (String s : splitSteps) {
+//                combination_list.add(s);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+
         for (String s : combination_list) {
             allClusteringResult.put(s, new HashMap<>());
         }
@@ -587,6 +599,7 @@ public class AnalyzingCommunityDetectionResult {
                     if (!clusterID.contains("_")) {
                         isOriginal = true;
                     }
+                    if (!noSplittingNode.contains(clusterID)||isOriginal) {
                     HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, isOriginal);
 //                    HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, false);
 
@@ -598,7 +611,7 @@ public class AnalyzingCommunityDetectionResult {
                             map.get(index).put(k1, v1);
                         });
                     });
-//                }
+                }
             }
         }
 
@@ -1033,10 +1046,11 @@ public class AnalyzingCommunityDetectionResult {
 
 //                boolean isOriginal = true;
 
+
                 if (clusters.size() > 2 || (!isOriginal && clusters.size() == 2)) {
 //                if (clusters.size() > 2 || (clusters.size() == 2 && clusterID.contains("_"))) {
 
-                    if (clusters.size() > 3) {
+                    if (clusters.size() > 3 ) {
                         isOriginal = true;
                     }
                     for (int i = 0; i < clusters.size(); i++) {
@@ -1046,7 +1060,11 @@ public class AnalyzingCommunityDetectionResult {
                             if (isOriginal) {
                                 index = s.substring(0, s.indexOf(")")).trim();
                             } else {
-                                index = clusterID + "_" + i;
+                                if(clusters.size()==2){
+                                    index=clusterID;
+                                }else {
+                                    index = clusterID + "_" + i;
+                                }
                             }
                             String str = s.substring(s.indexOf("[") + 1).replace("]", "");
                             String[] nodeList = str.split(",");

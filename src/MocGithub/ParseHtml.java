@@ -38,7 +38,7 @@ public class ParseHtml {
     int numberOfBiggestClusters;
 
     HashMap<String, String> nodeId_to_clusterID_Map;
-    ArrayList<String> combination_list;
+    ArrayList<String> combination_list=new ArrayList<>();
     HashMap<String, String> label_to_id;
     ArrayList<String> forkAddedNodeList;
     HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap;
@@ -148,9 +148,21 @@ public class ParseHtml {
     }
 
     public void generateMocGithubForkPage(String diffPageUrl, String forkName, String localSourceCodeDirPath) {
-        combination_list = generateAllCombineResult(analysisDir, max_numberOfCut);
-        this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
         ProcessingText pt = new ProcessingText();
+//        combination_list = generateAllCombineResult(analysisDir, max_numberOfCut);
+
+        try {
+           String [] splitSteps =pt.readResult(analysisDir+"splittingSteps.txt").split("\n");
+           for(String s:splitSteps){
+               combination_list.add(s);
+           }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
+
 
         try {
             String page = pt.readResult(analysisDir + originalPage);
@@ -200,10 +212,12 @@ public class ParseHtml {
 
             allSplittingResult = new AnalyzingCommunityDetectionResult(analysisDir).getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
-            ArrayList<String> splitStepList = generateAllCombineResult(analysisDir, max_numberOfCut);
+//            ArrayList<String> splitStepList = generateAllCombineResult(analysisDir, max_numberOfCut);
+//            ArrayList<String> splitStepList = generateAllCombineResult(analysisDir, max_numberOfCut);
 
 
-            for (String splitStep : splitStepList) {
+            for (String splitStep : combination_list) {
+//            for (String splitStep : splitStepList) {
 
                 HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep);
                 HashMap<String, List<String>> cluster_keyword = new HashMap<>();
@@ -449,7 +463,11 @@ public class ParseHtml {
             }
         }
         cluster_color.put(clusterID, color);
-
+        //todo: null pointer
+System.out.print(clusterID);
+if(cluster_keyword.get(clusterID)==null){
+    System.out.println();
+}
         /**  keyword **/
         String keyword_long = cluster_keyword.get(clusterID).toString();
         String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";

@@ -107,7 +107,6 @@ public class ClusterCodeChanges {
                     analysisDirName = "testMS_NO_Consec";
                 }
                 /**  testCase specifys the repository that need to be parsed.  **/
-                //TODO: set subdir name for multiple tests
 
                 String testCaseDir = sourcecodeDir + analysisDirName + FS;
                 System.out.println(testCaseDir);
@@ -179,7 +178,6 @@ public class ClusterCodeChanges {
                             }
 
                             /**  testCase specifys the repository that need to be parsed.  **/
-                            //TODO: set subdir name for multiple tests
                             for (int i = 4; i <= 4; i++) {
 
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
