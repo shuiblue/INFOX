@@ -375,7 +375,7 @@ public class DependencyGraph {
 
         processingText.writeToPajekFile(dependencyGraph, nodeList, testCaseDir, testDir, "changedCode.pajek.net", forkaddedNodeList);
 
-        addAllNodeToChangedCodeGraphFile();
+        addAllNodeToChangedCodeGraphFile(testCaseDir);
 
         /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
              ------ similarity calculation purpose---------     */
@@ -424,14 +424,11 @@ public class DependencyGraph {
     }
 
 
-    public static void main(String[] args){
-        addAllNodeToChangedCodeGraphFile();
-    }
 
-    private static void addAllNodeToChangedCodeGraphFile() {
+    private static void addAllNodeToChangedCodeGraphFile(String analysisDir) {
 ProcessingText processingText = new ProcessingText() ;
-        String analysisDir =                "/Users/shuruiz/Work/GithubProject/malx122/Marlin/INFOX_output/";
-
+//        String analysisDir =                "/Users/shuruiz/Work/GithubProject/malx122/Marlin/INFOX_output/";
+//        String analysisDir =  testCaseDir;
         try {
             String completeNodeList = processingText.readResult(analysisDir+"complete.pajek.net").split("\\*arcs")[0];
             String changedCodeGraph[]= processingText.readResult(analysisDir+"changedCode.pajek.net").split("\\*arcs");

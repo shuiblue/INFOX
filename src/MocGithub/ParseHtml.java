@@ -193,7 +193,7 @@ public class ParseHtml {
 
             String workingDir = System.getProperty("user.dir");
             String js = pt.readResult(workingDir + "/src/files/jsFile.txt");
-            doc.getElementsByTag("html").last().after(js);
+            doc.getElementsByTag("html").append(js);
             Elements fileList_elements = doc.getElementsByClass("file-header");
 
 

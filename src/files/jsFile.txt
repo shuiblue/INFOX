@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-window.onload = refreshPage();
+//window.onload = refreshPage();
 
 function refreshPage(){
   var table_height = $("#cluster").height();
