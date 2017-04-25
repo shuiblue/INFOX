@@ -1,0 +1,65 @@
+<style type="text/css">
+#cluster{
+    background-color: #fff;
+    border:1px solid #dfe2e5;
+    padding: 5px 10px;
+    position:fixed;
+    right: 0;
+    left: 0;
+    width: 980px;
+    margin-right: auto;
+    margin-left: auto;
+    top:0px;
+    z-index:99999;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 14px;
+    line-height: 20px;
+    align-content: left;
+    vertical-align: top;
+td, th {
+    overflow: ellipse;
+    background-color: #fff;
+    color: #000;
+    position: relative;
+    /*padding-right: 10px; */
+    /*padding-left: 10px;*/
+    border-radius:3px
+}
+}
+.test_me:hover {
+    max-width : initial;
+    overflow: show;
+}
+
+.long_td {
+    max-width : 660px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.tooltip-inner {
+    max-width: 100%;
+    padding: 3px 8px;
+    color: #fff;
+    text-align: center;
+    background-color: #000;
+    border-radius: 4px
+}
+
+.btn {
+    padding: 6px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 12px;
+    background-color:#eff3f6;
+}
+.blob-num-deletion {
+    background-color:#fff;
+    border-color:#f1c0c0;
+}
+.blob-num-addition {
+    background-color:#fff;
+    border-color:#f1c0c0
+}
+
+</style>
