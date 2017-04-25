@@ -38,7 +38,7 @@ public class ParseHtml {
     int numberOfBiggestClusters;
 
     HashMap<String, String> nodeId_to_clusterID_Map;
-    ArrayList<String> combination_list=new ArrayList<>();
+    ArrayList<String> combination_list = new ArrayList<>();
     HashMap<String, String> label_to_id;
     ArrayList<String> forkAddedNodeList;
     HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap;
@@ -152,10 +152,10 @@ public class ParseHtml {
 //        combination_list = generateAllCombineResult(analysisDir, max_numberOfCut);
 
         try {
-           String [] splitSteps =pt.readResult(analysisDir+"splittingSteps.txt").split("\n");
-           for(String s:splitSteps){
-               combination_list.add(s);
-           }
+            String[] splitSteps = pt.readResult(analysisDir + "splittingSteps.txt").split("\n");
+            for (String s : splitSteps) {
+                combination_list.add(s);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -464,10 +464,10 @@ public class ParseHtml {
         }
         cluster_color.put(clusterID, color);
         //todo: null pointer
-System.out.print(clusterID);
-if(cluster_keyword.get(clusterID)==null){
-    System.out.println();
-}
+        System.out.print(clusterID);
+        if (cluster_keyword.get(clusterID) == null) {
+            System.out.println();
+        }
         /**  keyword **/
         String keyword_long = cluster_keyword.get(clusterID).toString();
         String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
@@ -694,6 +694,9 @@ if(cluster_keyword.get(clusterID)==null){
                     String keywod_prefix = "other";
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
                     Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
+                    if (currentFile == null) {
+                        System.out.println(lineNumber);
+                    }
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
                     Element lineElement;
                     if (lineElements.size() > 1) {

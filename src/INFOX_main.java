@@ -26,7 +26,7 @@ public class INFOX_main {
      */
     public static void main(String[] args) {
         /*** user input***/
-        String forkName = "bq/Marlin";
+        String forkName = "AdeDZY/ShardFeature";
 //        String forkName = "malx122/Marlin";
 //        String forkName = "Ultimaker/Marlin";
         boolean hasGroundTruth = false;
@@ -36,35 +36,35 @@ public class INFOX_main {
         int numberOfBiggestClusters = 5;
 
         /***git clone repo to local dir***/
-        JgitUtility jgitUtility = new JgitUtility();
-        String uri = github_page + forkName + ".git";
-        jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
-        if(forkName.contains("Marlin")) {
-            try {
-                FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        JgitUtility jgitUtility = new JgitUtility();
+//        String uri = github_page + forkName + ".git";
+//        jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
+//        if(forkName.contains("Marlin")) {
+//            try {
+//                FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         /***  get origin diff github page  ***/
         ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters,analysisDir);
-        String diffPageUrl = parseHtml.getDiffPageUrl(forkName,"12 month");
-//       String diffPageUrl ="https://github.com/malx122/Marlin/compare/8599e2334240f051ce0219249b90b650da0bd054...malx122:85afc64790e6be61176113f03acaf2a19a5a0b84";
-
-        ProcessingText processingText = new ProcessingText();
-        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
-
-        /***   get fork added node, generate ForkAddedNode.txt file   ***/
-        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath+"INFOX_output/diff.txt");
-        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map,localSourceCodeDirPath+"INFOX_output/forkAddedNode.txt");
-
-
-
-        /*** start clustering code  ***/
-        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
-        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+//        String diffPageUrl = parseHtml.getDiffPageUrl(forkName,"12 month");
+       String diffPageUrl ="https://github.com/AdeDZY/ShardFeature/compare/9dc9cb7aa043010c89cef06d1031c834aef4825a...AdeDZY:3ff9d4d7404cb93a5e75e5cfe8b55336214c0bf9";
+//
+//        ProcessingText processingText = new ProcessingText();
+//        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
+//
+//        /***   get fork added node, generate ForkAddedNode.txt file   ***/
+//        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
+//        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath+"INFOX_output/diff.txt");
+//        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map,localSourceCodeDirPath+"INFOX_output/forkAddedNode.txt");
+//
+//
+//
+//        /*** start clustering code  ***/
+//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
+//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
 
 
         /*** hack github page   ***/

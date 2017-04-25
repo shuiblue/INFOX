@@ -67,6 +67,8 @@ public class BackgroundColor {
         colorList_1.add("#F2D7D5");
         colorList_1.add("#F9EBEA");
         colorList_1.add("#FDEDEC");
+        colorList_1.add("red");
+        colorList_1.add("pink");
 
         colorfamiliy_List.add(colorList_1);
 
@@ -92,6 +94,7 @@ public class BackgroundColor {
         colorList_2.add("#D4E6F1");
         colorList_2.add("#EBF5FB");
         colorList_2.add("#EAF2F8");
+        colorList_2.add("Blue");
         colorfamiliy_List.add(colorList_2);
 
         //Yellow
