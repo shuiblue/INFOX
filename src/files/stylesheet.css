@@ -16,6 +16,9 @@
     line-height: 20px;
     align-content: left;
     vertical-align: top;
+    display:block;
+    height:200px;
+    overflow:auto;
     td, th {
     overflow: ellipse;
     background-color: #fff;
