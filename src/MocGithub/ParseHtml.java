@@ -248,7 +248,7 @@ public class ParseHtml {
 
         sb.append("<tr> \n" +
                 "       <td width=\"60\" style=\"cursor: pointer; background:grey\" onclick='hide_cluster_rows(\"infox_other\")'> other </td>\n" +
-                "       <td width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_other\')\" >Next</button><button onclick=\"prev_in_cluster(\'infox_other\')\">Prev</button></td>" +
+                "       <td width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_other\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_other\')\">Prev</button></td>" +
                 "       <td ><div class=\"long_td\"> other small clusters </div></td>\n" +
                 "       <td width=\"50\">" + otherClusterSize + "</td>\n" +
                 "       <td width=\"80\">no more</td>\n" +
@@ -317,7 +317,7 @@ public class ParseHtml {
     private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr) {
         return "<tr> \n" +
                 "       <td width=\"60\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
-                "       <td width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
+                "       <td width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
                 "        <td ><div class=\"long_td\">" + keyword_long + "</div></td>\n" +
                 "       <td width=\"50\">" + clusterSize + "</td>\n" +
                 nextStepStr +
