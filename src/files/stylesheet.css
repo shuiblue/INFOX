@@ -16,7 +16,7 @@
     line-height: 20px;
     align-content: left;
     vertical-align: top;
-td, th {
+    td, th {
     overflow: ellipse;
     background-color: #fff;
     color: #000;
@@ -24,7 +24,7 @@ td, th {
     /*padding-right: 10px; */
     /*padding-left: 10px;*/
     border-radius:3px
-}
+    }
 }
 .test_me:hover {
     max-width : initial;
@@ -37,15 +37,29 @@ td, th {
     white-space:nowrap;
     text-overflow:ellipsis;
 }
-.tooltip-inner {
+
+.long_td:hover{
+     text-overflow: clip;
+    white-space: normal;
+    word-break: break-all;
+    padding: 3px 8px;
+    /*color: #fff;*/
+    text-align: left;
+    background-color:#eff3f6;
+}
+
+/*.tooltip-inner {
+    position: relative;
+    float: right;
     max-width: 100%;
     padding: 3px 8px;
     color: #fff;
     text-align: center;
     background-color: #000;
-    border-radius: 4px
+    border-radius: 5px
+    z-index: 2147483647;
 }
-
+*/
 .btn {
     padding: 6px 8px;
     font-size: 12px;
@@ -62,4 +76,4 @@ td, th {
     border-color:#f1c0c0
 }
 
-</style>
+</style> 
