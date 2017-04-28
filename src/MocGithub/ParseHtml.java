@@ -160,7 +160,7 @@ public class ParseHtml {
 //            doc.getElementsByTag("header").append(jqueryLink);
 
 
-            String js = pt.readResult(workingDir + "/src/files/jsFile.txt");
+            String js = pt.readResult(workingDir + "/src/files/jsFile.js");
             doc.getElementsByTag("html").append(js);
             Elements fileList_elements = doc.getElementsByClass("file-header");
 
