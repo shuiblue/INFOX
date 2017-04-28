@@ -47,7 +47,7 @@ function hide_non_cluster_rows() {
     btn.innerHTML = "Hide non cluster code"
   } 
   else {
-    btn.innerHTML = "Show hidden non cluster code"
+    btn.innerHTML = "Show hidden code"
   }
     
 }
