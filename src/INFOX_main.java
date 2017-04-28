@@ -32,7 +32,7 @@ public class INFOX_main {
         boolean hasGroundTruth = false;
         String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName+FS;
         String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName+FS+"INFOX_output/";
-        int max_numberOfCut = 4;
+        int max_numberOfCut = 3;
         int numberOfBiggestClusters = 5;
 
         /***git clone repo to local dir***/
@@ -51,7 +51,7 @@ public class INFOX_main {
         ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters,analysisDir);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(forkName,"12 month");
        String diffPageUrl ="https://github.com/AdeDZY/ShardFeature/compare/9dc9cb7aa043010c89cef06d1031c834aef4825a...AdeDZY:3ff9d4d7404cb93a5e75e5cfe8b55336214c0bf9";
-//
+
 //        ProcessingText processingText = new ProcessingText();
 //        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
 //
@@ -68,7 +68,7 @@ public class INFOX_main {
 
 
         /*** hack github page   ***/
-        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
+//        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
         parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
 
 

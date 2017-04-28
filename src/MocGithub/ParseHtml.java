@@ -1,9 +1,7 @@
 package MocGithub;
 
-
 import ColorCode.BackgroundColor;
 import CommunityDetection.AnalyzingCommunityDetectionResult;
-import Util.GenerateCombination;
 import Util.JsonUtility;
 import Util.ProcessingText;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -49,7 +47,6 @@ public class ParseHtml {
     static int otherClusterSize = 0;
 
 
-
     private String table_header = "<table id=\"cluster\"  \n" +
             "  <tr> \n" +
             "    <td> <button id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
@@ -64,7 +61,6 @@ public class ParseHtml {
             "    </tr>\n";
 
 
-
     public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters, String analysisDir) {
         this.max_numberOfCut = max_numberOfCut;
         this.numberOfBiggestClusters = numberOfBiggestClusters;
@@ -74,6 +70,7 @@ public class ParseHtml {
     }
 
     public void getOriginalDiffPage(String diffPageUrl, String localSourceCodeDirPath) {
+        System.out.println("get original diff page");
         this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
         // turn off htmlunit warnings
@@ -180,7 +177,7 @@ public class ParseHtml {
                 usedColorIndex.put(tc, 0);
             }
 
-
+            System.out.println("get all splitting result map");
             allSplittingResult = new AnalyzingCommunityDetectionResult(analysisDir).getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
 //            ArrayList<String> splitStepList = generateAllCombineResult(analysisDir, max_numberOfCut);
@@ -217,157 +214,6 @@ public class ParseHtml {
         }
     }
 
-    /**
-     * @param analysisDir
-     * @param max_numberOfCut
-     */
-    public ArrayList<String> generateAllCombineResult(String analysisDir, int max_numberOfCut) {
-        ProcessingText pt = new ProcessingText();
-        ArrayList<String> topClusters = null;
-        try {
-            topClusters = new ArrayList<>(Arrays.asList(pt.readResult(analysisDir + "topClusters.txt").split("\n")));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir).getAllSplitSteps(max_numberOfCut, (ArrayList<String>) topClusters);
-        return generateCombineResult_4CurrentClusterList(allSplitSteps_map, topClusters, max_numberOfCut);
-
-    }
-
-
-    private ArrayList<String> generateCombineResult_4CurrentClusterList(HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map, ArrayList<String> topClusters, int max_numberOfCut) {
-//        HashMap<String, ArrayList<String>> cluster_possibleSplitStep = getPossileSplitStepForeachCluster(allSplitSteps_map, topClusters, max_numberOfCut);
-//
-        List<List<String>> totalList = getAllCombination();
-        return new GenerateCombination(analysisDir).printAllCases(totalList);
-
-    }
-
-    private static HashMap<String, ArrayList<String>> getPossileSplitStepForeachCluster(HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map, ArrayList<String> topClusters, int max_numberOfCut) {
-        HashMap<String, ArrayList<String>> cluster_possibleSplitStep = new HashMap<>();
-
-        for (String originalCluster : topClusters) {
-            ArrayList<String> list = new ArrayList<>();
-            list.add(originalCluster);
-            cluster_possibleSplitStep.put(originalCluster, list);
-
-            ArrayList<String> current_list = cluster_possibleSplitStep.get(originalCluster);
-
-            String previousStep = originalCluster;
-            for (int split = 1; split <= max_numberOfCut; split++) {
-                ArrayList<String> nextSplit = allSplitSteps_map.get(originalCluster).get(split);
-                String thisSplit = "";
-
-                for (String parentCluster : allSplitSteps_map.get(originalCluster).get(split - 1)) {
-                    if (nextSplit.size() > 0) {
-                        String child1 = parentCluster + "_1";
-                        String child2 = parentCluster + "_2";
-                        if (nextSplit.contains(child1) && nextSplit.contains(child2)) {
-                            thisSplit += child1 + "~" + child2;
-                        } else {
-                            thisSplit += "~" + parentCluster;
-                        }
-                    }
-                }
-
-
-                if (thisSplit.length() > 0) {
-                    current_list.add(thisSplit);
-                    previousStep = thisSplit;
-                }
-            }
-            cluster_possibleSplitStep.put(originalCluster, current_list);
-        }
-
-        return cluster_possibleSplitStep;
-    }
-
-    private List<List<String>> getAllCombination() {
-        List<List<String>> all_cluster_combineList = new ArrayList<>();
-        ArrayList<String> topClusters = null;
-        try {
-            topClusters = new ArrayList<>(Arrays.asList(new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n")));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        List<String> stopSplitClusters = null;
-        try {
-            stopSplitClusters = Arrays.asList(new ProcessingText().readResult(analysisDir + "noSplittingStepList.txt").split("\n"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir).getAllSplitSteps(max_numberOfCut, (ArrayList<String>) topClusters);
-
-        for (String clusterID : topClusters) {
-            HashSet<String> thisCombinelist = new HashSet<>();
-            thisCombinelist.add(clusterID);
-            String nextStr = "";
-            String[] children = new String[]{clusterID};
-
-            int num_stopCluster = 1;
-            thisCombinelist = getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children, num_stopCluster);
-            all_cluster_combineList.add(new ArrayList<String>(thisCombinelist));
-
-        }
-        return all_cluster_combineList;
-    }
-
-    public HashSet<String> getNextSteps(List<String> stopSplitClusters, HashSet<String> thisCombinelist, String nextStr, String[] children, int num_stopCluster) {
-        while (children.length > 0 && (num_stopCluster <= children.length || num_stopCluster == 1)) {
-
-            HashSet<String> tmpCombinelist = new HashSet<>();
-            for (int i = 0; i < children.length; i++) {
-
-                String child = children[i];
-                if (child.split("_").length <= max_numberOfCut) {
-                    if (!stopSplitClusters.contains(child)) {
-                        nextStr += "~" + getChildren(child);
-
-                    } else {
-                        nextStr += "~" + child;
-                        num_stopCluster++;
-                    }
-                    while (nextStr.startsWith("~")) {
-                        nextStr = nextStr.substring(1, nextStr.length());
-                    }
-
-                    String[] next = Arrays.copyOf(children, children.length);
-                    ;
-                    next[i] = nextStr;
-                    String nextStep = "";
-                    for (String n : next) {
-                        nextStep += "~" + n;
-                    }
-                    while (nextStep.startsWith("~")) {
-                        nextStep = nextStep.substring(1, nextStep.length());
-                    }
-                    tmpCombinelist.add(nextStep);
-                    children = nextStep.split("~");
-                    nextStr = "";
-                    tmpCombinelist.addAll(getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children, num_stopCluster));
-                }
-
-            }
-            if (tmpCombinelist.size() > 0) {
-                thisCombinelist.addAll(tmpCombinelist);
-            } else {
-                break;
-            }
-        }
-        return thisCombinelist;
-    }
-
-
-    private String getChildren(String cluster) {
-        String nextSplit = "";
-        String child1 = cluster + "_1";
-        String child2 = cluster + "_2";
-
-        return child1 + "~" + child2;
-    }
 
     private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword, List<String> stopSplitClusters) throws IOException {
 
@@ -386,10 +232,12 @@ public class ParseHtml {
             /**   generate next step link **/
             String nextStep, nextStepStr;
 
-            for (String clusterID : cid.split("~")) {
-
+            for (int j = 0; j < cid.split("~").length; j++) {
+//            for (String clusterID : cid.split("~")) {
+                String clusterID = cid.split("~")[j];
                 if (!stopSplitClusters.contains(clusterID) && clusterID.split("_").length < max_numberOfCut + 1) {
-                    nextStep = splitStep.replace(clusterID, clusterID + "_1~" + clusterID + "_2");
+                    nextStep = replaceCurrentStep(splitStep, cid, j);
+
                     nextStepStr = "       <td width=\"80\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
                 } else {
                     nextStepStr = "       <td width=\"80\">no more</td>\n";
@@ -411,6 +259,22 @@ public class ParseHtml {
 
         pt.rewriteFile(sb.toString(), analysisDir + splitStep + ".color");
         return cluster_color;
+
+    }
+
+    private String replaceCurrentStep(String splitStep, String cid, int j) {
+        String[] currentIDArray = cid.split("~");
+        String clusterID = currentIDArray[j];
+        currentIDArray[j] = currentIDArray[j].replace(clusterID, clusterID + "_1~" + clusterID + "_2");
+        String newStep = "";
+        for (String s : currentIDArray) {
+            newStep += "~"+s;
+        }
+        while (newStep.startsWith("~")) {
+            newStep = newStep.substring(1);
+        }
+
+        return splitStep.replace(cid,newStep);
 
     }
 
@@ -632,9 +496,8 @@ public class ParseHtml {
                 String lineNumber = nodeLable[1];
 
 
-                AnalyzingCommunityDetectionResult an = new AnalyzingCommunityDetectionResult(analysisDir);
-
-                if (an.isTopCluster(clusterid)) {
+                ArrayList<String> topClusterList = pt.getListFromFile(analysisDir, "topClusters.txt");
+                if (pt.isTopCluster(topClusterList, clusterid)) {
                     String keywod_prefix = cluster_keyword.get(clusterid).get(0).trim();
                     keywod_prefix = keywod_prefix.split("").length > 3 ? keywod_prefix.substring(0, 3).replace("[", "") + "." : keywod_prefix;
 
@@ -764,9 +627,6 @@ public class ParseHtml {
 
 
     public static void main(String[] args) {
-        String forkName = "malx122/Marlin";
-        for (int i = 0; i < 11; i++) {
-            System.out.println(i + " - " + ((i - 3) < 0 ? (i + 12 - 3) : i - 3));
-        }
+
     }
 }

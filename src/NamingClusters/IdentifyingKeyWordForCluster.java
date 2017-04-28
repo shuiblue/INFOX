@@ -43,6 +43,7 @@ public class IdentifyingKeyWordForCluster {
 
 
     public HashMap<String, ArrayList<String>> findKeyWordsFor_eachSplitStep(String testCaseDir, String testDir, HashMap<String, HashSet<Integer>> clusterList, int n_gram, String splitStep) {
+        ProcessingText pt = new ProcessingText();
         String analysisDir = testCaseDir + testDir + FS;
         HashMap<String, ArrayList<String>> keyWordList = new HashMap<>();
         HashMap<String, String> nodeIdMap = new HashMap<>();
@@ -92,9 +93,10 @@ public class IdentifyingKeyWordForCluster {
             e.printStackTrace();
         }
 
-        AnalyzingCommunityDetectionResult an = new AnalyzingCommunityDetectionResult(analysisDir);
+
+        ArrayList<String> topClusterList = pt.getListFromFile(analysisDir, "topClusters.txt");
         clusterList.forEach((clusterID, v) -> {
-            if (an.isTopCluster(clusterID)) {
+            if (pt.isTopCluster(topClusterList, clusterID)) {
                 System.out.println(clusterID);
                 /** add source code **/
                 List<List<String>> newCode_docs = new ArrayList<>();

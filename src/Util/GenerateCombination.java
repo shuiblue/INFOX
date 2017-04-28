@@ -1,6 +1,7 @@
 package Util;
 
 import CommunityDetection.AnalyzingCommunityDetectionResult;
+import com.jcraft.jsch.HASH;
 
 import java.io.IOException;
 import java.util.*;
@@ -16,13 +17,13 @@ public class GenerateCombination {
     static HashSet<ArrayList<Integer>> allPairs_array = new HashSet<>();
     static HashSet<HashSet<String>> allPairs_string = new HashSet<>();
     static String analysisDir = "";
+    static int max_numberOfCut;
 
-    public GenerateCombination(String analysisDir) {
+    public GenerateCombination(String analysisDir, int max_numberOfCut) {
         allPairs = new HashSet<>();
         this.analysisDir = analysisDir;
-
+        this.max_numberOfCut = max_numberOfCut;
     }
-
 
 
     /**
@@ -120,8 +121,8 @@ public class GenerateCombination {
             e.printStackTrace();
         }
         noFurtherSplittingStepSet = new HashSet<>();
-        for(String s:noSplitStepList){
-            if(s.length()>0){
+        for (String s : noSplitStepList) {
+            if (s.length() > 0) {
                 noFurtherSplittingStepSet.add(s);
             }
         }
@@ -164,7 +165,6 @@ public class GenerateCombination {
     }
 
 
-
     public static HashSet<HashSet<String>> getAllPairs_string(HashSet<String> set) {
         List<String> list = new ArrayList<>(set);
         String first = list.remove(0);
@@ -186,7 +186,7 @@ public class GenerateCombination {
 
 
     public ArrayList<String> printAllCases(List<List<String>> totalList) {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         List<String> result = new ArrayList<String>(totalList.get(0));
 
         for (int index = 1; index < totalList.size(); index++) {
@@ -197,9 +197,9 @@ public class GenerateCombination {
         int count = 0;
         for (String s : result) {
             System.out.printf("%d. %s\n", ++count, s);
-            sb.append(s+"\n");
+            sb.append(s + "\n");
         }
-        new ProcessingText().rewriteFile(sb.toString(),analysisDir+"splittingSteps.txt");
+        new ProcessingText().rewriteFile(sb.toString(), analysisDir + "splittingSteps.txt");
         return (ArrayList<String>) result;
     }
 
@@ -216,6 +216,114 @@ public class GenerateCombination {
         return result;
     }
 
+    /**
+     * @param analysisDir
+     * @param max_numberOfCut
+     */
+    public ArrayList<String> generateAllCombineResult(String analysisDir, int max_numberOfCut) {
+        List<List<String>> totalList = getAllCombination();
+        return printAllCases(totalList);
+    }
+
+    /**
+     * This function generates two children of the parent node, _1 _2
+     *
+     * @param cluster
+     * @return child1 + "~" + child2
+     */
+    private String getChildren(String cluster) {
+        String child1 = cluster + "_1";
+        String child2 = cluster + "_2";
+
+        return child1 + "~" + child2;
+    }
+
+    private List<List<String>> getAllCombination() {
+        List<List<String>> all_cluster_combineList = new ArrayList<>();
+        ArrayList<String> topClusters = null;
+        try {
+            topClusters = new ArrayList<>(Arrays.asList(new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n")));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<String> stopSplitClusters = null;
+        try {
+            stopSplitClusters = Arrays.asList(new ProcessingText().readResult(analysisDir + "noSplittingStepList.txt").split("\n"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String clusterID : topClusters) {
+            HashSet<String> thisCombinelist = new HashSet<>();
+            thisCombinelist.add(clusterID);
+            String nextStr = "";
+            String[] children = new String[]{clusterID};
+
+            thisCombinelist = getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children);
+            all_cluster_combineList.add(new ArrayList<>(thisCombinelist));
+
+        }
+        return all_cluster_combineList;
+    }
+//
+//    class Page {
+//
+//        final List<String> ids;
+//
+//        Page(List<String> ids) {
+//            this.ids = ids;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "";
+//        }
+//    }
+
+
+    public HashSet<String> getNextSteps(List<String> stopSplitClusters, HashSet<String> thisCombinelist, String nextStr, String[] children) {
+
+        HashSet<String> tmpCombinelist = new HashSet<>();
+        for (int i = 0; i < children.length; i++) {
+
+            String child = children[i];
+            if (child.split("_").length <= max_numberOfCut) {
+                if (!stopSplitClusters.contains(child)) {
+                    nextStr += "~" + getChildren(child);
+                } else {
+                    continue;
+                }
+
+                while (nextStr.startsWith("~")) {
+                    nextStr = nextStr.substring(1);
+                }
+
+                String[] next = Arrays.copyOf(children, children.length);
+                next[i] = nextStr;
+                String nextStep = "";
+                for (String n : next) {
+                    nextStep += "~" + n;
+                }
+                while (nextStep.startsWith("~")) {
+                    nextStep = nextStep.substring(1);
+                }
+                tmpCombinelist.add(nextStep);
+                children = nextStep.split("~");
+                nextStr = "";
+
+                tmpCombinelist.addAll(getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children));
+            } else {
+                continue;
+            }
+
+        }
+        if (tmpCombinelist.size() > 0) {
+            thisCombinelist.addAll(tmpCombinelist);
+        }
+        return thisCombinelist;
+    }
 
     public static void main(String[] args) {
 //        HashSet<Integer> set = new LinkedHashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6));

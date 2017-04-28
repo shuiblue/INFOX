@@ -127,10 +127,10 @@ public class ProcessingText {
         for (String s : lines) {
             String node = s.split(" ")[0];
 
-            if(node.equals("")){
+            if (node.equals("")) {
                 System.out.println();
             }
-            if (!forkAddedNodeList.contains(node)&&!node.equals("")) {
+            if (!forkAddedNodeList.contains(node) && !node.equals("")) {
                 forkAddedNodeList.add(node);
             }
             String filename = node.split("-")[0];
@@ -347,7 +347,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]$", ".c").replace("INO",".ino");
+        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]$", ".c").replace("INO", ".ino");
 
     }
 
@@ -407,12 +407,13 @@ public class ProcessingText {
     public boolean isPdeFile(String filePath) {
         return filePath.endsWith(".pde");
     }
+
     public boolean isInoFile(String filePath) {
         return filePath.endsWith(".ino");
     }
 
     public boolean isCFile_general(String filePath) {
-        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath)||isInoFile(filePath);
+        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath) || isInoFile(filePath);
     }
 
     public String removeUselessLine(String line) {
@@ -488,7 +489,6 @@ public class ProcessingText {
     }
 
 
-
     public HashMap<String, String> getNodeLabel_to_id_map(String filePath) {
         HashMap<String, String> label_to_id = new HashMap<>();
 
@@ -499,7 +499,7 @@ public class ProcessingText {
                 if (!line.startsWith("*")) {
                     String label = line.split(":")[0];
                     String id = line.split(":")[1];
-                    if(!label.equals("")) {
+                    if (!label.equals("")) {
                         label_to_id.put(label, id);
                     }
                 }
@@ -509,6 +509,35 @@ public class ProcessingText {
         }
         return label_to_id;
     }
+
+    public ArrayList<String> getListFromFile(String analysisDir, String fileName) {
+        ArrayList<String> topClusterList = new ArrayList<>();
+        try {
+            String[] topClusters = readResult(analysisDir + fileName).split("\n");
+            for (String tc : topClusters) {
+                topClusterList.add(tc);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return topClusterList;
+    }
+
+    public boolean isTopCluster( ArrayList<String> topClusterList,String clusterID) {
+
+        if (topClusterList.contains(clusterID)) {
+            return true;
+        }
+        for (String cl : topClusterList) {
+
+            if (clusterID.matches(cl+"(_[0-9])+")) {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
         String path = "C:\\Users\\shuruiz\\Documents\\LineCounter\\txt\\";
         final int[] lines = {0};

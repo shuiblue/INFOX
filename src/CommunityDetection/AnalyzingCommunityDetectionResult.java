@@ -484,29 +484,19 @@ public class AnalyzingCommunityDetectionResult {
     public HashMap<Integer, ArrayList<String>> generateClusteringResult(int max_numberOfCut, int numberOfBiggestClusters) {
         ProcessingText protext = new ProcessingText();
         boolean hasGroundTruth = false;
+        //todo; magic number
         int clusterSizeThreshold = 10;
+        originCombination = "original";
 
         /**  generate combinations if split steps of sub-cluster **/
         System.out.println("    generating all the possible splitting steps... E.g,. ABC, A1A2BC, ABC1C2");
-        ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
-
-//        ArrayList<String> combination_list = new ArrayList<>();
-//        try {
-//            String[] splitSteps = new ProcessingText().readResult(testCaseDir + "splittingSteps.txt").split("\n");
-//            for (String s : splitSteps) {
-//                combination_list.add(s);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+        ArrayList<String> combination_list = new GenerateCombination(analysisDir,max_numberOfCut).generateAllCombineResult(testCaseDir, max_numberOfCut);
 
         for (String s : combination_list) {
             allClusteringResult.put(s, new HashMap<>());
         }
 
 
-        originCombination = "original";
         /** for original clustering result , generate corresponding table, html ...**/
         System.out.println("    analyzing original chenged code graph, get original cluster mapping...");
         parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, originCombination, true);
@@ -567,7 +557,7 @@ public class AnalyzingCommunityDetectionResult {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir).getAllSplitSteps(max_numberOfCut, topClusterList);
+        HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir,max_numberOfCut).getAllSplitSteps(max_numberOfCut, topClusterList);
 
         allSplitSteps_map.forEach((k, v) -> {
             HashMap<Integer, HashMap<String, HashSet<Integer>>> map = new HashMap<>();
@@ -625,30 +615,6 @@ public class AnalyzingCommunityDetectionResult {
 
     }
 
-    public boolean isTopCluster(String clusterID) {
-        String[] topClusters = null;
-        ArrayList<String> topClusterList = new ArrayList<>();
-        try {
-            topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (String tc : topClusters) {
-            topClusterList.add(tc);
-        }
-
-        if (topClusterList.contains(clusterID)) {
-            return true;
-        }
-        for (String cl : topClusterList) {
-
-            if (clusterID.matches(cl+"(_[0-9])+")) {
-                return true;
-            }
-
-        }
-        return false;
-    }
 
     private HashMap<String, HashSet<Integer>> getCopyOfOriginalClusters() {
         HashMap<String, HashSet<Integer>> currentCluster = new HashMap<>();
@@ -1181,7 +1147,7 @@ public class AnalyzingCommunityDetectionResult {
         }
 
 
-        HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination(analysisDir).getAllPairs(nodeIDSet);
+        HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination(analysisDir,max_numberOfCut).getAllPairs(nodeIDSet);
         Iterator nodePair_iterator = nodePairSet.iterator();
 
 
