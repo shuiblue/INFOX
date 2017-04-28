@@ -49,7 +49,7 @@ public class ParseHtml {
 
     private String table_header = "<table id=\"cluster\"  \n" +
             "  <tr> \n" +
-            "    <td> <button class=\"btn\" id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
+            "    <td colspan=\"2\"> <button class=\"btn\" id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
             "    </td> \n" +
             "  </tr>\n" +
             "  <tr>\n" +
