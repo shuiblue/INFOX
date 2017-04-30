@@ -347,7 +347,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]$", ".c").replace("INO", ".ino");
+        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[CC]$", ".cc").replaceAll("[C]$", ".c").replace("INO", ".ino");
 
     }
 
@@ -396,12 +396,10 @@ public class ProcessingText {
      */
     public boolean isCFile(String filePath) {
         return filePath.endsWith(".cpp") || filePath.endsWith(".c");
-//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
 
     public boolean isHeaderFile(String filePath) {
         return filePath.endsWith(".h");
-//        return filePath.endsWith(".cpp") || filePath.endsWith(".h") || filePath.endsWith(".c") || filePath.endsWith(".pde");
     }
 
     public boolean isPdeFile(String filePath) {
@@ -412,14 +410,16 @@ public class ProcessingText {
         return filePath.endsWith(".ino");
     }
 
+    public boolean isCCFile(String filePath) {
+        return filePath.endsWith(".cc");
+    }
+
     public boolean isCFile_general(String filePath) {
-        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath) || isInoFile(filePath);
+        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath) || isInoFile(filePath) || isCCFile(filePath);
     }
 
     public String removeUselessLine(String line) {
         /**remove comments **/
-//        line = removeComments(line);
-
         if (line.trim().startsWith("#include")) {
             line = "";
         }
@@ -523,14 +523,14 @@ public class ProcessingText {
         return topClusterList;
     }
 
-    public boolean isTopCluster( ArrayList<String> topClusterList,String clusterID) {
+    public boolean isTopCluster(ArrayList<String> topClusterList, String clusterID) {
 
         if (topClusterList.contains(clusterID)) {
             return true;
         }
         for (String cl : topClusterList) {
 
-            if (clusterID.matches(cl+"(_[0-9])+")) {
+            if (clusterID.matches(cl + "(_[0-9])+")) {
                 return true;
             }
 

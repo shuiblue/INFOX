@@ -16,8 +16,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
@@ -268,13 +270,13 @@ public class ParseHtml {
         currentIDArray[j] = currentIDArray[j].replace(clusterID, clusterID + "_1~" + clusterID + "_2");
         String newStep = "";
         for (String s : currentIDArray) {
-            newStep += "~"+s;
+            newStep += "~" + s;
         }
         while (newStep.startsWith("~")) {
             newStep = newStep.substring(1);
         }
 
-        return splitStep.replace(cid,newStep);
+        return splitStep.replace(cid, newStep);
 
     }
 
@@ -566,7 +568,7 @@ public class ParseHtml {
      * @param timeWindowSize "begining" -- , "x months"
      * @return
      */
-    public String getDiffPageUrl(String forkName, String timeWindowSize) {
+    public String getDiffPageUrl(String localSourceCodeDirPath, String forkName, String timeWindowSize) {
         String forkUrl = github_api + forkName;
         JsonUtility jsonUtility = new JsonUtility();
         try {
@@ -589,11 +591,29 @@ public class ParseHtml {
 
             if (timeWindowSize.equals("beginning")) {
                 String firstCommitTimeStamp = fork_jsonObj.getString("created_at");
-                JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
-                comparedFork = upstreamInfo.getString("full_name");
-                JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + firstCommitTimeStamp));
-                previousCommitSHA = upstream_jsonObj.getString("sha");
+                if (fork_jsonObj.has("parent")) {
+                    JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
 
+                    comparedFork = upstreamInfo.getString("full_name");
+                    JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + firstCommitTimeStamp));
+                    previousCommitSHA = upstream_jsonObj.getString("sha");
+                } else {
+                    //git rev-list --max-parents=0 HEAD
+                    ProcessBuilder pb = new ProcessBuilder("git", "rev-list", "--max-parents=0", "HEAD");
+//                    ProcessBuilder pb = new ProcessBuilder("git","log");
+
+                    Map<String, String> envs = pb.environment();
+                    pb.directory(new File(localSourceCodeDirPath));
+                    System.out.println("" + pb.directory());
+                    Process p = pb.start();
+                    BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+                    while (true) {
+                        previousCommitSHA = r.readLine();
+                        break;
+                    }
+                    comparedFork = forkName;
+                }
 
             } else if (timeWindowSize.contains("month")) {
                 int[] monthArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};

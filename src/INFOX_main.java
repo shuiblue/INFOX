@@ -26,7 +26,8 @@ public class INFOX_main {
      */
     public static void main(String[] args) {
         /*** user input***/
-        String forkName = "AdeDZY/ShardFeature";
+        String forkName = "TsinghuaDatabaseGroup/VTree";
+//        String forkName = "AdeDZY/ShardFeature";
 //        String forkName = "malx122/Marlin";
 //        String forkName = "Ultimaker/Marlin";
         boolean hasGroundTruth = false;
@@ -38,6 +39,7 @@ public class INFOX_main {
         /***git clone repo to local dir***/
 //        JgitUtility jgitUtility = new JgitUtility();
 //        String uri = github_page + forkName + ".git";
+//        System.out.println("Cloning repo from github: " +forkName);
 //        jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
 //        if(forkName.contains("Marlin")) {
 //            try {
@@ -49,9 +51,9 @@ public class INFOX_main {
 
         /***  get origin diff github page  ***/
         ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters,analysisDir);
-//        String diffPageUrl = parseHtml.getDiffPageUrl(forkName,"12 month");
-       String diffPageUrl ="https://github.com/AdeDZY/ShardFeature/compare/9dc9cb7aa043010c89cef06d1031c834aef4825a...AdeDZY:3ff9d4d7404cb93a5e75e5cfe8b55336214c0bf9";
-
+//        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"beginning");
+       String diffPageUrl ="https://github.com/TsinghuaDatabaseGroup/VTree/compare/13556037a20baa1a3928224ff7c087102a5bba8c...TsinghuaDatabaseGroup:7e6516cac56ffdd3145b82c94db8c0f0ce48dca5";
+//
 //        ProcessingText processingText = new ProcessingText();
 //        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
 //
@@ -59,16 +61,16 @@ public class INFOX_main {
 //        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath+"INFOX_output/diff.txt");
 //        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map,localSourceCodeDirPath+"INFOX_output/forkAddedNode.txt");
-//
-//
-//
-//        /*** start clustering code  ***/
-//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
-//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+
+
+
+        /*** start clustering code  ***/
+        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
+        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
 
 
         /*** hack github page   ***/
-//        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
+        parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
         parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
 
 

@@ -227,7 +227,7 @@ public class GetCommitMsg {
             String originFileName = processingText.getOriginFileName(nodeLabel);
             String lineNumber = nodeLabel.split("-")[1];
 
-            //commit[] ={commitSHA, normalized_line, originCommit}
+            //commit[] ={commitSHA, one_gram, two_gram, originCommit}
             String one_commit[] = getCommitMsgForEachNode(originFileName, lineNumber, 1, repoPath);
             String two_commit[] = getCommitMsgForEachNode(originFileName, lineNumber, 2, repoPath);
             String nodeId = label_to_id.get("\"" + nodeLabel + "\"");
@@ -258,27 +258,21 @@ public class GetCommitMsg {
      * @return commit msg
      */
     public static String[] getCommitMsgForEachNode(String fileName, String lineNumber, int n_gram, String repoPath) {
-        Stemmer stemmer = new Stemmer();
-        Tokenizer tokenizer = new Tokenizer();
         String lineInfo = lineNumber + "," + lineNumber + ":" + fileName;
         ProcessBuilder processBuilder = new ProcessBuilder("git", "log", "--pretty=medium", "-L", lineInfo);
         processBuilder.directory(new File(repoPath).getParentFile()); // this is where you set the root folder for the executable to run with
-
         processBuilder.redirectErrorStream(true);
-        Process process = null;
+        Process process ;
         InputStream inputStream = null;
         try {
             process = processBuilder.start();
-//            process.waitFor();
             inputStream = process.getInputStream();
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
         String commitSHA = "";
-        BufferedReader br = null;
-        String line = null;
+        BufferedReader br ;
+        String line ;
         String originCommit = null;
         String normalized_line = "";
         try {
@@ -299,16 +293,16 @@ public class GetCommitMsg {
                         word = word.trim();
                         if (word.length() > 0) {
 
+
                             if (word.contains("_") && n_gram == 2) {
-                                for (String s : tokenizer.generateNgrams(n_gram, word)) {
+                                for (String s : new Tokenizer().generateNgrams(n_gram, word)) {
                                     normalized_line += s + " ";
                                 }
                             } else {
                                 if (!word.matches(("[0-9]*"))){
-                                    ;
                                     word = new StopWords().removeStopWord(word);
                                     if (word.trim().length() > 0) {
-                                        normalized_line += stemmer.stemmingAWord(word) + " ";
+                                        normalized_line += new Stemmer().stemmingAWord(word) + " ";
                                     }
                                 }
                             }

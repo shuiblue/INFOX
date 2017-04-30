@@ -51,7 +51,7 @@ public class JsonUtility {
                 buffer.append(chars, 0, read);
 
             String json_string = buffer.toString();
-            if(json_string.startsWith("[")){
+            if(json_string.startsWith("[")&&!json_string.replace("[","").replace("]","").equals("")){
                 json_string=json_string.substring(1,json_string.lastIndexOf(']')-2);
             }
 

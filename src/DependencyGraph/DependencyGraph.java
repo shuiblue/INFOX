@@ -353,7 +353,7 @@ public class DependencyGraph {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
 //                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
 /**  need to parse pde file as well for real fork**/
-                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString()) || processingText.isPdeFile(filePath.toString())||processingText.isInoFile(filePath.toString()))) {
+                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString()) || processingText.isPdeFile(filePath.toString())||processingText.isInoFile(filePath.toString())||processingText.isCCFile(filePath.toString()))) {
 
                     parseSingleFile(filePath);
                 }
