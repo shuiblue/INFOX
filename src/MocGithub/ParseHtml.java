@@ -104,17 +104,22 @@ public class ParseHtml {
         new ProcessingText().rewriteFile(currentPage.toString(), analysisDir + originalPage);
     }
 
+    /**
+     * This function iteratively load all the big diff files
+     *
+     * @param webClient   htmlunit web client, which is used for loading js file
+     * @param currentPage currentPage, which contains "load diff" blocks and unload rest pages
+     * @return renewed current page
+     * @throws IOException
+     */
     private Document getLoadDiffContentMap(WebClient webClient, Document currentPage) throws IOException {
-        HashMap<String, String> loadDiffId_to_content = new HashMap<>();
         Elements loadingElements = currentPage.getElementsByTag("include-fragment");
-        HtmlPage currentDiffPage = null;
+        HtmlPage currentDiffPage;
         for (Element ele : loadingElements) {
             String loadDiffUrl = ele.attr("data-fragment-url");
             if (!loadDiffUrl.equals("")) {
                 String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
                 currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
-                loadDiffId_to_content.put(diffID, currentDiffPage.asXml());
-
                 Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
                 Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
                 currentDiff.getElementsByClass("js-diff-load-container").remove();
@@ -127,15 +132,18 @@ public class ParseHtml {
                 Element diffViewElement = currentPage.getElementsByClass("diff-view ").first();
                 diffViewElement.append(bodyElement.toString().replace("<body>", "").replace("</body>", ""));
                 ele.remove();
-
-                System.out.println();
-
                 currentPage = getLoadDiffContentMap(webClient, currentPage);
             }
         }
         return currentPage;
     }
 
+    /**
+     * This function generates all the html files for each splitting step
+     *
+     * @param forkName
+     * @param localSourceCodeDirPath
+     */
     public void generateMocGithubForkPage(String forkName, String localSourceCodeDirPath) {
         ProcessingText pt = new ProcessingText();
         this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
@@ -185,7 +193,7 @@ public class ParseHtml {
                 usedColorIndex.put(tc, 0);
             }
 
-            System.out.println("get all splitting result map");
+            System.out.println("get all splitting result map, there are " + combination_list.size() + " html pages need to be generated..");
             allSplittingResult = new AnalyzingCommunityDetectionResult(analysisDir).getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
             for (String splitStep : combination_list) {
@@ -203,7 +211,7 @@ public class ParseHtml {
 
                 List<String> stopSplitClusters = Arrays.asList(new ProcessingText().readResult(analysisDir + "noSplittingStepList.txt").split("\n"));
 
-
+                System.out.println("generating Cluster Summary Table for current splitting step: " + splitStep);
                 HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword, stopSplitClusters);
 
 
@@ -218,14 +226,9 @@ public class ParseHtml {
 
 
     private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword, List<String> stopSplitClusters) throws IOException {
-
-
         ProcessingText pt = new ProcessingText();
-
-
         StringBuilder sb = new StringBuilder();
         sb.append(table_header);
-
 
         String[] clusters = splitStep.split("--");
 
@@ -235,11 +238,9 @@ public class ParseHtml {
             String nextStep, nextStepStr;
 
             for (int j = 0; j < cid.split("~").length; j++) {
-//            for (String clusterID : cid.split("~")) {
                 String clusterID = cid.split("~")[j];
                 if (!stopSplitClusters.contains(clusterID) && clusterID.split("_").length < max_numberOfCut + 1) {
                     nextStep = replaceCurrentStep(splitStep, cid, j);
-
                     nextStepStr = "       <td width=\"80\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
                 } else {
                     nextStepStr = "       <td width=\"80\">no more</td>\n";
@@ -260,6 +261,10 @@ public class ParseHtml {
         sb.append("</table>");
 
         pt.rewriteFile(sb.toString(), analysisDir + splitStep + ".color");
+
+        System.out.println("finished generating summary table");
+
+
         return cluster_color;
 
     }
@@ -281,6 +286,7 @@ public class ParseHtml {
     }
 
     private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID) {
+        System.out.print("adding one row for current summary table of cluster : " + clusterID + " ...");
         BackgroundColor cc = new BackgroundColor();
         ArrayList<ArrayList<String>> colorfamiliy_List = cc.getColorFamilyList();
 
@@ -300,11 +306,7 @@ public class ParseHtml {
             }
         }
         cluster_color.put(clusterID, color);
-        //todo: null pointer
-        System.out.print(clusterID);
-        if (cluster_keyword.get(clusterID) == null) {
-            System.out.println();
-        }
+
         /**  keyword **/
         String keyword_long = cluster_keyword.get(clusterID).toString();
         String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
@@ -313,6 +315,7 @@ public class ParseHtml {
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
 
         sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr));
+        System.out.println("done");
         return sb.toString();
     }
 
@@ -472,31 +475,31 @@ public class ParseHtml {
      * @param fileList_elements
      */
     private void generateHtml(Elements fileList_elements, HashMap<String, String> nodeId_to_clusterID, String splitStep, HashMap<String, String> cluster_color, HashMap<String, List<String>> cluster_keyword) {
-
+        System.out.println("generating html file for step: " + splitStep + "...");
 
         currentDoc = doc.clone();
         ProcessingText pt = new ProcessingText();
-
-        String summaryTable;
         try {
-            summaryTable = pt.readResult(analysisDir + splitStep + ".color");
+            String summaryTable = pt.readResult(analysisDir + splitStep + ".color");
             currentDoc.getElementsByTag("html").first().children().first().before(summaryTable);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
+        int newCodeSize = forkAddedNodeList.size();
+        System.out.println("start to modify each line of fork added code, there are " + newCodeSize + " loc...");
+        int i = 1;
         for (String changedCodeLabel : forkAddedNodeList) {
+
             if (label_to_id.get("\"" + changedCodeLabel + "\"") != null) {
+                System.out.println(i++ + "/" + newCodeSize);
                 String nodeId = label_to_id.get("\"" + changedCodeLabel + "\"");
                 String clusterid = nodeId_to_clusterID.get(nodeId);
-
 
                 String nodeLable[] = changedCodeLabel.split("-");
                 String filename_tag = nodeLable[0];
                 String fileName = pt.getOriginFileName(filename_tag);
                 String lineNumber = nodeLable[1];
-
 
                 ArrayList<String> topClusterList = pt.getListFromFile(analysisDir, "topClusters.txt");
                 if (pt.isTopCluster(topClusterList, clusterid)) {
@@ -506,16 +509,7 @@ public class ParseHtml {
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
                     Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
-                    Element lineElement;
-                    if (lineElements.size() > 1) {
-                        if (lineElements.get(0).toString().contains("addition")) {
-                            lineElement = lineElements.get(0);
-                        } else {
-                            lineElement = lineElements.get(1);
-                        }
-                    } else {
-                        lineElement = lineElements.first();
-                    }
+                    Element lineElement = getElement(lineElements);
 
                     String styleStr = "background-color:"
                             + cluster_color.get(clusterid)
@@ -534,16 +528,7 @@ public class ParseHtml {
                         System.out.println(lineNumber);
                     }
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
-                    Element lineElement;
-                    if (lineElements.size() > 1) {
-                        if (lineElements.get(0).toString().contains("addition")) {
-                            lineElement = lineElements.get(0);
-                        } else {
-                            lineElement = lineElements.get(1);
-                        }
-                    } else {
-                        lineElement = lineElements.first();
-                    }
+                    Element lineElement = getElement(lineElements);
 
                     String styleStr = "background-color:grey"
                             + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
@@ -557,8 +542,22 @@ public class ParseHtml {
         }
 
         pt.rewriteFile(currentDoc.toString(), analysisDir + splitStep + ".html");
+        System.out.println("done with current splitstep");
 
+    }
 
+    private Element getElement(Elements lineElements) {
+        Element lineElement;
+        if (lineElements.size() > 1) {
+            if (lineElements.get(0).toString().contains("addition")) {
+                lineElement = lineElements.get(0);
+            } else {
+                lineElement = lineElements.get(1);
+            }
+        } else {
+            lineElement = lineElements.first();
+        }
+        return lineElement;
     }
 
     /**
