@@ -89,20 +89,24 @@ public class ParseHtml {
         HashMap<String, String> loadDiffId_to_content = new HashMap<>();
         try {
             page = webClient.getPage(diffPageUrl + "#files_bucket");
+
             webClient.waitForBackgroundJavaScriptStartingBefore(200);
-            webClient.waitForBackgroundJavaScript(50000);
-
-
+            webClient.waitForBackgroundJavaScript(5000);
             ArrayList<HtmlDivision> buttonList = (ArrayList<HtmlDivision>) page.getByXPath("//div[@class='js-diff-load-container']");
-            for (HtmlDivision hd : buttonList) {
+           while(buttonList.size()>0) {
+               for (HtmlDivision hd : buttonList) {
 
-                String loadDiffUrl = hd.getElementsByTagName("include-fragment").get(0).getAttribute("data-fragment-url");
-                String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
+                   String loadDiffUrl = hd.getElementsByTagName("include-fragment").get(0).getAttribute("data-fragment-url");
+                   String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
 
-                HtmlPage currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
-                loadDiffId_to_content.put(diffID, currentDiffPage.asXml());
+                   HtmlPage currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+                   loadDiffId_to_content.put(diffID, currentDiffPage.asXml());
+                   webClient.waitForBackgroundJavaScriptStartingBefore(200);
+                   webClient.waitForBackgroundJavaScript(500000);
 
-            }
+               }
+               buttonList = (ArrayList<HtmlDivision>) page.getByXPath("//div[@class='js-diff-load-container']");
+           }
 
         } catch (Exception e) {
             System.out.println("Get page error");
@@ -126,7 +130,7 @@ public class ParseHtml {
         new ProcessingText().rewriteFile(currentPage.toString(), analysisDir + originalPage);
     }
 
-    public void generateMocGithubForkPage(String diffPageUrl, String forkName, String localSourceCodeDirPath) {
+    public void generateMocGithubForkPage( String forkName, String localSourceCodeDirPath) {
         ProcessingText pt = new ProcessingText();
 //        combination_list = generateAllCombineResult(analysisDir, max_numberOfCut);
 

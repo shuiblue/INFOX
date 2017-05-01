@@ -115,13 +115,27 @@ public class ProcessingText {
         return s.replace("\n", "").replace(" ", "").replace("\t", "");
     }
 
+
+    public HashMap<String, String> getNodeIdMap(String analysisDir, ProcessingText processingText) throws IOException {
+        HashMap<String, String> nodeIdMap = new HashMap<>();
+        /**   get node id -  node location (label)**/
+        String nodeIdList = processingText.readResult(analysisDir + "NodeList.txt");
+        String[] nodeIdArray = nodeIdList.split("\n");
+        for (String s : nodeIdArray) {
+            if (s.split("---------").length > 1) {
+                nodeIdMap.put(s.split("---------")[0], s.split("---------")[1]);
+            }
+        }
+        return nodeIdMap;
+    }
+
     /**
      * This function will collect all the fork added node from  "forkAddedNode.txt", and generate a list of forkAddedNode
      *
      * @return Arraylist of fork Added Nodes
      * @throws IOException
      */
-    public ArrayList getForkAddedNodeList(String forkAddedNodeTxt) throws IOException {
+    public ArrayList<String> getForkAddedNodeList(String forkAddedNodeTxt) throws IOException {
         String[] lines = readResult(forkAddedNodeTxt).split("\n");
         ArrayList<String> forkAddedNodeList = new ArrayList<>();
         for (String s : lines) {
@@ -347,12 +361,10 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[CC]$", ".cc").replaceAll("[C]$", ".c").replace("INO", ".ino");
+        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]{2}$", ".cc").replaceAll("[C]$", ".c").replace("INO", ".ino");
 
     }
 
-    public void writeSymboTableToFile(HashSet<Symbol> symbolTable, String analysisDir) {
-    }
 
     public static int countLines(String filePath) throws IOException {
         int counter = 0;
@@ -555,5 +567,27 @@ public class ProcessingText {
             e.printStackTrace();
         }
         System.out.print("linenumber : " + lines[0]);
+    }
+
+    /**
+     * This function read unified source code and generates map of nodeid-source code terms
+     * @param n_gram  1 or 2 gram
+     * @param analysisDir
+     * @return  map
+     */
+    public HashMap<String, String> getnodeToSourceCodeMap(int n_gram, String analysisDir) {
+        HashMap<String, String> nodeToSourceCodeMap = new HashMap<>();
+        String fileName = (n_gram == 1) ? "tokenizedSouceCode_oneGram.txt" : "tokenizedSouceCode_twoGram.txt";
+
+        try {
+            String sourceCode = new ProcessingText().readResult(analysisDir + fileName);
+            String[] sourceCodeArray = sourceCode.split("\n");
+            for (String s : sourceCodeArray) {
+                nodeToSourceCodeMap.put(s.split(":")[0], s.split(":")[1]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  nodeToSourceCodeMap;
     }
 }

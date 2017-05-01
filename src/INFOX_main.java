@@ -31,8 +31,8 @@ public class INFOX_main {
 //        String forkName = "malx122/Marlin";
 //        String forkName = "Ultimaker/Marlin";
         boolean hasGroundTruth = false;
-        String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName+FS;
-        String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName+FS+"INFOX_output/";
+        String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName + FS;
+        String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName + FS + "INFOX_output/";
         int max_numberOfCut = 3;
         int numberOfBiggestClusters = 5;
 
@@ -50,9 +50,10 @@ public class INFOX_main {
 //        }
 
         /***  get origin diff github page  ***/
-        ParseHtml parseHtml = new ParseHtml(max_numberOfCut,numberOfBiggestClusters,analysisDir);
+        ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir);
+//        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"12 month");
 //        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"beginning");
-       String diffPageUrl ="https://github.com/TsinghuaDatabaseGroup/VTree/compare/13556037a20baa1a3928224ff7c087102a5bba8c...TsinghuaDatabaseGroup:7e6516cac56ffdd3145b82c94db8c0f0ce48dca5";
+        String diffPageUrl = "https://github.com/TsinghuaDatabaseGroup/VTree/compare/13556037a20baa1a3928224ff7c087102a5bba8c...TsinghuaDatabaseGroup:7e6516cac56ffdd3145b82c94db8c0f0ce48dca5";
 //
 //        ProcessingText processingText = new ProcessingText();
 //        processingText.ReadTextFromURL(diffPageUrl+".diff",localSourceCodeDirPath+"INFOX_output/diff.txt");
@@ -63,15 +64,14 @@ public class INFOX_main {
 //        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map,localSourceCodeDirPath+"INFOX_output/forkAddedNode.txt");
 
 
-
         /*** start clustering code  ***/
-        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
-        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
+//        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut,numberOfBiggestClusters);
+//        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth);
 
 
         /*** hack github page   ***/
         parseHtml.getOriginalDiffPage(diffPageUrl,localSourceCodeDirPath);
-        parseHtml.generateMocGithubForkPage(diffPageUrl, forkName,localSourceCodeDirPath);
+        parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
 
 
     }

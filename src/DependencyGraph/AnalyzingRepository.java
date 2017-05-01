@@ -153,6 +153,14 @@ public class AnalyzingRepository {
 //        }
 
 //        ArrayList<String> combination_list = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, testCaseDir).generateAllCombineResult(testCaseDir, max_numberOfCut);
+
+//
+        GetCommitMsg getCommitMsg=new GetCommitMsg();
+        getCommitMsg.getCommitMsgForChangedCode(testCaseDir, repoPath);
+
+        HashMap<String, ArrayList<String>> commitInfoMap = getCommitMsg.getCommitInfoMap(testCaseDir);
+
+
         ArrayList<String> combination_list = new ArrayList<>();
         try {
             String[] splitSteps = new ProcessingText().readResult(testCaseDir + "splittingSteps.txt").split("\n");
@@ -162,10 +170,8 @@ public class AnalyzingRepository {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster(sourcecodeDir, testCaseDir, commitInfoMap);
 
-
-        HashMap<String, HashMap<String, String>> allKindsOf_unifiedCommits = new GetCommitMsg().getCommitMsgForChangedCode(testCaseDir, repoPath);
-        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster(sourcecodeDir, testCaseDir, allKindsOf_unifiedCommits);
         for (String splitStep : combination_list) {
             System.out.println("identifying keywords for Splitting Steps ..: " + splitStep);
             identifyingKeyWordForCluster.findKeyWordForEachSplit(sourcecodeDir, testCaseDir, testDir, splitStep, repoPath);

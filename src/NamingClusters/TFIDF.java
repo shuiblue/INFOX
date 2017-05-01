@@ -1,10 +1,5 @@
 package NamingClusters;
 
-import Util.ProcessingText;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -45,17 +40,55 @@ public class TFIDF {
         return Math.log(docs.size() / n);
     }
 
+    public double idf_new(HashMap<String, HashMap<String, Integer>> clusterID_term_count, String term) {
+        final double[] n = {0};
+        clusterID_term_count.forEach((clusterID, map) -> {
+            if (map.keySet().contains(term)) {
+                n[0]++;
+            }
+        });
+
+        return Math.log(clusterID_term_count.keySet().size() / n[0]);
+    }
+
+
     /**
-     * @param doc  a text document
-     * @param docs all documents
-     * @param term term
+     * @param clusterID_term_count a map  clusterID-  term and times it appears
      * @return the TF-IDF of term
      */
+    public String calculateTfIdf_new(HashMap<String, HashMap<String, Integer>> clusterID_term_count) {
+        StringBuilder sb = new StringBuilder();
+        clusterID_term_count.forEach((clusterid, map) -> {
+
+            HashMap<String, Double> term_tfidf = new HashMap<>();
+            int total = 0;
+            for (int count : map.values()) {
+                total += count;
+            }
+            int finalTotal = total;
+            map.forEach((term, count) -> {
+                double tf = (double)count / finalTotal;
+                double idf = idf_new(clusterID_term_count, term);
+                term_tfidf.put(term, tf * idf);
+            });
+
+            sb.append(clusterid + ": [");
+            term_tfidf.entrySet().stream()
+                    .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                    .limit(10)
+                    .forEach(item -> sb.append(item.getKey() + ", "));
+            sb.append("]\n");
+
+
+        });
+        return sb.toString();
+    }
+
+
     public double calculateTfIdf(List<String> doc, List<List<String>> docs, String term) {
         return tf(doc, term) * idf(docs, term);
 
     }
-
 
     public static void main(String[] args) {
 
