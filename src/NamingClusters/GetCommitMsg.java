@@ -9,15 +9,7 @@ import java.util.*;
  * Created by shuruiz on 10/22/16.
  */
 public class GetCommitMsg {
-    static final String FS = File.separator;
-
     static HashMap<String, String> label_to_id = null;
-
-    public GetCommitMsg() {
-
-    }
-
-
     /**
      * This function generates a mapping between nodeID to commit msg arraylist, which contains {sha, original commit msg, one gram, two gram}
      * @param analysisDir

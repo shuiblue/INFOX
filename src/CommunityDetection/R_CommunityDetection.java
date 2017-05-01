@@ -26,10 +26,8 @@ public class R_CommunityDetection {
     public ArrayList<Integer> cutSequence;
     ProcessingText ioFunc = new ProcessingText();
     HashMap<Integer, double[]> modularityMap;
-    //    int bestCut;
     Rengine re = null;
     static final String FS = File.separator;
-    //    double[][] shortestPathMatrix;
     double[][] edgelist;
     double[][] current_edgelist;
     double[][] previous_edgelist;
@@ -267,11 +265,6 @@ public class R_CommunityDetection {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
             while ((line = br.readLine()) != null) {
-//                if (filePath.contains("upstream")) {
-//                    upstreamNode.add(line.trim());
-//                } else {
-//                    forkAddedNode.add(line.trim());
-//                }
                 forkAddedNode.add(line.split(" ")[0]);
             }
         } catch (FileNotFoundException e) {

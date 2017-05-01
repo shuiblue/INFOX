@@ -365,6 +365,9 @@ public class ProcessingText {
 
     }
 
+    //todo
+    public void writeSymboTableToFile(HashSet<Symbol> symbolTable, String analysisDir) {
+    }
 
     public static int countLines(String filePath) throws IOException {
         int counter = 0;

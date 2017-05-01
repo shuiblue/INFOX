@@ -86,54 +86,59 @@ public class ParseHtml {
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
 
         HtmlPage page = null;
-        HashMap<String, String> loadDiffId_to_content = new HashMap<>();
+        Document currentPage = null;
         try {
             page = webClient.getPage(diffPageUrl + "#files_bucket");
 
             webClient.waitForBackgroundJavaScriptStartingBefore(200);
             webClient.waitForBackgroundJavaScript(5000);
-            ArrayList<HtmlDivision> buttonList = (ArrayList<HtmlDivision>) page.getByXPath("//div[@class='js-diff-load-container']");
-           while(buttonList.size()>0) {
-               for (HtmlDivision hd : buttonList) {
 
-                   String loadDiffUrl = hd.getElementsByTagName("include-fragment").get(0).getAttribute("data-fragment-url");
-                   String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
-
-                   HtmlPage currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
-                   loadDiffId_to_content.put(diffID, currentDiffPage.asXml());
-                   webClient.waitForBackgroundJavaScriptStartingBefore(200);
-                   webClient.waitForBackgroundJavaScript(500000);
-
-               }
-               buttonList = (ArrayList<HtmlDivision>) page.getByXPath("//div[@class='js-diff-load-container']");
-           }
+            currentPage = Jsoup.parse(page.asXml());
+            currentPage = getLoadDiffContentMap(webClient, currentPage);
 
         } catch (Exception e) {
             System.out.println("Get page error");
         }
 
 
-        Document currentPage = Jsoup.parse(page.asXml());
-        loadDiffId_to_content.forEach((diffID, xml) -> {
-            Document xmldoc = Jsoup.parse(xml);
-            Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
-//            Element currentDiff= currentPage.getElementById("diff-"+diffID);
-//            Element replaceBlock = currentDiff.getElementsByClass("js-file-content Details-content--shown").first();
-//            replaceBlock.getElementsByTag("div").remove();
-
-//           replaceBlock.append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
-            currentDiff.getElementsByClass("js-diff-load-container").remove();
-            System.out.println();
-        });
-
-
         new ProcessingText().rewriteFile(currentPage.toString(), analysisDir + originalPage);
     }
 
-    public void generateMocGithubForkPage( String forkName, String localSourceCodeDirPath) {
-        ProcessingText pt = new ProcessingText();
-//        combination_list = generateAllCombineResult(analysisDir, max_numberOfCut);
+    private Document getLoadDiffContentMap(WebClient webClient, Document currentPage) throws IOException {
+        HashMap<String, String> loadDiffId_to_content = new HashMap<>();
+        Elements loadingElements = currentPage.getElementsByTag("include-fragment");
+        HtmlPage currentDiffPage = null;
+        for (Element ele : loadingElements) {
+            String loadDiffUrl = ele.attr("data-fragment-url");
+            if (!loadDiffUrl.equals("")) {
+                String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
+                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+                loadDiffId_to_content.put(diffID, currentDiffPage.asXml());
 
+                Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
+                Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
+                currentDiff.getElementsByClass("js-diff-load-container").remove();
+
+            } else {
+                loadDiffUrl = ele.attr("src");
+                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+                Document currentDiffDoc = Jsoup.parse(currentDiffPage.asXml());
+                Element bodyElement = currentDiffDoc.getElementsByTag("body").first();
+                Element diffViewElement = currentPage.getElementsByClass("diff-view ").first();
+                diffViewElement.append(bodyElement.toString().replace("<body>", "").replace("</body>", ""));
+                ele.remove();
+
+                System.out.println();
+
+                currentPage = getLoadDiffContentMap(webClient, currentPage);
+            }
+        }
+        return currentPage;
+    }
+
+    public void generateMocGithubForkPage(String forkName, String localSourceCodeDirPath) {
+        ProcessingText pt = new ProcessingText();
+        this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
         try {
             String[] splitSteps = pt.readResult(analysisDir + "splittingSteps.txt").split("\n");
             for (String s : splitSteps) {
@@ -142,9 +147,6 @@ public class ParseHtml {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
 
 
         try {
@@ -186,13 +188,7 @@ public class ParseHtml {
             System.out.println("get all splitting result map");
             allSplittingResult = new AnalyzingCommunityDetectionResult(analysisDir).getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
-//            ArrayList<String> splitStepList = generateAllCombineResult(analysisDir, max_numberOfCut);
-//            ArrayList<String> splitStepList = generateAllCombineResult(analysisDir, max_numberOfCut);
-
-
             for (String splitStep : combination_list) {
-//            for (String splitStep : splitStepList) {
-
                 HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep);
                 HashMap<String, List<String>> cluster_keyword = new HashMap<>();
                 String keyword[] = pt.readResult(analysisDir + splitStep + "_keyword.txt").split("\n");
