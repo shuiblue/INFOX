@@ -1,7 +1,5 @@
 package Util;
 
-import CommunityDetection.AnalyzingCommunityDetectionResult;
-import com.jcraft.jsch.HASH;
 
 import java.io.IOException;
 import java.util.*;
@@ -150,17 +148,17 @@ public class GenerateCombination {
                 }
             }
         }
-//        if(noFurtherSplittingStepSet.size()>0) {
-//            noFurtherSplittingStepSet.forEach(stopCluster -> {
-//                String[] clusterid = stopCluster.split("_");
-//                int index = clusterid.length - 1;
-//                String cluster = clusterid[0];
-//
-//                HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
-//                split_nodelist.get(index).add(stopCluster);
-//                resultMap.put(cluster, split_nodelist);
-//            });
-//        }
+        if(noFurtherSplittingStepSet.size()>0) {
+            noFurtherSplittingStepSet.forEach(stopCluster -> {
+                String[] clusterid = stopCluster.split("_");
+                int index = clusterid.length - 1;
+                String cluster = clusterid[0];
+
+                HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
+                split_nodelist.get(index).add(stopCluster);
+                resultMap.put(cluster, split_nodelist);
+            });
+        }
         return resultMap;
     }
 
@@ -267,20 +265,7 @@ public class GenerateCombination {
         }
         return all_cluster_combineList;
     }
-//
-//    class Page {
-//
-//        final List<String> ids;
-//
-//        Page(List<String> ids) {
-//            this.ids = ids;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return "";
-//        }
-//    }
+
 
 
     public HashSet<String> getNextSteps(List<String> stopSplitClusters, HashSet<String> thisCombinelist, String nextStr, String[] children) {
@@ -326,31 +311,8 @@ public class GenerateCombination {
     }
 
     public static void main(String[] args) {
-//        HashSet<Integer> set = new LinkedHashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6));
-//        System.out.print(getAllPairs(set));
-
-        String[] elements = new String[]{"1", "2"};
-        int lengthOfList = 3;
-
-//        String[] aa = getAllLists(3, lengthOfList);
-        System.out.print("");
-
-//
-//        HashMap<Integer, HashSet<Integer>> groundTruthClusters = new HashMap<>();
-//        HashSet<Integer> gt_one = new LinkedHashSet<>(Arrays.asList(1, 2, 3));
-//        HashSet<Integer> gt_two = new LinkedHashSet<>(Arrays.asList(4, 5, 6));
-//        groundTruthClusters.put(1, gt_one);
-//        groundTruthClusters.put(2, gt_two);
-//
-//        HashMap<Integer, HashSet<Integer>> test_Clusters = new HashMap<>();
-//        HashSet<Integer> test_one = new LinkedHashSet<>(Arrays.asList(1, 3));
-//        HashSet<Integer> test_two = new LinkedHashSet<>(Arrays.asList(2));
-//        HashSet<Integer> test_three = new LinkedHashSet<>(Arrays.asList(4, 5, 6));
-//        test_Clusters.put(1, test_one);
-//        test_Clusters.put(2, test_two);
-//        test_Clusters.put(3, test_three);
-
-//        new AnalyzingCommunityDetectionResult().calculatingAccuracy(groundTruthClusters, test_Clusters,false);
+        GenerateCombination gc = new GenerateCombination("/Users/shuruiz/Desktop/",3);
+        gc.getAllCombination();
 
     }
 

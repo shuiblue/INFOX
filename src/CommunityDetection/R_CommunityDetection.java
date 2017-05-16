@@ -149,9 +149,11 @@ public class R_CommunityDetection {
             }
             re.end();
             return true;
+        }else{
+            System.out.println("no edge!");
         }
         re.end();
-        System.out.println("no edge");
+
         return false;
 
     }

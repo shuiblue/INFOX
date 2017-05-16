@@ -38,13 +38,9 @@ public class ClusterCodeChanges {
     /**
      * This function cluster changed code from a fork
      */
-    public void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth) {
+    public void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth,  Rengine re) {
 
-        Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
-        if (!re.waitForR()) {
-            System.out.println("Cannot load R");
-            return ;
-        }
+
 
         int approachIndex = 1; //INFOX ==1
         String sourcecodeDir = localSourceCodeDirPath;

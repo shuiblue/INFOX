@@ -361,7 +361,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]{2}$", ".cc").replaceAll("[C]$", ".c").replace("INO", ".ino");
+        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]{2}$", ".cc").replaceAll("[C]$", ".c").replaceAll("[INO]$", ".ino");
 
     }
 

@@ -69,6 +69,9 @@ public class GetCommitMsg {
                 String nodeID = infoArray[0];
                 ArrayList<String> infoList = new ArrayList<>();
 
+                if(infoArray.length<3){
+                    System.out.println();
+                }
                 infoList.add(infoArray[1]);
                 infoList.add(infoArray[2]);
                 infoList.add(infoArray[3]);

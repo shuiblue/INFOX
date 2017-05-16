@@ -49,19 +49,21 @@ public class ParseHtml {
     static int otherClusterSize = 0;
 
 
-    private String table_header = "<table id=\"cluster\"  \n" +
-            "  <tr> \n" +
-            "    <td colspan=\"2\"> <button class=\"btn\" id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
-            "    </td> \n" +
-            "  </tr>\n" +
-            "  <tr>\n" +
-            "       <th>Cluster</th>\n" +
-            "       <th>Navigation</th>\n" +
-            "       <th>Keywords</th>\n" +
-            "       <th>LOC</th>\n" +
-            "       <th>Split Cluster </th>\n" +
-            "    </tr>\n";
-
+    public String appendTableTitle(int colspan) {
+        return "<table id=\"cluster\"  \n" +
+                "  <tr> \n" +
+                "    <td colspan=\"2\"> <button class=\"btn\" id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
+                "    </td> \n" +
+                "  </tr>\n" +
+                "  <tr>\n" +
+                "   <th colspan=\"" + colspan + "\">Level</th>\n" +
+                "       <th>Cluster</th>\n" +
+                "       <th>Navigation</th>\n" +
+                "       <th>Keywords</th>\n" +
+                "       <th>LOC</th>\n" +
+                "       <th>Split Cluster </th>\n" +
+                "    </tr>\n";
+    }
 
     public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters, String analysisDir) {
         this.max_numberOfCut = max_numberOfCut;
@@ -214,8 +216,7 @@ public class ParseHtml {
                 System.out.println("generating Cluster Summary Table for current splitting step: " + splitStep);
                 HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword, stopSplitClusters);
 
-
-                generateHtml(fileList_elements, nodeId_to_clusterID, splitStep, cluster_color, cluster_keyword);
+//                generateHtml(fileList_elements, nodeId_to_clusterID, splitStep, cluster_color, cluster_keyword);
             }
 
 
@@ -228,7 +229,8 @@ public class ParseHtml {
     private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword, List<String> stopSplitClusters) throws IOException {
         ProcessingText pt = new ProcessingText();
         StringBuilder sb = new StringBuilder();
-        sb.append(table_header);
+        int colspan = getTreeHight(splitStep);
+        sb.append(appendTableTitle(colspan));
 
         String[] clusters = splitStep.split("--");
 
@@ -236,22 +238,31 @@ public class ParseHtml {
             String cid = clusters[i];
             /**   generate next step link **/
             String nextStep, nextStepStr;
-
-            for (int j = 0; j < cid.split("~").length; j++) {
-                String clusterID = cid.split("~")[j];
+            String[] subClusterArray = cid.split("~");
+            for (int j = 0; j < subClusterArray.length; j++) {
+                String clusterID = subClusterArray[j];
                 if (!stopSplitClusters.contains(clusterID) && clusterID.split("_").length < max_numberOfCut + 1) {
+//                    System.out.println(splitStep);
                     nextStep = replaceCurrentStep(splitStep, cid, j);
+//                    System.out.println(nextStep+"\n----------");
                     nextStepStr = "       <td width=\"80\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
                 } else {
                     nextStepStr = "       <td width=\"80\">no more</td>\n";
                 }
-                generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID);
+
+                boolean hasPair = false;
+                if (j + 1 < subClusterArray.length) {
+                    hasPair = hasPair(subClusterArray[j], subClusterArray[j + 1]);
+                }
+                String hierachy_str = new DrawTableHierarchy().drawTableHierarchy( clusters,colspan);
+
+                generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID, hasPair);
             }
         }
 
         sb.append("<tr> \n" +
                 "       <td width=\"60\" style=\"cursor: pointer; background:grey\" onclick='hide_cluster_rows(\"infox_other\")'> other </td>\n" +
-                "       <td width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_other\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_other\')\">Prev</button></td>" +
+                "       <td  width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_other\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_other\')\">Prev</button></td>" +
                 "       <td ><div class=\"long_td\"> other small clusters </div></td>\n" +
                 "       <td width=\"50\">" + otherClusterSize + "</td>\n" +
                 "       <td width=\"80\">no more</td>\n" +
@@ -267,6 +278,81 @@ public class ParseHtml {
 
         return cluster_color;
 
+    }
+
+    private String getHierachyStringForCurrentRow(String clusterID, boolean hasPair, String[] clusters, int index, int maxHeight) {
+        String parentID = clusterID.substring(0, clusterID.lastIndexOf("_"));
+        int middle = (2 * clusters.length) / 2;
+        String str = "";
+        System.out.println();
+        for (int height = 0; height < maxHeight; height++) {
+            if (hasPair) {
+                if (clusterID.endsWith("_1")) {
+                    if (index == 0&&height == 0 ) {
+                        return "     <td style=\"border:none;\"> </td>\n" +
+                                "       <td style=\"border:none;\"> </td>\n" +
+                                "        <td style=\"border:none;\"> </td>\n" +
+                                "       <td style=\"border:none;\"> </td>\n";
+                    } else {
+                        if (height == 0 & 2 * index + 1 == middle) {
+                            str += "<td colspan=\"1\" id=\"cel_3\"><button>" + parentID + "</button></td>\n";
+                        } else {
+                            str += "     <td style=\"border:none;\"> </td>\n";
+                        }
+
+                        if(height ==1 & maxHeight-height>1){
+                            str+="     <td style=\"border:none;\"> </td>\n";
+                        }else{
+                            str+="<td colspan=\"1\" id=\"cel_3\"><button>" + parentID + "</button></td>\n";
+                        }
+                    }
+                } else  if(clusterID.endsWith("_2")){
+                    if (index == clusters.length - 1) {
+                        return "     <td style=\"border:none;\"> </td>\n" +
+                                "       <td style=\"border:none;\"> </td>\n" +
+                                "        <td style=\"border:none;\"> </td>\n" +
+                                "       <td style=\"border:none;\"> </td>\n";
+                    }
+
+                    if(height ==1 & maxHeight-height>1){
+                        str+="     <td style=\"border:none;\"> </td>\n";
+                    }else{
+                        str+="<td colspan=\"1\" id=\"cel_3\"><button>" + parentID + "</button></td>\n";
+                    }
+
+                }else{
+                    return "     <td style=\"border:none;\"> </td>\n" +
+                            "       <td style=\"border:none;\"> </td>\n" +
+                            "        <td style=\"border:none;\"> </td>\n" +
+                            "       <td style=\"border:none;\"> </td>\n";
+                }
+            } else {
+
+            }
+
+        }
+        return str;
+    }
+
+    private boolean hasPair(String s, String s1) {
+        int s_len = s.split("_").length;
+        int s1_len = s1.split("_").length;
+
+        return s.substring(0, s.lastIndexOf("_")).equals(s1.substring(0, s1.lastIndexOf("_")));
+    }
+
+    private int getTreeHight(String splitStep) {
+        int colspan = 0;
+        String[] split = splitStep.split("--");
+        for (String s : split) {
+            for (String sub : s.split("~")) {
+                int tmp_colspan = sub.split("_").length;
+                if (tmp_colspan > colspan) {
+                    colspan = tmp_colspan;
+                }
+            }
+        }
+        return colspan;
     }
 
     private String replaceCurrentStep(String splitStep, String cid, int j) {
@@ -285,7 +371,7 @@ public class ParseHtml {
 
     }
 
-    private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID) {
+    private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID, boolean hasPair) {
         System.out.print("adding one row for current summary table of cluster : " + clusterID + " ...");
         BackgroundColor cc = new BackgroundColor();
         ArrayList<ArrayList<String>> colorfamiliy_List = cc.getColorFamilyList();
@@ -314,17 +400,20 @@ public class ParseHtml {
 
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
 
+
         sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr));
         System.out.println("done");
         return sb.toString();
     }
 
     private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr) {
+
+
         return "<tr> \n" +
-                "       <td width=\"60\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
-                "       <td width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
-                "        <td ><div class=\"long_td\">" + keyword_long + "</div></td>\n" +
-                "       <td width=\"50\">" + clusterSize + "</td>\n" +
+                "       <td rowspan=\"2\" width=\"60\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
+                "       <td rowspan=\"2\" width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
+                "        <td rowspan=\"2\"><div class=\"long_td\">" + keyword_long + "</div></td>\n" +
+                "       <td rowspan=\"2\" width=\"50\">" + clusterSize + "</td>\n" +
                 nextStepStr +
                 "   </tr>";
     }
@@ -340,7 +429,7 @@ public class ParseHtml {
 
 
         StringBuilder sb = new StringBuilder();
-        sb.append(table_header);
+        sb.append(appendTableTitle(3));
 
 
         try {
@@ -486,6 +575,7 @@ public class ParseHtml {
             e.printStackTrace();
         }
 
+        // could used forkaddednodelist id file instead of fork added not list todo
         int newCodeSize = forkAddedNodeList.size();
         System.out.println("start to modify each line of fork added code, there are " + newCodeSize + " loc...");
         int i = 1;
@@ -568,13 +658,13 @@ public class ParseHtml {
      * @return
      */
     public String getDiffPageUrl(String localSourceCodeDirPath, String forkName, String timeWindowSize) {
-        String forkUrl = github_api + forkName;
+        String forkUrl = github_api + forkName + "?access_token=77f3237f8b1c5d6d7b66849fd33e247692911641";
         JsonUtility jsonUtility = new JsonUtility();
         try {
             // get latest commit sha
             String[] todayTimeStamp = new Timestamp(System.currentTimeMillis()).toString().split(" ");
             String format_current_time = todayTimeStamp[0] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
-            JSONObject fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + forkName + "/commits?until=" + format_current_time));
+            JSONObject fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + forkName + "/commits?access_token=77f3237f8b1c5d6d7b66849fd33e247692911641&until=" + format_current_time));
             String latestCommitSHA = fork_commit_jsonObj.getString("sha");
             String latestCommitDate = fork_commit_jsonObj.getJSONObject("commit").getJSONObject("author").get("date").toString();
             int latestMonth = Integer.parseInt(latestCommitDate.split("-")[1]);
@@ -587,14 +677,14 @@ public class ParseHtml {
             //get commit before fork was created
             String comparedFork = "";
             String previousCommitSHA = "";
-
+            String defaultBranch = "", forkBranchName = "";
             if (timeWindowSize.equals("beginning")) {
                 String firstCommitTimeStamp = fork_jsonObj.getString("created_at");
                 if (fork_jsonObj.has("parent")) {
                     JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
 
                     comparedFork = upstreamInfo.getString("full_name");
-                    JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + firstCommitTimeStamp));
+                    JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?access_token=77f3237f8b1c5d6d7b66849fd33e247692911641&until=" + firstCommitTimeStamp));
                     previousCommitSHA = upstream_jsonObj.getString("sha");
                 } else {
                     //git rev-list --max-parents=0 HEAD
@@ -631,9 +721,21 @@ public class ParseHtml {
                 previousCommitSHA = fork_commit_jsonObj.getString("sha");
 
 
+            } else if (timeWindowSize.contains("withUpstream")) {
+
+                JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
+                comparedFork = upstreamInfo.getString("full_name");
+                defaultBranch = upstreamInfo.get("default_branch").toString();
+                forkBranchName = fork_jsonObj.get("default_branch").toString();
+
             }
 
-            String diffURL = github_page + comparedFork + "/compare/" + previousCommitSHA + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
+            String diffURL;
+            if (timeWindowSize.contains("withUpstream")) {
+                diffURL = github_page + comparedFork + "/compare/" + defaultBranch + "..." + forkName.split(FS)[0] + ":" + forkBranchName;
+            } else {
+                diffURL = github_page + comparedFork + "/compare/" + previousCommitSHA + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
+            }
             System.out.println(diffURL);
             new ProcessingText().rewriteFile(diffURL, analysisDir + "diffurl.txt");
             System.out.println("diff url:" + diffURL);
