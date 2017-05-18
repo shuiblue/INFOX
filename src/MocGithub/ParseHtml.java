@@ -335,8 +335,6 @@ public class ParseHtml {
     }
 
     private boolean hasPair(String s, String s1) {
-        int s_len = s.split("_").length;
-        int s1_len = s1.split("_").length;
 
         return s.substring(0, s.lastIndexOf("_")).equals(s1.substring(0, s1.lastIndexOf("_")));
     }
