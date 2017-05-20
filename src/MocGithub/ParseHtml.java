@@ -229,7 +229,7 @@ public class ParseHtml {
     private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword, List<String> stopSplitClusters) throws IOException {
         ProcessingText pt = new ProcessingText();
         StringBuilder sb = new StringBuilder();
-        int colspan = getTreeHight(splitStep);
+        int colspan = new DrawTableHierarchy().getTreeHight(splitStep);
         sb.append(appendTableTitle(colspan));
 
         String[] clusters = splitStep.split("--");
@@ -254,7 +254,8 @@ public class ParseHtml {
                 if (j + 1 < subClusterArray.length) {
                     hasPair = hasPair(subClusterArray[j], subClusterArray[j + 1]);
                 }
-                String hierachy_str = new DrawTableHierarchy().drawTableHierarchy( clusters,colspan);
+
+                DrawTableHierarchy.Cell[][] cellArray = new DrawTableHierarchy(). calculatingArray(cid);
 
                 generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID, hasPair);
             }
@@ -339,19 +340,7 @@ public class ParseHtml {
         return s.substring(0, s.lastIndexOf("_")).equals(s1.substring(0, s1.lastIndexOf("_")));
     }
 
-    private int getTreeHight(String splitStep) {
-        int colspan = 0;
-        String[] split = splitStep.split("--");
-        for (String s : split) {
-            for (String sub : s.split("~")) {
-                int tmp_colspan = sub.split("_").length;
-                if (tmp_colspan > colspan) {
-                    colspan = tmp_colspan;
-                }
-            }
-        }
-        return colspan;
-    }
+
 
     private String replaceCurrentStep(String splitStep, String cid, int j) {
         String[] currentIDArray = cid.split("~");
