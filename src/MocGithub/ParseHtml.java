@@ -216,7 +216,7 @@ public class ParseHtml {
                 System.out.println("generating Cluster Summary Table for current splitting step: " + splitStep);
                 HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword, stopSplitClusters);
 
-//                generateHtml(fileList_elements, nodeId_to_clusterID, splitStep, cluster_color, cluster_keyword);
+                generateHtml(fileList_elements, nodeId_to_clusterID, splitStep, cluster_color, cluster_keyword);
             }
 
 
@@ -233,12 +233,13 @@ public class ParseHtml {
         sb.append(appendTableTitle(colspan));
 
         String[] clusters = splitStep.split("--");
-
         for (int i = 0; i < clusters.length; i++) {
+
             String cid = clusters[i];
             /**   generate next step link **/
             String nextStep, nextStepStr;
             String[] subClusterArray = cid.split("~");
+
             for (int j = 0; j < subClusterArray.length; j++) {
                 String clusterID = subClusterArray[j];
                 if (!stopSplitClusters.contains(clusterID) && clusterID.split("_").length < max_numberOfCut + 1) {
@@ -255,13 +256,21 @@ public class ParseHtml {
                     hasPair = hasPair(subClusterArray[j], subClusterArray[j + 1]);
                 }
 
-                DrawTableHierarchy.Cell[][] cellArray = new DrawTableHierarchy(). calculatingArray(cid);
+                new DrawTableHierarchy().calculatingArray(analysisDir, cid);
 
-                generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID, hasPair);
+                System.out.print("get split step hierachy array ...");
+                String[][] hierarchyArray = new DrawTableHierarchy().getHierachyStringFromText(analysisDir, cid);
+
+                String parentStep = clusterID.contains("_") ? clusterID.replaceAll("[_][1|2]$", "") : clusterID;
+                String joinStep = splitStep.replace(parentStep + "_1~" + parentStep + "_2", parentStep);
+
+                generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID, hasPair, hierarchyArray[2 * j], hierarchyArray[2 * j + 1], joinStep, colspan);
+
             }
         }
 
         sb.append("<tr> \n" +
+                "       <td colspan=\"" + colspan + "\"></td>\n" +
                 "       <td width=\"60\" style=\"cursor: pointer; background:grey\" onclick='hide_cluster_rows(\"infox_other\")'> other </td>\n" +
                 "       <td  width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_other\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_other\')\">Prev</button></td>" +
                 "       <td ><div class=\"long_td\"> other small clusters </div></td>\n" +
@@ -289,7 +298,7 @@ public class ParseHtml {
         for (int height = 0; height < maxHeight; height++) {
             if (hasPair) {
                 if (clusterID.endsWith("_1")) {
-                    if (index == 0&&height == 0 ) {
+                    if (index == 0 && height == 0) {
                         return "     <td style=\"border:none;\"> </td>\n" +
                                 "       <td style=\"border:none;\"> </td>\n" +
                                 "        <td style=\"border:none;\"> </td>\n" +
@@ -301,13 +310,13 @@ public class ParseHtml {
                             str += "     <td style=\"border:none;\"> </td>\n";
                         }
 
-                        if(height ==1 & maxHeight-height>1){
-                            str+="     <td style=\"border:none;\"> </td>\n";
-                        }else{
-                            str+="<td colspan=\"1\" id=\"cel_3\"><button>" + parentID + "</button></td>\n";
+                        if (height == 1 & maxHeight - height > 1) {
+                            str += "     <td style=\"border:none;\"> </td>\n";
+                        } else {
+                            str += "<td colspan=\"1\" id=\"cel_3\"><button>" + parentID + "</button></td>\n";
                         }
                     }
-                } else  if(clusterID.endsWith("_2")){
+                } else if (clusterID.endsWith("_2")) {
                     if (index == clusters.length - 1) {
                         return "     <td style=\"border:none;\"> </td>\n" +
                                 "       <td style=\"border:none;\"> </td>\n" +
@@ -315,13 +324,13 @@ public class ParseHtml {
                                 "       <td style=\"border:none;\"> </td>\n";
                     }
 
-                    if(height ==1 & maxHeight-height>1){
-                        str+="     <td style=\"border:none;\"> </td>\n";
-                    }else{
-                        str+="<td colspan=\"1\" id=\"cel_3\"><button>" + parentID + "</button></td>\n";
+                    if (height == 1 & maxHeight - height > 1) {
+                        str += "     <td style=\"border:none;\"> </td>\n";
+                    } else {
+                        str += "<td colspan=\"1\" id=\"cel_3\"><button>" + parentID + "</button></td>\n";
                     }
 
-                }else{
+                } else {
                     return "     <td style=\"border:none;\"> </td>\n" +
                             "       <td style=\"border:none;\"> </td>\n" +
                             "        <td style=\"border:none;\"> </td>\n" +
@@ -341,7 +350,6 @@ public class ParseHtml {
     }
 
 
-
     private String replaceCurrentStep(String splitStep, String cid, int j) {
         String[] currentIDArray = cid.split("~");
         String clusterID = currentIDArray[j];
@@ -358,8 +366,9 @@ public class ParseHtml {
 
     }
 
-    private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID, boolean hasPair) {
+    private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID, boolean hasPair, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan) {
         System.out.print("adding one row for current summary table of cluster : " + clusterID + " ...");
+
         BackgroundColor cc = new BackgroundColor();
         ArrayList<ArrayList<String>> colorfamiliy_List = cc.getColorFamilyList();
 
@@ -388,110 +397,52 @@ public class ParseHtml {
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
 
 
-        sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr));
+        sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan));
         System.out.println("done");
         return sb.toString();
     }
 
-    private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr) {
+    private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan) {
 
+
+        String row_1 = "";
+        for (int i = 0; i < colspan - levelColumn_1.length; i++) {
+            row_1 += " <td  id=\"cel_none\"></td>\n";
+        }
+        for (String s : levelColumn_1) {
+            if (s.equals("bottomLeft")) {
+                row_1 += " <td  id=\"cel_" + s + "\">" + keyword_suffix + "</td>\n";
+            } else {
+                row_1 += " <td  id=\"cel_" + s + "\"></td>\n";
+            }
+        }
+
+
+        String row_2 = "<tr>";
+        for (int i = 0; i < colspan - levelColumn_2.length; i++) {
+            row_2 += " <td  id=\"cel_none\"></td>\n";
+        }
+        for (String s : levelColumn_2) {
+            if (s.equals("bottom")) {
+                row_2 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep + ".html\" class=\"button\">join</a></td>\n";
+            } else if (s.equals("topLeft")) {
+                row_2 += " <td  id=\"cel_" + s + "\">" + keyword_suffix + "</td>\n";
+            } else {
+
+                row_2 += " <td  id=\"cel_" + s + "\"></td>\n";
+            }
+        }
+        row_2 += "</tr>";
 
         return "<tr> \n" +
+                row_1 +
                 "       <td rowspan=\"2\" width=\"60\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
                 "       <td rowspan=\"2\" width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
                 "        <td rowspan=\"2\"><div class=\"long_td\">" + keyword_long + "</div></td>\n" +
                 "       <td rowspan=\"2\" width=\"50\">" + clusterSize + "</td>\n" +
                 nextStepStr +
-                "   </tr>";
-    }
-
-
-    private HashMap<String, String> generateClusterSummaryTable_old(String splitStep, HashMap<String, List<String>> cluster_keyword, List<String> stopSplitClusters) throws IOException {
-        HashMap<String, String> cluster_color = new HashMap<>();
-
-        ProcessingText pt = new ProcessingText();
-        BackgroundColor cc = new BackgroundColor();
-
-        ArrayList<ArrayList<String>> colorfamiliy_List = cc.getColorFamilyList();
-
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(appendTableTitle(3));
-
-
-        try {
-            String[] topClusterID = pt.readResult(analysisDir + "topClusters.txt").split("\n");
-
-            for (int i = 0; i < topClusterID.length; i++) {
-                String clusterID = topClusterID[i];
-                String cluster[] = clusterID.split("_");
-                int clusterIndex = cluster.length == 1 ? 1 : Integer.parseInt(cluster[1]);
-
-
-                /**   generate next step link **/
-                String[] splitArray = splitStep.split("");
-                String[] nextSplit = Arrays.copyOf(splitArray, splitArray.length);
-                nextSplit[i] = String.valueOf(Integer.valueOf(splitArray[clusterIndex]) + 1);
-                String nextStep = "";
-                String nextStepStr = "";
-                if (Integer.valueOf(nextSplit[i]) <= max_numberOfCut) {
-                    for (String s : nextSplit) {
-                        nextStep += s;
-                    }
-                    nextStepStr = "       <td width=\"80\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
-                } else {
-                    nextStepStr = "       <td width=\"80\"></td>\n";
-                }
-
-
-                int current_split = Integer.valueOf(splitArray[i]);
-                if (current_split > 1) {
-                    for (int s = 1; s <= current_split; s++) {
-                        String current_clusterID = clusterID + "_" + s;
-                        String keyword_long = cluster_keyword.get(current_clusterID).toString();
-                        String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
-                        String color = colorfamiliy_List.get(i).get(s - 1);
-
-                        final String[] clusterSize = {""};
-                        clusterResultMap.forEach((k, v) -> {
-                            HashMap<String, HashSet<Integer>> currentClusterMap = v;
-                            clusterSize[0] = String.valueOf(currentClusterMap.get(current_clusterID).size());
-                        });
-
-                        cluster_color.put(current_clusterID, color);
-                        sb.append(generateRow(color, current_clusterID, keyword_suffix, keyword_long, Integer.parseInt(clusterSize[0]), nextStepStr));
-
-                    }
-                } else {
-                    String color = colorfamiliy_List.get(i).get(0);
-                    String keyword_long = cluster_keyword.get(clusterID).toString();
-                    String keyword_suffix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
-
-
-                    final String[] clusterSize = {""};
-                    clusterResultMap.forEach((k, v) -> {
-                        HashMap<String, HashSet<Integer>> currentClusterMap = v;
-                        clusterSize[0] = String.valueOf(currentClusterMap.get(clusterID).size());
-                    });
-
-                    sb.append(generateRow(color, clusterID, keyword_suffix, keyword_long, Integer.parseInt(clusterSize[0]), nextStepStr));
-                    cluster_color.put(clusterID, color);
-                }
-
-
-            }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        sb.append("</table>");
-
-        pt.rewriteFile(sb.toString(), analysisDir + splitStep + ".color");
-        return cluster_color;
-
+                "   </tr>" +
+                row_2;
     }
 
 
@@ -735,6 +686,7 @@ public class ParseHtml {
 
 
     public static void main(String[] args) {
-
+ParseHtml parseHtml = new ParseHtml(0,0,"");
+parseHtml.getOriginalDiffPage("https://github.com/AdeDZY/ShardFeature/network","/Users/shuruiz/Desktop/");
     }
 }

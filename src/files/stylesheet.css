@@ -1,8 +1,7 @@
 <style type="text/css">
 #cluster{
-    background-color: #fff;
+     background-color: #fff;
     border:1px solid #dfe2e5;
-/*     padding: 5px 10px; */
     position:fixed;
     right: 0;
     left: 0;
@@ -12,30 +11,56 @@
     top:0px;
     z-index:99999;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 11px;
+    line-height: 11px;
     align-content: left;
     vertical-align: top;
     display:block;
     height:200px;
     overflow:auto;
-    td, th {
+td, th {
+    border: 1px solid black;
+    position: relative;
     overflow: ellipse;
     background-color: #fff;
-    color: #000;
-    position: relative;
-    /*padding-right: 10px; */
-    /*padding-left: 10px;*/
     border-radius:3px
-    }
 }
+
+}
+#cel_none{
+     border:none;
+     width: 10%;
+ }
+#cel_bottom{
+    border-bottom:  1px solid black;
+    width: 10%;
+}
+#cel_topLeft{
+    border-top:  1px solid black;
+    border-left:  1px solid black;
+    width: 10%;
+}
+
+#cel_left{
+    border-left:  1px solid black;
+    width: 10%;
+}
+
+#cel_bottomLeft{
+    border-bottom:  1px solid black;
+    border-left:  1px solid black;
+    width: 10%;
+}
+
+
 .test_me:hover {
     max-width : initial;
     overflow: show;
 }
 
 .long_td {
-    max-width : 700px;
+    font-size: 12px;
+    max-width : 600px;
     overflow:hidden;
     white-space:nowrap;
     text-overflow:ellipsis;
@@ -51,23 +76,11 @@
     background-color:#eff3f6;
 }
 
-/*.tooltip-inner {
-    position: relative;
-    float: right;
-    max-width: 100%;
-    padding: 3px 8px;
-    color: #fff;
-    text-align: center;
-    background-color: #000;
-    border-radius: 5px
-    z-index: 2147483647;
-}
-*/
 .btn {
     padding: 6px 8px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    line-height: 12px;
+    line-height: 11px;
     background-color:#eff3f6;
 }
 .blob-num-deletion {

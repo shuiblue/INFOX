@@ -1,11 +1,12 @@
 package MocGithub;
 
+import Util.ProcessingText;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.*;
 
 import static MocGithub.DrawTableHierarchy.Cell.*;
-import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 
 /**
@@ -15,8 +16,49 @@ public class DrawTableHierarchy {
     HashMap<String, Cluster> clusterTree = new HashMap<>();
     ArrayList<Cluster> noPairLeftClusters = new ArrayList<>();
     int array_width;
+
+    public String[][] getHierachyStringFromText(String analysisDir,String splitStep) {
+        String hierarchyString = "";
+        try {
+            hierarchyString = new ProcessingText().readResult(analysisDir +  splitStep+"_hierachyArray.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String[] hierarchyList = hierarchyString.split("\n");
+        int array_hight = hierarchyList.length;
+        String[][] hierachyArray = new String[array_hight][];
+
+        for (int i = 0; i < array_hight; i++) {
+            String row = hierarchyList[i];
+            String[] cell = row.split(",");
+            hierachyArray[i] = cell;
+
+        }
+        return hierachyArray;
+    }
+
     enum Cell {
-        topLeft, bottomLeft, bottom, left, none
+        topLeft, bottomLeft, bottom, left, none;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case topLeft:
+                    return "topLeft";
+                case bottomLeft:
+                    return "bottomLeft";
+                case bottom:
+                    return "bottom";
+                case left:
+                    return "left";
+                case none:
+                    return "none";
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+
     }
 
     class Cluster {
@@ -60,7 +102,6 @@ public class DrawTableHierarchy {
     }
 
 
-
     public int getTreeHight(String splitStep) {
         int colspan = 0;
         String[] split = splitStep.split("--");
@@ -75,9 +116,9 @@ public class DrawTableHierarchy {
         return colspan;
     }
 
-    public Cell[][] calculatingArray(String splitStep) {
+    public Cell[][] calculatingArray(String analysisDir, String splitStep) {
 
-         array_width = getTreeHight(splitStep);
+        array_width = getTreeHight(splitStep);
         clusterTree = generateTree(splitStep, array_width);
 
         String[] clusterArray = splitStep.split("~");
@@ -133,7 +174,17 @@ public class DrawTableHierarchy {
             }
         }
 
+        if(analysisDir.length()>0) {
+            StringBuilder sb = new StringBuilder();
 
+            for (int j = 0; j < array_hight; j++) {
+                for (int i = 0; i < array_width; i++) {
+                    sb.append(array[j][i].toString() + ",");
+                }
+                sb.append("\n");
+            }
+            new ProcessingText().rewriteFile(sb.toString(), analysisDir + splitStep + "_hierachyArray.txt");
+        }
         return array;
     }
 
@@ -141,8 +192,8 @@ public class DrawTableHierarchy {
 
         for (int index = array_width - 1; index >= 0; index--) {
             if (index > level) {
-                if( array[rightStart][index]==null) array[rightStart][index] = bottom;
-                if( array[rightStart+1][index]==null)array[rightStart+1][index] = none;
+                if (array[rightStart][index] == null) array[rightStart][index] = bottom;
+                if (array[rightStart + 1][index] == null) array[rightStart + 1][index] = none;
             } else if (index == level) {
                 array[rightStart][level] = bottomLeft;
                 if (array[rightStart + 1][level] == null) {
@@ -152,13 +203,12 @@ public class DrawTableHierarchy {
         }
 
 
-
         Cluster parentCluster = clusterTree.get(subCluster.replaceAll("[\\_][2]$", ""));
         parentCluster.setEnd(clusterTree.get(subCluster).end);
 
 
         Cluster leftCluster = clusterTree.get(parentCluster.leftChildName);
-        int leftMiddle = leftCluster.start + (leftCluster.end - leftCluster.start) / 2;
+        int leftMiddle = getMiddleIndex(leftCluster);
 
         if (!hasPair) {
             for (int diff = leftMiddle + 2; diff <= rightStart - 1; diff++) {
@@ -170,7 +220,7 @@ public class DrawTableHierarchy {
 
         setParentCluster(array, level, parentCluster);
         if (parentCluster.name.endsWith("_1")) {
-            setLeftChildCluster(array, leftCluster.start + 1, parentCluster.name, level - 1, leftCluster.start);
+            setLeftChildCluster(array, getMiddleIndex(parentCluster), parentCluster.name, level - 1, leftCluster.start);
         }
 
         if (noPairLeftClusters.size() > 0) {
@@ -179,15 +229,24 @@ public class DrawTableHierarchy {
             Cluster rightChild = clusterTree.get(rightChildName);
             int cur_level = leftChild.name.split("_").length - 1;
             if (cur_level + 1 == level) {
-                int middle = rightChild.start + (rightChild.end - rightChild.start) / 2;
+                int middle = getMiddleIndex(rightChild);
                 noPairLeftClusters.remove(leftChild);
                 setRightChildCluster(array, middle, rightChildName, cur_level, false);
+            }else if(cur_level==level){
+                int middle = getMiddleIndex(rightChild);
+                noPairLeftClusters.remove(leftChild);
+                setRightChildCluster(array, middle, rightChildName, cur_level, false);
+
             }
         }
         if (parentCluster.name.endsWith("_1")) {
             noPairLeftClusters.add(parentCluster);
         }
 
+    }
+
+    private int getMiddleIndex(Cluster leftCluster) {
+        return leftCluster.start + (leftCluster.end- leftCluster.start) / 2;
     }
 
     private void setParentCluster(Cell[][] array, int level, Cluster parentCluster) {
@@ -201,14 +260,13 @@ public class DrawTableHierarchy {
     private void setLeftChildCluster(Cell[][] array, int leftStart, String subCluster, int level, int parent_start) {
         for (int index = array_width - 1; index >= 0; index--) {
             if (index > level) {
-               if( array[leftStart][index]==null) array[leftStart][index] = bottom;
-                if( array[leftStart+1][index]==null)array[leftStart+1][index] = none;
+                if (array[leftStart][index] == null) array[leftStart][index] = bottom;
+                if (array[leftStart + 1][index] == null) array[leftStart + 1][index] = none;
             } else if (index == level) {
                 if (array[leftStart][level] == null) array[leftStart][level] = none;
                 array[leftStart + 1][level] = topLeft;
             }
         }
-
 
 
         Cluster parentCluster = clusterTree.get(subCluster.replaceAll("[\\_][1]$", ""));
@@ -270,7 +328,7 @@ public class DrawTableHierarchy {
     @Test
     public void test1() {
 
-        Cell[][] actual = calculatingArray("A_1~A_2");
+        Cell[][] actual = calculatingArray("", "A_1~A_2");
         Cell[][] expected = new Cell[4][2];
         expected[0] = new Cell[]{none, none};
         expected[1] = new Cell[]{bottom, topLeft};
@@ -283,7 +341,7 @@ public class DrawTableHierarchy {
     @Test
     public void test2() {
 
-        Cell[][] actual = calculatingArray("A_1_1~A_1_2~A_2");
+        Cell[][] actual = calculatingArray("", "A_1_1~A_1_2~A_2");
         Cell[][] expected = new Cell[6][3];
         expected[0] = new Cell[]{none, none, none};
         expected[1] = new Cell[]{none, bottom, topLeft};
@@ -298,7 +356,7 @@ public class DrawTableHierarchy {
     @Test
     public void test3() {
 
-        Cell[][] actual = calculatingArray("A_1~A_2_1~A_2_2");
+        Cell[][] actual = calculatingArray("", "A_1~A_2_1~A_2_2");
         Cell[][] expected = new Cell[6][3];
         expected[0] = new Cell[]{none, none, bottom};
         expected[1] = new Cell[]{none, topLeft, none};
@@ -313,7 +371,7 @@ public class DrawTableHierarchy {
     @Test
     public void test4() {
 
-        Cell[][] actual = calculatingArray("A_1_1~A_1_2~A_2_1~A_2_2");
+        Cell[][] actual = calculatingArray("", "A_1_1~A_1_2~A_2_1~A_2_2");
         Cell[][] expected = new Cell[8][3];
         expected[0] = new Cell[]{none, none, none};
         expected[1] = new Cell[]{none, bottom, topLeft};
@@ -330,7 +388,7 @@ public class DrawTableHierarchy {
     @Test
     public void test5() {
 
-        Cell[][] actual = calculatingArray("A_1~A_2_1_1~A_2_1_2~A_2_2");
+        Cell[][] actual = calculatingArray("", "A_1~A_2_1_1~A_2_1_2~A_2_2");
         Cell[][] expected = new Cell[8][4];
         expected[0] = new Cell[]{none, none, bottom, bottom};
         expected[1] = new Cell[]{none, topLeft, none, none};
@@ -347,7 +405,7 @@ public class DrawTableHierarchy {
     @Test
     public void test6() {
 
-        Cell[][] actual = calculatingArray("A_1_1~A_1_2~A_2_1_1~A_2_1_2~A_2_2");
+        Cell[][] actual = calculatingArray("", "A_1_1~A_1_2~A_2_1_1~A_2_1_2~A_2_2");
         Cell[][] expected = new Cell[10][4];
         expected[0] = new Cell[]{none, none, none, bottom};
         expected[1] = new Cell[]{none, bottom, topLeft, none};
@@ -358,6 +416,26 @@ public class DrawTableHierarchy {
         expected[6] = new Cell[]{none, bottomLeft, topLeft, bottomLeft};
         expected[7] = new Cell[]{none, none, left, none};
         expected[8] = new Cell[]{none, none, bottomLeft, bottom};
+        expected[9] = new Cell[]{none, none, none, none};
+
+        assertArrayEquals(expected, actual);
+    }
+
+
+    @Test
+    public void test7() {
+
+        Cell[][] actual = calculatingArray("", "A_1_1_1~A_1_1_2~A_1_2~A_2_1~A_2_2");
+        Cell[][] expected = new Cell[10][4];
+        expected[0] = new Cell[]{none, none, none, none};
+        expected[1] = new Cell[]{none, none,bottom, topLeft};
+        expected[2] = new Cell[]{none, bottom,topLeft, bottomLeft};
+        expected[3] = new Cell[]{none, topLeft, left, none};
+        expected[4] = new Cell[]{bottom, left, bottomLeft, bottom};
+        expected[5] = new Cell[]{none, left, none, none};
+        expected[6] = new Cell[]{none, left, none, bottom};
+        expected[7] = new Cell[]{none, bottomLeft, topLeft,none};
+        expected[8] = new Cell[]{none, none,bottomLeft,bottom};
         expected[9] = new Cell[]{none, none, none, none};
 
         assertArrayEquals(expected, actual);
