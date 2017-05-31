@@ -17,6 +17,10 @@ public class DrawTableHierarchy {
     ArrayList<Cluster> noPairLeftClusters = new ArrayList<>();
     int array_width;
 
+    public HashMap<String, Cluster> getClusterTree(){
+        return  clusterTree;
+    }
+
     public String[][] getHierachyStringFromText(String analysisDir,String splitStep) {
         String hierarchyString = "";
         try {

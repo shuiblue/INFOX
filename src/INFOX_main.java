@@ -29,18 +29,18 @@ public class INFOX_main {
         /*** user input***/
         String[] forkListArray = null;
         try {
-            forkListArray = new ProcessingText().readResult("/Users/shuruiz/Work/GithubProject/forklist.txt").split("\n");
+            forkListArray = new ProcessingText().readResult("/Users/shuruiz/Work/GithubProject/opencv_forkList.txt").split("\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
         Rengine re = new Rengine(new String[]{"--vanilla"}, false, null);
         if (!re.waitForR()) {
             System.out.println("Cannot load R");
-            return ;
+            return;
         }
 //        for (String forkName : forkListArray) {
-//            String forkName = "TsinghuaDatabaseGroup/VTree";
-        String forkName = "AdeDZY/ShardFeature";
+//          String forkName = "jfmcarreira/opencv";
+          String forkName = "AdeDZY/ShardFeature";
             boolean hasGroundTruth = false;
             String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName + FS;
             String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName + FS + "INFOX_output/";
@@ -62,9 +62,9 @@ public class INFOX_main {
 //
 //            /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir);
-//        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"withUpstream");
+//            String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
 //            System.out.println(diffPageUrl);
-////        String diffPageUrl = "https://github.com/TsinghuaDatabaseGroup/VTree/compare/13556037a20baa1a3928224ff7c087102a5bba8c...TsinghuaDatabaseGroup:7e6516cac56ffdd3145b82c94db8c0f0ce48dca5";
+////          String diffPageUrl = "https://github.com/TsinghuaDatabaseGroup/VTree/compare/13556037a20baa1a3928224ff7c087102a5bba8c...TsinghuaDatabaseGroup:7e6516cac56ffdd3145b82c94db8c0f0ce48dca5";
 //
 //
 //            ProcessingText processingText = new ProcessingText();
@@ -76,10 +76,9 @@ public class INFOX_main {
 //            githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
 //
 //
-//
 //            /*** start clustering code  ***/
 //            ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
-//            clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth,re);
+//            clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re);
 //
 //
 //            /*** hack github page   ***/
@@ -88,4 +87,7 @@ public class INFOX_main {
 //        }
 
     }
+
+
+
 }

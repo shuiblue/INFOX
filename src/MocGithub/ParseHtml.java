@@ -199,6 +199,9 @@ public class ParseHtml {
             allSplittingResult = new AnalyzingCommunityDetectionResult(analysisDir).getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
             for (String splitStep : combination_list) {
+
+                List<String> stopSplitClusters = Arrays.asList(new ProcessingText().readResult(analysisDir + "noSplittingStepList.txt").split("\n"));
+
                 HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep);
                 HashMap<String, List<String>> cluster_keyword = new HashMap<>();
                 String keyword[] = pt.readResult(analysisDir + splitStep + "_keyword.txt").split("\n");
@@ -210,8 +213,6 @@ public class ParseHtml {
                     cluster_keyword.put(cid, list);
                 }
 
-
-                List<String> stopSplitClusters = Arrays.asList(new ProcessingText().readResult(analysisDir + "noSplittingStepList.txt").split("\n"));
 
                 System.out.println("generating Cluster Summary Table for current splitting step: " + splitStep);
                 HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword, stopSplitClusters);
@@ -256,15 +257,16 @@ public class ParseHtml {
                     hasPair = hasPair(subClusterArray[j], subClusterArray[j + 1]);
                 }
 
-                new DrawTableHierarchy().calculatingArray(analysisDir, cid);
-
+                DrawTableHierarchy drawTableHierarchy = new DrawTableHierarchy();
+                drawTableHierarchy.calculatingArray(analysisDir, cid);
+                HashMap<String, DrawTableHierarchy.Cluster> clusterTree = drawTableHierarchy.getClusterTree();
                 System.out.print("get split step hierachy array ...");
-                String[][] hierarchyArray = new DrawTableHierarchy().getHierachyStringFromText(analysisDir, cid);
+                String[][] hierarchyArray = drawTableHierarchy.getHierachyStringFromText(analysisDir, cid);
 
                 String parentStep = clusterID.contains("_") ? clusterID.replaceAll("[_][1|2]$", "") : clusterID;
                 String joinStep = splitStep.replace(parentStep + "_1~" + parentStep + "_2", parentStep);
 
-                generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID, hasPair, hierarchyArray[2 * j], hierarchyArray[2 * j + 1], joinStep, colspan);
+                generate_one_row_of_currentCluster(cluster_keyword, sb, i, nextStepStr, clusterID, hasPair, hierarchyArray[2 * j], hierarchyArray[2 * j + 1], joinStep, colspan, clusterTree);
 
             }
         }
@@ -366,7 +368,7 @@ public class ParseHtml {
 
     }
 
-    private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID, boolean hasPair, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan) {
+    private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID, boolean hasPair, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan, HashMap<String, DrawTableHierarchy.Cluster> clusterTree) {
         System.out.print("adding one row for current summary table of cluster : " + clusterID + " ...");
 
         BackgroundColor cc = new BackgroundColor();
@@ -397,45 +399,18 @@ public class ParseHtml {
         int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
 
 
-        sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan));
+        sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan, clusterTree));
         System.out.println("done");
         return sb.toString();
     }
 
-    private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan) {
+    private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan, HashMap<String, DrawTableHierarchy.Cluster> clusterTree) {
 
 
-        String row_1 = "";
-        for (int i = 0; i < colspan - levelColumn_1.length; i++) {
-            row_1 += " <td  id=\"cel_none\"></td>\n";
-        }
-        for (String s : levelColumn_1) {
-            if (s.equals("bottomLeft")) {
-                row_1 += " <td  id=\"cel_" + s + "\">" + keyword_suffix + "</td>\n";
-            } else {
-                row_1 += " <td  id=\"cel_" + s + "\"></td>\n";
-            }
-        }
+        String row_1 = getLevelColumn(levelColumn_1, joinStep, colspan, current_clusterID, clusterTree);
+        String row_2 = getLevelColumn(levelColumn_2, joinStep, colspan, current_clusterID, clusterTree);
 
-
-        String row_2 = "<tr>";
-        for (int i = 0; i < colspan - levelColumn_2.length; i++) {
-            row_2 += " <td  id=\"cel_none\"></td>\n";
-        }
-        for (String s : levelColumn_2) {
-            if (s.equals("bottom")) {
-                row_2 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep + ".html\" class=\"button\">join</a></td>\n";
-            } else if (s.equals("topLeft")) {
-                row_2 += " <td  id=\"cel_" + s + "\">" + keyword_suffix + "</td>\n";
-            } else {
-
-                row_2 += " <td  id=\"cel_" + s + "\"></td>\n";
-            }
-        }
-        row_2 += "</tr>";
-
-        return "<tr> \n" +
-                row_1 +
+        return row_1 +
                 "       <td rowspan=\"2\" width=\"60\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
                 "       <td rowspan=\"2\" width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
                 "        <td rowspan=\"2\"><div class=\"long_td\">" + keyword_long + "</div></td>\n" +
@@ -443,6 +418,38 @@ public class ParseHtml {
                 nextStepStr +
                 "   </tr>" +
                 row_2;
+    }
+
+    private String getLevelColumn(String[] levelColumn_1, String joinStep, int colspan, String current_clusterID, HashMap<String, DrawTableHierarchy.Cluster> clusterTree) {
+        String row_1 = "<tr>";
+        for (int i = 0; i < colspan - levelColumn_1.length; i++) {
+            row_1 += " <td  id=\"cel_none\"></td>\n";
+        }
+        for (int x = 0; x < levelColumn_1.length; x++) {
+            String s = levelColumn_1[x];
+
+            if (s.equals("bottomLeft")||s.equals("bottom")) {
+                String join = "";
+                if (x <= levelColumn_1.length - 2) {
+                    if(levelColumn_1[x + 1].equals("topLeft")){
+                        System.out.print("");
+                    }
+                    join = levelColumn_1[x + 1].equals("topLeft")&&((x+1==levelColumn_1.length-1)||((x+1==levelColumn_1.length-2)&&levelColumn_1[x+2].equals("none")) )? "join " : "";
+                }
+
+
+                row_1 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep + ".html\" class=\"button\">" + join + "</a></td>\n";
+            }  else {
+                row_1 += " <td  id=\"cel_" + s + "\"></td>\n";
+            }
+        }
+        return row_1;
+    }
+
+    private String getJoinStep(String current_clusterID, int x) {
+
+        return "";
+
     }
 
 
@@ -686,7 +693,7 @@ public class ParseHtml {
 
 
     public static void main(String[] args) {
-ParseHtml parseHtml = new ParseHtml(0,0,"");
-parseHtml.getOriginalDiffPage("https://github.com/AdeDZY/ShardFeature/network","/Users/shuruiz/Desktop/");
+        ParseHtml parseHtml = new ParseHtml(0, 0, "");
+        parseHtml.getOriginalDiffPage("https://github.com/AdeDZY/ShardFeature/network", "/Users/shuruiz/Desktop/");
     }
 }

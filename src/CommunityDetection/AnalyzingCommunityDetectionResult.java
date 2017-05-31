@@ -102,8 +102,8 @@ public class AnalyzingCommunityDetectionResult {
         String[] resultArray = clusterResultListString.split("--------Graph-------");
 
         for (int i = 0; i < resultArray.length; i++) {
-            if(i>1)
-                isOriginalGraph=false;
+            if (i > 1)
+                isOriginalGraph = false;
             /**  one edge cutting result **/
             String result = resultArray[i];
             if (result.contains("communities")) {
@@ -490,7 +490,7 @@ public class AnalyzingCommunityDetectionResult {
 
         /**  generate combinations if split steps of sub-cluster **/
         System.out.println("    generating all the possible splitting steps... E.g,. ABC, A1A2BC, ABC1C2");
-        ArrayList<String> combination_list = new GenerateCombination(analysisDir,max_numberOfCut).generateAllCombineResult(testCaseDir, max_numberOfCut);
+        ArrayList<String> combination_list = new GenerateCombination(analysisDir, max_numberOfCut).generateAllCombineResult(testCaseDir, max_numberOfCut);
 
         for (String s : combination_list) {
             allClusteringResult.put(s, new HashMap<>());
@@ -521,21 +521,22 @@ public class AnalyzingCommunityDetectionResult {
         /**get all splitting result mapping , storing in 'topClustersSplittingResult'.**/
         getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
+        if (combination_list.size() > 1) {
+            for (String com : combination_list) {
+                if (com.replaceAll("1", "").length() == 0) {
+                    HashMap<String, HashSet<Integer>> origialClusters = getCopyOfOriginalClusters();
+                    allClusteringResult.put(com, origialClusters);
+                    continue;
+                }
 
-        for (String com : combination_list) {
-            if (com.replaceAll("1", "").length() == 0) {
-                HashMap<String, HashSet<Integer>> origialClusters = getCopyOfOriginalClusters();
-                allClusteringResult.put(com, origialClusters);
-                continue;
+                System.out.println("generate Clustering Result By Combining Splitting Steps ...:");
+                HashMap<String, HashSet<Integer>> currentCluster = generateClusteringResult_ByCombiningSplittingStep(com);
+
+                /****/
+                generateCompleteClusteringFiles(currentCluster, com);
+                parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, com, false);
+
             }
-
-            System.out.println("generate Clustering Result By Combining Splitting Steps ...:");
-            HashMap<String, HashSet<Integer>> currentCluster = generateClusteringResult_ByCombiningSplittingStep(com);
-
-            /****/
-            generateCompleteClusteringFiles(currentCluster, com);
-            parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, com, false);
-
         }
         return clusterResultMap;
     }
@@ -543,6 +544,7 @@ public class AnalyzingCommunityDetectionResult {
     /**
      * get all splitting result mapping , storing in 'topClustersSplittingResult'
      * * @param max_numberOfCut
+     *
      * @param topClusterList
      * @param combination_list
      * @return
@@ -557,7 +559,7 @@ public class AnalyzingCommunityDetectionResult {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir,max_numberOfCut).getAllSplitSteps(max_numberOfCut, topClusterList);
+        HashMap<String, HashMap<Integer, ArrayList<String>>> allSplitSteps_map = new GenerateCombination(analysisDir, max_numberOfCut).getAllSplitSteps(max_numberOfCut, topClusterList);
 
         allSplitSteps_map.forEach((k, v) -> {
             HashMap<Integer, HashMap<String, HashSet<Integer>>> map = new HashMap<>();
@@ -584,12 +586,12 @@ public class AnalyzingCommunityDetectionResult {
         for (String clusterID : topClist) {
             int originalClusterID = Integer.valueOf(clusterID.split("_")[0]);
 //            if (!noSplittingNode.contains(clusterID)) {
-                if (clusterID.split("_").length < max_numberOfCut + 1) {
-                    boolean isOriginal = false;
-                    if (!clusterID.contains("_")) {
-                        isOriginal = true;
-                    }
-                    if (!noSplittingNode.contains(clusterID)||isOriginal) {
+            if (clusterID.split("_").length < max_numberOfCut + 1) {
+                boolean isOriginal = false;
+                if (!clusterID.contains("_")) {
+                    isOriginal = true;
+                }
+                if (!noSplittingNode.contains(clusterID) || isOriginal) {
                     HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, isOriginal);
 //                    HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, false);
 
@@ -631,7 +633,7 @@ public class AnalyzingCommunityDetectionResult {
      * This function generate different clustering result by combining differernt splitting steps
      */
     private HashMap<String, HashSet<Integer>> generateClusteringResult_ByCombiningSplittingStep(String splitStep) {
-        System.out.println("current splitting step :"+splitStep);
+        System.out.println("current splitting step :" + splitStep);
         ProcessingText pt = new ProcessingText();
 
         HashMap<String, HashSet<Integer>> currentCluster = getCopyOfOriginalClusters();
@@ -665,7 +667,7 @@ public class AnalyzingCommunityDetectionResult {
 //
 //                while (itr.hasNext()) {
 
-                    currentCluster.put(cid, newCluster.get(cid));
+                currentCluster.put(cid, newCluster.get(cid));
 //                }
             }
         }
@@ -1016,7 +1018,7 @@ public class AnalyzingCommunityDetectionResult {
                 if (clusters.size() > 2 || (!isOriginal && clusters.size() == 2)) {
 //                if (clusters.size() > 2 || (clusters.size() == 2 && clusterID.contains("_"))) {
 
-                    if (clusters.size() > 3 ) {
+                    if (clusters.size() > 3) {
                         isOriginal = true;
                     }
                     for (int i = 0; i < clusters.size(); i++) {
@@ -1026,9 +1028,9 @@ public class AnalyzingCommunityDetectionResult {
                             if (isOriginal) {
                                 index = s.substring(0, s.indexOf(")")).trim();
                             } else {
-                                if(clusters.size()==2){
-                                    index=clusterID;
-                                }else {
+                                if (clusters.size() == 2) {
+                                    index = clusterID;
+                                } else {
                                     index = clusterID + "_" + i;
                                 }
                             }
@@ -1147,7 +1149,7 @@ public class AnalyzingCommunityDetectionResult {
         }
 
 
-        HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination(analysisDir,max_numberOfCut).getAllPairs(nodeIDSet);
+        HashSet<HashSet<Integer>> nodePairSet = new GenerateCombination(analysisDir, max_numberOfCut).getAllPairs(nodeIDSet);
         Iterator nodePair_iterator = nodePairSet.iterator();
 
 

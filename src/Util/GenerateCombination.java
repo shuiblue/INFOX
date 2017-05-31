@@ -1,8 +1,15 @@
 package Util;
 
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.util.*;
+
+import Util.ProcessingText;
+
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * Created by shuruiz on 1/6/17.
@@ -148,7 +155,7 @@ public class GenerateCombination {
                 }
             }
         }
-        if(noFurtherSplittingStepSet.size()>0) {
+        if (noFurtherSplittingStepSet.size() > 0) {
             noFurtherSplittingStepSet.forEach(stopCluster -> {
                 String[] clusterid = stopCluster.split("_");
                 int index = clusterid.length - 1;
@@ -254,66 +261,71 @@ public class GenerateCombination {
         }
 
         for (String clusterID : topClusters) {
-            HashSet<String> thisCombinelist = new HashSet<>();
-            thisCombinelist.add(clusterID);
+            HashSet<String> thisCombineSet = new HashSet<>();
+            thisCombineSet.add(clusterID);
             String nextStr = "";
             String[] children = new String[]{clusterID};
 
-            thisCombinelist = getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children);
-            all_cluster_combineList.add(new ArrayList<>(thisCombinelist));
+            getNextSteps(stopSplitClusters, thisCombineSet, nextStr, children);
+
+            all_cluster_combineList.add(new ArrayList<>(thisCombineSet));
 
         }
         return all_cluster_combineList;
     }
 
 
+    public void getNextSteps(List<String> stopSplitClusters, HashSet<String> thisCombineSet, final String currentStr, final String[] children) {
 
-    public HashSet<String> getNextSteps(List<String> stopSplitClusters, HashSet<String> thisCombinelist, String nextStr, String[] children) {
-
-        HashSet<String> tmpCombinelist = new HashSet<>();
         for (int i = 0; i < children.length; i++) {
 
             String child = children[i];
             if (child.split("_").length <= max_numberOfCut) {
+                String nextStr = currentStr;
                 if (!stopSplitClusters.contains(child)) {
                     nextStr += "~" + getChildren(child);
                 } else {
                     continue;
                 }
 
-                while (nextStr.startsWith("~")) {
-                    nextStr = nextStr.substring(1);
-                }
-
+                nextStr = removePrefixSymbol(nextStr);
                 String[] next = Arrays.copyOf(children, children.length);
                 next[i] = nextStr;
+
                 String nextStep = "";
                 for (String n : next) {
                     nextStep += "~" + n;
                 }
-                while (nextStep.startsWith("~")) {
-                    nextStep = nextStep.substring(1);
-                }
-                tmpCombinelist.add(nextStep);
-                children = nextStep.split("~");
-                nextStr = "";
+                nextStep = removePrefixSymbol(nextStep);
+                if (thisCombineSet.contains(nextStep)) {
 
-                tmpCombinelist.addAll(getNextSteps(stopSplitClusters, thisCombinelist, nextStr, children));
+                    continue;
+                }
+
+                thisCombineSet.add(nextStep);
+
+
+                String[] children2 = nextStep.split("~");
+                nextStr = "";
+                getNextSteps(stopSplitClusters, thisCombineSet, nextStr, children2);
             } else {
                 continue;
             }
 
         }
-        if (tmpCombinelist.size() > 0) {
-            thisCombinelist.addAll(tmpCombinelist);
+    }
+
+    private String removePrefixSymbol(String nextStr) {
+        while (nextStr.startsWith("~")) {
+            nextStr = nextStr.substring(1);
         }
-        return thisCombinelist;
+        return nextStr;
     }
 
-    public static void main(String[] args) {
-        GenerateCombination gc = new GenerateCombination("/Users/shuruiz/Desktop/",3);
-        gc.getAllCombination();
 
+    public static void main(String... a) {
+    System.out.print("Blah");
     }
+
 
 }

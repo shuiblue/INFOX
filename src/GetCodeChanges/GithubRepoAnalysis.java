@@ -103,7 +103,9 @@ public class GithubRepoAnalysis {
 //        String diffFilePath = "diff.txt";
 //        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-githubRepoAnalysis.calculatingAvgSizeOfCodeChanges("/Users/shuruiz/Work/GithubProject/forklist.txt");
+
+        String root = "/Users/shuruiz/Work/checkOpenCVForkSize/";
+githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root+"/opencv_forkList.txt");
 
 
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
@@ -114,12 +116,14 @@ githubRepoAnalysis.calculatingAvgSizeOfCodeChanges("/Users/shuruiz/Work/GithubPr
 
         try {
             String[] forkListArray = processingText.readResult(forkListFilePath).split("\n");
-            processingText.rewriteFile("","/Users/shuruiz/Work/GithubProject/codeChangeSize.csv" );
+
+            String root = "/Users/shuruiz/Work/checkOpenCVForkSize/";
+            processingText.rewriteFile("",root+"OpenCV_codeChangeSize.csv" );
             for (String forkName : forkListArray) {
-                String analysisDir = "/Users/shuruiz/Work/GithubProject/" + forkName + FS + "INFOX_output/";
+                String analysisDir = root + forkName + FS + "INFOX_output/";
                 ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"3 month");
-                String localSourceCodeDirPath = "/Users/shuruiz/Work/GithubProject/" + forkName + FS;
+                String localSourceCodeDirPath = root + forkName + FS;
                 String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
 
                 ProcessingText processingText = new ProcessingText();
@@ -132,7 +136,7 @@ githubRepoAnalysis.calculatingAvgSizeOfCodeChanges("/Users/shuruiz/Work/GithubPr
 
                 int size = processingText.readResult(localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt").split("\n").length;
 
-                processingText.writeTofile(forkName+","+size+"\n","/Users/shuruiz/Work/GithubProject/codeChangeSize.csv" );
+                processingText.writeTofile(forkName+","+size+"\n",root+"OpenCV_codeChangeSize.csv" );
             }
 
         } catch (IOException e) {
