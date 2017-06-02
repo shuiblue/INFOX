@@ -38,9 +38,7 @@ public class ClusterCodeChanges {
     /**
      * This function cluster changed code from a fork
      */
-    public void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth,  Rengine re) {
-
-
+    public void clusteringChangedCodeFromFork(String localSourceCodeDirPath, boolean hasGroundTruth,  Rengine re,int minimumClusterSize) {
 
         int approachIndex = 1; //INFOX ==1
         String sourcecodeDir = localSourceCodeDirPath;
@@ -51,7 +49,7 @@ public class ClusterCodeChanges {
         /** start ... **/
         AnalyzingRepository ap = new AnalyzingRepository();
         ap.setNumberOfCut_numberOfBiggestClusters(max_numberOfCut,numberOfBiggestClusters);
-        ap.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
+        ap.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath,minimumClusterSize);
     }
 
     private void realProjectTest_withGroundTruth() {
@@ -106,7 +104,7 @@ public class ClusterCodeChanges {
 
                 String testCaseDir = sourcecodeDir + analysisDirName + FS;
                 System.out.println(testCaseDir);
-                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath);
+                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, hasGroundTruth, repoPath,50);
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -179,9 +177,9 @@ public class ClusterCodeChanges {
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                                 System.out.println(testCaseDir);
-                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re, hasGroundTruth);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re, hasGroundTruth,50);
                                 System.out.println(testCaseDir_macrosFromOneFile);
-                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re, hasGroundTruth);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re, hasGroundTruth,50);
                             }
                         }
                     }

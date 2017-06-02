@@ -47,7 +47,7 @@ public class ParseHtml {
     HashMap<String, String> cluster_color = new HashMap<>();
     static HashMap<Integer, HashMap<Integer, HashMap<String, HashSet<Integer>>>> allSplittingResult;
     static int otherClusterSize = 0;
-
+    String publicToken;
 
     public String appendTableTitle(int colspan) {
         return "<table id=\"cluster\"  \n" +
@@ -65,11 +65,11 @@ public class ParseHtml {
                 "    </tr>\n";
     }
 
-    public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters, String analysisDir) {
+    public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters, String analysisDir,String publicToken) {
         this.max_numberOfCut = max_numberOfCut;
         this.numberOfBiggestClusters = numberOfBiggestClusters;
         this.analysisDir = analysisDir;
-
+        this.publicToken=publicToken;
 
     }
 
@@ -428,18 +428,18 @@ public class ParseHtml {
         for (int x = 0; x < levelColumn_1.length; x++) {
             String s = levelColumn_1[x];
 
-            if (s.equals("bottomLeft")||s.equals("bottom")) {
+            if (s.equals("bottomLeft") || s.equals("bottom")) {
                 String join = "";
                 if (x <= levelColumn_1.length - 2) {
-                    if(levelColumn_1[x + 1].equals("topLeft")){
+                    if (levelColumn_1[x + 1].equals("topLeft")) {
                         System.out.print("");
                     }
-                    join = levelColumn_1[x + 1].equals("topLeft")&&((x+1==levelColumn_1.length-1)||((x+1==levelColumn_1.length-2)&&levelColumn_1[x+2].equals("none")) )? "join " : "";
+                    join = levelColumn_1[x + 1].equals("topLeft") && ((x + 1 == levelColumn_1.length - 1) || ((x + 1 == levelColumn_1.length - 2) && levelColumn_1[x + 2].equals("none"))) ? "join " : "";
                 }
 
 
                 row_1 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep + ".html\" class=\"button\">" + join + "</a></td>\n";
-            }  else {
+            } else {
                 row_1 += " <td  id=\"cel_" + s + "\"></td>\n";
             }
         }
@@ -603,13 +603,15 @@ public class ParseHtml {
      * @return
      */
     public String getDiffPageUrl(String localSourceCodeDirPath, String forkName, String timeWindowSize) {
-        String forkUrl = github_api + forkName + "?access_token=77f3237f8b1c5d6d7b66849fd33e247692911641";
+
+
+        String forkUrl = github_api + forkName + "?access_token=" + publicToken;
         JsonUtility jsonUtility = new JsonUtility();
         try {
             // get latest commit sha
             String[] todayTimeStamp = new Timestamp(System.currentTimeMillis()).toString().split(" ");
             String format_current_time = todayTimeStamp[0] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
-            JSONObject fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + forkName + "/commits?access_token=77f3237f8b1c5d6d7b66849fd33e247692911641&until=" + format_current_time));
+            JSONObject fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + forkName + "/commits?access_token=" + publicToken + "&until=" + format_current_time));
             String latestCommitSHA = fork_commit_jsonObj.getString("sha");
             String latestCommitDate = fork_commit_jsonObj.getJSONObject("commit").getJSONObject("author").get("date").toString();
             int latestMonth = Integer.parseInt(latestCommitDate.split("-")[1]);
@@ -629,7 +631,7 @@ public class ParseHtml {
                     JSONObject upstreamInfo = (JSONObject) fork_jsonObj.get("parent");
 
                     comparedFork = upstreamInfo.getString("full_name");
-                    JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?access_token=77f3237f8b1c5d6d7b66849fd33e247692911641&until=" + firstCommitTimeStamp));
+                    JSONObject upstream_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?access_token=" + publicToken + "&until=" + firstCommitTimeStamp));
                     previousCommitSHA = upstream_jsonObj.getString("sha");
                 } else {
                     //git rev-list --max-parents=0 HEAD
@@ -650,7 +652,6 @@ public class ParseHtml {
                 }
 
             } else if (timeWindowSize.contains("month")) {
-                int[] monthArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
                 int diffMonth = Integer.parseInt(timeWindowSize.split(" ")[0]);
 
                 int delta = latestMonth - diffMonth;
@@ -661,8 +662,11 @@ public class ParseHtml {
 
                 comparedFork = forkName;
                 String previousTimeStamp = previousYear + "-" + previousMonthStr + "-" + todayTimeStamp[0].split("-")[2] + "T" + todayTimeStamp[1].split("\\.")[0] + "Z";
-                // get latest commit sha
-                fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(github_api + comparedFork + "/commits?until=" + previousTimeStamp));
+                // get latest commit sha\
+                String url = github_api + comparedFork + "/commits?until=" + previousTimeStamp + "access_token=" + publicToken;
+
+                fork_commit_jsonObj = new JSONObject(jsonUtility.readUrl(url));
+
                 previousCommitSHA = fork_commit_jsonObj.getString("sha");
 
 
@@ -691,9 +695,4 @@ public class ParseHtml {
         return "";
     }
 
-
-    public static void main(String[] args) {
-        ParseHtml parseHtml = new ParseHtml(0, 0, "");
-        parseHtml.getOriginalDiffPage("https://github.com/AdeDZY/ShardFeature/network", "/Users/shuruiz/Desktop/");
-    }
 }

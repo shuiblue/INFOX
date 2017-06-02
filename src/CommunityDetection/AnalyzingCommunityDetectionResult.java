@@ -521,8 +521,9 @@ public class AnalyzingCommunityDetectionResult {
         /**get all splitting result mapping , storing in 'topClustersSplittingResult'.**/
         getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
-        if (combination_list.size() > 1) {
+        if (combination_list.size() > 0&&combination_list.get(0).contains("--")) {
             for (String com : combination_list) {
+
                 if (com.replaceAll("1", "").length() == 0) {
                     HashMap<String, HashSet<Integer>> origialClusters = getCopyOfOriginalClusters();
                     allClusteringResult.put(com, origialClusters);

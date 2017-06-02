@@ -14,7 +14,7 @@ import java.util.Map;
  * Created by shuruiz on 3/30/17.
  */
 public class GithubRepoAnalysis {
-    ProcessingText processingText = new ProcessingText();
+    static ProcessingText processingText = new ProcessingText();
     static final String FS = File.separator;
 
     public HashMap<String, ArrayList<Integer>> getChangedCodeForGithubRepo(String diffFilePath) {
@@ -105,26 +105,32 @@ public class GithubRepoAnalysis {
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
 
         String root = "/Users/shuruiz/Work/checkOpenCVForkSize/";
-githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root+"/opencv_forkList.txt");
+        String token = null;
+        try {
+            token = processingText.readResult("./testCases/token.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/opencv_forkList.txt",token);
 
 
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
 //        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, dir + forkAddedNode_file);
     }
 
-    public void calculatingAvgSizeOfCodeChanges(String forkListFilePath) {
+    public void calculatingAvgSizeOfCodeChanges(String forkListFilePath,String publicToken) {
 
         try {
             String[] forkListArray = processingText.readResult(forkListFilePath).split("\n");
 
             String root = "/Users/shuruiz/Work/checkOpenCVForkSize/";
-            processingText.rewriteFile("",root+"OpenCV_codeChangeSize.csv" );
+            processingText.rewriteFile("", root + "OpenCV_codeChangeSize.csv");
             for (String forkName : forkListArray) {
                 String analysisDir = root + forkName + FS + "INFOX_output/";
-                ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir);
+                ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir,publicToken);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"3 month");
                 String localSourceCodeDirPath = root + forkName + FS;
-                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
+                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "3 month");
 
                 ProcessingText processingText = new ProcessingText();
                 processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
@@ -136,7 +142,7 @@ githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root+"/opencv_forkList.txt");
 
                 int size = processingText.readResult(localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt").split("\n").length;
 
-                processingText.writeTofile(forkName+","+size+"\n",root+"OpenCV_codeChangeSize.csv" );
+                processingText.writeTofile(forkName + "," + size + "\n", root + "OpenCV_codeChangeSize.csv");
             }
 
         } catch (IOException e) {

@@ -42,9 +42,10 @@ public class R_CommunityDetection {
     StringBuilder noSplitting_step = new StringBuilder();
 
     //todo: user input
-    int minimumClusterSize = 50;
+//    int minimumClusterSize = 50;
+    int minimumClusterSize ;
 
-    public R_CommunityDetection(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re, int max_numberOfCut, int numberOfBiggestClusters) {
+    public R_CommunityDetection(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re, int max_numberOfCut, int numberOfBiggestClusters, int minimumClusterSize) {
         this.sourcecodeDir = sourcecodeDir;
         if (testDir.equals("")) {
             this.analysisDir = testCaseDir;
@@ -60,6 +61,7 @@ public class R_CommunityDetection {
         this.re = re;
         this.max_numberOfCut = max_numberOfCut;
         this.numberOfBiggestClusters = numberOfBiggestClusters;
+        this.minimumClusterSize=minimumClusterSize;
     }
 
     public R_CommunityDetection(String analysisDir) {

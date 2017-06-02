@@ -200,7 +200,7 @@ public class DependencyGraph {
             /** Check whether forkAddedNode file exists **/
             changedFiles = new HashSet<>();
 
-            forkAddedNodeTxt =  "forkAddedNode.txt";
+            forkAddedNodeTxt = "forkAddedNode.txt";
             if (new File(forkAddedNodeTxt).exists()) {
                 try {
                     forkaddedNodeList = processingText.getForkAddedNodeList(forkAddedNodeTxt);
@@ -266,16 +266,17 @@ public class DependencyGraph {
 
     /**
      * This function get nodeid to label map
+     *
      * @return hashmap  nodeid_label
      */
-    public HashMap<Integer,String> getNodeid2LableMap(String analysisDir){
-        HashMap<Integer,String> nodeID_label= new HashMap<>();
+    public HashMap<Integer, String> getNodeid2LableMap(String analysisDir) {
+        HashMap<Integer, String> nodeID_label = new HashMap<>();
         try {
-            String[] nodeArray = processingText.readResult(analysisDir+"NodeList.txt").split("\n");
-            for(String node :nodeArray){
+            String[] nodeArray = processingText.readResult(analysisDir + "NodeList.txt").split("\n");
+            for (String node : nodeArray) {
                 String[] nodeInfo = node.split("---------");
-                if(nodeInfo.length>1){
-                    nodeID_label.put(Integer.valueOf(nodeInfo[0]),nodeInfo[1]);
+                if (nodeInfo.length > 1) {
+                    nodeID_label.put(Integer.valueOf(nodeInfo[0]), nodeInfo[1]);
                 }
             }
         } catch (IOException e) {
@@ -339,7 +340,8 @@ public class DependencyGraph {
                     if (!filePath.toString().contains("pixman-arm-neon-asm.h")
                             && !filePath.toString().contains("SkBitmapSamplerTemplate.h")
                             && !filePath.toString().contains("prstrms.h")
-                            && !filePath.toString().contains("/js/")) {
+                            && !filePath.toString().contains("/js/") ){
+
 
                         parseSingleFile(filePath);
                     }
@@ -353,9 +355,10 @@ public class DependencyGraph {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
 //                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
 /**  need to parse pde file as well for real fork**/
-                if (Files.isRegularFile(filePath) && (processingText.isCFile(filePath.toString()) || processingText.isPdeFile(filePath.toString())||processingText.isInoFile(filePath.toString())||processingText.isCCFile(filePath.toString()))) {
-
-                    parseSingleFile(filePath);
+                if (Files.isRegularFile(filePath) && new ProcessingText().isCLanguageFile(filePath)) {
+                    if (!filePath.toString().contains("/matlab/")) {
+                        parseSingleFile(filePath);
+                    }
                 }
             });
         } catch (IOException e) {
@@ -424,25 +427,22 @@ public class DependencyGraph {
     }
 
 
-
     private static void addAllNodeToChangedCodeGraphFile(String analysisDir) {
-ProcessingText processingText = new ProcessingText() ;
+        ProcessingText processingText = new ProcessingText();
 //        String analysisDir =                "/Users/shuruiz/Work/GithubProject/malx122/Marlin/INFOX_output/";
 //        String analysisDir =  testCaseDir;
         try {
-            String completeNodeList = processingText.readResult(analysisDir+"complete.pajek.net").split("\\*arcs")[0];
-            String changedCodeGraph[]= processingText.readResult(analysisDir+"changedCode.pajek.net").split("\\*arcs");
+            String completeNodeList = processingText.readResult(analysisDir + "complete.pajek.net").split("\\*arcs")[0];
+            String changedCodeGraph[] = processingText.readResult(analysisDir + "changedCode.pajek.net").split("\\*arcs");
 
             String changedCodeGraph_edgeList = changedCodeGraph[1];
-            String newChangeGraph  = completeNodeList+"*arcs"+changedCodeGraph_edgeList;
+            String newChangeGraph = completeNodeList + "*arcs" + changedCodeGraph_edgeList;
 
-            processingText.rewriteFile(newChangeGraph,analysisDir+"changedCode.pajek.net");
+            processingText.rewriteFile(newChangeGraph, analysisDir + "changedCode.pajek.net");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-
 
 
     /**
@@ -462,7 +462,7 @@ ProcessingText processingText = new ProcessingText() ;
 //        if (fileName.endsWith(".h") || fileName.endsWith(".pde")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
 //        if (fileName.endsWith(".h")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
         /**for real fork **/
-        if (fileName.endsWith(".h") || fileName.endsWith(".pde")||fileName.endsWith(".ino")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
+        if (fileName.endsWith(".h") || fileName.endsWith(".pde") || fileName.endsWith(".ino")) {  // src2srcml cannot parse  ' *.h' file correctly, so change the suffix '+.cpp'
             tmpFilePath += ".cpp";
         }
         try {
@@ -1770,7 +1770,7 @@ ProcessingText processingText = new ProcessingText() ;
      * @param exprLocation
      */
     private void storeIntoNodeList(String exprLocation) {
-        if(exprLocation.equals("")){
+        if (exprLocation.equals("")) {
             System.out.println("");
         }
         // -----------for dependency graph
@@ -1833,6 +1833,7 @@ ProcessingText processingText = new ProcessingText() ;
             } else {
                 location = getLocationOfElement(callNameElement, fileName);
             }
+            System.out.print(location + "\n");
             String callName = callNameElement.getValue();
             if (callName.contains(".")) {
                 String obj = callName.split("\\.")[0];
@@ -1856,11 +1857,13 @@ ProcessingText processingText = new ProcessingText() ;
         }
         //argument list
         Element argumentListEle = callNode.getFirstChildElement("argument_list", NAMESPACEURI);
-        Elements argumentList = argumentListEle.getChildElements("argument", NAMESPACEURI);
-        if (location.equals("")) {
-            location = getLocationOfElement(argumentListEle, fileName);
+        if (argumentListEle != null) {
+            Elements argumentList = argumentListEle.getChildElements("argument", NAMESPACEURI);
+            if (location.equals("")) {
+                location = getLocationOfElement(argumentListEle, fileName);
+            }
+            handleArgumentList(argumentList, location, scope, parentLocation, isInit);
         }
-        handleArgumentList(argumentList, location, scope, parentLocation, isInit);
         return location;
     }
 
@@ -2285,7 +2288,6 @@ ProcessingText processingText = new ProcessingText() ;
         }
 
     }
-
 
 
 }

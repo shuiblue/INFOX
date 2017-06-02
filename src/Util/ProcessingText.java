@@ -552,7 +552,9 @@ public class ProcessingText {
         }
         return false;
     }
-
+    public boolean isCLanguageFile(Path filePath) {
+        return isCFile(filePath.toString()) || isPdeFile(filePath.toString())||isInoFile(filePath.toString())||isCCFile(filePath.toString());
+    }
     public static void main(String[] args) {
         String path = "C:\\Users\\shuruiz\\Documents\\LineCounter\\txt\\";
         final int[] lines = {0};
