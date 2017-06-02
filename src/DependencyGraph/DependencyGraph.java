@@ -3,6 +3,7 @@ package DependencyGraph;
 import NamingClusters.StopWords;
 import Util.GenerateCombination;
 import Util.ProcessingText;
+import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.Text;
@@ -1538,7 +1539,6 @@ public class DependencyGraph {
             findVarDependency(type_symbol);
         }
 
-        System.out.println(NAMESPACEURI);
         processingText.writeTofile(getLocationOfElement(element, fileName) + "\n", parsedLineTxt);
         return symbol;
     }
@@ -1762,7 +1762,16 @@ public class DependencyGraph {
     private String getLineNumOfElement(Element element) {
         String lineNum = "-1";
         if (element.getAttributeCount() > 0) {
-            lineNum = element.getAttribute("line", NAMESPACEURI_POSITION).getValue();
+            Attribute lineNum_attr = element.getAttribute("line", NAMESPACEURI_POSITION);
+            if (lineNum_attr != null) {
+                lineNum = lineNum_attr.getValue();
+            } else if (element.getFirstChildElement("position") != null) {
+                System.out.print("position tag!!!");
+                lineNum = element.getFirstChildElement("position").getAttribute("line", NAMESPACEURI_POSITION).getValue();
+
+            }
+
+
         } else {
             Elements childElements = element.getChildElements();
             int childElements_size = childElements.size();
