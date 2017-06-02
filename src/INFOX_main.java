@@ -19,6 +19,7 @@ public class INFOX_main {
     static String github_api = "https://api.github.com/repos/";
     static String github_page = "https://github.com/";
 
+    static String OS = System.getProperty("os.name").toLowerCase();
 
     /**
      * Main method for testing the INFOX method
@@ -45,10 +46,11 @@ public class INFOX_main {
         String forkListFile = experimentParameters[4];
         String current_OS = experimentParameters[5];
         String timeWindow = experimentParameters[6];
+
         /*** user input***/
         String[] forkListArray = null;
         try {
-            forkListArray = new ProcessingText().readResult("./testCases/"+forkListFile).split("\n");
+            forkListArray = new ProcessingText().readResult("./testCases/" + forkListFile).split("\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,12 +61,14 @@ public class INFOX_main {
         }
         for (String forkName : forkListArray) {
             boolean hasGroundTruth = false;
-            String testCasesDir ;
-            if (current_OS.equals("MAC")) {
+            String testCasesDir;
+
+            if (OS.indexOf("mac") >= 0) {
                 testCasesDir = "/Users/shuruiz/Work/GithubProject/";
             } else {
                 testCasesDir = "/home/feature/INFOX_testCases/";
             }
+
             String localSourceCodeDirPath = testCasesDir + forkName + FS;
             String analysisDir = testCasesDir + forkName + FS + "INFOX_output/";
 
@@ -72,7 +76,7 @@ public class INFOX_main {
             /***git clone repo to local dir***/
             JgitUtility jgitUtility = new JgitUtility();
             String uri = github_page + forkName + ".git";
-            System.out.println("Cloning repo from github: " + forkName+" to "+testCasesDir);
+            System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
             jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
             if (forkName.contains("Marlin")) {
                 try {
