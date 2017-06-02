@@ -20,8 +20,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ProcessingText {
+    static String current_OS = System.getProperty("os.name").toLowerCase();
 
     public void writeTofile(String content, String filepath) {
+
 
         try {
             File file = new File(filepath);
@@ -183,24 +185,26 @@ public class ProcessingText {
     }
 
     /**
+     * create dir for store xml files
+     *
      * @param inputFile file that need to be parsed by srcML
      * @return path of XML file
      * @throws IOException e
      */
     public static String getXmlFile(String inputFile) {
-        // create dir for store xml files
-
         String outXmlFile = inputFile + ".xml";
         //run srcML
         if (new File(inputFile).isFile()) {
             try {
-                ProcessBuilder processBuilder = new ProcessBuilder("srcml", "--position", inputFile, "-o", outXmlFile);
-//                ProcessBuilder processBuilder = new ProcessBuilder("src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
-//                ProcessBuilder processBuilder = new ProcessBuilder("srcML/src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
-    /* for windows
-              ProcessBuilder processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
-              inputFile, "-o", outXmlFile);
-     */
+                ProcessBuilder processBuilder = null;
+                if (current_OS.indexOf("mac") >= 0) {
+                    processBuilder = new ProcessBuilder("src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
+                } else if (current_OS.indexOf("windows") >= 0) {
+                    processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
+                            inputFile, "-o", outXmlFile);
+                } else {
+                    processBuilder = new ProcessBuilder("srcml", "--position", inputFile, "-o", outXmlFile);
+                }
 
                 Process process = processBuilder.start();
                 process.waitFor();
