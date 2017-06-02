@@ -194,7 +194,7 @@ public class ProcessingText {
         //run srcML
         if (new File(inputFile).isFile()) {
             try {
-                ProcessBuilder processBuilder = new ProcessBuilder("src", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
+                ProcessBuilder processBuilder = new ProcessBuilder("srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
 //                ProcessBuilder processBuilder = new ProcessBuilder("src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
 //                ProcessBuilder processBuilder = new ProcessBuilder("srcML/src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
     /* for windows
