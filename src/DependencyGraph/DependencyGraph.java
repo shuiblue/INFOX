@@ -176,15 +176,15 @@ public class DependencyGraph {
     }
 
     public DependencyGraph() {
-        if (current_OS.indexOf("mac") >= 0) {
-            NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
-            NAMESPACEURI = "http://www.sdml.info/srcML/src";
-            NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
-        } else {
-            NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
-            NAMESPACEURI = "http://www.srcML.org/srcML/src";
-            NAMESPACEURI_CPP = "http://www.srcML.org/srcML/cpp";
-        }
+//        if (current_OS.indexOf("mac") >= 0) {
+//            NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
+//            NAMESPACEURI = "http://www.sdml.info/srcML/src";
+//            NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
+//        } else {
+        NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
+        NAMESPACEURI = "http://www.srcML.org/srcML/src";
+        NAMESPACEURI_CPP = "http://www.srcML.org/srcML/cpp";
+//        }
     }
 
     public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re) {
@@ -645,6 +645,10 @@ public class DependencyGraph {
                 tmpStmtList.add(parseDoWhile(ele, fileName, scope));
             } else if (ele.getLocalName().equals("using")) {
                 Element nameEle = ele.getFirstChildElement("name", NAMESPACEURI);
+                if (nameEle == null) {
+                    Element namespace_Ele = ele.getFirstChildElement("namespace", NAMESPACEURI);
+                    nameEle = namespace_Ele.getFirstChildElement("name", NAMESPACEURI);
+                }
                 String location = getLocationOfElement(nameEle, fileName);
                 tmpStmtList.add(fileName + "-" + line);
                 Symbol symbol = new Symbol(nameEle.getValue(), "", location, "using", scope);
