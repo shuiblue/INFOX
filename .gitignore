@@ -38,3 +38,5 @@ out/
 .svn
 .CVS
 .hg*
+
+.idea/
