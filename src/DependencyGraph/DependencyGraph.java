@@ -1146,7 +1146,6 @@ public class DependencyGraph {
         } else {
             tag = "function_decl";
         }
-
         //add function to symbol table
         Symbol functionSymbol = addDeclarationSymbol(element, tag, fileName, scope, "", "");
         String parentLocation = functionSymbol.getLocation();
@@ -1389,10 +1388,10 @@ public class DependencyGraph {
         String forLocation = getLocationOfElement(ele, fileName);
         Element control = ele.getFirstChildElement("control", NAMESPACEURI);
         Element init;
-        if(control!=null) {
-             init = control.getFirstChildElement("init", NAMESPACEURI);
-        }else{
-             init = ele.getFirstChildElement("init", NAMESPACEURI);
+        if (control != null) {
+            init = control.getFirstChildElement("init", NAMESPACEURI);
+        } else {
+            init = ele.getFirstChildElement("init", NAMESPACEURI);
         }
 
         Element init_decl = null, init_expr = null;
@@ -1539,6 +1538,7 @@ public class DependencyGraph {
             findVarDependency(type_symbol);
         }
 
+        System.out.println(NAMESPACEURI);
         processingText.writeTofile(getLocationOfElement(element, fileName) + "\n", parsedLineTxt);
         return symbol;
     }
@@ -1792,9 +1792,6 @@ public class DependencyGraph {
      * @param exprLocation
      */
     private void storeIntoNodeList(String exprLocation) {
-        if (exprLocation.equals("")) {
-            System.out.println("");
-        }
         // -----------for dependency graph
         if (!nodeList.containsKey(exprLocation)) {
             id++;
@@ -1808,7 +1805,6 @@ public class DependencyGraph {
                 complete_nodeList.add(exprLocation);
             }
         }
-//        System.out.println(exprLocation);
         // --------for compact graph--------------
         String filename = exprLocation.split("-")[0];
         if (!changedFiles.contains(filename)) {
@@ -1855,7 +1851,6 @@ public class DependencyGraph {
             } else {
                 location = getLocationOfElement(callNameElement, fileName);
             }
-            System.out.print(location + "\n");
             String callName = callNameElement.getValue();
             if (callName.contains(".")) {
                 String obj = callName.split("\\.")[0];
