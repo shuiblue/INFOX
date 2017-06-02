@@ -70,7 +70,7 @@ public class INFOX_main {
             if (current_OS.indexOf("mac") >= 0) {
                 testCasesDir = "/Users/shuruiz/Work/GithubProject/";
             } else {
-                testCasesDir = "/home/feature/INFOX_testCases/";
+                testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
             }
             if (current_OS.indexOf("mac") >= 0) {
                 Root_Dir = "/Users/shuruiz/Work/";
