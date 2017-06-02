@@ -643,5 +643,13 @@ public class ProcessingText {
             System.out.println("File is deleted : " + file.getAbsolutePath());
         }
     }
-
+    public static String getRootDir() {
+        if (current_OS.indexOf("mac") >= 0) {
+           return "/Users/shuruiz/Work/";
+        } else if (current_OS.indexOf("windows") >= 0) {
+            return "C:\\Users\\shuruiz\\Documents\\";
+        } else {
+            return "./";
+        }
+    }
 }

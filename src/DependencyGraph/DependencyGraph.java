@@ -35,8 +35,7 @@ public class DependencyGraph {
     /**
      * These two var are used for srcML
      **/
-    static final public String NAMESPACEURI = "http://www.sdml.info/srcML/src";
-    static final public String NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
+    String NAMESPACEURI , NAMESPACEURI_CPP , NAMESPACEURI_POSITION;
 
     public boolean HIERACHICAL = true;
     public boolean CONTROL_FLOW = true;
@@ -163,9 +162,16 @@ public class DependencyGraph {
         System.out.println("DEF_USE: " + DEF_USE);
         System.out.println(" CONSECUTIVE: " + CONSECUTIVE);
 
-    }
+        if (current_OS.indexOf("mac") >= 0) {
+            NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
+             NAMESPACEURI = "http://www.sdml.info/srcML/src";
+             NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
+        } else {
+            NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
+             NAMESPACEURI = "http://www.srcML.org/srcML/src";
+             NAMESPACEURI_CPP ="http://www.srcML.org/srcML/cpp";
+        }
 
-    public DependencyGraph() {
 
     }
 
@@ -300,18 +306,7 @@ public class DependencyGraph {
         this.testCaseDir = testCaseDir;
         this.testDir = testDir;
         gotoMap = new HashMap<>();
-
-        if (current_OS.equals("MAC")) {
-            Root_Dir = "/Users/shuruiz/Work/";
-        }
-
-        if (current_OS.indexOf("mac") >= 0) {
-            Root_Dir = "/Users/shuruiz/Work/";
-        } else if (current_OS.indexOf("windows") >= 0) {
-            Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
-        } else {
-            Root_Dir = "./";
-        }
+        Root_Dir = processingText.getRootDir();
 
         /**------------ Specify paths --------------**/
         forkAddedNodeTxt = testCaseDir + "forkAddedNode.txt";
@@ -1745,7 +1740,7 @@ public class DependencyGraph {
     private String getLineNumOfElement(Element element) {
         String lineNum = "-1";
         if (element.getAttributeCount() > 0) {
-            lineNum = element.getAttribute("line", "http://www.sdml.info/srcML/position").getValue();
+            lineNum = element.getAttribute("line", NAMESPACEURI_POSITION).getValue();
         } else {
             Elements childElements = element.getChildElements();
             int childElements_size = childElements.size();

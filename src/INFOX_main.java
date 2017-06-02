@@ -72,13 +72,7 @@ public class INFOX_main {
             } else {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
             }
-            if (current_OS.indexOf("mac") >= 0) {
-                Root_Dir = "/Users/shuruiz/Work/";
-            } else if (current_OS.indexOf("windows") >= 0) {
-                Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
-            } else {
-                Root_Dir = "./";
-            }
+           Root_Dir= new ProcessingText(). getRootDir();
             String localSourceCodeDirPath = testCasesDir + forkName + FS;
             String analysisDir = testCasesDir + forkName + FS + "INFOX_output/";
 
@@ -129,6 +123,8 @@ public class INFOX_main {
         }
 
     }
+
+
 
 
 }
