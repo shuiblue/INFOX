@@ -35,7 +35,7 @@ public class DependencyGraph {
     /**
      * These two var are used for srcML
      **/
-    String NAMESPACEURI , NAMESPACEURI_CPP , NAMESPACEURI_POSITION;
+    String NAMESPACEURI, NAMESPACEURI_CPP, NAMESPACEURI_POSITION;
 
     public boolean HIERACHICAL = true;
     public boolean CONTROL_FLOW = true;
@@ -164,18 +164,27 @@ public class DependencyGraph {
 
         if (current_OS.indexOf("mac") >= 0) {
             NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
-             NAMESPACEURI = "http://www.sdml.info/srcML/src";
-             NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
+            NAMESPACEURI = "http://www.sdml.info/srcML/src";
+            NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
         } else {
             NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
-             NAMESPACEURI = "http://www.srcML.org/srcML/src";
-             NAMESPACEURI_CPP ="http://www.srcML.org/srcML/cpp";
+            NAMESPACEURI = "http://www.srcML.org/srcML/src";
+            NAMESPACEURI_CPP = "http://www.srcML.org/srcML/cpp";
         }
 
 
     }
-     public DependencyGraph(){
 
+    public DependencyGraph() {
+        if (current_OS.indexOf("mac") >= 0) {
+            NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
+            NAMESPACEURI = "http://www.sdml.info/srcML/src";
+            NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
+        } else {
+            NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
+            NAMESPACEURI = "http://www.srcML.org/srcML/src";
+            NAMESPACEURI_CPP = "http://www.srcML.org/srcML/cpp";
+        }
     }
 
     public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re) {
@@ -2291,5 +2300,18 @@ public class DependencyGraph {
 
     }
 
+    public static void main(String[] args) {
+        ProcessingText processingText = new ProcessingText();
+        /** generating DOM tree by xmlParser (xom) **/
+        Element root = processingText.getXmlDom("/Users/shuruiz/Downloads/1.xml").getRootElement();
+
+        /** Rewrite the file name for the convenience of generating html files later **/
+        String newFileName = processingText.changeFileName("1.c");
+        String parentLocation = "";
+        /** Generating dependency graph for  **/
+        System.out.println("now parsing ----:" + newFileName);
+        new DependencyGraph().generatingDependencyGraphForSubTree(root, newFileName, 1, parentLocation);
+
+    }
 
 }
