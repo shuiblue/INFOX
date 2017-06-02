@@ -174,7 +174,9 @@ public class DependencyGraph {
 
 
     }
+     public DependencyGraph(){
 
+    }
 
     public void generateChangedDependencyGraphFromCompleteGraph(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re) {
         this.analysisDir = testCaseDir + testDir + FS;
