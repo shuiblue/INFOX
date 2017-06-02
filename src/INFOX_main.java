@@ -44,8 +44,7 @@ public class INFOX_main {
         int minimumClusterSize = Integer.valueOf(experimentParameters[2]);
         String publicToken = experimentParameters[3];
         String forkListFile = experimentParameters[4];
-        String current_OS = experimentParameters[5];
-        String timeWindow = experimentParameters[6];
+        String timeWindow = experimentParameters[5];
 
         /*** user input***/
         String[] forkListArray = null;
