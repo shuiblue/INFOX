@@ -203,6 +203,7 @@ public class ProcessingText {
                     processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
                             inputFile, "-o", outXmlFile);
                 } else {
+                    System.out.println("linux!");
                     processBuilder = new ProcessBuilder("srcml", "--position", inputFile, "-o", outXmlFile);
                 }
 

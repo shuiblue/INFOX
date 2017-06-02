@@ -43,7 +43,7 @@ public class DependencyGraph {
     public boolean DEF_USE = true;
     public boolean CONSECUTIVE = true;
 
-    public String current_OS  = System.getProperty("os.name").toLowerCase();
+    public String current_OS = System.getProperty("os.name").toLowerCase();
 
     ProcessingText processingText = new ProcessingText();
 
@@ -309,7 +309,7 @@ public class DependencyGraph {
             Root_Dir = "/Users/shuruiz/Work/";
         } else if (current_OS.indexOf("windows") >= 0) {
             Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
-        }else {
+        } else {
             Root_Dir = "./";
         }
 
@@ -345,7 +345,7 @@ public class DependencyGraph {
                     if (!filePath.toString().contains("pixman-arm-neon-asm.h")
                             && !filePath.toString().contains("SkBitmapSamplerTemplate.h")
                             && !filePath.toString().contains("prstrms.h")
-                            && !filePath.toString().contains("/js/") ){
+                            && !filePath.toString().contains("/js/")) {
 
 
                         parseSingleFile(filePath);
@@ -1745,14 +1745,7 @@ public class DependencyGraph {
     private String getLineNumOfElement(Element element) {
         String lineNum = "-1";
         if (element.getAttributeCount() > 0) {
-
-            if (current_OS.indexOf("mac") >= 0) {
-                lineNum = element.getAttribute("line", "http://www.sdml.info/srcML/position").getValue();
-            }  else {
-                lineNum = element.getAttribute("line").getValue();
-            }
-
-
+            lineNum = element.getAttribute("line", "http://www.sdml.info/srcML/position").getValue();
         } else {
             Elements childElements = element.getChildElements();
             int childElements_size = childElements.size();
