@@ -1745,7 +1745,14 @@ public class DependencyGraph {
     private String getLineNumOfElement(Element element) {
         String lineNum = "-1";
         if (element.getAttributeCount() > 0) {
-            lineNum = element.getAttribute("line", "http://www.sdml.info/srcML/position").getValue();
+
+            if (current_OS.indexOf("mac") >= 0) {
+                lineNum = element.getAttribute("line", "http://www.sdml.info/srcML/position").getValue();
+            }  else {
+                lineNum = element.getAttribute("line").getValue();
+            }
+
+
         } else {
             Elements childElements = element.getChildElements();
             int childElements_size = childElements.size();
