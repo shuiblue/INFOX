@@ -8,6 +8,9 @@ import org.rosuda.JRI.Rengine;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -19,7 +22,9 @@ public class INFOX_main {
     static String github_api = "https://api.github.com/repos/";
     static String github_page = "https://github.com/";
 
-    static String OS = System.getProperty("os.name").toLowerCase();
+    static String current_OS = System.getProperty("os.name").toLowerCase();
+    static String tmpXmlPath = "tmpXMLFile" + FS;
+    static String Root_Dir = "";
 
     /**
      * Main method for testing the INFOX method
@@ -62,12 +67,18 @@ public class INFOX_main {
             boolean hasGroundTruth = false;
             String testCasesDir;
 
-            if (OS.indexOf("mac") >= 0) {
+            if (current_OS.indexOf("mac") >= 0) {
                 testCasesDir = "/Users/shuruiz/Work/GithubProject/";
             } else {
                 testCasesDir = "/home/feature/INFOX_testCases/";
             }
-
+            if (current_OS.indexOf("mac") >= 0) {
+                Root_Dir = "/Users/shuruiz/Work/";
+            } else if (current_OS.indexOf("windows") >= 0) {
+                Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
+            } else {
+                Root_Dir = "./";
+            }
             String localSourceCodeDirPath = testCasesDir + forkName + FS;
             String analysisDir = testCasesDir + forkName + FS + "INFOX_output/";
 
@@ -105,6 +116,11 @@ public class INFOX_main {
             /*** start clustering code  ***/
             ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
             clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
+            try {
+                processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
 
             /*** hack github page   ***/

@@ -43,8 +43,7 @@ public class DependencyGraph {
     public boolean DEF_USE = true;
     public boolean CONSECUTIVE = true;
 
-    public String current_OS = "MAC"; // "WINDOWS"
-
+    public String current_OS  = System.getProperty("os.name").toLowerCase();
 
     ProcessingText processingText = new ProcessingText();
 
@@ -304,8 +303,14 @@ public class DependencyGraph {
 
         if (current_OS.equals("MAC")) {
             Root_Dir = "/Users/shuruiz/Work/";
-        } else if (current_OS == "WINDOWS") {
+        }
+
+        if (current_OS.indexOf("mac") >= 0) {
+            Root_Dir = "/Users/shuruiz/Work/";
+        } else if (current_OS.indexOf("windows") >= 0) {
             Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
+        }else {
+            Root_Dir = "./";
         }
 
         /**------------ Specify paths --------------**/

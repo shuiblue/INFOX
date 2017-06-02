@@ -1,13 +1,12 @@
 package MocGithub;
 
 import Util.ProcessingText;
-import org.junit.Test;
+
 
 import java.io.IOException;
 import java.util.*;
 
 import static MocGithub.DrawTableHierarchy.Cell.*;
-import static org.junit.Assert.assertArrayEquals;
 
 /**
  * Created by shuruiz on 5/16/17.
@@ -42,7 +41,7 @@ public class DrawTableHierarchy {
         return hierachyArray;
     }
 
-    enum Cell {
+    public enum Cell {
         topLeft, bottomLeft, bottom, left, none;
 
         @Override
@@ -329,120 +328,5 @@ public class DrawTableHierarchy {
         return false;
     }
 
-    @Test
-    public void test1() {
-
-        Cell[][] actual = calculatingArray("", "A_1~A_2");
-        Cell[][] expected = new Cell[4][2];
-        expected[0] = new Cell[]{none, none};
-        expected[1] = new Cell[]{bottom, topLeft};
-        expected[2] = new Cell[]{none, bottomLeft};
-        expected[3] = new Cell[]{none, none};
-
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void test2() {
-
-        Cell[][] actual = calculatingArray("", "A_1_1~A_1_2~A_2");
-        Cell[][] expected = new Cell[6][3];
-        expected[0] = new Cell[]{none, none, none};
-        expected[1] = new Cell[]{none, bottom, topLeft};
-        expected[2] = new Cell[]{bottom, topLeft, bottomLeft};
-        expected[3] = new Cell[]{none, left, none};
-        expected[4] = new Cell[]{none, bottomLeft, bottom};
-        expected[5] = new Cell[]{none, none, none};
-
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void test3() {
-
-        Cell[][] actual = calculatingArray("", "A_1~A_2_1~A_2_2");
-        Cell[][] expected = new Cell[6][3];
-        expected[0] = new Cell[]{none, none, bottom};
-        expected[1] = new Cell[]{none, topLeft, none};
-        expected[2] = new Cell[]{bottom, left, none};
-        expected[3] = new Cell[]{none, bottomLeft, topLeft};
-        expected[4] = new Cell[]{none, none, bottomLeft};
-        expected[5] = new Cell[]{none, none, none};
-
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void test4() {
-
-        Cell[][] actual = calculatingArray("", "A_1_1~A_1_2~A_2_1~A_2_2");
-        Cell[][] expected = new Cell[8][3];
-        expected[0] = new Cell[]{none, none, none};
-        expected[1] = new Cell[]{none, bottom, topLeft};
-        expected[2] = new Cell[]{none, topLeft, bottomLeft};
-        expected[3] = new Cell[]{bottom, left, none};
-        expected[4] = new Cell[]{none, left, none};
-        expected[5] = new Cell[]{none, bottomLeft, topLeft};
-        expected[6] = new Cell[]{none, none, bottomLeft};
-        expected[7] = new Cell[]{none, none, none};
-
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void test5() {
-
-        Cell[][] actual = calculatingArray("", "A_1~A_2_1_1~A_2_1_2~A_2_2");
-        Cell[][] expected = new Cell[8][4];
-        expected[0] = new Cell[]{none, none, bottom, bottom};
-        expected[1] = new Cell[]{none, topLeft, none, none};
-        expected[2] = new Cell[]{none, left, none, none};
-        expected[3] = new Cell[]{bottom, left, bottom, topLeft};
-        expected[4] = new Cell[]{none, bottomLeft, topLeft, bottomLeft};
-        expected[5] = new Cell[]{none, none, left, none};
-        expected[6] = new Cell[]{none, none, bottomLeft, bottom};
-        expected[7] = new Cell[]{none, none, none, none};
-
-        assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void test6() {
-
-        Cell[][] actual = calculatingArray("", "A_1_1~A_1_2~A_2_1_1~A_2_1_2~A_2_2");
-        Cell[][] expected = new Cell[10][4];
-        expected[0] = new Cell[]{none, none, none, bottom};
-        expected[1] = new Cell[]{none, bottom, topLeft, none};
-        expected[2] = new Cell[]{none, topLeft, bottomLeft, bottom};
-        expected[3] = new Cell[]{none, left, none, none};
-        expected[4] = new Cell[]{bottom, left, none, none};
-        expected[5] = new Cell[]{none, left, bottom, topLeft};
-        expected[6] = new Cell[]{none, bottomLeft, topLeft, bottomLeft};
-        expected[7] = new Cell[]{none, none, left, none};
-        expected[8] = new Cell[]{none, none, bottomLeft, bottom};
-        expected[9] = new Cell[]{none, none, none, none};
-
-        assertArrayEquals(expected, actual);
-    }
-
-
-    @Test
-    public void test7() {
-
-        Cell[][] actual = calculatingArray("", "A_1_1_1~A_1_1_2~A_1_2~A_2_1~A_2_2");
-        Cell[][] expected = new Cell[10][4];
-        expected[0] = new Cell[]{none, none, none, none};
-        expected[1] = new Cell[]{none, none,bottom, topLeft};
-        expected[2] = new Cell[]{none, bottom,topLeft, bottomLeft};
-        expected[3] = new Cell[]{none, topLeft, left, none};
-        expected[4] = new Cell[]{bottom, left, bottomLeft, bottom};
-        expected[5] = new Cell[]{none, left, none, none};
-        expected[6] = new Cell[]{none, left, none, bottom};
-        expected[7] = new Cell[]{none, bottomLeft, topLeft,none};
-        expected[8] = new Cell[]{none, none,bottomLeft,bottom};
-        expected[9] = new Cell[]{none, none, none, none};
-
-        assertArrayEquals(expected, actual);
-    }
 
 }

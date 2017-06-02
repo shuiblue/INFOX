@@ -1,5 +1,4 @@
-package Util;
-
+import Util.GenerateCombination;
 import org.junit.Test;
 
 import java.util.ArrayList;

@@ -552,9 +552,11 @@ public class ProcessingText {
         }
         return false;
     }
+
     public boolean isCLanguageFile(Path filePath) {
-        return isCFile(filePath.toString()) || isPdeFile(filePath.toString())||isInoFile(filePath.toString())||isCCFile(filePath.toString());
+        return isCFile(filePath.toString()) || isPdeFile(filePath.toString()) || isInoFile(filePath.toString()) || isCCFile(filePath.toString());
     }
+
     public static void main(String[] args) {
         String path = "C:\\Users\\shuruiz\\Documents\\LineCounter\\txt\\";
         final int[] lines = {0};
@@ -576,9 +578,10 @@ public class ProcessingText {
 
     /**
      * This function read unified source code and generates map of nodeid-source code terms
-     * @param n_gram  1 or 2 gram
+     *
+     * @param n_gram      1 or 2 gram
      * @param analysisDir
-     * @return  map
+     * @return map
      */
     public HashMap<String, String> getnodeToSourceCodeMap(int n_gram, String analysisDir) {
         HashMap<String, String> nodeToSourceCodeMap = new HashMap<>();
@@ -593,6 +596,46 @@ public class ProcessingText {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return  nodeToSourceCodeMap;
+        return nodeToSourceCodeMap;
     }
+
+    public void deleteDir(File file) throws IOException {
+
+        if (file.isDirectory()) {
+
+            //directory is empty, then delete it
+            if (file.list().length == 0) {
+
+                file.delete();
+                System.out.println("Directory is deleted : "
+                        + file.getAbsolutePath());
+
+            } else {
+
+                //list all the directory contents
+                String files[] = file.list();
+
+                for (String temp : files) {
+                    //construct the file structure
+                    File fileDelete = new File(file, temp);
+
+                    //recursive delete
+                    deleteDir(fileDelete);
+                }
+
+                //check the directory again, if empty then delete it
+                if (file.list().length == 0) {
+                    file.delete();
+                    System.out.println("Directory is deleted : "
+                            + file.getAbsolutePath());
+                }
+            }
+
+        } else {
+            //if file, then delete it
+            file.delete();
+            System.out.println("File is deleted : " + file.getAbsolutePath());
+        }
+    }
+
 }
