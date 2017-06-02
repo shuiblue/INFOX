@@ -1387,7 +1387,14 @@ public class DependencyGraph {
     private String parseForStmt(Element ele, String fileName, int scope, String parentLocation) {
         ArrayList<String> tmpStmtList = new ArrayList<>();
         String forLocation = getLocationOfElement(ele, fileName);
-        Element init = ele.getFirstChildElement("init", NAMESPACEURI);
+        Element control = ele.getFirstChildElement("control", NAMESPACEURI);
+        Element init;
+        if(control!=null) {
+             init = control.getFirstChildElement("init", NAMESPACEURI);
+        }else{
+             init = ele.getFirstChildElement("init", NAMESPACEURI);
+        }
+
         Element init_decl = null, init_expr = null;
         if (init.getFirstChildElement("decl", NAMESPACEURI) != null) {
             init_decl = init.getFirstChildElement("decl", NAMESPACEURI);
