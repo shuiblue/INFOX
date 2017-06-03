@@ -396,7 +396,8 @@ public class ParseHtml {
         String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
 
 
-        int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
+        int clusterSize = clusterResultMap.get(1).get(clusterID).size();
+//        int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
 
 
         sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan, clusterTree));

@@ -197,15 +197,12 @@ public class ProcessingText {
         if (new File(inputFile).isFile()) {
             try {
                 ProcessBuilder processBuilder = null;
-                if (current_OS.indexOf("mac") >= 0) {
+//                if (current_OS.indexOf("mac") >= 0) {
                     processBuilder = new ProcessBuilder("src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
-                } else if (current_OS.indexOf("windows") >= 0) {
-                    processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
-                            inputFile, "-o", outXmlFile);
-                } else {
-                    System.out.println("linux!");
-                    processBuilder = new ProcessBuilder("srcml", "--position", inputFile, "-o", outXmlFile);
-                }
+//                } else if (current_OS.indexOf("windows") >= 0) {
+//                    processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
+//                            inputFile, "-o", outXmlFile);
+//                }
 
                 Process process = processBuilder.start();
                 process.waitFor();

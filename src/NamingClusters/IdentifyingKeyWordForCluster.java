@@ -20,16 +20,30 @@ public class IdentifyingKeyWordForCluster {
     HashMap<String, String> twoGram_sourceCodeLocMap = new HashMap<>();
 
     public IdentifyingKeyWordForCluster(String sourcecodeDir, String analysisDir, HashMap<String, ArrayList<String>> commitInfoMap) {
-        /**  tokenization **/
+ /**  tokenization **/
         System.out.println("        Tokenizing source code...");
+        ProcessingText processingText = new ProcessingText();
 
-        new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
+        boolean hasTokenizedSourceCode=false;
+        try {
+            if(new File(analysisDir+"tokenizedSouceCode_oneGram.txt").exists()) {
+                String tokenizedSourceCode = processingText.readResult(analysisDir + "tokenizedSouceCode_oneGram.txt");
+                if (tokenizedSourceCode.trim().length() > 0) {
+                    hasTokenizedSourceCode = true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(!hasTokenizedSourceCode) {
+            new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
+        }
         this.commitInfoMap = commitInfoMap;
 
 
         System.out.println("    list top X biggest cluster id");
         String[] topClusters = null;
-        ProcessingText processingText = new ProcessingText();
         try {
             topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
             nodeIdMap = processingText.getNodeIdMap(analysisDir, processingText);
@@ -56,12 +70,14 @@ public class IdentifyingKeyWordForCluster {
         // doc stores all the documents
         List<String> all_sourceCode_doc = new ArrayList<>();
         /** get node label -- node content **/
-        if (n_gram == 1) {
-            processingText.rewriteFile("", analysisDir + splitStep + "_one_keyWord.txt");
-            all_sourceCode_doc.addAll(oneGram_sourceCodeLocMap.values());
-        } else if (n_gram == 2) {
-            processingText.rewriteFile("", analysisDir + splitStep + "_two_keyWord.txt");
-            all_sourceCode_doc.addAll(twoGram_sourceCodeLocMap.values());
+        if(clusterList.size()==1) {
+            if (n_gram == 1) {
+                processingText.rewriteFile("", analysisDir + splitStep + "_one_keyWord.txt");
+                all_sourceCode_doc.addAll(oneGram_sourceCodeLocMap.values());
+            } else if (n_gram == 2) {
+                processingText.rewriteFile("", analysisDir + splitStep + "_two_keyWord.txt");
+                all_sourceCode_doc.addAll(twoGram_sourceCodeLocMap.values());
+            }
         }
 
         /** get commit msg

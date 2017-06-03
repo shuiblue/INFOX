@@ -37,7 +37,8 @@ public class INFOX_main {
      * @param args
      */
     public static void main(String[] args) {
-        String filePath = args[0];
+//        String filePath = args[0];
+        String filePath = "test_param.txt";
         String[] experimentParameters = new String[7];
         try {
             experimentParameters = new ProcessingText().readResult("./testCases/" + filePath).split("\n");
@@ -76,11 +77,14 @@ public class INFOX_main {
             String localSourceCodeDirPath = testCasesDir + forkName + FS;
             String analysisDir = testCasesDir + forkName + FS + "INFOX_output/";
 
+            File file = new File(localSourceCodeDirPath);
 
+            if (!file.exists()) {
             /***git clone repo to local dir***/
             JgitUtility jgitUtility = new JgitUtility();
             String uri = github_page + forkName + ".git";
             System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
+
             jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
             if (forkName.contains("Marlin")) {
                 try {
@@ -89,14 +93,13 @@ public class INFOX_main {
                     e.printStackTrace();
                 }
             }
+                System.out.println("a file or directory named 'foo' exists");
+            }
 
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
             String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-//        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "3 month", isPublicRepo);
             System.out.println(diffPageUrl);
-//          String diffPageUrl = "https://github.com/TsinghuaDatabaseGroup/VTree/compare/13556037a20baa1a3928224ff7c087102a5bba8c...TsinghuaDatabaseGroup:7e6516cac56ffdd3145b82c94db8c0f0ce48dca5";
-
 
             ProcessingText processingText = new ProcessingText();
             processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");

@@ -521,7 +521,9 @@ public class AnalyzingCommunityDetectionResult {
         /**get all splitting result mapping , storing in 'topClustersSplittingResult'.**/
         getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
 
-        if (combination_list.size() > 0&&combination_list.get(0).contains("--")) {
+
+
+
             for (String com : combination_list) {
 
                 if (com.replaceAll("1", "").length() == 0) {
@@ -531,13 +533,12 @@ public class AnalyzingCommunityDetectionResult {
                 }
 
                 System.out.println("generate Clustering Result By Combining Splitting Steps ...:");
-                HashMap<String, HashSet<Integer>> currentCluster = generateClusteringResult_ByCombiningSplittingStep(com);
+                    HashMap<String, HashSet<Integer>> currentCluster = generateClusteringResult_ByCombiningSplittingStep(com);
 
-                /****/
-                generateCompleteClusteringFiles(currentCluster, com);
+                    /****/
+                    generateCompleteClusteringFiles(currentCluster, com);
+
                 parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, com, false);
-
-            }
         }
         return clusterResultMap;
     }
@@ -669,6 +670,10 @@ public class AnalyzingCommunityDetectionResult {
 //                while (itr.hasNext()) {
 
                 currentCluster.put(cid, newCluster.get(cid));
+                if(currentCluster.get("original")!=null&&currentCluster.get(cid).size()==currentCluster.get("original").size()){
+                    currentCluster.remove("original");
+                }
+
 //                }
             }
         }
