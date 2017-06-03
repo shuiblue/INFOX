@@ -646,7 +646,7 @@ public class ProcessingText {
         } else if (current_OS.indexOf("windows") >= 0) {
             return "C:\\Users\\shuruiz\\Documents\\";
         } else {
-            return "./";
+            return "/home/feature/shuruiz/";
         }
     }
 }
