@@ -163,15 +163,15 @@ public class DependencyGraph {
         System.out.println("DEF_USE: " + DEF_USE);
         System.out.println(" CONSECUTIVE: " + CONSECUTIVE);
 
-        if (current_OS.indexOf("mac") >= 0) {
+//        if (current_OS.indexOf("mac") >= 0) {
             NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
             NAMESPACEURI = "http://www.sdml.info/srcML/src";
             NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
-        } else {
-            NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
-            NAMESPACEURI = "http://www.srcML.org/srcML/src";
-            NAMESPACEURI_CPP = "http://www.srcML.org/srcML/cpp";
-        }
+//        } else {
+//            NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
+//            NAMESPACEURI = "http://www.srcML.org/srcML/src";
+//            NAMESPACEURI_CPP = "http://www.srcML.org/srcML/cpp";
+//        }
 
 
     }
