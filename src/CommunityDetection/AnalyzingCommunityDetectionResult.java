@@ -853,7 +853,6 @@ public class AnalyzingCommunityDetectionResult {
 //                                /** generateing toggle.js file for each cluster **/
 //                                generateToggleFileForEachCluster(joined_clusters, true, numberOfCommunities);
 
-
                                 if (hasGroundTruth) {
                                     /** calculate accuracy result for joined clusters **/
                                     calculatingAccuracy(groundTruthClusters, joined_clusters, true, combination);
