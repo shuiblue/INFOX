@@ -43,6 +43,8 @@ public class AnalyzingCommunityDetectionResult {
     HashMap<String, HashMap<String, HashSet<Integer>>> allClusteringResult = new HashMap<>();
     int max_numberOfCut;
     int numberOfBiggestClusters;
+    static HashMap<String, HashSet<Integer>> joined_clusters = null;
+
 
     public AnalyzingCommunityDetectionResult(String sourcecodeDir, String testCaseDir, String testDir, boolean isMS_CLUSTERCHANGES, int max_numberOfCut, int numberOfBiggestClusters) {
         this.sourcecodeDir = sourcecodeDir;
@@ -845,7 +847,7 @@ public class AnalyzingCommunityDetectionResult {
 //                            calculatingAccuracy(groundTruthClusters, current_clustering_result, false, combination);
 //                        }
                         if (!isMS_CLUSTERCHANGES) {
-                            HashMap<String, HashSet<Integer>> joined_clusters = null;
+//                            HashMap<String, HashSet<Integer>> joined_clusters = null;
                             if (isOriginalGraph) {
                                 /**   get joined clusters   **/
                                 //todo: comment this line becuase of time limitation... calculate soo long
