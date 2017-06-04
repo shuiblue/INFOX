@@ -520,25 +520,20 @@ public class AnalyzingCommunityDetectionResult {
 
         /**get all splitting result mapping , storing in 'topClustersSplittingResult'.**/
         getAllSplittingResult(max_numberOfCut, topClusterList, combination_list);
+        for (String com : combination_list) {
+            if (com.replaceAll("1", "").length() == 0) {
+                HashMap<String, HashSet<Integer>> origialClusters = getCopyOfOriginalClusters();
+                allClusteringResult.put(com, origialClusters);
+                continue;
+            }
 
+            System.out.println("generate Clustering Result By Combining Splitting Steps ...:");
+            HashMap<String, HashSet<Integer>> currentCluster = generateClusteringResult_ByCombiningSplittingStep(com);
 
+            /****/
+            generateCompleteClusteringFiles(currentCluster, com);
 
-
-            for (String com : combination_list) {
-
-                if (com.replaceAll("1", "").length() == 0) {
-                    HashMap<String, HashSet<Integer>> origialClusters = getCopyOfOriginalClusters();
-                    allClusteringResult.put(com, origialClusters);
-                    continue;
-                }
-
-                System.out.println("generate Clustering Result By Combining Splitting Steps ...:");
-                    HashMap<String, HashSet<Integer>> currentCluster = generateClusteringResult_ByCombiningSplittingStep(com);
-
-                    /****/
-                    generateCompleteClusteringFiles(currentCluster, com);
-
-                parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, com, false);
+            parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, com, false);
         }
         return clusterResultMap;
     }
@@ -587,7 +582,6 @@ public class AnalyzingCommunityDetectionResult {
         }
         for (String clusterID : topClist) {
             int originalClusterID = Integer.valueOf(clusterID.split("_")[0]);
-//            if (!noSplittingNode.contains(clusterID)) {
             if (clusterID.split("_").length < max_numberOfCut + 1) {
                 boolean isOriginal = false;
                 if (!clusterID.contains("_")) {
@@ -595,12 +589,9 @@ public class AnalyzingCommunityDetectionResult {
                 }
                 if (!noSplittingNode.contains(clusterID) || isOriginal) {
                     HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, isOriginal);
-//                    HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, false);
-
                     tmpClustertwoSplit.forEach((k, v) -> {
                         v.forEach((k1, v1) -> {
                             int index = k1.split("_").length - 1;
-
                             HashMap<Integer, HashMap<String, HashSet<Integer>>> map = topClustersSplittingResult.get(originalClusterID);
                             map.get(index).put(k1, v1);
                         });
@@ -613,10 +604,7 @@ public class AnalyzingCommunityDetectionResult {
     }
 
     private void generateCompleteClusteringFiles(HashMap<String, HashSet<Integer>> currentCluster, String combination) {
-
         new R_CommunityDetection(analysisDir).printMemebershipOfCurrentGraph_new(currentCluster, combination + "_clusterTMP.txt");
-
-
     }
 
 
@@ -624,12 +612,11 @@ public class AnalyzingCommunityDetectionResult {
         HashMap<String, HashSet<Integer>> currentCluster = new HashMap<>();
         for (Map.Entry<String, HashSet<Integer>> entry : originalClusterMap.entrySet()) {
             currentCluster.put(String.valueOf(entry.getKey()),
-                    // Or whatever List implementation you'd like here.
                     new HashSet<>(entry.getValue()));
         }
         return currentCluster;
     }
-    //todo
+
 
     /**
      * This function generate different clustering result by combining differernt splitting steps
@@ -670,7 +657,7 @@ public class AnalyzingCommunityDetectionResult {
 //                while (itr.hasNext()) {
 
                 currentCluster.put(cid, newCluster.get(cid));
-                if(currentCluster.get("original")!=null&&currentCluster.get(cid).size()==currentCluster.get("original").size()){
+                if (currentCluster.get("original") != null && currentCluster.get(cid).size() == currentCluster.get("original").size()) {
                     currentCluster.remove("original");
                 }
 

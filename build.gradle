@@ -9,7 +9,7 @@ repositories {
 }
 
 mainClassName = "INFOX_main"
-applicationDefaultJvmArgs = ["-Xmx16g", "-ea", "-Djava.library.path=/Library/Frameworks/R.framework/Resources/library/rJava/jri/"]
+applicationDefaultJvmArgs = ["-Xmx32g", "-ea", "-Djava.library.path=/Library/Frameworks/R.framework/Resources/library/rJava/jri/"]
 
 dependencies {
     compile group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
