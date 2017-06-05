@@ -650,4 +650,11 @@ public class ProcessingText {
         }
     }
 
+    public void writeToJoinClusterFile(String analysisDir, HashMap<String, HashSet<Integer>> joined_clusters) {
+        StringBuilder sb = new StringBuilder();
+        joined_clusters.forEach((k,v)->{
+                 sb.append(k+":"+v.toString()+"\n");
+        });
+        new ProcessingText().writeTofile(sb.toString(),analysisDir+"joined_cluster.txt");
+    }
 }
