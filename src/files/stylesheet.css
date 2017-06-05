@@ -60,7 +60,7 @@ td, th {
 
 .long_td {
     font-size: 12px;
-    max-width : 600px;
+    max-width : 550px;
     overflow:hidden;
     white-space:nowrap;
     text-overflow:ellipsis;
