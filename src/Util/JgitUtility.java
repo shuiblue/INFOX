@@ -11,15 +11,23 @@ import java.io.File;
 public class JgitUtility {
 
 
-    public void cloneRepo(String uri, String localDirPath) {
+    public void cloneRepo(String uri, String localDirPath,String branchName) {
         File dir =new File(localDirPath);
         dir.mkdir();
 
         try {
-            Git git = Git.cloneRepository()
-                    .setURI(uri)
-                    .setDirectory(dir)
-                    .call();
+            if(branchName.equals("")){
+                Git git = Git.cloneRepository()
+                        .setURI(uri)
+                        .setDirectory(dir)
+                        .call();
+            }else {
+                Git git = Git.cloneRepository()
+                        .setURI(uri)
+                        .setDirectory(dir)
+                        .setBranch(branchName)
+                        .call();
+            }
         } catch (GitAPIException e) {
             e.printStackTrace();
         }

@@ -64,28 +64,30 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-        for (String forkName : forkListArray) {
-            boolean hasGroundTruth = false;
-            String testCasesDir;
+//        for (String forkName : forkListArray) {
+        String forkName = "cruwaller/Marlin";
+        String branchName = "max318xx_dev";
+        boolean hasGroundTruth = false;
+        String testCasesDir;
 
-            if (current_OS.indexOf("mac") >= 0) {
-                testCasesDir = "/Users/shuruiz/Work/GithubProject/";
-            } else {
-                testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
-            }
-           Root_Dir= new ProcessingText(). getRootDir();
-            String localSourceCodeDirPath = testCasesDir + forkName + FS;
-            String analysisDir = testCasesDir + forkName + FS + "INFOX_output/";
+        if (current_OS.indexOf("mac") >= 0) {
+            testCasesDir = "/Users/shuruiz/Work/GithubProject/";
+        } else {
+            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
+        }
+        Root_Dir = new ProcessingText().getRootDir();
+        String localSourceCodeDirPath = testCasesDir + forkName + FS;
+        String analysisDir = testCasesDir + forkName + FS + "INFOX_output/";
 
-            File file = new File(localSourceCodeDirPath);
+        File file = new File(localSourceCodeDirPath);
 
-            if (!file.exists()) {
+        if (!file.exists()) {
             /***git clone repo to local dir***/
             JgitUtility jgitUtility = new JgitUtility();
             String uri = github_page + forkName + ".git";
             System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
 
-            jgitUtility.cloneRepo(uri, localSourceCodeDirPath);
+            jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
             if (forkName.contains("Marlin")) {
                 try {
                     FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
@@ -93,42 +95,39 @@ public class INFOX_main {
                     e.printStackTrace();
                 }
             }
-                System.out.println("a file or directory named 'foo' exists");
-            }
-
-            /***  get origin diff github page  ***/
-            ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-          String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-//            String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:Duo";
-            System.out.println(diffPageUrl);
-
-            ProcessingText processingText = new ProcessingText();
-            processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
-
-            /***   get fork added node, generate ForkAddedNode.txt file   ***/
-            GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-            HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
-            githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
-
-
-            /*** start clustering code  ***/
-            ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
-            clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
-            try {
-                processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            /*** hack github page   ***/
-            parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
-            parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
         }
 
+        /***  get origin diff github page  ***/
+        ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
+//          String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+        String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:max318xx_dev";
+        System.out.println(diffPageUrl);
+
+        ProcessingText processingText = new ProcessingText();
+        processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
+
+        /***   get fork added node, generate ForkAddedNode.txt file   ***/
+        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
+        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
+        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
+
+
+        /*** start clustering code  ***/
+        ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
+        clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
+        try {
+            processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        /*** hack github page   ***/
+        parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
+        parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
     }
 
-
+//    }
 
 
 }
