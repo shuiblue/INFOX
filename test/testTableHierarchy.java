@@ -126,4 +126,23 @@ public class testTableHierarchy {
         assertArrayEquals(expected, actual);
     }
 
+
+
+    @Test
+    public void test8() {
+
+        DrawTableHierarchy.Cell[][] actual = drawTableHierarchy.calculatingArray("", "A_1~A_2_1~A_2_2_1~A_2_2_2");
+        DrawTableHierarchy.Cell[][] expected = new DrawTableHierarchy.Cell[8][4];
+        expected[0] = new DrawTableHierarchy.Cell[]{none, none, bottom,bottom};
+        expected[1] = new DrawTableHierarchy.Cell[]{none, topLeft,none, none};
+        expected[2] = new DrawTableHierarchy.Cell[]{none, left,none, bottom};
+        expected[3] = new DrawTableHierarchy.Cell[]{bottom, left, topLeft, none};
+        expected[4] = new DrawTableHierarchy.Cell[]{none, bottomLeft, left, none};
+        expected[5] = new DrawTableHierarchy.Cell[]{none, none, bottomLeft, topLeft};
+        expected[6] = new DrawTableHierarchy.Cell[]{none, none, none, bottomLeft};
+        expected[7] = new DrawTableHierarchy.Cell[]{none, none, none, none};
+
+        assertArrayEquals(expected, actual);
+    }
+
 }

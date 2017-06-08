@@ -3,6 +3,7 @@ package MocGithub;
 import Util.ProcessingText;
 
 
+import javax.swing.plaf.synth.SynthScrollBarUI;
 import java.io.IOException;
 import java.util.*;
 
@@ -16,14 +17,14 @@ public class DrawTableHierarchy {
     ArrayList<Cluster> noPairLeftClusters = new ArrayList<>();
     int array_width;
 
-    public HashMap<String, Cluster> getClusterTree(){
-        return  clusterTree;
+    public HashMap<String, Cluster> getClusterTree() {
+        return clusterTree;
     }
 
-    public String[][] getHierachyStringFromText(String analysisDir,String splitStep) {
+    public String[][] getHierachyStringFromText(String analysisDir, String splitStep) {
         String hierarchyString = "";
         try {
-            hierarchyString = new ProcessingText().readResult(analysisDir +  splitStep+"_hierachyArray.txt");
+            hierarchyString = new ProcessingText().readResult(analysisDir + splitStep + "_hierachyArray.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -142,6 +143,7 @@ public class DrawTableHierarchy {
                 } else if (subCluster.endsWith("_2")) {
                     setRightChildCluster(array, 2 * j, subCluster, level, hasPair);
                 }
+
             } else {
                 for (int index = array_width - 1; index >= 0; index--) {
                     if (index > level) {
@@ -177,7 +179,7 @@ public class DrawTableHierarchy {
             }
         }
 
-        if(analysisDir.length()>0) {
+        if (analysisDir.length() > 0) {
             StringBuilder sb = new StringBuilder();
 
             for (int j = 0; j < array_hight; j++) {
@@ -224,32 +226,35 @@ public class DrawTableHierarchy {
         setParentCluster(array, level, parentCluster);
         if (parentCluster.name.endsWith("_1")) {
             setLeftChildCluster(array, getMiddleIndex(parentCluster), parentCluster.name, level - 1, leftCluster.start);
+        }else  if (parentCluster.name.endsWith("_2")) {
+            setRightChildCluster(array, getMiddleIndex(parentCluster), parentCluster.name, level - 1, false);
         }
 
         if (noPairLeftClusters.size() > 0) {
-            Cluster leftChild = noPairLeftClusters.get(0);
-            String rightChildName = leftChild.name.replaceAll("[_][1]$", "\\_2");
-            Cluster rightChild = clusterTree.get(rightChildName);
-            int cur_level = leftChild.name.split("_").length - 1;
-            if (cur_level + 1 == level) {
-                int middle = getMiddleIndex(rightChild);
-                noPairLeftClusters.remove(leftChild);
-                setRightChildCluster(array, middle, rightChildName, cur_level, false);
-            }else if(cur_level==level){
-                int middle = getMiddleIndex(rightChild);
-                noPairLeftClusters.remove(leftChild);
-                setRightChildCluster(array, middle, rightChildName, cur_level, false);
-
+            for (int i = 0; i <noPairLeftClusters.size(); i++) {
+                Cluster leftChild = noPairLeftClusters.get(i);
+                int cur_level = leftChild.name.split("_").length - 1;
+                String rightChildName = leftChild.name.replaceAll("[_][1]$", "\\_2");
+                Cluster rightChild = clusterTree.get(rightChildName);
+                if ((cur_level + 1 == level) || (cur_level == level)) {
+                    if (cur_level + 1 == level) {
+                        int middle = getMiddleIndex(rightChild);
+                        noPairLeftClusters.remove(leftChild);
+                        setRightChildCluster(array, middle, rightChildName, cur_level, false);
+                    } else if (cur_level == level) {
+                        int middle = getMiddleIndex(rightChild);
+                        noPairLeftClusters.remove(leftChild);
+                        setRightChildCluster(array, middle, rightChildName, cur_level, false);
+                    }
+                }
             }
-        }
-        if (parentCluster.name.endsWith("_1")) {
-            noPairLeftClusters.add(parentCluster);
         }
 
     }
 
+
     private int getMiddleIndex(Cluster leftCluster) {
-        return leftCluster.start + (leftCluster.end- leftCluster.start) / 2;
+        return leftCluster.start + (leftCluster.end - leftCluster.start) / 2;
     }
 
     private void setParentCluster(Cell[][] array, int level, Cluster parentCluster) {
@@ -258,6 +263,11 @@ public class DrawTableHierarchy {
         if (array[parent_start + (parent_end - parent_start) / 2][level - 1] == null) {
             array[parent_start + (parent_end - parent_start) / 2][level - 1] = bottom;
         }
+//        if (level - 1 > 1) {
+//            Cluster grandParentCluster = clusterTree.get(parentCluster.name.replaceAll("[\\_][2]$", ""));
+//            grandParentCluster.setEnd(clusterTree.get(parentCluster.name).end);
+//            noPairLeftClusters.add(grandParentCluster);
+//        }
     }
 
     private void setLeftChildCluster(Cell[][] array, int leftStart, String subCluster, int level, int parent_start) {

@@ -98,8 +98,8 @@ public class INFOX_main {
 
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-//          String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-            String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:Duo";
+          String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+//            String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:Duo";
             System.out.println(diffPageUrl);
 
             ProcessingText processingText = new ProcessingText();
