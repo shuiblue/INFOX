@@ -434,6 +434,7 @@ public class DependencyGraph {
             e.printStackTrace();
         }
 
+        System.out.println("Done with generating dependency graph!");
 
         return edgeList;
     }

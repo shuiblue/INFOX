@@ -64,9 +64,10 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-//        for (String forkName : forkListArray) {
-        String forkName = "cruwaller/Marlin";
-        String branchName = "max318xx_dev";
+        for (String forkName : forkListArray) {
+//        String forkName = "cruwaller/Marlin";
+//        String branchName = "max318xx_dev";
+        String branchName = "";
         boolean hasGroundTruth = false;
         String testCasesDir;
 
@@ -127,7 +128,7 @@ public class INFOX_main {
         parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
     }
 
-//    }
+    }
 
 
 }

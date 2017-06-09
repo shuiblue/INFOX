@@ -43,7 +43,7 @@ public class R_CommunityDetection {
 
     //todo: user input
 //    int minimumClusterSize = 50;
-    int minimumClusterSize ;
+    int minimumClusterSize;
 
     public R_CommunityDetection(String sourcecodeDir, String analysisDirName, String testCaseDir, String testDir, Rengine re, int max_numberOfCut, int numberOfBiggestClusters, int minimumClusterSize) {
         this.sourcecodeDir = sourcecodeDir;
@@ -61,7 +61,7 @@ public class R_CommunityDetection {
         this.re = re;
         this.max_numberOfCut = max_numberOfCut;
         this.numberOfBiggestClusters = numberOfBiggestClusters;
-        this.minimumClusterSize=minimumClusterSize;
+        this.minimumClusterSize = minimumClusterSize;
     }
 
     public R_CommunityDetection(String analysisDir) {
@@ -151,7 +151,7 @@ public class R_CommunityDetection {
             }
             re.end();
             return true;
-        }else{
+        } else {
             System.out.println("no edge!");
         }
         re.end();
@@ -169,7 +169,7 @@ public class R_CommunityDetection {
      * @return
      */
     public boolean clustering_CodeChanges(String testCaseDir, String testDir, Rengine re, boolean directedGraph, boolean isOriginalGraph, String fileprefix) {
-
+        System.out.println("start community detection ...");
         getCompleteGraph(directedGraph);
 
         String outputFile = fileprefix + "_clusterTMP.txt";
@@ -179,67 +179,73 @@ public class R_CommunityDetection {
         if (hasEdge) {
             int cutNum = 1;
 //            while (checkedEdges.values().contains(false)) {
-                if (listOfNumberOfCommunities.size() <= max_numberOfCut) {
-                    //count betweenness for current graph
+            if (listOfNumberOfCommunities.size() <= max_numberOfCut) {
+                //count betweenness for current graph
 //                    calculateEachGraph(re, testCaseDir, testDir, cutNum, directedGraph, numOfcut, isOriginGraph, outputFile);
 
 
-                    ArrayList<Integer> nodeIdList = new ArrayList<>();
-                    for (int i = 0; i < nodelist.length; i++) {
-                        if (forkAddedNode.contains(nodelist[i])) {
-                            nodeIdList.add(i + 1);
-                        }
+                ArrayList<Integer> nodeIdList = new ArrayList<>();
+                for (int i = 0; i < nodelist.length; i++) {
+                    if (forkAddedNode.contains(nodelist[i])) {
+                        nodeIdList.add(i + 1);
                     }
+                }
 
-                    String command;
-                    if (!directedGraph) {
-                        command = "edge.betweenness(g,directed=FALSE)";
-                    } else {
-                        command = "edge.betweenness(g,directed=TRUE)";
-                    }
+                String command;
+                System.out.println("Calculating betweenness ...");
+                if (!directedGraph) {
+                    command = "edge.betweenness(g,directed=FALSE)";
+                } else {
+                    command = "edge.betweenness(g,directed=TRUE)";
+                }
 
-                    //get betweenness for current graph
-                    REXP betweenness_R = re.eval(command, true);
-                    double[] betweenness = betweenness_R.asDoubleArray();
+                //get betweenness for current graph
+                REXP betweenness_R = re.eval(command, true);
+                double[] betweenness = betweenness_R.asDoubleArray();
 
-                    //calculate modularty for current graph
-                    REXP membership_R = re.eval("cl<-clusters(g)$membership");
-                    double[] membership = membership_R.asDoubleArray();
+                //calculate modularty for current graph
+                REXP membership_R = re.eval("cl<-clusters(g)$membership");
+                double[] membership = membership_R.asDoubleArray();
 
 
-                    /** get current clusters **/
-                    HashMap<String, ArrayList<Integer>> clusters = getCurrentClusters(membership, nodeIdList);
-                    REXP modularity_R = re.eval("modularity(originalg,cl)");
-                    double modularity = modularity_R.asDoubleArray()[0];
+                /** get current clusters **/
+                System.out.println("Calculating modularity ...");
+                HashMap<String, ArrayList<Integer>> clusters = getCurrentClusters(membership, nodeIdList);
+                REXP modularity_R = re.eval("modularity(originalg,cl)");
+                double modularity = modularity_R.asDoubleArray()[0];
 
-                    Graph currentGraph;
-                    if (current_edgelist == null) {
-                        currentGraph = new Graph(nodelist, edgelist, betweenness, modularity);
-                    } else {
-                        currentGraph = new Graph(nodelist, current_edgelist, betweenness, modularity);
-                    }
+                Graph currentGraph;
+                if (current_edgelist == null) {
+                    currentGraph = new Graph(nodelist, edgelist, betweenness, modularity);
+                } else {
+                    currentGraph = new Graph(nodelist, current_edgelist, betweenness, modularity);
+                }
 
-                    if (currentGraph.getEdgelist().size() > 0) {
+                if (currentGraph.getEdgelist().size() > 0) {
 //        minimizeUpstreamEdgeBetweenness(currentGraph);
 
-                        //modularity find removableEdge
-                        String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
-                        if (isOriginalGraph) {
-                            calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, fileprefix, directedGraph);
-                        }
-                        ioFunc.rewriteFile("", analysisDir + outputFile);
-                        printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
-                        printMemebershipOfCurrentGraph(clusters, outputFile, true);
-
-                        /** split sub-clusters step by step  **/
-                        clusterToplusters(clusters, re, testCaseDir, testDir, cutNum, directedGraph);
-
-                        cutNum++;
+                    //modularity find removableEdge
+                    String[] edgeID_maxBetweenness = findRemovableEdge(currentGraph);
+                    if (isOriginalGraph) {
+                        System.out.println("calculating distance between clusters ...");
+                        calculateDistanceBetweenCommunities(clusters, testCaseDir, testDir, fileprefix, directedGraph);
                     }
+                    ioFunc.rewriteFile("", analysisDir + outputFile);
+                    System.out.println("printing edge removing result...");
+                    printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
+                    System.out.println("printing membership of current graph...");
+                    printMemebershipOfCurrentGraph(clusters, outputFile, true);
+
+                    /** split sub-clusters step by step  **/
+                    System.out.println("start to split top clusters ...");
+                    clusterToplusters(clusters, re, testCaseDir, testDir, cutNum, directedGraph);
+
+                    cutNum++;
+                }
 //                    else {
 //                        break;
 //                    }
-                }
+            }
 //                else {
 //                    break;
 //                }
@@ -440,7 +446,7 @@ public class R_CommunityDetection {
         while (cursor.hasNext()) {
             final String clusterID = cursor.next();
             sb_topClusters.append(clusterID + "\n");
-            stopedTopCluster.put(clusterID,false);
+            stopedTopCluster.put(clusterID, false);
 
             /** read original changed code graph, preparing for cluster this subgraph  **/
             String inputFile = "changedCode.pajek.net";
@@ -501,7 +507,7 @@ public class R_CommunityDetection {
             HashSet<Integer> set = new HashSet<>(clusterNodeList);
             currentCluster.put(clusterID, set);
             printMemebershipOfCurrentGraph_new(currentCluster, clusterID + "_clusterTMP.txt");
-            stopedTopCluster.put(clusterID,true);
+            stopedTopCluster.put(clusterID, true);
 
         }
     }
@@ -667,8 +673,8 @@ public class R_CommunityDetection {
                         if (shortestPath > c1_c2) {
                             shortestPath = c1_c2;
                             if (shortestPath == 10) {
-
                                 sb_shortestPath_node.append("c1: " + nodelist[c1 - 1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2 + "\n");
+                                System.out.println("distance between c1: " + nodelist[c1 - 1] + " and c2: " + nodelist[c2] + " is: " + c1_c2 );
                             }
                         }
                     }
@@ -711,24 +717,37 @@ public class R_CommunityDetection {
      */
     private ArrayList<ArrayList<String>> getPairsOfCommunities(HashMap<String, ArrayList<Integer>> clusters) {
 
-        ArrayList<HashSet<String>> combination_Set = new ArrayList<>();
+//        ArrayList<HashSet<String>> combination_Set = new ArrayList<>();
         ArrayList<ArrayList<String>> combination_List = new ArrayList<>();
         Set<String> keyset = clusters.keySet();
-        for (String s : keyset) {
-            for (String c : keyset) {
+
+        List<String> clusterIDList= new ArrayList<>(keyset);
+        for(int i =0;i<clusterIDList.size();i++){
+            for(int j =i+1;j<clusterIDList.size();j++){
                 HashSet<String> pair = new HashSet<>();
-                if (!s.equals(c)) {
-                    pair.add(s);
-                    pair.add(c);
-                    if (!combination_Set.contains(pair)) {
+                    pair.add(clusterIDList.get(i));
+                    pair.add(clusterIDList.get(j));
                         ArrayList<String> pairList = new ArrayList<>();
                         pairList.addAll(pair);
-                        combination_Set.add(pair);
+//                        combination_Set.add(pair);
                         combination_List.add(pairList);
-                    }
                 }
             }
-        }
+//        for (String s : keyset) {
+//            for (String c : keyset) {
+//                HashSet<String> pair = new HashSet<>();
+//                if (!s.equals(c)) {
+//                    pair.add(s);
+//                    pair.add(c);
+//                    if (!combination_Set.contains(pair)) {
+//                        ArrayList<String> pairList = new ArrayList<>();
+//                        pairList.addAll(pair);
+//                        combination_Set.add(pair);
+//                        combination_List.add(pairList);
+//                    }
+//                }
+//            }
+//        }
         return combination_List;
     }
 

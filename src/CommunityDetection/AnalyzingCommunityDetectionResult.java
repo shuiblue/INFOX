@@ -854,7 +854,7 @@ public class AnalyzingCommunityDetectionResult {
                                 joined_clusters = getJoinedClusters(colorCode, originCombination, clusters, current_clustering_result, clusterSizeThreshold);
 //                                /** generateing toggle.js file for each cluster **/
 //                                generateToggleFileForEachCluster(joined_clusters, true, numberOfCommunities);
-processingText.writeToJoinClusterFile(analysisDir,joined_clusters);
+                                processingText.writeToJoinClusterFile(analysisDir, joined_clusters);
 
                                 if (hasGroundTruth) {
                                     /** calculate accuracy result for joined clusters **/

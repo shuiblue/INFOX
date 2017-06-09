@@ -104,14 +104,14 @@ public class GithubRepoAnalysis {
 //        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
 
-        String root = "/Users/shuruiz/Work/checkOpenCVForkSize/";
+        String root = "/Users/shuruiz/Work/checkProjectSize/checkMarlinForkSize/";
         String token = null;
         try {
-            token = processingText.readResult("./testCases/token.txt");
+            token = processingText.readResult("./testCases/token.txt").trim();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/opencv_forkList.txt",token);
+        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/MarlinForkList.txt",token);
 
 
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
@@ -123,14 +123,14 @@ public class GithubRepoAnalysis {
         try {
             String[] forkListArray = processingText.readResult(forkListFilePath).split("\n");
 
-            String root = "/Users/shuruiz/Work/checkOpenCVForkSize/";
-            processingText.rewriteFile("", root + "OpenCV_codeChangeSize.csv");
+            String root = "/Users/shuruiz/Work/checkProjectSize/checkMarlinForkSize/";
+            processingText.rewriteFile("", root + "marlin_codeChangeSize.csv");
             for (String forkName : forkListArray) {
                 String analysisDir = root + forkName + FS + "INFOX_output/";
                 ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir,publicToken);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"3 month");
                 String localSourceCodeDirPath = root + forkName + FS;
-                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "3 month");
+                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
 
                 ProcessingText processingText = new ProcessingText();
                 processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
@@ -142,7 +142,7 @@ public class GithubRepoAnalysis {
 
                 int size = processingText.readResult(localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt").split("\n").length;
 
-                processingText.writeTofile(forkName + "," + size + "\n", root + "OpenCV_codeChangeSize.csv");
+                processingText.writeTofile(forkName + "," + size + "\n", root + "marlin_codeChangeSize.csv");
             }
 
         } catch (IOException e) {
