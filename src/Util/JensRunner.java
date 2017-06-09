@@ -14,6 +14,7 @@ public class JensRunner {
 	static boolean coreFailure = true;
 
 	public static void main(String[] args) {
+		System.out.println("Processors: " + Runtime.getRuntime().availableProcessors());
 		System.out.println("Execute: ");
 		List<String> commands = new LinkedList<>();
 		commands.add("./gradlew");
