@@ -40,7 +40,13 @@ public class GetCommitMsg {
             String originalCommit[] = getCommitMsgForEachNode(originFileName, lineNumber, repoPath);
             String commitMsg = originalCommit[1];
             String one_commit = getCommitMsgForEachNode(commitMsg, 1);
+            if(one_commit  .length()==0){
+                one_commit="not_english";
+            }
             String two_commit = getCommitMsgForEachNode(commitMsg, 2);
+            if(two_commit.length()==0){
+                two_commit="not_english";
+            }
             String nodeId = label_to_id.get("\"" + nodeLabel + "\"");
             if (nodeId != null) {
                 ArrayList<String> commitInfoList = new ArrayList<>();
@@ -60,16 +66,19 @@ public class GetCommitMsg {
     }
 
     public HashMap<String, ArrayList<String>> getCommitInfoMap(String analysisDir) {
+        System.out.println("get nodeid to commit msg map..");
         HashMap<String, ArrayList<String>> commitInfoMap = new HashMap<>();
         try {
             String commitInfo[] = new ProcessingText().readResult(analysisDir + "nodeid_commit.txt").split("\n");
+            int i =1;
             for (String line : commitInfo) {
+                System.out.println(i++);
                 String[] infoArray = line.split(",");
 
                 String nodeID = infoArray[0];
                 ArrayList<String> infoList = new ArrayList<>();
 
-                if(infoArray.length<3){
+                if(infoArray.length<=2){
                     System.out.println();
                 }
                 infoList.add(infoArray[1]);
