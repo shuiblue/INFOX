@@ -224,6 +224,9 @@ public class ParseHtml {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+        new ProcessingText().rewriteFile("done",analysisDir+"done.txt");
     }
 
 

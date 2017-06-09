@@ -103,31 +103,31 @@ public class GithubRepoAnalysis {
 //        String diffFilePath = "diff.txt";
 //        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-
-        String root = "/Users/shuruiz/Work/checkProjectSize/checkMarlinForkSize/";
+        String projectName = "panda3D";
+        String folder = "check"+projectName+"ForkSize/";
+        String root = "/Users/shuruiz/Work/checkProjectSize/";
         String token = null;
         try {
-            token = processingText.readResult("./testCases/token.txt").trim();
+            token = processingText.readResult(root+"/token.txt").trim();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/MarlinForkList.txt",token);
+        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/"+folder+projectName+"ForkList.txt", token,root,projectName);
 
 
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
 //        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, dir + forkAddedNode_file);
     }
 
-    public void calculatingAvgSizeOfCodeChanges(String forkListFilePath,String publicToken) {
+    public void calculatingAvgSizeOfCodeChanges(String forkListFilePath, String publicToken,String root,String projectName) {
 
         try {
             String[] forkListArray = processingText.readResult(forkListFilePath).split("\n");
 
-            String root = "/Users/shuruiz/Work/checkProjectSize/checkMarlinForkSize/";
-            processingText.rewriteFile("", root + "marlin_codeChangeSize.csv");
+            processingText.rewriteFile("", root + projectName+"_codeChangeSize.csv");
             for (String forkName : forkListArray) {
                 String analysisDir = root + forkName + FS + "INFOX_output/";
-                ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir,publicToken);
+                ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir, publicToken);
 //        String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"3 month");
                 String localSourceCodeDirPath = root + forkName + FS;
                 String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
@@ -142,7 +142,7 @@ public class GithubRepoAnalysis {
 
                 int size = processingText.readResult(localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt").split("\n").length;
 
-                processingText.writeTofile(forkName + "," + size + "\n", root + "marlin_codeChangeSize.csv");
+                processingText.writeTofile(forkName + "," + size + "\n", root + projectName+"_codeChangeSize.csv");
             }
 
         } catch (IOException e) {
