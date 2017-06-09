@@ -76,6 +76,13 @@ public class INFOX_main {
             } else {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
             }
+
+            File dir = new File(testCasesDir+"/"+forkName);
+            if (dir.exists()) {
+                continue;
+            }
+
+
             Root_Dir = new ProcessingText().getRootDir();
             String localSourceCodeDirPath = testCasesDir + forkName + FS;
             String analysisDir = testCasesDir + forkName + FS + "INFOX_output/";
