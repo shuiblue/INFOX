@@ -51,7 +51,8 @@ public class JensRunner {
 						}
 						int exitValue = process.exitValue();
 						if (exitValue != 0) {
-							if (exitValue == 134) {
+							if (exitValue == 134||exitValue==1) {
+								System.out.println("Exit value = " + exitValue);
 								coreFailure = true;
 								return;
 							}
