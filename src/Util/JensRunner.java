@@ -7,13 +7,16 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class VarexJRunner {
+public class JensRunner {
 	
 	static PrintStream out = System.out; 
 
 	public static void main(String[] args) {
+		System.out.println("Execute: ");
 		List<String> commands = new LinkedList<>();
-		commands.add("./gradlew run");
+		commands.add("./gradlew");
+		commands.add("run");
+		System.out.println(commands);
 
 		process(commands);
 		out.println();
