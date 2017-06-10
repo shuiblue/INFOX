@@ -532,6 +532,7 @@ public class ParseHtml {
 
             if (label_to_id.get("\"" + changedCodeLabel + "\"") != null) {
                 System.out.println(i++ + "/" + newCodeSize);
+                System.out.println(changedCodeLabel);
                 String nodeId = label_to_id.get("\"" + changedCodeLabel + "\"");
                 String clusterid = nodeId_to_clusterID.get(nodeId);
 
@@ -546,9 +547,10 @@ public class ParseHtml {
                     keywod_prefix = keywod_prefix.split("").length > 3 ? keywod_prefix.substring(0, 3).replace("[", "") + "." : keywod_prefix;
 
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
-                    Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
+                    Element currentFile = currentDoc.getElementsByAttributeValueMatching("data-path", fileName).next().first();
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
                     Element lineElement = getElement(lineElements);
+
 
                     String styleStr = "background-color:"
                             + cluster_color.get(clusterid)
