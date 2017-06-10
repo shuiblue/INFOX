@@ -17,9 +17,9 @@ public class JensRunner {
 		System.out.println("Processors: " + Runtime.getRuntime().availableProcessors());
 		System.out.println("Execute: ");
 		List<String> commands = new LinkedList<>();
-		commands.add("ulimit");
-		commands.add("-c");
-		commands.add("unlimited");
+//		commands.add("ulimit");
+//		commands.add("-c");
+//		commands.add("unlimited");
 
 
 		commands.add("./gradlew");
