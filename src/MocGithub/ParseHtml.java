@@ -247,7 +247,7 @@ public class ParseHtml {
             for (int j = 0; j < subClusterArray.length; j++) {
                 String clusterID = subClusterArray[j];
                 if (!stopSplitClusters.contains(clusterID) && clusterID.split("_").length < max_numberOfCut + 1) {
-//                    System.out.println(splitStep);
+                    System.out.println(splitStep);
                     nextStep = replaceCurrentStep(splitStep, cid, j);
 //                    System.out.println(nextStep+"\n----------");
                     nextStepStr = "       <td width=\"80\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
@@ -468,6 +468,7 @@ public class ParseHtml {
         label_to_id = pt.getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
 
         try {
+            System.out.println("read fork added node list..");
             forkAddedNodeList = pt.getForkAddedNodeList(analysisDir + "forkAddedNode.txt");
             for (String nodeLabel : forkAddedNodeList) {
                 String nodeID = label_to_id.get("\"" + nodeLabel + "\"");
@@ -532,7 +533,6 @@ public class ParseHtml {
 
             if (label_to_id.get("\"" + changedCodeLabel + "\"") != null) {
                 System.out.println(i++ + "/" + newCodeSize);
-                System.out.println(changedCodeLabel);
                 String nodeId = label_to_id.get("\"" + changedCodeLabel + "\"");
                 String clusterid = nodeId_to_clusterID.get(nodeId);
 
@@ -564,11 +564,11 @@ public class ParseHtml {
                 } else {
                     String keywod_prefix = "other";
                     currentDoc.getElementsByAttributeValue("data-path", fileName);
-                    Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
-                    if (currentFile == null) {
-                        System.out.println(lineNumber);
-                    }
+//                    Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
+                    Element currentFile = currentDoc.getElementsByAttributeValueMatching("data-path", fileName).next().first();
+
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
+
                     Element lineElement = getElement(lineElements);
 
                     String styleStr = "background-color:grey"
