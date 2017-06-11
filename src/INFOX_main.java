@@ -89,25 +89,25 @@ public class INFOX_main {
 
         File finishFile = new File(analysisDir + "done.txt");
 
-        if (!finishFile.exists()) {
-
-            File file = new File(localSourceCodeDirPath);
-
-            if (!file.exists()) {
-                /***git clone repo to local dir***/
-                JgitUtility jgitUtility = new JgitUtility();
-                String uri = github_page + forkName + ".git";
-                System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
-
-                jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
-                if (forkName.contains("Marlin")) {
-                    try {
-                        FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+//        if (!finishFile.exists()) {
+//
+//            File file = new File(localSourceCodeDirPath);
+//
+//            if (!file.exists()) {
+//                /***git clone repo to local dir***/
+//                JgitUtility jgitUtility = new JgitUtility();
+//                String uri = github_page + forkName + ".git";
+//                System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
+//
+//                jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
+//                if (forkName.contains("Marlin")) {
+//                    try {
+//                        FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
 
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
@@ -138,7 +138,7 @@ public class INFOX_main {
             parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
             parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
 //            }
-        }
+//        }
 
     }
 
