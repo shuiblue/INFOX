@@ -137,7 +137,7 @@ public class INFOX_main {
             /*** hack github page   ***/
             parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
             parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
-//            }
+            }
 //        }
 
     }
