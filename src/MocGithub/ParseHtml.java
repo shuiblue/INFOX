@@ -415,7 +415,7 @@ public class ParseHtml {
         String row_2 = getLevelColumn(levelColumn_2, joinStep, colspan, current_clusterID, clusterTree);
 
         return row_1 +
-                "       <td rowspan=\"2\" width=\"60\" style=\"cursor: pointer; background:" + color + "\" onclick='hide_cluster_rows(\"infox_" + current_clusterID + "\")'>" + keyword_suffix + "</td>\n" +
+                "       <td rowspan=\"2\" width=\"60\" style=\"cursor: pointer; background:" + color + "\"><button id= \"infox_"+current_clusterID+"_button\"   onclick='hide_cluster_rows(\"infox_" + current_clusterID + "_button\")'>hide</button>" + keyword_suffix + "</td>\n" +
                 "       <td rowspan=\"2\" width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
                 "        <td rowspan=\"2\"><div class=\"long_td\">" + keyword_long + "</div></td>\n" +
                 "       <td rowspan=\"2\" width=\"50\">" + clusterSize + "</td>\n" +

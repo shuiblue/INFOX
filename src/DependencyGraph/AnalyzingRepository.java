@@ -46,7 +46,7 @@ public class AnalyzingRepository {
             isMS_CLUSTERCHANGES = false;
         }
         this.repoPath = repoPath;
-        executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, isMS_CLUSTERCHANGES, max_numberOfCut, directedGraph, testDir, hasGroundTruth,minimumClusterSize);
+         executeINFOX(sourcecodeDir, analysisDirName, testCaseDir, approachIndex, re, isMS_CLUSTERCHANGES, max_numberOfCut, directedGraph, testDir, hasGroundTruth,minimumClusterSize);
     }
 
     /**
