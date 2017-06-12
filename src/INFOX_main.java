@@ -65,10 +65,11 @@ public class INFOX_main {
             return;
         }
 //        for (String forkName : forkListArray) {
-        String forkName = "cruwaller/Marlin";
+//        String forkName = "cruwaller/Marlin";
+        String forkName =  "MarlinFirmware/Marlin";
 //        String forkName = "JoelBrenstrum/Marlin";
-        String branchName = "max318xx_dev";
-//        String branchName = "";
+//        String branchName = "max318xx_dev";
+        String branchName = "";
         boolean hasGroundTruth = false;
         String testCasesDir;
 
@@ -113,7 +114,7 @@ public class INFOX_main {
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
 //          String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-            String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:max318xx_dev";
+            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/Duo...MarlinFirmware:1.1.x";
             System.out.println(diffPageUrl);
 
             ProcessingText processingText = new ProcessingText();
