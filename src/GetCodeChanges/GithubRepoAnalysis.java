@@ -103,7 +103,7 @@ public class GithubRepoAnalysis {
 //        String diffFilePath = "diff.txt";
 //        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-        String projectName = "BVLC";
+        String projectName = "grpc";
         String folder = "check"+projectName+"ForkSize/";
         String root = "/Users/shuruiz/Work/checkProjectSize/";
         String token = null;
