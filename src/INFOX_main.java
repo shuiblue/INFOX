@@ -64,8 +64,8 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-//        for (String forkName : forkListArray) {
-        String forkName = "MarlinFirmware/Marlin";
+        for (String forkName : forkListArray) {
+//        String forkName = "MarlinFirmware/Marlin";
 //        String forkName =  "SkyNet3D/Marlin";
 //        String forkName = "JoelBrenstrum/Marlin";
 //        String branchName = "max318xx_dev";
@@ -80,10 +80,10 @@ public class INFOX_main {
             testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
         }
 
-//            File dir = new File(testCasesDir + "/" + forkName);
-//        if (dir.exists()) {
-//            continue;
-//        }
+            File dir = new File(testCasesDir + "/" + forkName);
+        if (dir.exists()) {
+            continue;
+        }
 
 
         Root_Dir = new ProcessingText().getRootDir();
@@ -97,6 +97,7 @@ public class INFOX_main {
             File file = new File(localSourceCodeDirPath);
 
             if (!file.exists()) {
+
                 /***git clone repo to local dir***/
                 JgitUtility jgitUtility = new JgitUtility();
                 String uri = github_page + forkName + ".git";
@@ -114,8 +115,8 @@ public class INFOX_main {
 
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-//          String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
+          String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+//            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
             System.out.println(diffPageUrl);
 
             ProcessingText processingText = new ProcessingText();
@@ -140,7 +141,7 @@ public class INFOX_main {
             /*** hack github page   ***/
             parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
             parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
-//            }
+            }
         }
 
     }
