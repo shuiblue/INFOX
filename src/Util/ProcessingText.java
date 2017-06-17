@@ -313,6 +313,9 @@ public class ProcessingText {
                 if (line.contains("inline _attribute_((always_inline))")) {
                     line = line.replace("inline _attribute_((always_inline))", "");
                 }
+                if (line.trim().startsWith("inline" )) {
+                    line = line.replace("inline ", "");
+                }
                 if (line.contains("__attribute__") && line.contains("((packed))")) {
                     line = line.replace("__attribute__", "").replace("((packed))", "");
                 }
@@ -322,13 +325,21 @@ public class ProcessingText {
                 if (line.contains("unsigned")) {
                     line = line.replace("unsigned", "unknowntype");
                 }
+                if (line.contains("static const")) {
+                    line = line.replace("static const", "");
+                }
+                if (line.trim().startsWith("static" )) {
+                    line = line.replace("static ", "");
+                }
                 if (line.contains("const")) {
                     line = line.replace("const", "");
                 }
                 if (line.startsWith("%")) {
                     line = line.replace(line, "");
                 }
-
+                if (line.contains("virtual")) {
+                    line = line.replace("virtual", "");
+                }
 
                 Pattern p1 = Pattern.compile("([x](\\d|[a-zA-Z])(\\d|[a-zA-Z]))*");
                 Pattern p2 = Pattern.compile("\\\\[x](\\d|[a-zA-Z])(\\d|[a-zA-Z])");

@@ -164,9 +164,9 @@ public class DependencyGraph {
         System.out.println(" CONSECUTIVE: " + CONSECUTIVE);
 
 //        if (current_OS.indexOf("mac") >= 0) {
-            NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
-            NAMESPACEURI = "http://www.sdml.info/srcML/src";
-            NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
+        NAMESPACEURI_POSITION = "http://www.sdml.info/srcML/position";
+        NAMESPACEURI = "http://www.sdml.info/srcML/src";
+        NAMESPACEURI_CPP = "http://www.sdml.info/srcML/cpp";
 //        } else {
 //            NAMESPACEURI_POSITION = "http://www.srcML.org/srcML/position";
 //            NAMESPACEURI = "http://www.srcML.org/srcML/src";
@@ -567,7 +567,7 @@ public class DependencyGraph {
                 parseDefineNode(fileName, scope, ele);
                 String location = getLocationOfElement(ele, fileName);
                 storeStrings(location, ele.getValue());
-            } else if (ele.getLocalName().equals("function") || ele.getLocalName().equals("constructor") || ele.getLocalName().equals("function_decl")) {
+            } else if (isFunction(ele)) {
                 parseFunctionNode(ele, fileName, scope);
             } else if (ele.getLocalName().equals("if") && !ele.getNamespacePrefix().equals("cpp")) {
                 tmpStmtList.add(parseIfStmt(ele, fileName, scope, parentLocation));
@@ -619,7 +619,7 @@ public class DependencyGraph {
             } else if (ele.getLocalName().equals("return")) {
                 Element returnContent = ele.getFirstChildElement("expr", NAMESPACEURI);
                 if (returnContent != null) {
-                    tmpStmtList.add(parseVariableInExpression(ele, "", scope, parentLocation, false));
+                    tmpStmtList.add(parseVariableInExpression(ele, getLocationOfElement(returnContent, fileName), scope, parentLocation, false));
                 }
                 String location = getLocationOfElement(ele, fileName);
                 storeStrings(location, ele.getValue());
@@ -669,14 +669,20 @@ public class DependencyGraph {
                 Element name = ele.getFirstChildElement("name", NAMESPACEURI);
                 String location = getLocationOfElement(ele, fileName);
                 gotoMap.put(location, name.getValue());
-            } else {
-                if (ele.getLocalName().equals("struct")
-                        || ele.getLocalName().equals("class")
-                        || ele.getLocalName().equals("namespace")
-                        || ele.getLocalName().equals("union")
-                        ) {
-                    parseStructOrClass(ele, fileName, scope, parentLocation, "", ele.getLocalName());
+            } else if (ele.getLocalName().equals("template")) {
+                Element classElement = ele.getFirstChildElement("class", NAMESPACEURI);
+                if (classElement != null) {
+                    parseStructOrClass(classElement, fileName, scope, parentLocation, "", classElement.getLocalName());
                 }
+            } else if (ele.getLocalName().equals("class_decl")) {
+                addDeclarationSymbol(ele, "class_decl", fileName, 1, parentLocation, "");
+            } else if (ele.getLocalName().equals("struct")
+                    || ele.getLocalName().equals("class")
+                    || ele.getLocalName().equals("namespace")
+                    || ele.getLocalName().equals("union")
+                    ) {
+                parseStructOrClass(ele, fileName, scope, parentLocation, "", ele.getLocalName());
+
             }
 
             //remove symbol, whose scope >1
@@ -712,6 +718,10 @@ public class DependencyGraph {
 
 
         return stmtList;
+    }
+
+    private boolean isFunction(Element ele) {
+        return ele.getLocalName().equals("function") || ele.getLocalName().equals("constructor") || ele.getLocalName().equals("destructor") || ele.getLocalName().equals("function_decl");
     }
 
     /**
@@ -863,6 +873,9 @@ public class DependencyGraph {
         //typedef struct
         Element type_ele = ele.getFirstChildElement("type", NAMESPACEURI);
         Element name_ele = ele.getFirstChildElement("name", NAMESPACEURI);
+        //typedef function
+        Element funcDecl_ele = ele.getFirstChildElement("function_decl", NAMESPACEURI);
+
         if (type_ele != null) {
             //struct definition
             Element structChild = type_ele.getFirstChildElement("struct", NAMESPACEURI);
@@ -907,12 +920,13 @@ public class DependencyGraph {
                 }
 
 
-            }
-            //typedef function
-            Element funcDecl_ele = ele.getFirstChildElement("function_decl", NAMESPACEURI);
-            if (funcDecl_ele != null) {
+            } else if (funcDecl_ele != null) {
                 parseFunctionNode(funcDecl_ele, fileName, scope);
+            } else {
+                addDeclarationSymbol(ele, "typedef", fileName, 1, parentLocation, "");
             }
+
+
         }
         return;
     }
@@ -946,7 +960,7 @@ public class DependencyGraph {
                         newsymbol.add(func_decl);
                         storeSymbols(newsymbol);
                         storeIntoNodeList(location);
-
+                        processingText.writeTofile(location + "\n", parsedLineTxt);
                         //check block
                         Element block = siblings.get(i + 1);
                         if (block != null) {
@@ -1143,8 +1157,10 @@ public class DependencyGraph {
     private void parseFunctionNode(Element element, String fileName, int scope) {
 
         String tag = "";
-        if (element.getLocalName().equals("function") || element.getLocalName().equals("constructor")) {
+        if (element.getLocalName().equals("function")) {
             tag = "function";
+        } else if (element.getLocalName().equals("destructor")) {
+            tag = "destructor";
         } else {
             tag = "function_decl";
         }
@@ -1458,6 +1474,12 @@ public class DependencyGraph {
             type = "";
         }
 
+        if (type.contains("::")) {
+            String[] subNameArray = type.split("::");
+            int length = subNameArray.length;
+            type = subNameArray[length - 1];
+        }
+
         Symbol symbol;
         Element nameElement = element.getFirstChildElement("name", NAMESPACEURI);
         Element decl_Element = element.getFirstChildElement("decl", NAMESPACEURI);
@@ -1467,7 +1489,20 @@ public class DependencyGraph {
         String name;
         if (nameElement != null && alias.equals("")) {
             //for the case of array , e.g. a[3]  <name><name>a</name><index>3</index><name>
-            Element subnameEle = nameElement.getFirstChildElement("name", NAMESPACEURI);
+            Element subnameEle = null;
+
+            Elements subnameEleList = nameElement.getChildElements("name", NAMESPACEURI);
+            int size = subnameEleList.size();
+            if (size == 0) {
+                subnameEle = nameElement;
+            } else if (size == 1) {
+                subnameEle = nameElement.getFirstChildElement("name", NAMESPACEURI);
+            } else if (size > 1) {
+                subnameEle = subnameEleList.get(size - 1);
+                type = subnameEleList.get(size - 2).getValue();
+            }
+
+
             if (subnameEle != null) {
                 name = subnameEle.getValue();
             } else {
@@ -1475,6 +1510,11 @@ public class DependencyGraph {
             }
             if (name.contains("::")) {
                 name = name.split("::")[1];
+            }
+
+            if (tag.equals("destructor")) {
+                name = "~" + name;
+                tag = "function_decl";
             }
         } else if (nameElement == null && !alias.equals("")) {
             name = alias;    //this is only used for typedef struct
@@ -1484,6 +1524,11 @@ public class DependencyGraph {
             name = tag;
         }
 
+        Element superElement = element.getFirstChildElement("super", NAMESPACEURI);
+        if (superElement != null) {
+            Element name_superEle = superElement.getFirstChildElement("name", NAMESPACEURI);
+            // todo: dependency to super class
+        }
 
         String location;
         if (((Element) element.getParent()).getLocalName().endsWith("param")) {
@@ -1861,7 +1906,19 @@ public class DependencyGraph {
             } else {
                 location = getLocationOfElement(callNameElement, fileName);
             }
-            String callName = callNameElement.getValue();
+            String callName = "";
+
+            Elements subnameEleList = callNameElement.getChildElements("name", NAMESPACEURI);
+            int size = subnameEleList.size();
+            if (size == 0) {
+                callName = callNameElement.getValue();
+            } else if (size == 1) {
+                callName = callNameElement.getFirstChildElement("name", NAMESPACEURI).getValue();
+            } else if (size > 1) {
+                callName = subnameEleList.get(size - 1).getValue();
+            }
+
+
             if (callName.contains(".")) {
                 String obj = callName.split("\\.")[0];
                 callName = callName.split("\\.")[1];
