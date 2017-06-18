@@ -692,6 +692,7 @@ public class ParseHtml {
             } else {
                 diffURL = github_page + comparedFork + "/compare/" + previousCommitSHA + "..." + forkName.split(FS)[0] + ":" + latestCommitSHA;
             }
+            diffURL+="?w=1";
             System.out.println(diffURL);
             new ProcessingText().rewriteFile(diffURL, analysisDir + "diffurl.txt");
             System.out.println("diff url:" + diffURL);
