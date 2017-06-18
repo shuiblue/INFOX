@@ -64,8 +64,8 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-        for (String forkName : forkListArray) {
-//        String forkName = "test/grpc";
+//        for (String forkName : forkListArray) {
+        String forkName = "mUVe3D/Marlin-mUVe1-Beta";
 //        String forkName = "MarlinFirmware/Marlin";
         String branchName = "";
         boolean hasGroundTruth = false;
@@ -77,10 +77,10 @@ public class INFOX_main {
             testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
         }
 
-            File dir = new File(testCasesDir + "/" + forkName);
-        if (dir.exists()) {
-            continue;
-        }
+//            File dir = new File(testCasesDir + "/" + forkName);
+//        if (dir.exists()) {
+//            continue;
+//        }
 
 
         Root_Dir = new ProcessingText().getRootDir();
@@ -145,4 +145,4 @@ public class INFOX_main {
     }
 
 
-}
+//}
