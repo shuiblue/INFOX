@@ -66,7 +66,7 @@ public class INFOX_main {
         }
 //        for (String forkName : forkListArray) {
 //        String forkName = "test/grpc";
-        String forkName = "crugitwaller/Marlin";
+        String forkName = "cruwaller/Marlin";
         String branchName = "";
         boolean hasGroundTruth = false;
         String testCasesDir;
