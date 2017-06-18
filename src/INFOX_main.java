@@ -93,22 +93,22 @@ public class INFOX_main {
 
             File file = new File(localSourceCodeDirPath);
 
-//            if (!file.exists()) {
-//
-//                /***git clone repo to local dir***/
-//                JgitUtility jgitUtility = new JgitUtility();
-//                String uri = github_page + forkName + ".git";
-//                System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
-//
-//                jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
-//                if (forkName.contains("Marlin")) {
-//                    try {
-//                        FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
+            if (!file.exists()) {
+
+                /***git clone repo to local dir***/
+                JgitUtility jgitUtility = new JgitUtility();
+                String uri = github_page + forkName + ".git";
+                System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
+
+                jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
+                if (forkName.contains("Marlin")) {
+                    try {
+                        FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
@@ -117,23 +117,23 @@ public class INFOX_main {
             String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:max318xx_dev";
             System.out.println(diffPageUrl);
 
-//            ProcessingText processingText = new ProcessingText();
-//            processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
-//
-//                /***   get fork added node, generate ForkAddedNode.txt file   ***/
-//            GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-//            HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
-//            githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
+            ProcessingText processingText = new ProcessingText();
+            processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
+
+                /***   get fork added node, generate ForkAddedNode.txt file   ***/
+            GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
+            HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
+            githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
 
 
             /*** start clustering code  ***/
             ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
             clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
-//            try {
-//                processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
 
             /*** hack github page   ***/
