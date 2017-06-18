@@ -365,7 +365,7 @@ public class ProcessingText {
     public String changeFileName(String fileName) {
         String[] nameArray = fileName.split("\\.");
         String suffix = nameArray[nameArray.length - 1];
-        return fileName.replace("." + suffix, suffix.toUpperCase()).replace("-", "~").replace("/", "~").replace("\\", "~");
+        return fileName.replace("." + suffix, suffix.toUpperCase()).replace("-", "=").replace("/", "~").replace("\\", "~");
     }
 
     /**
@@ -375,7 +375,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]{2}$", ".cc").replaceAll("[C]$", ".c").replaceAll("[I][N][O]$", ".ino");
+        return nodeLabel.split("-")[0].replace("~", "/").replace("=", "-").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]{2}$", ".cc").replaceAll("[C]$", ".c").replaceAll("[I][N][O]$", ".ino");
 
     }
 

@@ -368,7 +368,10 @@ public class DependencyGraph {
 //                if (Files.isRegularFile(filePath) && processingText.isCFile(filePath.toString())) {
 /**  need to parse pde file as well for real fork**/
                 if (Files.isRegularFile(filePath) && new ProcessingText().isCLanguageFile(filePath)) {
-                    if (!filePath.toString().contains("/matlab/")) {
+                    if (!filePath.toString().contains("/matlab/")
+                            &&!filePath.toString().contains("/example_configurations/")
+                            &&!filePath.toString().contains("language")
+                            ) {
                         parseSingleFile(filePath);
                     }
                 }

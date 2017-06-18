@@ -533,7 +533,7 @@ public class ParseHtml {
         for (String changedCodeLabel : forkAddedNodeList) {
 
             if (label_to_id.get("\"" + changedCodeLabel + "\"") != null) {
-                System.out.println(i++ + "/" + newCodeSize);
+                System.out.println(i + "/" + newCodeSize);
                 String nodeId = label_to_id.get("\"" + changedCodeLabel + "\"");
                 String clusterid = nodeId_to_clusterID.get(nodeId);
 
@@ -564,8 +564,6 @@ public class ParseHtml {
 
                 } else {
                     String keywod_prefix = "other";
-                    currentDoc.getElementsByAttributeValue("data-path", fileName);
-//                    Element currentFile = currentDoc.getElementsByAttributeValue("data-path", fileName).next().first();
                     Element currentFile = currentDoc.getElementsByAttributeValueMatching("data-path", fileName).next().first();
 
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
@@ -580,6 +578,8 @@ public class ParseHtml {
                     lineElement.attr("class", "infox_other").attr("style", styleStr).text(keywod_prefix);
 
                 }
+                i++;
+                System.out.println(i);
             }
         }
 
