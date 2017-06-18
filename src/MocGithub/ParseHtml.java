@@ -458,6 +458,7 @@ public class ParseHtml {
 
 
     private HashMap<String, String> genrate_NodeId_to_clusterIDList_Map(String splitStep) {
+        otherClusterSize = 0;
         Set<String> topClusterSet = new HashSet<String>(Arrays.asList(splitStep.replaceAll("--", "~").split("~")));
 
 
