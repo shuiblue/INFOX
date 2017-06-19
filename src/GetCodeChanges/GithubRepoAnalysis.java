@@ -29,7 +29,7 @@ public class GithubRepoAnalysis {
                 if (!changedFile.equals("")) {
                     if (currentFileName.equals("")) {
                         String[] content = changedFile.split("\n");
-                        currentFileName = content[0].split(" ")[2].replaceAll("^[b][/]","");
+                        currentFileName = content[0].split(" ")[2].replace("b/", "");
 
                         if (processingText.isCFile_general(currentFileName)) {
                             lineNumberList = new ArrayList<>();
@@ -103,7 +103,7 @@ public class GithubRepoAnalysis {
 //        String diffFilePath = "diff.txt";
 //        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-        String projectName = "grpc";
+        String projectName = "ktap";
         String folder = "check"+projectName+"ForkSize/";
         String root = "/Users/shuruiz/Work/checkProjectSize/";
         String token = null;

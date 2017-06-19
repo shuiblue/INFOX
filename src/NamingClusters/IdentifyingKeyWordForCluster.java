@@ -177,7 +177,7 @@ public class IdentifyingKeyWordForCluster {
                 HashSet<String> one_wordSet = new HashSet<>();
 
                 for (String two : twoGramList) {
-                    if (two.startsWith(cl)) {
+                    if (two.startsWith(cl)&&two.replace("[","").replace("]","").trim().length()>0) {
                         String clusterID = two.split(":")[0];
                         int start = two.indexOf("[");
                         int end = two.indexOf("]");
