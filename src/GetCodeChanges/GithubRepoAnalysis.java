@@ -87,10 +87,17 @@ public class GithubRepoAnalysis {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             String fileName = (String) pair.getKey();
-            String newFileName = processingText.changeFileName(fileName);
-            ArrayList<Integer> lineNumList = (ArrayList<Integer>) pair.getValue();
-            for (Integer lineNum : lineNumList) {
-                sb.append(newFileName + "-" + lineNum + "\n");
+
+            if (!fileName.toString().contains("matlab")
+                    &&!fileName.toString().contains("example_configurations")
+                    &&!fileName.toString().contains("language")
+                    ) {
+
+                String newFileName = processingText.changeFileName(fileName);
+                ArrayList<Integer> lineNumList = (ArrayList<Integer>) pair.getValue();
+                for (Integer lineNum : lineNumList) {
+                    sb.append(newFileName + "-" + lineNum + "\n");
+                }
             }
         }
         processingText.rewriteFile(sb.toString(), output);
