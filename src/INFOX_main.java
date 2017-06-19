@@ -64,8 +64,8 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-        for (String forkName : forkListArray) {
-//        String forkName = "infinit/grpc";
+//        for (String forkName : forkListArray) {
+        String forkName = "wydwww/grpc";
 //        String forkName = "MarlinFirmware/Marlin";
         String branchName = "";
         boolean hasGroundTruth = false;
@@ -145,4 +145,4 @@ public class INFOX_main {
 }
 
 
-}
+//}
