@@ -176,8 +176,9 @@ public class IdentifyingKeyWordForCluster {
                 HashSet<String> one_wordSet = new HashSet<>();
 
                 for (String two : twoGramList) {
+                    String clusterID = two.split(":")[0];
                     if (two.startsWith(cl) && two.replace("[", "").replace("]", "").trim().length() > 0) {
-                        String clusterID = two.split(":")[0];
+
                         int start = two.indexOf("[");
                         int end = two.indexOf("]");
                         String[] keywords = two.substring(start + 1, end - 1).split(",");
@@ -191,6 +192,10 @@ public class IdentifyingKeyWordForCluster {
                         }
 
                         keywordSet = new HashSet<String>(Arrays.asList(keywords));
+                        clusterID_keyword.put(clusterID, keywordSet);
+                    }else{
+                        keywordSet = new HashSet<String>();
+                        keywordSet.add("no-meaningful-keyword");
                         clusterID_keyword.put(clusterID, keywordSet);
                     }
                 }
