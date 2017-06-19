@@ -202,7 +202,8 @@ public class IdentifyingKeyWordForCluster {
 
                 String[] oneGramList = pt.readResult(analysisDir + splitStep + "_one_keyWord.txt").split("\n");
                 for (String one : oneGramList) {
-                    if (one.startsWith(cl) && one.replace("[", "").replace("]", "").trim().length() > 0) {
+                    if (one.startsWith(cl) && one.replace(cl,"").replace(":","").replace("[", "").replace("]", "").trim().length() > 0) {
+
                         int start = one.indexOf("[");
                         int end = one.indexOf("]");
                         String[] keywords = one.substring(start + 1, end - 1).split(",");
