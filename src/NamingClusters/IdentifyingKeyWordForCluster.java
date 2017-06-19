@@ -177,9 +177,11 @@ public class IdentifyingKeyWordForCluster {
 
                 for (String two : twoGramList) {
                     String clusterID = two.split(":")[0];
-                    if (two.startsWith(cl) && two.replace(cl,"").replace(":","").replace("[", "").replace("]", "").trim().length() > 0) {
+                    if (two.startsWith(cl)) {
 
-                        int start = two.indexOf("[");
+                        if (two.replace(cl, "").replace(":", "").replace("[", "").replace("]", "").trim().length() > 0){
+
+                            int start = two.indexOf("[");
                         int end = two.indexOf("]");
                         String[] keywords = two.substring(start + 1, end - 1).split(",");
 
@@ -193,40 +195,47 @@ public class IdentifyingKeyWordForCluster {
 
                         keywordSet = new HashSet<String>(Arrays.asList(keywords));
                         clusterID_keyword.put(clusterID, keywordSet);
-                    }else{
+                    } else {
                         keywordSet = new HashSet<String>();
                         keywordSet.add("no-meaningful-keyword");
                         clusterID_keyword.put(clusterID, keywordSet);
                     }
                 }
+            }
 
-                String[] oneGramList = pt.readResult(analysisDir + splitStep + "_one_keyWord.txt").split("\n");
-                for (String one : oneGramList) {
-                    if (one.startsWith(cl) && one.replace(cl,"").replace(":","").replace("[", "").replace("]", "").trim().length() > 0) {
+            String[] oneGramList = pt.readResult(analysisDir + splitStep + "_one_keyWord.txt").split("\n");
+            for (String one : oneGramList) {
+                if (one.startsWith(cl) && one.replace(cl, "").replace(":", "").replace("[", "").replace("]", "").trim().length() > 0) {
 
-                        int start = one.indexOf("[");
-                        int end = one.indexOf("]");
-                        String[] keywords = one.substring(start + 1, end - 1).split(",");
-                        for (String oneKey : keywords) {
-                            if (!one_wordSet.contains(oneKey)) {
-                                keywordSet.add(oneKey);
-                            }
+                    int start = one.indexOf("[");
+                    int end = one.indexOf("]");
+                    String[] keywords = one.substring(start + 1, end - 1).split(",");
+                    for (String oneKey : keywords) {
+                        if (!one_wordSet.contains(oneKey)) {
+                            keywordSet.add(oneKey);
                         }
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        StringBuffer sb = new StringBuffer();
-        clusterID_keyword.forEach((k, v) -> {
+    } catch(
+    IOException e)
 
-            sb.append(k + ": " + v.toString());
-
-            sb.append("\n");
-        });
-
-        pt.rewriteFile(sb.toString(), analysisDir + splitStep + "_keyword.txt");
+    {
+        e.printStackTrace();
     }
+
+    StringBuffer sb = new StringBuffer();
+        clusterID_keyword.forEach((k,v)->
+
+    {
+
+        sb.append(k + ": " + v.toString());
+
+        sb.append("\n");
+    });
+
+        pt.rewriteFile(sb.toString(),analysisDir +splitStep +"_keyword.txt");
+}
 
 }
