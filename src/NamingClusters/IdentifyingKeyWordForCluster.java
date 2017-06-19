@@ -20,13 +20,13 @@ public class IdentifyingKeyWordForCluster {
     HashMap<String, String> twoGram_sourceCodeLocMap = new HashMap<>();
 
     public IdentifyingKeyWordForCluster(String sourcecodeDir, String analysisDir, HashMap<String, ArrayList<String>> commitInfoMap) {
- /**  tokenization **/
+        /**  tokenization **/
         System.out.println("        Tokenizing source code...");
         ProcessingText processingText = new ProcessingText();
 
-        boolean hasTokenizedSourceCode=false;
+        boolean hasTokenizedSourceCode = false;
         try {
-            if(new File(analysisDir+"tokenizedSouceCode_oneGram.txt").exists()) {
+            if (new File(analysisDir + "tokenizedSouceCode_oneGram.txt").exists()) {
                 String tokenizedSourceCode = processingText.readResult(analysisDir + "tokenizedSouceCode_oneGram.txt");
                 if (tokenizedSourceCode.trim().length() > 0) {
                     hasTokenizedSourceCode = true;
@@ -36,7 +36,7 @@ public class IdentifyingKeyWordForCluster {
             e.printStackTrace();
         }
 
-        if(!hasTokenizedSourceCode) {
+        if (!hasTokenizedSourceCode) {
             new Tokenizer().tokenizeSourceCode(sourcecodeDir, analysisDir);
         }
         this.commitInfoMap = commitInfoMap;
@@ -70,7 +70,7 @@ public class IdentifyingKeyWordForCluster {
         // doc stores all the documents
         List<String> all_sourceCode_doc = new ArrayList<>();
         /** get node label -- node content **/
-        if(clusterList.size()==1) {
+        if (clusterList.size() == 1) {
             if (n_gram == 1) {
                 processingText.rewriteFile("", analysisDir + splitStep + "_one_keyWord.txt");
                 all_sourceCode_doc.addAll(oneGram_sourceCodeLocMap.values());
@@ -99,11 +99,11 @@ public class IdentifyingKeyWordForCluster {
                         v.forEach(nodeId -> {
                             String nodeContent = sourceCodeLocMap.get(nodeIdMap.get(nodeId + ""));
                             if (nodeContent != null) {
-                                term_count[0] =getTermCountMap(nodeContent, term_count[0]);
+                                term_count[0] = getTermCountMap(nodeContent, term_count[0]);
 
-                                int n_gram_index = n_gram == 1 ? 2: 3;
+                                int n_gram_index = n_gram == 1 ? 2 : 3;
                                 String commit = commitInfoMap.get(nodeId + "").get(n_gram_index);
-                                term_count[0] =getTermCountMap(commit, term_count[0]);
+                                term_count[0] = getTermCountMap(commit, term_count[0]);
                             }
                         });
                     }
@@ -168,7 +168,6 @@ public class IdentifyingKeyWordForCluster {
     private void mergeOne_two_gram(String analysisDir, String splitStep) {
         ProcessingText pt = new ProcessingText();
         HashMap<String, HashSet<String>> clusterID_keyword = new HashMap<>();
-
         try {
             String[] topClusterID = pt.readResult(analysisDir + "topClusters.txt").split("\n");
             for (String cl : topClusterID) {
@@ -177,7 +176,7 @@ public class IdentifyingKeyWordForCluster {
                 HashSet<String> one_wordSet = new HashSet<>();
 
                 for (String two : twoGramList) {
-                    if (two.startsWith(cl)&&two.replace("[","").replace("]","").trim().length()>0) {
+                    if (two.startsWith(cl) && two.replace("[", "").replace("]", "").trim().length() > 0) {
                         String clusterID = two.split(":")[0];
                         int start = two.indexOf("[");
                         int end = two.indexOf("]");
@@ -198,7 +197,7 @@ public class IdentifyingKeyWordForCluster {
 
                 String[] oneGramList = pt.readResult(analysisDir + splitStep + "_one_keyWord.txt").split("\n");
                 for (String one : oneGramList) {
-                    if (one.startsWith(cl)) {
+                    if (one.startsWith(cl) && one.replace("[", "").replace("]", "").trim().length() > 0) {
                         int start = one.indexOf("[");
                         int end = one.indexOf("]");
                         String[] keywords = one.substring(start + 1, end - 1).split(",");
