@@ -370,6 +370,7 @@ public class DependencyGraph {
                 if (Files.isRegularFile(filePath) && new ProcessingText().isCLanguageFile(filePath)) {
                     if (!filePath.toString().contains("/matlab/")
                             &&!filePath.toString().contains("/example_configurations/")
+                            &&!filePath.toString().contains("/ArduinoAddons/")
                             &&!filePath.toString().contains("language")
                             ) {
                         parseSingleFile(filePath);

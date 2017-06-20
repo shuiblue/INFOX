@@ -64,10 +64,11 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-        for (String forkName : forkListArray) {
-//        String forkName = "wydwww/grpc";
-//        String forkName = "MarlinFirmware/Marlin";
+//        for (String forkName : forkListArray) {
+        String forkName = "wydwww/grpc";
+//        String forkName = "shuiblue/Marlin";
         String branchName = "";
+//        String branchName = "muve_fork_master";
         boolean hasGroundTruth = false;
         String testCasesDir;
 
@@ -76,11 +77,11 @@ public class INFOX_main {
         } else {
             testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
         }
-
-        File dir = new File(testCasesDir + "/" + forkName);
-        if (dir.exists()) {
-            continue;
-        }
+//
+//        File dir = new File(testCasesDir + "/" + forkName);
+//        if (dir.exists()) {
+//            continue;
+//        }
 
 
         Root_Dir = new ProcessingText().getRootDir();
@@ -113,12 +114,12 @@ public class INFOX_main {
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
             String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-//            String diffPageUrl = "https://github.com/grpcddqqd/grpc/compare/master...infinit:master";
+//            String diffPageUrl = "https://github.com/shuiblue/Marlin/compare/3a9f3070b737092dae548ee1dc4a6745e04fad2a...shuiblue:858da19142602dea181dc132d7c9609b236a3188";
 //            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
             System.out.println(diffPageUrl);
 
             ProcessingText processingText = new ProcessingText();
-            processingText.ReadTextFromURL(diffPageUrl + ".diff?w=1", localSourceCodeDirPath + "INFOX_output/diff.txt");
+//            processingText.ReadTextFromURL(diffPageUrl + ".diff?w=1", localSourceCodeDirPath + "INFOX_output/diff.txt");
 
             /***   get fork added node, generate ForkAddedNode.txt file   ***/
             GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
@@ -145,4 +146,4 @@ public class INFOX_main {
 }
 
 
-}
+//}

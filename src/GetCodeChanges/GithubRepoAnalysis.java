@@ -90,6 +90,7 @@ public class GithubRepoAnalysis {
 
             if (!fileName.toString().contains("matlab")
                     &&!fileName.toString().contains("example_configurations")
+                    &&!fileName.toString().contains("ArduinoAddons")
                     &&!fileName.toString().contains("language")
                     ) {
 
