@@ -119,7 +119,7 @@ public class INFOX_main {
             System.out.println(diffPageUrl);
 
             ProcessingText processingText = new ProcessingText();
-//            processingText.ReadTextFromURL(diffPageUrl + ".diff?w=1", localSourceCodeDirPath + "INFOX_output/diff.txt");
+            processingText.ReadTextFromURL(diffPageUrl + ".diff?w=1", localSourceCodeDirPath + "INFOX_output/diff.txt");
 
             /***   get fork added node, generate ForkAddedNode.txt file   ***/
             GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
