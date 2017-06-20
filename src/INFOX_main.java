@@ -112,9 +112,9 @@ public class INFOX_main {
 
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-//            String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-//            String diffPageUrl = "https://github.com/grpc/grpc/compare/master...infinit:master";
-            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
+            String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+//            String diffPageUrl = "https://github.com/grpcddqqd/grpc/compare/master...infinit:master";
+//            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
             System.out.println(diffPageUrl);
 
             ProcessingText processingText = new ProcessingText();
