@@ -99,9 +99,10 @@ public class ParseHtml {
             currentPage = Jsoup.parse(page.asXml());
             currentPage = getLoadDiffContentMap(webClient, currentPage);
             System.out.println("done with getting all the files");
-            currentPage = getLoadBigDiffContentMap(webClient, currentPage);
 
-            System.out.println("done with clicking all the load diff button");
+            currentPage = getLoadBigDiffContentMap(webClient, currentPage);
+            System.out.println("done with clicking all the load diff button  --1");
+
 
         } catch (Exception e) {
             System.out.println("Get page error");
@@ -115,30 +116,19 @@ public class ParseHtml {
     private Document getLoadBigDiffContentMap(WebClient webClient, Document currentPage) throws IOException {
         Elements loadingElements = currentPage.getElementsByTag("include-fragment");
         HtmlPage currentDiffPage;
+        int i =1;
         for (Element ele : loadingElements) {
             String loadDiffUrl = ele.attr("data-fragment-url");
-            if (!loadDiffUrl.equals("")) {
+            if (!loadDiffUrl.equals("")&&ele.parent().parent().parent().getElementsByAttribute("data-path").first().toString().contains("data-path=\"Marlin")) {
 
-                System.out.println(loadDiffUrl);
+                System.out.println(loadDiffUrl+"----"+i++);
                 String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
                 currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+                webClient.waitForBackgroundJavaScriptStartingBefore(200);
+                webClient.waitForBackgroundJavaScript(5000);
                 Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
                 Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
                 currentDiff.getElementsByClass("js-diff-load-container").remove();
-
-            } else {
-//                loadDiffUrl = ele.attr("src");
-//                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
-//                webClient.waitForBackgroundJavaScriptStartingBefore(200);
-//                webClient.waitForBackgroundJavaScript(5000);
-//
-//
-//                Document currentDiffDoc = Jsoup.parse(currentDiffPage.asXml());
-//                Element bodyElement = currentDiffDoc.getElementsByTag("body").first();
-//                Element diffViewElement = currentPage.getElementsByClass("diff-view ").first();
-//                diffViewElement.append(bodyElement.toString().replace("<body>", "").replace("</body>", ""));
-//                ele.remove();
-//                currentPage = getLoadDiffContentMap(webClient, currentPage);
             }
         }
         return currentPage;
@@ -157,14 +147,7 @@ public class ParseHtml {
         HtmlPage currentDiffPage;
         for (Element ele : loadingElements) {
             String loadDiffUrl = ele.attr("data-fragment-url");
-            if (!loadDiffUrl.equals("")) {
-//                String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
-//                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
-//                Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
-//                Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
-//                currentDiff.getElementsByClass("js-diff-load-container").remove();
-
-            } else {
+            if (loadDiffUrl.equals("")) {
                 loadDiffUrl = ele.attr("src");
                 System.out.println(loadDiffUrl);
                 currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);

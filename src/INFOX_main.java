@@ -94,26 +94,26 @@ public class INFOX_main {
 
             File file = new File(localSourceCodeDirPath);
 
-//            if (!file.exists()) {
-//
-//                /***git clone repo to local dir***/
-//                JgitUtility jgitUtility = new JgitUtility();
-//                String uri = github_page + forkName + ".git";
-//                System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
-//
-//                jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
-//                if (forkName.contains("Marlin")) {
-//                    try {
-//                        FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
+            if (!file.exists()) {
+
+                /***git clone repo to local dir***/
+                JgitUtility jgitUtility = new JgitUtility();
+                String uri = github_page + forkName + ".git";
+                System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
+
+                jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
+                if (forkName.contains("Marlin")) {
+                    try {
+                        FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
             /***  get origin diff github page  ***/
             ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-//            String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+////            String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
             String diffPageUrl = "https://github.com/shuiblue/Marlin/compare/3a9f3070b737092dae548ee1dc4a6745e04fad2a...shuiblue:858da19142602dea181dc132d7c9609b236a3188";
 //            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
             System.out.println(diffPageUrl);
