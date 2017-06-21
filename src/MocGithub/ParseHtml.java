@@ -92,11 +92,16 @@ public class ParseHtml {
         try {
             page = webClient.getPage(diffPageUrl + "#files_bucket");
 
+
             webClient.waitForBackgroundJavaScriptStartingBefore(200);
             webClient.waitForBackgroundJavaScript(5000);
 
             currentPage = Jsoup.parse(page.asXml());
             currentPage = getLoadDiffContentMap(webClient, currentPage);
+            System.out.println("done with getting all the files");
+            currentPage = getLoadBigDiffContentMap(webClient, currentPage);
+
+            System.out.println("done with clicking all the load diff button");
 
         } catch (Exception e) {
             System.out.println("Get page error");
@@ -104,6 +109,39 @@ public class ParseHtml {
 
 
         new ProcessingText().rewriteFile(currentPage.toString(), analysisDir + originalPage);
+        System.out.println("done with getting original html file.");
+    }
+
+    private Document getLoadBigDiffContentMap(WebClient webClient, Document currentPage) throws IOException {
+        Elements loadingElements = currentPage.getElementsByTag("include-fragment");
+        HtmlPage currentDiffPage;
+        for (Element ele : loadingElements) {
+            String loadDiffUrl = ele.attr("data-fragment-url");
+            if (!loadDiffUrl.equals("")) {
+
+                System.out.println(loadDiffUrl);
+                String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
+                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+                Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
+                Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
+                currentDiff.getElementsByClass("js-diff-load-container").remove();
+
+            } else {
+//                loadDiffUrl = ele.attr("src");
+//                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+//                webClient.waitForBackgroundJavaScriptStartingBefore(200);
+//                webClient.waitForBackgroundJavaScript(5000);
+//
+//
+//                Document currentDiffDoc = Jsoup.parse(currentDiffPage.asXml());
+//                Element bodyElement = currentDiffDoc.getElementsByTag("body").first();
+//                Element diffViewElement = currentPage.getElementsByClass("diff-view ").first();
+//                diffViewElement.append(bodyElement.toString().replace("<body>", "").replace("</body>", ""));
+//                ele.remove();
+//                currentPage = getLoadDiffContentMap(webClient, currentPage);
+            }
+        }
+        return currentPage;
     }
 
     /**
@@ -120,14 +158,15 @@ public class ParseHtml {
         for (Element ele : loadingElements) {
             String loadDiffUrl = ele.attr("data-fragment-url");
             if (!loadDiffUrl.equals("")) {
-                String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
-                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
-                Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
-                Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
-                currentDiff.getElementsByClass("js-diff-load-container").remove();
+//                String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
+//                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+//                Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
+//                Element currentDiff = currentPage.getElementById("diff-" + diffID).getElementsByClass("js-file-content Details-content--shown").first().append(String.valueOf(xmldoc.getElementsByClass("data highlight blob-wrapper")));
+//                currentDiff.getElementsByClass("js-diff-load-container").remove();
 
             } else {
                 loadDiffUrl = ele.attr("src");
+                System.out.println(loadDiffUrl);
                 currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
                 Document currentDiffDoc = Jsoup.parse(currentDiffPage.asXml());
                 Element bodyElement = currentDiffDoc.getElementsByTag("body").first();
