@@ -70,17 +70,11 @@ public class GetCommitMsg {
         HashMap<String, ArrayList<String>> commitInfoMap = new HashMap<>();
         try {
             String commitInfo[] = new ProcessingText().readResult(analysisDir + "nodeid_commit.txt").split("\n");
-            int i =1;
             for (String line : commitInfo) {
-                System.out.println(i++);
                 String[] infoArray = line.split(",");
-
                 String nodeID = infoArray[0];
                 ArrayList<String> infoList = new ArrayList<>();
 
-                if(infoArray.length<=2){
-                    System.out.println();
-                }
                 infoList.add(infoArray[1]);
                 infoList.add(infoArray[2]);
                 infoList.add(infoArray[3]);

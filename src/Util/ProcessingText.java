@@ -119,6 +119,7 @@ public class ProcessingText {
 
 
     public HashMap<String, String> getNodeIdMap(String analysisDir, ProcessingText processingText) throws IOException {
+       System.out.println("getting node-id map...");
         HashMap<String, String> nodeIdMap = new HashMap<>();
         /**   get node id -  node location (label)**/
         String nodeIdList = processingText.readResult(analysisDir + "NodeList.txt");
