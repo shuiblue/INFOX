@@ -429,7 +429,7 @@ public class ProcessingText {
     }
 
     public boolean isHeaderFile(String filePath) {
-        return filePath.endsWith(".h");
+        return filePath.endsWith(".h")||filePath.endsWith(".hpp");
     }
 
     public boolean isPdeFile(String filePath) {
