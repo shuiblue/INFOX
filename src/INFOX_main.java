@@ -64,9 +64,9 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-        for (String forkName : forkListArray) {
+//        for (String forkName : forkListArray) {
             String branchName = "";
-//        String forkName = "MarlinFirmware/Marlin";
+        String forkName = "cruwaller/Marlin";
 //        String branchName = "muve_fork_master";
             boolean hasGroundTruth = false;
             String testCasesDir;
@@ -76,11 +76,11 @@ public class INFOX_main {
             } else {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
             }
-
-        File dir = new File(testCasesDir + "/" + forkName);
-        if (dir.exists()) {
-            continue;
-        }
+//
+//        File dir = new File(testCasesDir + "/" + forkName);
+//        if (dir.exists()) {
+//            continue;
+//        }
 
 
             Root_Dir = new ProcessingText().getRootDir();
@@ -112,9 +112,10 @@ public class INFOX_main {
 
                 /***  get origin diff github page  ***/
                 ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+//                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
 //            String diffPageUrl = "https://github.com/shuiblue/Marlin/compare/3a9f3070b737092dae548ee1dc4a6745e04fad2a...shuiblue:858da19142602dea181dc132d7c9609b236a3188";
 //            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
+            String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:max318xx_dev";
                 System.out.println(diffPageUrl);
 
                 ProcessingText processingText = new ProcessingText();
@@ -146,4 +147,4 @@ public class INFOX_main {
     }
 
 
-}
+//}

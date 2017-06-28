@@ -90,7 +90,7 @@ public class ParseHtml {
         HtmlPage page = null;
         Document currentPage = null;
         try {
-            page = webClient.getPage(diffPageUrl + "#files_bucket");
+            page = webClient.getPage(diffPageUrl + "#files_bucket?w=1");
 
 
             webClient.waitForBackgroundJavaScriptStartingBefore(200);
@@ -508,6 +508,7 @@ public class ParseHtml {
         clusterResultMap = acdr.getClusteringResultMapforClusterID(splitStep, isOriginalGraph);
 
         clusterResultMap.forEach((k, v) -> {
+            otherClusterSize = 0;
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
             currentClusterMap.forEach((clusterID, nodeSet) -> {
                 nodeSet.forEach(nodeId -> {

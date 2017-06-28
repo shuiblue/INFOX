@@ -106,26 +106,7 @@ public class GithubRepoAnalysis {
 
     }
 
-    public static void main(String[] args) {
-//        String dir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/";
-//        String diffFilePath = "diff.txt";
-//        String forkAddedNode_file = "forkAddedNode.txt";
-        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-        String projectName = "ktap";
-        String folder = "check"+projectName+"ForkSize/";
-        String root = "/Users/shuruiz/Work/checkProjectSize/";
-        String token = null;
-        try {
-            token = processingText.readResult(root+"/token.txt").trim();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/"+folder+projectName+"ForkList.txt", token,root,projectName);
 
-
-//        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
-//        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, dir + forkAddedNode_file);
-    }
 
     public void calculatingAvgSizeOfCodeChanges(String forkListFilePath, String publicToken,String root,String projectName) {
 
@@ -156,6 +137,26 @@ public class GithubRepoAnalysis {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public static void main(String[] args) {
+//        String dir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/";
+//        String diffFilePath = "diff.txt";
+//        String forkAddedNode_file = "forkAddedNode.txt";
+        GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
+        String projectName = "ofxGifEncoder";
+        String folder = "check"+projectName+"ForkSize/";
+        String root = "/Users/shuruiz/Work/checkProjectSize/";
+        String token = null;
+        try {
+            token = processingText.readResult(root+"/token.txt").trim();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/"+folder+projectName+"ForkList.txt", token,root,projectName);
+
+
+//        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
+//        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, dir + forkAddedNode_file);
     }
 
 }
