@@ -64,9 +64,9 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-//        for (String forkName : forkListArray) {
+        for (String forkName : forkListArray) {
             String branchName = "";
-                    String forkName = "MarlinFirmware/Marlin";
+//        String forkName = "MarlinFirmware/Marlin";
 //        String branchName = "muve_fork_master";
             boolean hasGroundTruth = false;
             String testCasesDir;
@@ -76,11 +76,11 @@ public class INFOX_main {
             } else {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
             }
-//
-//        File dir = new File(testCasesDir + "/" + forkName);
-//        if (dir.exists()) {
-//            continue;
-//        }
+
+        File dir = new File(testCasesDir + "/" + forkName);
+        if (dir.exists()) {
+            continue;
+        }
 
 
             Root_Dir = new ProcessingText().getRootDir();
@@ -112,33 +112,33 @@ public class INFOX_main {
 
                 /***  get origin diff github page  ***/
                 ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-////                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-////            String diffPageUrl = "https://github.com/shuiblue/Marlin/compare/3a9f3070b737092dae548ee1dc4a6745e04fad2a...shuiblue:858da19142602dea181dc132d7c9609b236a3188";
+                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+//            String diffPageUrl = "https://github.com/shuiblue/Marlin/compare/3a9f3070b737092dae548ee1dc4a6745e04fad2a...shuiblue:858da19142602dea181dc132d7c9609b236a3188";
 //            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
-//                System.out.println(diffPageUrl);
-//
-//                ProcessingText processingText = new ProcessingText();
-//                processingText.ReadTextFromURL(diffPageUrl + ".diff?w=1", localSourceCodeDirPath + "INFOX_output/diff.txt");
-//
-//                /***   get fork added node, generate ForkAddedNode.txt file   ***/
-//                GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-//                HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
-//                githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
+                System.out.println(diffPageUrl);
+
+                ProcessingText processingText = new ProcessingText();
+                processingText.ReadTextFromURL(diffPageUrl + ".diff?w=1", localSourceCodeDirPath + "INFOX_output/diff.txt");
+
+                /***   get fork added node, generate ForkAddedNode.txt file   ***/
+                GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
+                HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
+                githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
 
 
                 /*** start clustering code  ***/
-//                ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
-//                clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
-//                try {
-//                    processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//
-//                /*** hack github page   ***/
-//                parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
-//
+                ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
+                clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
+                try {
+                    processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                /*** hack github page   ***/
+                parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
+
                 parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
             }
         }
@@ -146,4 +146,4 @@ public class INFOX_main {
     }
 
 
-//}
+}

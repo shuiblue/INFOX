@@ -151,10 +151,10 @@ public class IdentifyingKeyWordForCluster {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
 
             /**  calculate tfidf  to identifing keywords from each cluster**/
-//            System.out.println("        identifying keywords from one gram list...");
-//            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 1, splitStep);
-//            System.out.println("        identifying keywords from two gram list...");
-//            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 2, splitStep);
+            System.out.println("        identifying keywords from one gram list...");
+            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 1, splitStep);
+            System.out.println("        identifying keywords from two gram list...");
+            findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 2, splitStep);
 
             /**  merging one-gram and two-gram result**/
             System.out.println("        merging one-gram and two-gram result.. removing redundancy...");
