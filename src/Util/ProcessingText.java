@@ -376,7 +376,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replace("=", "-").replaceAll("[H]$", ".h").replace("CPP", ".cpp").replace("PDE", ".pde").replaceAll("[C]{2}$", ".cc").replaceAll("[C]$", ".c").replaceAll("[I][N][O]$", ".ino");
+        return nodeLabel.split("-")[0].replace("~", "/").replace("=", "-").replaceAll("[H]$", ".h").replaceAll("[C][P][P]$", ".cpp").replaceAll("[H][P][P]$", ".hpp").replace("PDE", ".pde").replaceAll("[C]{2}$", ".cc").replaceAll("[C]$", ".c").replaceAll("[I][N][O]$", ".ino");
 
     }
 
@@ -425,27 +425,26 @@ public class ProcessingText {
      * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
      */
     public boolean isCFile(String filePath) {
-        return filePath.endsWith(".cpp") || filePath.endsWith(".c");
+        return filePath.endsWith(".cpp") || filePath.endsWith(".c")||filePath.endsWith(".pde")||filePath.endsWith(".ino")||filePath.endsWith(".cc");
     }
 
     public boolean isHeaderFile(String filePath) {
         return filePath.endsWith(".h")||filePath.endsWith(".hpp");
     }
 
-    public boolean isPdeFile(String filePath) {
-        return filePath.endsWith(".pde");
-    }
-
-    public boolean isInoFile(String filePath) {
-        return filePath.endsWith(".ino");
-    }
-
-    public boolean isCCFile(String filePath) {
-        return filePath.endsWith(".cc");
-    }
+//    public boolean isPdeFile(String filePath) {
+//        return filePath.endsWith(".pde");
+//    }
+//    public boolean isInoFile(String filePath) {
+//        return filePath.endsWith(".ino");
+//    }
+//
+//    public boolean isCCFile(String filePath) {
+//        return filePath.endsWith(".cc");
+//    }
 
     public boolean isCFile_general(String filePath) {
-        return isCFile(filePath) || isHeaderFile(filePath) || isPdeFile(filePath) || isInoFile(filePath) || isCCFile(filePath);
+        return isCFile(filePath) || isHeaderFile(filePath);
     }
 
     public String removeUselessLine(String line) {
@@ -569,7 +568,7 @@ public class ProcessingText {
     }
 
     public boolean isCLanguageFile(Path filePath) {
-        return isCFile(filePath.toString()) || isPdeFile(filePath.toString()) || isInoFile(filePath.toString()) || isCCFile(filePath.toString());
+        return isCFile(filePath.toString());
     }
 
     public static void main(String[] args) {
