@@ -91,7 +91,7 @@ public class ParseHtml {
         HtmlPage page = null;
         Document currentPage = null;
         try {
-            page = webClient.getPage(diffPageUrl + "#files_bucket");
+            page = webClient.getPage(diffPageUrl + "?w=1");
 
             webClient.waitForBackgroundJavaScriptStartingBefore(200);
             webClient.waitForBackgroundJavaScript(5000);
