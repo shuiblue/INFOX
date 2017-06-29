@@ -743,6 +743,8 @@ public class ProcessingText {
                 webClient.setCssErrorHandler(new SilentCssErrorHandler());
 
                 HtmlPage diff_page = webClient.getPage(diffLink);
+                webClient.waitForBackgroundJavaScriptStartingBefore(2000);
+                webClient.waitForBackgroundJavaScript(50000);
                 org.jsoup.nodes.Document diffBlock = Jsoup.parse(diff_page.asXml());
 
 
