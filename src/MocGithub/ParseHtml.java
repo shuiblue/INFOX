@@ -65,15 +65,16 @@ public class ParseHtml {
                 "    </tr>\n";
     }
 
-    public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters, String analysisDir,String publicToken) {
+    public ParseHtml(int max_numberOfCut, int numberOfBiggestClusters, String analysisDir, String publicToken) {
         this.max_numberOfCut = max_numberOfCut;
         this.numberOfBiggestClusters = numberOfBiggestClusters;
         this.analysisDir = analysisDir;
-        this.publicToken=publicToken;
+        this.publicToken = publicToken;
 
     }
 
-    public void getOriginalDiffPage(String diffPageUrl, String localSourceCodeDirPath) {
+    public void getOriginalDiffPage(String diffPageUrl, String localSourceCodeDirPath, String forkName) {
+        ProcessingText processingText = new ProcessingText();
         System.out.println("get original diff page");
         this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
@@ -90,40 +91,55 @@ public class ParseHtml {
         HtmlPage page = null;
         Document currentPage = null;
         try {
-            page = webClient.getPage(diffPageUrl + "#files_bucket?w=1");
-
+            page = webClient.getPage(diffPageUrl + "#files_bucket");
 
             webClient.waitForBackgroundJavaScriptStartingBefore(200);
             webClient.waitForBackgroundJavaScript(5000);
 
             currentPage = Jsoup.parse(page.asXml());
+
             currentPage = getLoadDiffContentMap(webClient, currentPage);
             System.out.println("done with getting all the files");
 
-            currentPage = getLoadBigDiffContentMap(webClient, currentPage);
-            System.out.println("done with clicking all the load diff button  --1");
+            boolean isMarlin = localSourceCodeDirPath.contains("Marlin");
+            currentPage = getLoadBigDiffContentMap(webClient, currentPage, isMarlin);
+            System.out.println("done with clicking all the load diff button ");
 
+
+            /** get commit list **/
+            Elements elements_commitID = currentPage.getElementsByClass("commit-id");
+            String firstCommit = elements_commitID.first().attr("href").split("/")[4];
+            String lastCommit = elements_commitID.last().attr("href").split("/")[4];
+            HtmlPage firstCommitPage = webClient.getPage("https://github.com/" + forkName + "/commit/" + firstCommit);
+            Document commitDoc = Jsoup.parse(firstCommitPage.asXml());
+            String parentCommit = commitDoc.getElementsByClass("sha").first().attr("href").split("/")[4];
+            processingText.rewriteFile(parentCommit+","+lastCommit, analysisDir + "SHA.txt");
 
         } catch (Exception e) {
             System.out.println("Get page error");
         }
 
 
-        new ProcessingText().rewriteFile(currentPage.toString(), analysisDir + originalPage);
+        processingText.rewriteFile(currentPage.toString(), analysisDir + originalPage);
         System.out.println("done with getting original html file.");
+
     }
 
-    private Document getLoadBigDiffContentMap(WebClient webClient, Document currentPage) throws IOException {
+    private Document getLoadBigDiffContentMap(WebClient webClient, Document currentPage, boolean isMarlin) throws IOException {
         Elements loadingElements = currentPage.getElementsByTag("include-fragment");
         HtmlPage currentDiffPage;
-        int i =1;
+        int i = 1;
         for (Element ele : loadingElements) {
             String loadDiffUrl = ele.attr("data-fragment-url");
-            if (!loadDiffUrl.equals("")&&ele.parent().parent().parent().getElementsByAttribute("data-path").first().toString().contains("data-path=\"Marlin")) {
+            boolean isMarlinFile = false;
+            if (isMarlin) {
+                isMarlinFile = ele.parent().parent().parent().getElementsByAttribute("data-path").first().toString().contains("data-path=\"Marlin");
+            }
+            if (!loadDiffUrl.equals("") && (!isMarlin || isMarlinFile)) {
 
-                System.out.println(loadDiffUrl+"----"+i++);
+                System.out.println(loadDiffUrl + "----" + i++);
                 String diffID = loadDiffUrl.split("\\?")[0].split("/")[4];
-                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl);
+                currentDiffPage = webClient.getPage("https://github.com" + loadDiffUrl + "&w=1");
                 webClient.waitForBackgroundJavaScriptStartingBefore(200);
                 webClient.waitForBackgroundJavaScript(5000);
                 Document xmldoc = Jsoup.parse(currentDiffPage.asXml());
@@ -248,7 +264,7 @@ public class ParseHtml {
         }
 
 
-        new ProcessingText().rewriteFile("done",analysisDir+"done.txt");
+        new ProcessingText().rewriteFile("done", analysisDir + "done.txt");
     }
 
 
@@ -380,7 +396,7 @@ public class ParseHtml {
     private String replaceCurrentStep(String splitStep, String cid, int j) {
         String[] currentIDArray = cid.split("~");
         String clusterID = currentIDArray[j];
-        currentIDArray[j] = currentIDArray[j].replace(clusterID, clusterID + "_1~" + clusterID + "_2");
+        currentIDArray[j] = currentIDArray[j].replaceAll(clusterID, clusterID + "_1~" + clusterID + "_2");
         String newStep = "";
         for (String s : currentIDArray) {
             newStep += "~" + s;
@@ -389,7 +405,26 @@ public class ParseHtml {
             newStep = newStep.substring(1);
         }
 
-        return splitStep.replace(cid, newStep);
+        String nextStep = "";
+        String[] array = splitStep.split("--");
+        for (int i = 0; i < array.length; i++) {
+            String tmpStr = "";
+            if (i == j) {
+                tmpStr = array[j].replace(cid, newStep);
+            } else {
+                tmpStr = array[i];
+            }
+
+            if (i == array.length - 1) {
+                nextStep += tmpStr;
+            } else if (i < array.length - 1) {
+                nextStep += tmpStr + "--";
+            }
+
+
+        }
+
+        return nextStep;
 
     }
 
@@ -437,7 +472,7 @@ public class ParseHtml {
         String row_2 = getLevelColumn(levelColumn_2, joinStep, colspan, current_clusterID, clusterTree);
 
         return row_1 +
-                "       <td rowspan=\"2\" width=\"60\" style=\"cursor: pointer; background:" + color + "\"><button id= \"infox_"+current_clusterID+"_button\"   onclick='hide_cluster_rows(\"infox_" + current_clusterID + "_button\")'>hide</button>" + keyword_suffix + "</td>\n" +
+                "       <td rowspan=\"2\" width=\"60\" style=\"cursor: pointer; background:" + color + "\"><button id= \"infox_" + current_clusterID + "_button\"   onclick='hide_cluster_rows(\"infox_" + current_clusterID + "_button\")'>hide</button>" + keyword_suffix + "</td>\n" +
                 "       <td rowspan=\"2\" width=\"90\"><button class=\"btn BtnGroup-item\" onclick=\"next_in_cluster(\'infox_" + current_clusterID + "\')\" >Next</button><button class=\"btn BtnGroup-item\" onclick=\"prev_in_cluster(\'infox_" + current_clusterID + "\')\">Prev</button></td>" +
                 "        <td rowspan=\"2\"><div class=\"long_td\">" + keyword_long + "</div></td>\n" +
                 "       <td rowspan=\"2\" width=\"50\">" + clusterSize + "</td>\n" +
@@ -508,7 +543,6 @@ public class ParseHtml {
         clusterResultMap = acdr.getClusteringResultMapforClusterID(splitStep, isOriginalGraph);
 
         clusterResultMap.forEach((k, v) -> {
-            otherClusterSize = 0;
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
             currentClusterMap.forEach((clusterID, nodeSet) -> {
                 nodeSet.forEach(nodeId -> {
@@ -570,20 +604,20 @@ public class ParseHtml {
                     String keywod_prefix = cluster_keyword.get(clusterid).get(0).trim();
                     keywod_prefix = keywod_prefix.split("").length > 3 ? keywod_prefix.substring(0, 3).replace("[", "") + "." : keywod_prefix;
 
-                    currentDoc.getElementsByAttributeValue("data-path", fileName);
                     Element currentFile = currentDoc.getElementsByAttributeValueMatching("data-path", fileName).next().first();
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
                     Element lineElement = getElement(lineElements);
 
+                    if (lineElement != null) {
+                        String styleStr = "background-color:"
+                                + cluster_color.get(clusterid)
+                                + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
+                                "  font-size:12px;\n" +
+                                "  line-height:20px;\n" +
+                                "  text-align:right;\"";
 
-                    String styleStr = "background-color:"
-                            + cluster_color.get(clusterid)
-                            + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
-                            "  font-size:12px;\n" +
-                            "  line-height:20px;\n" +
-                            "  text-align:right;\"";
-
-                    lineElement.attr("class", "infox_" + clusterid.trim()).attr("style", styleStr).text(keywod_prefix);
+                        lineElement.attr("class", "infox_" + clusterid.trim()).attr("style", styleStr).text(keywod_prefix);
+                    }
 
                 } else {
                     String keywod_prefix = "other";
@@ -592,17 +626,16 @@ public class ParseHtml {
                     Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
 
                     Element lineElement = getElement(lineElements);
-
-                    String styleStr = "background-color:grey"
-                            + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
-                            "  font-size:12px;\n" +
-                            "  line-height:20px;\n" +
-                            "  text-align:right;\"";
-                    lineElement.attr("class", "infox_other").attr("style", styleStr).text(keywod_prefix);
-
+                    if (lineElement != null) {
+                        String styleStr = "background-color:grey"
+                                + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
+                                "  font-size:12px;\n" +
+                                "  line-height:20px;\n" +
+                                "  text-align:right;\"";
+                        lineElement.attr("class", "infox_other").attr("style", styleStr).text(keywod_prefix);
+                    }
                 }
                 i++;
-                System.out.println(i);
             }
         }
 

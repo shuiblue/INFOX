@@ -5,9 +5,20 @@ package Util;
  */
 
 import DependencyGraph.Symbol;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import nu.xom.Builder;
 import nu.xom.Document;
+import nu.xom.Element;
 import nu.xom.ParsingException;
+import org.apache.commons.logging.LogFactory;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
+import org.jsoup.safety.Whitelist;
+import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -16,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,7 +131,7 @@ public class ProcessingText {
 
 
     public HashMap<String, String> getNodeIdMap(String analysisDir, ProcessingText processingText) throws IOException {
-       System.out.println("getting node-id map...");
+        System.out.println("getting node-id map...");
         HashMap<String, String> nodeIdMap = new HashMap<>();
         /**   get node id -  node location (label)**/
         String nodeIdList = processingText.readResult(analysisDir + "NodeList.txt");
@@ -199,7 +211,7 @@ public class ProcessingText {
             try {
                 ProcessBuilder processBuilder = null;
 //                if (current_OS.indexOf("mac") >= 0) {
-                    processBuilder = new ProcessBuilder("src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
+                processBuilder = new ProcessBuilder("src2srcml", "--xmlns:PREFIX=http://www.sdml.info/srcML/position", inputFile, "-o", outXmlFile);
 //                } else if (current_OS.indexOf("windows") >= 0) {
 //                    processBuilder = new ProcessBuilder("C:\\Users\\shuruiz\\Documents\\srcML-Win\\src2srcml.exe", "--position",
 //                            inputFile, "-o", outXmlFile);
@@ -314,7 +326,7 @@ public class ProcessingText {
                 if (line.contains("inline _attribute_((always_inline))")) {
                     line = line.replace("inline _attribute_((always_inline))", "");
                 }
-                if (line.trim().startsWith("inline" )) {
+                if (line.trim().startsWith("inline")) {
                     line = line.replace("inline ", "");
                 }
                 if (line.contains("__attribute__") && line.contains("((packed))")) {
@@ -329,7 +341,7 @@ public class ProcessingText {
                 if (line.contains("static const")) {
                     line = line.replace("static const", "");
                 }
-                if (line.trim().startsWith("static" )) {
+                if (line.trim().startsWith("static")) {
                     line = line.replace("static ", "");
                 }
                 if (line.contains("const")) {
@@ -425,11 +437,11 @@ public class ProcessingText {
      * @return true if the file is a .c/.h/.cpp/.pde (Marlin) file
      */
     public boolean isCFile(String filePath) {
-        return filePath.endsWith(".cpp") || filePath.endsWith(".c")||filePath.endsWith(".pde")||filePath.endsWith(".ino")||filePath.endsWith(".cc");
+        return filePath.endsWith(".cpp") || filePath.endsWith(".c") || filePath.endsWith(".pde") || filePath.endsWith(".ino") || filePath.endsWith(".cc");
     }
 
     public boolean isHeaderFile(String filePath) {
-        return filePath.endsWith(".h")||filePath.endsWith(".hpp");
+        return filePath.endsWith(".h") || filePath.endsWith(".hpp");
     }
 
 //    public boolean isPdeFile(String filePath) {
@@ -488,14 +500,14 @@ public class ProcessingText {
      * @return true== if it is code; false=== it is comment
      */
     public boolean isCode(String line) {
-        if (line.startsWith("*") || line.startsWith("//") || line.startsWith("/*") || line.endsWith("*/") || line.trim().length() == 0) {
+        if (line.startsWith("*") || line.startsWith("//") || line.startsWith("/*") || line.endsWith("*/") || line.startsWith("#") || line.trim().length() == 0) {
             return false;
         }
         return true;
     }
 
 
-    public void ReadTextFromURL(String urlStr, String outputFile) {
+    public void readTextFromURL(String urlStr, String outputFile) {
         StringBuilder sb = new StringBuilder();
         try {
             URL url = new URL(urlStr);
@@ -515,6 +527,28 @@ public class ProcessingText {
         }
 
         rewriteFile(sb.toString(), outputFile);
+    }
+
+    public String readTextFromURL(String urlStr) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            URL url = new URL(urlStr);
+            // read text returned by server
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+
+            String line;
+            while ((line = in.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            in.close();
+
+        } catch (MalformedURLException e) {
+            System.out.println("Malformed URL: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("I/O Error: " + e.getMessage());
+        }
+
+        return sb.toString();
     }
 
 
@@ -651,9 +685,10 @@ public class ProcessingText {
             System.out.println("File is deleted : " + file.getAbsolutePath());
         }
     }
+
     public static String getRootDir() {
         if (current_OS.indexOf("mac") >= 0) {
-           return "/Users/shuruiz/Work/";
+            return "/Users/shuruiz/Work/";
         } else if (current_OS.indexOf("windows") >= 0) {
             return "C:\\Users\\shuruiz\\Documents\\";
         } else {
@@ -663,9 +698,68 @@ public class ProcessingText {
 
     public void writeToJoinClusterFile(String analysisDir, HashMap<String, HashSet<Integer>> joined_clusters) {
         StringBuilder sb = new StringBuilder();
-        joined_clusters.forEach((k,v)->{
-                 sb.append(k+":"+v.toString()+"\n");
+        joined_clusters.forEach((k, v) -> {
+            sb.append(k + ":" + v.toString() + "\n");
         });
-        new ProcessingText().writeTofile(sb.toString(),analysisDir+"joined_cluster.txt");
+        new ProcessingText().writeTofile(sb.toString(), analysisDir + "joined_cluster.txt");
     }
+
+    public void getDiffText(String forkName, String analysisDir, String originalHtmlPath, String diffFilePath) {
+        System.out.println("getting diff information ... ");
+        ProcessingText processingText = new ProcessingText();
+        processingText.rewriteFile("", diffFilePath);
+        org.jsoup.nodes.Document currentPage = null;
+        ArrayList<String> fileNameList = new ArrayList<>();
+        try {
+            String originalHtmlString = readResult(analysisDir + originalHtmlPath);
+            currentPage = Jsoup.parse(originalHtmlString);
+            Elements fileList = currentPage.getElementsByAttribute("data-path");
+            for (org.jsoup.nodes.Element fileEle : fileList) {
+                String fileName = fileEle.attr("data-path");
+                fileNameList.add(fileName);
+            }
+            processingText.rewriteFile(fileNameList.toString(), analysisDir + "changedFileList.txt");
+
+            String parentRepo = currentPage.getElementsByClass("fork-flag").text().replace("forked from", "").trim();
+//            currentPage.getElementsByAttribute("data-fragment-url").first().attr("data-fragment-url");
+
+
+            String[] SHA_Array = processingText.readResult(analysisDir + "SHA.txt").split(",");
+
+            for (int i = 0; i < fileNameList.size(); i++) {
+                System.out.println(i + " / " + fileNameList.size());
+                String diffLink = "http://www.github.com/" + parentRepo + "/diffs/" + i + "?head_user=" + forkName.split("/")[0] + "&sha1=" + SHA_Array[0] + "&sha2=" + SHA_Array[1].trim() + "&w=1";
+
+
+                WebClient webClient = new WebClient(BrowserVersion.CHROME);
+                // turn off htmlunit warnings
+                LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+                java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
+                java.util.logging.Logger.getLogger("org.apache.commons.httpclient").setLevel(Level.OFF);
+                webClient.getOptions().setUseInsecureSSL(true); //ignore ssl certificate
+                webClient.getOptions().setThrowExceptionOnScriptError(false);
+                webClient.getOptions().setJavaScriptEnabled(true);
+                webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+                webClient.setCssErrorHandler(new SilentCssErrorHandler());
+
+                HtmlPage diff_page = webClient.getPage(diffLink);
+                org.jsoup.nodes.Document diffBlock = Jsoup.parse(diff_page.asXml());
+
+
+                StringBuilder sb = new StringBuilder();
+                for (org.jsoup.nodes.Element lineEle : diffBlock.getElementsByClass("blob-code-inner")) {
+                    sb.append(lineEle.text()+"\n");
+                }
+                System.out.println("writing to diff txt file...");
+                processingText.writeTofile("INFOX_DIFF_BLOCK\n" + sb.toString(), diffFilePath);
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 }

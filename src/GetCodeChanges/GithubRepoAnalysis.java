@@ -17,19 +17,30 @@ public class GithubRepoAnalysis {
     static ProcessingText processingText = new ProcessingText();
     static final String FS = File.separator;
 
-    public HashMap<String, ArrayList<Integer>> getChangedCodeForGithubRepo(String diffFilePath) {
+    public HashMap<String, ArrayList<Integer>> getChangedCodeForGithubRepo(String analysisDir) {
+        System.out.println("analyzing diff.txt file...");
         ProcessingText processingText = new ProcessingText();
+        String[] changedFileArray = {};
+        try {
+            changedFileArray = processingText.readResult(analysisDir + "/changedFileList.txt").replace("[", "").replace("]", "").split(",");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         HashMap<String, ArrayList<Integer>> changedFile_line_map = new HashMap<>();
         ArrayList<Integer> lineNumberList;
         try {
+            String diffFilePath = analysisDir + "/diff.txt";
             String diffFileContent = processingText.readResult(diffFilePath);
-            String[] changedFileDiffSet = diffFileContent.split("diff --git");
+//            String[] changedFileDiffSet = diffFileContent.split("diff --git");
+            String[] changedFileDiffSet = diffFileContent.split("INFOX_DIFF_BLOCK\n");
             String currentFileName = "";
-            for (String changedFile : changedFileDiffSet) {
+            for (int x =0; x < changedFileDiffSet.length; x++) {
+                String changedFile = changedFileDiffSet[x];
                 if (!changedFile.equals("")) {
                     if (currentFileName.equals("")) {
-                        String[] content = changedFile.split("\n");
-                        currentFileName = content[0].split(" ")[2].replace("b/", "");
+//                        String[] content = changedFile.split("\n");
+//                        currentFileName = content[0].split(" ")[2].replace("b/", "");
+                        currentFileName = changedFileArray[x-1].trim();
 
                         if (processingText.isCFile_general(currentFileName)) {
                             lineNumberList = new ArrayList<>();
@@ -39,7 +50,7 @@ public class GithubRepoAnalysis {
                             String[] hunkArray = changedFile.split("\n@@ ");
 
                             for (String hunk : hunkArray) {
-                                if (hunk.startsWith("-")) {
+                                if (hunk.startsWith("-")||hunk.startsWith("@@")) {
                                     int addIndex = hunk.indexOf("+") + 1;
                                     int endIndex = hunk.lastIndexOf("@@");
                                     String range = hunk.substring(addIndex, endIndex);
@@ -81,6 +92,8 @@ public class GithubRepoAnalysis {
 
     public void generateForkAddedNodeFile(HashMap<String, ArrayList<Integer>> changedFile_line_map, String
             output) {
+        System.out.println("generating fork added node list..");
+
         StringBuilder sb = new StringBuilder();
 
         Iterator it = changedFile_line_map.entrySet().iterator();
@@ -89,9 +102,9 @@ public class GithubRepoAnalysis {
             String fileName = (String) pair.getKey();
 
             if (!fileName.toString().contains("matlab")
-                    &&!fileName.toString().contains("example_configurations")
-                    &&!fileName.toString().contains("ArduinoAddons")
-                    &&!fileName.toString().contains("language")
+                    && !fileName.toString().contains("example_configurations")
+                    && !fileName.toString().contains("ArduinoAddons")
+                    && !fileName.toString().contains("language")
                     ) {
 
                 String newFileName = processingText.changeFileName(fileName);
@@ -107,13 +120,12 @@ public class GithubRepoAnalysis {
     }
 
 
-
-    public void calculatingAvgSizeOfCodeChanges(String forkListFilePath, String publicToken,String root,String projectName) {
-
+    public void calculatingAvgSizeOfCodeChanges(String forkListFilePath, String publicToken, String root, String projectName) {
+         String originalPage = "original.html";
         try {
             String[] forkListArray = processingText.readResult(forkListFilePath).split("\n");
 
-            processingText.rewriteFile("", root + projectName+"_codeChangeSize.csv");
+            processingText.rewriteFile("", root + projectName + "_codeChangeSize.csv");
             for (String forkName : forkListArray) {
                 String analysisDir = root + forkName + FS + "INFOX_output/";
                 ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir, publicToken);
@@ -122,8 +134,8 @@ public class GithubRepoAnalysis {
                 String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
 
                 ProcessingText processingText = new ProcessingText();
-                processingText.ReadTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
-//
+                processingText.getDiffText(forkName,analysisDir,originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
+//                processingText.readTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
                 /***   get fork added node, generate ForkAddedNode.txt file   ***/
                 GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
                 HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
@@ -131,28 +143,29 @@ public class GithubRepoAnalysis {
 
                 int size = processingText.readResult(localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt").split("\n").length;
 
-                processingText.writeTofile(forkName + "," + size + "\n", root + projectName+"_codeChangeSize.csv");
+                processingText.writeTofile(forkName + "," + size + "\n", root + projectName + "_codeChangeSize.csv");
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     public static void main(String[] args) {
 //        String dir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/";
 //        String diffFilePath = "diff.txt";
 //        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
         String projectName = "ofxGifEncoder";
-        String folder = "check"+projectName+"ForkSize/";
+        String folder = "check" + projectName + "ForkSize/";
         String root = "/Users/shuruiz/Work/checkProjectSize/";
         String token = null;
         try {
-            token = processingText.readResult(root+"/token.txt").trim();
+            token = processingText.readResult(root + "/token.txt").trim();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/"+folder+projectName+"ForkList.txt", token,root,projectName);
+        githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/" + folder + projectName + "ForkList.txt", token, root, projectName);
 
 
 //        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);

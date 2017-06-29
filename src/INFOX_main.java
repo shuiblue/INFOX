@@ -25,7 +25,7 @@ public class INFOX_main {
     static String current_OS = System.getProperty("os.name").toLowerCase();
     static String tmpXmlPath = "tmpXMLFile" + FS;
     static String Root_Dir = "";
-
+    static String originalPage = "original.html";
     /**
      * Main method for testing the INFOX method
      * String args[]={
@@ -66,7 +66,7 @@ public class INFOX_main {
         }
 //        for (String forkName : forkListArray) {
             String branchName = "";
-        String forkName = "cruwaller/Marlin";
+        String forkName = "razvanilin/ofxVideoRecorder";
 //        String branchName = "muve_fork_master";
             boolean hasGroundTruth = false;
             String testCasesDir;
@@ -93,54 +93,55 @@ public class INFOX_main {
 
                 File file = new File(localSourceCodeDirPath);
 
-                if (!file.exists()) {
-
-                    /***git clone repo to local dir***/
-                    JgitUtility jgitUtility = new JgitUtility();
-                    String uri = github_page + forkName + ".git";
-                    System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
-
-                    jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
-                    if (forkName.contains("Marlin")) {
-                        try {
-                            FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+//                if (!file.exists()) {
+//
+//                    /***git clone repo to local dir***/
+//                    JgitUtility jgitUtility = new JgitUtility();
+//                    String uri = github_page + forkName + ".git";
+//                    System.out.println("Cloning repo from github: " + forkName + " to " + testCasesDir);
+//
+//                    jgitUtility.cloneRepo(uri, localSourceCodeDirPath, branchName);
+//                    if (forkName.contains("Marlin")) {
+//                        try {
+//                            FileUtils.deleteDirectory(new File(localSourceCodeDirPath + "ArduinoAddons"));
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
 
                 /***  get origin diff github page  ***/
                 ParseHtml parseHtml = new ParseHtml(max_numberOfCut, numberOfBiggestClusters, analysisDir, publicToken);
-//                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
-//            String diffPageUrl = "https://github.com/shuiblue/Marlin/compare/3a9f3070b737092dae548ee1dc4a6745e04fad2a...shuiblue:858da19142602dea181dc132d7c9609b236a3188";
+////                String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, timeWindow);
+            String diffPageUrl = "https://github.com/DomAmato/ofxVideoRecorder/compare/master...razvanilin:master";
 //            String diffPageUrl = "https://github.com/cruwaller/Marlin/compare/max318xx_dev...MarlinFirmware:1.1.x";
-            String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:max318xx_dev";
+//            String diffPageUrl = "https://github.com/MarlinFirmware/Marlin/compare/1.1.x...cruwaller:max318xx_dev";
                 System.out.println(diffPageUrl);
-
-                ProcessingText processingText = new ProcessingText();
-                processingText.ReadTextFromURL(diffPageUrl + ".diff?w=1", localSourceCodeDirPath + "INFOX_output/diff.txt");
-
-                /***   get fork added node, generate ForkAddedNode.txt file   ***/
-                GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-                HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
-                githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
-
-
-                /*** start clustering code  ***/
-                ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
-                clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
-                try {
-                    processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
 
                 /*** hack github page   ***/
-                parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath);
+                parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath,forkName);
 
-                parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
+                ProcessingText processingText = new ProcessingText();
+                processingText.getDiffText(forkName,analysisDir,originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
+
+                /***   get fork added node, generate ForkAddedNode.txt file   ***/
+                GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
+                HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output");
+                githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
+//
+//
+//                /*** start clustering code  ***/
+//                ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
+//                clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
+//                try {
+//                    processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+
+
+//                parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
             }
         }
 
