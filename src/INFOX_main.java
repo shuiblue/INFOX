@@ -65,7 +65,7 @@ public class INFOX_main {
             return;
         }
         for (String forkName : forkListArray) {
-            String branchName = "";
+        String branchName = "";
             boolean hasGroundTruth = false;
             String testCasesDir;
 
@@ -118,23 +118,16 @@ public class INFOX_main {
 
                 /*** hack github page   ***/
                 parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath, forkName);
-                new ProcessingText().getDiffText(forkName, analysisDir, originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
-
-                /***   get fork added node, generate ForkAddedNode.txt file   ***/
-                GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-                HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output");
-                githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
 
 
                 /*** start clustering code  ***/
                 ClusterCodeChanges clusterCodeChanges = new ClusterCodeChanges(max_numberOfCut, numberOfBiggestClusters);
                 clusterCodeChanges.clusteringChangedCodeFromFork(localSourceCodeDirPath, hasGroundTruth, re, minimumClusterSize);
                 try {
-                    processingText.deleteDir(new File(Root_Dir + tmpXmlPath));
+                    new ProcessingText().deleteDir(new File(Root_Dir + tmpXmlPath));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
 
                 parseHtml.generateMocGithubForkPage(forkName, localSourceCodeDirPath);
             }

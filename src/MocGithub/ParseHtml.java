@@ -105,15 +105,19 @@ public class ParseHtml {
             currentPage = getLoadBigDiffContentMap(webClient, currentPage, isMarlin);
             System.out.println("done with clicking all the load diff button ");
 
+            getDiffInfo(currentPage,localSourceCodeDirPath+"/INFOX_output/forkAddedNode.txt");
 
-            /** get commit list **/
-            Elements elements_commitID = currentPage.getElementsByClass("commit-id");
-            String firstCommit = elements_commitID.first().attr("href").split("/")[4];
-            String lastCommit = elements_commitID.last().attr("href").split("/")[4];
-            HtmlPage firstCommitPage = webClient.getPage("https://github.com/" + forkName + "/commit/" + firstCommit);
-            Document commitDoc = Jsoup.parse(firstCommitPage.asXml());
-            String parentCommit = commitDoc.getElementsByClass("sha").first().attr("href").split("/")[4];
-            processingText.rewriteFile(parentCommit+","+lastCommit, analysisDir + "SHA.txt");
+//            /** get commit list **/
+//            Elements elements_commitID = currentPage.getElementsByClass("commit-id");
+//            String firstCommit = elements_commitID.first().attr("href").split("/")[4];
+//            String lastCommit = elements_commitID.last().attr("href").split("/")[4];
+//            HtmlPage firstCommitPage = webClient.getPage("https://github.com/" + forkName + "/commit/" + firstCommit);
+//            Document commitDoc = Jsoup.parse(firstCommitPage.asXml());
+//            String parentCommit = commitDoc.getElementsByClass("sha").first().attr("href").split("/")[4];
+//            processingText.rewriteFile(parentCommit + "," + lastCommit, analysisDir + "SHA.txt");
+//            String parentRepo = commitDoc.getElementsByClass("fork-flag").text().replace("forked from", "").trim();
+//            processingText.rewriteFile(parentRepo, analysisDir + "parent.txt");
+
 
         } catch (Exception e) {
             System.out.println("Get page error");
@@ -123,6 +127,33 @@ public class ParseHtml {
         processingText.rewriteFile(currentPage.toString(), analysisDir + originalPage);
         System.out.println("done with getting original html file.");
 
+    }
+
+    private void getDiffInfo(Document currentPage,String outputFile) {
+        System.out.println("getting diff info...");
+        StringBuilder sb = new StringBuilder();
+        ProcessingText processingText = new ProcessingText();
+        /**  get changed file list **/
+        Elements file_elements = currentPage.getElementsByClass("link-gray-dark");
+
+        Elements diff_elements = currentPage.getElementsByClass("js-file-content");
+        for (int i = 0; i < diff_elements.size(); i++) {
+            String currentFile = file_elements.get(i).text();
+            String newFileName = processingText.changeFileName(currentFile);
+            Elements tr_list = diff_elements.get(i).getElementsByTag("tr");
+            for (Element tr : tr_list) {
+                Elements td_list = tr.getElementsByTag("td");
+                if (td_list.size() == 3) {
+                    String line = td_list.last().text();
+                    if (line.trim().startsWith("+") && processingText.isCode(line.replaceAll("^[+]", ""))) {
+                        String lineNumber = td_list.get(1).attr("data-line-number");
+                        sb.append(newFileName + "-" + lineNumber + "\n");
+                    }
+                }
+            }
+        }
+        processingText.rewriteFile(sb.toString(),outputFile);
+        System.out.println("done with getting fork added node");
     }
 
     private Document getLoadBigDiffContentMap(WebClient webClient, Document currentPage, boolean isMarlin) throws IOException {
@@ -408,9 +439,9 @@ public class ParseHtml {
         String nextStep = "";
         String[] array = splitStep.split("--");
         for (int i = 0; i < array.length; i++) {
-            String tmpStr = "";
-            if (i == j) {
-                tmpStr = array[j].replace(cid, newStep);
+            String tmpStr ;
+            if (array[i].equals(cid)) {
+                tmpStr = newStep;
             } else {
                 tmpStr = array[i];
             }

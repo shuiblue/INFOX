@@ -500,7 +500,8 @@ public class ProcessingText {
      * @return true== if it is code; false=== it is comment
      */
     public boolean isCode(String line) {
-        if (line.startsWith("*") || line.startsWith("//") || line.startsWith("/*") || line.endsWith("*/") || line.startsWith("#") || line.trim().length() == 0) {
+        line = line.trim();
+        if (line.startsWith("*") || line.startsWith("//") || line.startsWith("/*") || line.endsWith("*/") || line.startsWith("#") || line.length() == 0) {
             return false;
         }
         return true;
