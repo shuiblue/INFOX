@@ -118,9 +118,7 @@ public class INFOX_main {
 
                 /*** hack github page   ***/
                 parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath, forkName);
-
-                ProcessingText processingText = new ProcessingText();
-                processingText.getDiffText(forkName, analysisDir, originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
+                new ProcessingText().getDiffText(forkName, analysisDir, originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
 
                 /***   get fork added node, generate ForkAddedNode.txt file   ***/
                 GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
