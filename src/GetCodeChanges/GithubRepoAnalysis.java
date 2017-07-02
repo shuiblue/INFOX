@@ -121,7 +121,6 @@ public class GithubRepoAnalysis {
 
 
     public void calculatingAvgSizeOfCodeChanges(String forkListFilePath, String publicToken, String root, String projectName) {
-         String originalPage = "original.html";
         try {
             String[] forkListArray = processingText.readResult(forkListFilePath).split("\n");
 
@@ -129,17 +128,10 @@ public class GithubRepoAnalysis {
             for (String forkName : forkListArray) {
                 String analysisDir = root + forkName + FS + "INFOX_output/";
                 ParseHtml parseHtml = new ParseHtml(0, 0, analysisDir, publicToken);
-//              String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath,forkName,"3 month");
                 String localSourceCodeDirPath = root + forkName + FS;
                 String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
 
                 ProcessingText processingText = new ProcessingText();
-//                processingText.getDiffText(forkName,analysisDir,originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
-//                processingText.readTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
-//                /***   get fork added node, generate ForkAddedNode.txt file   ***/
-//                GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-//                HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(localSourceCodeDirPath + "INFOX_output/diff.txt");
-//                githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, localSourceCodeDirPath + "INFOX_output/forkAddedNode.txt");
                 /*** hack github page   ***/
                 parseHtml.getOriginalDiffPage(diffPageUrl, localSourceCodeDirPath, forkName);
 
@@ -154,9 +146,6 @@ public class GithubRepoAnalysis {
     }
 
     public static void main(String[] args) {
-//        String dir = "/Users/shuruiz/Work/MarlinRepo/MarlinForks/gralco_Marlin/";
-//        String diffFilePath = "diff.txt";
-//        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
         String projectName = "Smoothieware";
         String folder = "check" + projectName + "ForkSize/";
@@ -169,9 +158,6 @@ public class GithubRepoAnalysis {
         }
         githubRepoAnalysis.calculatingAvgSizeOfCodeChanges(root + "/" + folder + projectName + "ForkList.txt", token, root, projectName);
 
-
-//        HashMap<String, ArrayList<Integer>> changedFile_line_map = githubRepoAnalysis.getChangedCodeForGithubRepo(dir + diffFilePath);
-//        githubRepoAnalysis.generateForkAddedNodeFile(changedFile_line_map, dir + forkAddedNode_file);
     }
 
 }
