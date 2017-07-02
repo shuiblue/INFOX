@@ -38,8 +38,6 @@ public class GithubRepoAnalysis {
                 String changedFile = changedFileDiffSet[x];
                 if (!changedFile.equals("")) {
                     if (currentFileName.equals("")) {
-//                        String[] content = changedFile.split("\n");
-//                        currentFileName = content[0].split(" ")[2].replace("b/", "");
                         currentFileName = changedFileArray[x-1].trim();
 
                         if (processingText.isCFile_general(currentFileName)) {
