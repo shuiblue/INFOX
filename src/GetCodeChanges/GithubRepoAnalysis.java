@@ -134,7 +134,7 @@ public class GithubRepoAnalysis {
                 String diffPageUrl = parseHtml.getDiffPageUrl(localSourceCodeDirPath, forkName, "withUpstream");
 
                 ProcessingText processingText = new ProcessingText();
-                processingText.getDiffText(forkName,analysisDir,originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
+//                processingText.getDiffText(forkName,analysisDir,originalPage, localSourceCodeDirPath + "INFOX_output/diff.txt");
 //                processingText.readTextFromURL(diffPageUrl + ".diff", localSourceCodeDirPath + "INFOX_output/diff.txt");
 //                /***   get fork added node, generate ForkAddedNode.txt file   ***/
 //                GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
@@ -158,7 +158,7 @@ public class GithubRepoAnalysis {
 //        String diffFilePath = "diff.txt";
 //        String forkAddedNode_file = "forkAddedNode.txt";
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-        String projectName = "ofxGifEncoder";
+        String projectName = "Smoothieware";
         String folder = "check" + projectName + "ForkSize/";
         String root = "/Users/shuruiz/Work/checkProjectSize/";
         String token = null;

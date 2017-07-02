@@ -50,7 +50,7 @@ public class ParseHtml {
     String publicToken;
 
     public String appendTableTitle(int colspan) {
-        return "<table id=\"cluster\"  \n" +
+        return "<table id=\"cluster\">  \n" +
                 "  <tr> \n" +
                 "    <td colspan=\"2\"> <button class=\"btn\" id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
                 "    </td> \n" +
