@@ -31,7 +31,6 @@ public class GithubRepoAnalysis {
         try {
             String diffFilePath = analysisDir + "/diff.txt";
             String diffFileContent = processingText.readResult(diffFilePath);
-//            String[] changedFileDiffSet = diffFileContent.split("diff --git");
             String[] changedFileDiffSet = diffFileContent.split("INFOX_DIFF_BLOCK\n");
             String currentFileName = "";
             for (int x =0; x < changedFileDiffSet.length; x++) {
