@@ -107,18 +107,6 @@ public class ParseHtml {
 
             getDiffInfo(currentPage,localSourceCodeDirPath+"/INFOX_output/forkAddedNode.txt");
 
-//            /** get commit list **/
-//            Elements elements_commitID = currentPage.getElementsByClass("commit-id");
-//            String firstCommit = elements_commitID.first().attr("href").split("/")[4];
-//            String lastCommit = elements_commitID.last().attr("href").split("/")[4];
-//            HtmlPage firstCommitPage = webClient.getPage("https://github.com/" + forkName + "/commit/" + firstCommit);
-//            Document commitDoc = Jsoup.parse(firstCommitPage.asXml());
-//            String parentCommit = commitDoc.getElementsByClass("sha").first().attr("href").split("/")[4];
-//            processingText.rewriteFile(parentCommit + "," + lastCommit, analysisDir + "SHA.txt");
-//            String parentRepo = commitDoc.getElementsByClass("fork-flag").text().replace("forked from", "").trim();
-//            processingText.rewriteFile(parentRepo, analysisDir + "parent.txt");
-
-
         } catch (Exception e) {
             System.out.println("Get page error");
         }
