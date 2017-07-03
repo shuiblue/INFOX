@@ -673,8 +673,10 @@ public class R_CommunityDetection {
                         if (shortestPath > c1_c2) {
                             shortestPath = c1_c2;
                             if (shortestPath == 10) {
-                                sb_shortestPath_node.append("c1: " + nodelist[c1 - 1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2 + "\n");
-                                System.out.println("distance between c1: " + nodelist[c1 - 1] + " and c2: " + nodelist[c2] + " is: " + c1_c2 );
+//                                re.eval(" path <-get.shortest.paths(completeGraph, "+c1+","+cl2+")$vpath");
+//                                REXP vpath = re.eval("path");
+                                 sb_shortestPath_node.append(c1+"," + cl2 +"\n");
+//                                sb_shortestPath_node.append("c1: " + nodelist[c1 - 1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2 + "\n");
                             }
                         }
                     }
@@ -706,7 +708,7 @@ public class R_CommunityDetection {
 //        String analysisDir = testCaseDir + testDir + FS;
         ioFunc.rewriteFile(sb.toString(), analysisDir + numOfClusters + "_distanceBetweenCommunityies.txt");
         ioFunc.rewriteFile(clusterIDList.toString(), analysisDir + numOfClusters + "_clusterIdList.txt");
-//        ioFunc.rewriteFile(sb_shortestPath_node.toString(), analysisDir + numOfClusters + "_shortestPath.txt");
+        ioFunc.rewriteFile(sb_shortestPath_node.toString(), analysisDir + numOfClusters + "_shortestPath.txt");
     }
 
     /**

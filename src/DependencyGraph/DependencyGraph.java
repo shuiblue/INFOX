@@ -217,7 +217,7 @@ public class DependencyGraph {
             /** Check whether forkAddedNode file exists **/
             changedFiles = new HashSet<>();
 
-            forkAddedNodeTxt = "forkAddedNode.txt";
+
             if (new File(forkAddedNodeTxt).exists()) {
                 try {
                     forkaddedNodeList = processingText.getForkAddedNodeList(forkAddedNodeTxt);

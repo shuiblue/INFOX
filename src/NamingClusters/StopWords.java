@@ -60,6 +60,8 @@ public class StopWords {
         stopWordList.add("there");
         stopWordList.add("are");
         stopWordList.add("fatal");
+        stopWordList.add("could");
+        stopWordList.add("could");
     }
 
     public String removeStopWord(String string) {

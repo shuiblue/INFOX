@@ -697,12 +697,31 @@ public class ProcessingText {
         }
     }
 
-    public void writeToJoinClusterFile(String analysisDir, HashMap<String, HashSet<Integer>> joined_clusters) {
+    public void writeToJoinClusterFile(String analysisDir, HashMap<String, HashSet<Integer>> joined_clusters, String combination) {
         StringBuilder sb = new StringBuilder();
+//        joined_clusters.forEach((k, v) -> {
+//            sb.append(k + ":" + v.toString() + "\n");
+//        });
+
+        HashMap<String, Integer> clusterID_size = new HashMap<>();
         joined_clusters.forEach((k, v) -> {
-            sb.append(k + ":" + v.toString() + "\n");
+            clusterID_size.put(k, v.size());
         });
-        new ProcessingText().writeTofile(sb.toString(), analysisDir + "joined_cluster.txt");
+        Map<String, Integer> result = new LinkedHashMap<>();
+        clusterID_size.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .forEachOrdered(x -> {
+                    result.put(x.getKey(), x.getValue());
+
+                });
+        final Iterator<String> cursor = result.keySet().iterator();
+        StringBuilder sb_topClusters = new StringBuilder();
+
+        while (cursor.hasNext()) {
+            final String clusterID = cursor.next();
+            sb.append(clusterID + ":" + joined_clusters.get(clusterID).toString() + "\n");
+        }
+        new ProcessingText().rewriteFile(sb.toString(), analysisDir + combination+"_joined_cluster.txt");
     }
 
     public void getDiffText(String forkName, String analysisDir, String originalHtmlPath, String diffFilePath) {
@@ -751,7 +770,7 @@ public class ProcessingText {
 
                 StringBuilder sb = new StringBuilder();
                 for (org.jsoup.nodes.Element lineEle : diffBlock.getElementsByClass("blob-code-inner")) {
-                    sb.append(lineEle.text()+"\n");
+                    sb.append(lineEle.text() + "\n");
                 }
                 System.out.println("writing to diff txt file...");
                 processingText.writeTofile("INFOX_DIFF_BLOCK\n" + sb.toString(), diffFilePath);

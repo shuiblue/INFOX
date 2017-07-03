@@ -428,12 +428,13 @@ public class ColorCode {
      * //todo: other conditions?
      *
      * @param clusters
-     * @param numberOfClusters
+     * @param combination
      */
-    public ArrayList<HashSet<String>> joiningCloseClusters(ArrayList<String> clusters, String numberOfClusters, int clusterSizeThreshold) {
+    public ArrayList<HashSet<String>> joiningCloseClusters(ArrayList<String> clusters, String combination, int clusterSizeThreshold) {
         bigSizeClusterList = new HashSet<>();
         ArrayList<String> distanceArray;
-        String distanceFile = analysisDir + numberOfClusters + "_distanceBetweenCommunityies.txt";
+//        String distanceFile = analysisDir + combination + "_distanceBetweenCommunityies.txt";
+        String distanceFile = analysisDir +  "original_distanceBetweenCommunityies.txt";
         closeClusterList = new ArrayList<>();
         try {
             String distanceString = processingText.readResult(distanceFile);
@@ -506,6 +507,14 @@ public class ColorCode {
             e.printStackTrace();
         }
 
+        StringBuilder sb = new StringBuilder();
+        for(HashSet<String> set : closeClusterList){
+            if(set.size()>0) {
+                sb.append(set.toString() + "\n");
+            }
+        }
+
+        processingText.rewriteFile(sb.toString(),analysisDir+combination+"_closedClusters.txt");
         return closeClusterList;
     }
 
