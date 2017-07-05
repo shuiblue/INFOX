@@ -22,12 +22,12 @@ public class AnalyzingCommunityDetectionResult {
     String nodeListTxt = "NodeList.txt";
     String forkAddedNodeTxt = "forkAddedNode.txt";
     String expectTxt = "expectCluster.txt";
-    String suffix_ClusterFile = "_clusterTMP.txt";
+
     String forkAddedNode = "";
     int initialNumOfClusters = 0;
     HashMap<Integer, ArrayList<String>> clusterResultMap;
     static HashMap<Integer, String> nodeMap = new HashMap<>();
-
+    String suffix_ClusterFile = "_clusterTMP.txt";
 
     static HashMap<String, String> expectNodeMap = new HashMap<>();
     HashMap<String, HashSet<Integer>> groundTruthClusters = new HashMap<>();
@@ -74,12 +74,12 @@ public class AnalyzingCommunityDetectionResult {
      * @param isOriginalGraph
      * @return
      */
-    public HashMap<Integer, HashMap<String, HashSet<Integer>>> getClusteringResultMapforClusterID(String clusterID, boolean isOriginalGraph) {
+    public HashMap<Integer, HashMap<String, HashSet<Integer>>> getClusteringResultMapforClusterID(String clusterID, boolean isOriginalGraph, boolean isJoined) {
 //    public HashMap<Integer, HashMap<String, HashSet<Integer>>> getClusteringResultMap(int clusterSizeThreshold,  boolean hasGroundTruth, String filePrefix, boolean isOriginalGraph) {
         HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap = new HashMap<>();
 
-
-        String clusterFilePath = analysisDir + clusterID + suffix_ClusterFile;
+        String isJoined_str = isJoined ? "_joined" : "";
+        String clusterFilePath = analysisDir + clusterID + isJoined_str + suffix_ClusterFile;
         String clusterResultListString = "";
 
         ProcessingText processingText = new ProcessingText();
@@ -488,7 +488,6 @@ public class AnalyzingCommunityDetectionResult {
     public HashMap<Integer, ArrayList<String>> generateClusteringResult(int max_numberOfCut, int numberOfBiggestClusters, int clusterSizeThreshold) {
         ProcessingText protext = new ProcessingText();
         boolean hasGroundTruth = false;
-        //todo; magic number
 
         originCombination = "original";
 
@@ -504,7 +503,7 @@ public class AnalyzingCommunityDetectionResult {
         /** for original clustering result , generate corresponding table, html ...**/
         System.out.println("    analyzing original chenged code graph, get original cluster mapping...");
         parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, originCombination, true);
-        HashMap<Integer, HashMap<String, HashSet<Integer>>> originalCluster = getClusteringResultMapforClusterID(originCombination, true);
+        HashMap<Integer, HashMap<String, HashSet<Integer>>> originalCluster = getClusteringResultMapforClusterID(originCombination, true, false);
         for (Map.Entry<Integer, HashMap<String, HashSet<Integer>>> entry : originalCluster.entrySet()) {
             originalClusterMap = entry.getValue();
         }
@@ -598,7 +597,7 @@ public class AnalyzingCommunityDetectionResult {
                     isOriginal = true;
                 }
                 if (!noSplittingNode.contains(clusterID) || isOriginal) {
-                    HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, isOriginal);
+                    HashMap<Integer, HashMap<String, HashSet<Integer>>> tmpClustertwoSplit = getClusteringResultMapforClusterID(clusterID, isOriginal, false);
                     tmpClustertwoSplit.forEach((k, v) -> {
                         v.forEach((k1, v1) -> {
                             int index = k1.split("_").length - 1;
@@ -780,6 +779,8 @@ public class AnalyzingCommunityDetectionResult {
       */
     public HashMap<Integer, ArrayList<String>> parseEachUsefulClusteringResult(int clusterSizeThreshold, boolean hasGroundTruth, String combination, boolean isOriginalGraph) {
         clusterResultMap = new HashMap<>();
+
+
         String clusterFilePath = analysisDir + combination + suffix_ClusterFile;
         String clusterResultListString = "";
 
@@ -863,13 +864,13 @@ public class AnalyzingCommunityDetectionResult {
 
                             if (combination.equals("original")) {
                                 closeClusters_list = colorCode.joiningCloseClusters(clusters, combination, clusterSizeThreshold);
+                                /**   get joined clusters   **/
+                                joined_clusters = getJoinedClusters(colorCode, combination, clusters, current_clustering_result, clusterSizeThreshold, closeClusters_list);
                             } else {
-                                closeClusters_list = getCloseClustersForSplittingStep(combination);
+                                joined_clusters = getJoinedClustersForSplittingStep(combination);
                             }
 
 
-                            /**   get joined clusters   **/
-                            joined_clusters = getJoinedClusters(colorCode, combination, clusters, current_clustering_result, clusterSizeThreshold, closeClusters_list);
 //                                /** generateing toggle.js file for each cluster **/
 //                                generateToggleFileForEachCluster(joined_clusters, true, numberOfCommunities);
                             processingText.writeToJoinClusterFile(analysisDir, joined_clusters, combination);
@@ -930,21 +931,26 @@ public class AnalyzingCommunityDetectionResult {
         return clusterResultMap;
     }
 
-    private ArrayList<HashSet<String>> getCloseClustersForSplittingStep(String combination) {
+    private HashMap<String, HashSet<Integer>> getJoinedClustersForSplittingStep(String combination) {
         ProcessingText processingText = new ProcessingText();
         ArrayList<String> topClusterList = getTopClusterList();
         ArrayList<HashSet<String>> closeClusters_list = new ArrayList<>();
+        HashMap<String, HashSet<Integer>> joined_clustering_node_result = new HashMap<>();
+        HashMap<String, HashSet<String>> joined_clustering_result = new HashMap<>();
+
+        HashMap<String, ArrayList<Integer>> clusters_changed = new HashMap<>();
+
 
         if (!combination.contains("~")) {
             try {
-                String[] closedClusterArray = processingText.readResult(analysisDir + "original_closedClusters.txt").split("\n");
-                for (String s : closedClusterArray) {
-                    HashSet<String> closedCluster_set = new HashSet<String>(Arrays.asList(s.replaceAll("\\[", "").replaceAll("\\]", "").split(",")));
-                    closeClusters_list.add(closedCluster_set);
-                }
+                String closedCluster = processingText.readResult(analysisDir + "original_joined_cluster.txt");
+                processingText.rewriteFile(closedCluster, analysisDir + combination + "_joined_clusterTMP.txt");
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
         } else {
             ArrayList<String> clusters = new ArrayList<>();
             try {
@@ -956,7 +962,11 @@ public class AnalyzingCommunityDetectionResult {
             }
 
             HashMap<String, HashSet<Integer>> current_clustering_result = generateCurrentClusteringResultMap(clusters, combination, true);
-            HashMap<String, HashSet<Integer>> joined_clustering_result = new HashMap<>();
+            HashMap<String, HashSet<Integer>> copy = new HashMap<String, HashSet<Integer>>();
+            for (Map.Entry<String, HashSet<Integer>> entry : current_clustering_result.entrySet()) {
+                copy.put(entry.getKey(),
+                        new HashSet<>(entry.getValue()));
+            }
 
 
             String[] shortestPath_nodePair = {};
@@ -975,31 +985,79 @@ public class AnalyzingCommunityDetectionResult {
                 String cluster_1 = nodeId_to_clusterID.get(node_1);
                 String cluster_2 = nodeId_to_clusterID.get(node_2);
 
-                int cluster_index = 6;
-                String original_cluster_1 = cluster_1.split("_")[0];
-                String original_cluster_2 = cluster_2.split("_")[0];
-                if (topClusterList.contains(original_cluster_1)) {
-                    cluster_index = topClusterList.indexOf(original_cluster_1);
-                    if (topClusterList.contains(original_cluster_2)) {
-                        int cluter_2_index_of_top = topClusterList.indexOf(original_cluster_2);
-                        if (cluter_2_index_of_top < cluster_index) {
-                            cluster_index = cluter_2_index_of_top;
+                final boolean[] checked = {false};
+                joined_clustering_result.values().forEach(x -> {
+                    if (x.contains(cluster_1) && x.contains(cluster_2)) checked[0] = true;
+                });
+
+                if (!checked[0]) {
+                    String currentClusterId = "";
+                    int cluster_index = 6;
+                    String original_cluster_1 = cluster_1.split("_")[0];
+                    String original_cluster_2 = cluster_2.split("_")[0];
+                    if (topClusterList.contains(original_cluster_1)) {
+                        cluster_index = topClusterList.indexOf(original_cluster_1);
+                        currentClusterId = cluster_1;
+                        if (topClusterList.contains(original_cluster_2)) {
+                            int cluter_2_index_of_top = topClusterList.indexOf(original_cluster_2);
+                            if (cluter_2_index_of_top < cluster_index) {
+                                cluster_index = cluter_2_index_of_top;
+                                currentClusterId = cluster_2;
+                            }
+
                         }
+                    }
+
+                    HashSet<Integer> closeCluster_nodeSet = joined_clustering_node_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_node_result.get(currentClusterId);
+                    for (Integer node : current_clustering_result.get(cluster_1)) {
+                        closeCluster_nodeSet.add(node);
+                    }
+                    for (Integer node : current_clustering_result.get(cluster_2)) {
+                        closeCluster_nodeSet.add(node);
+                    }
+
+                    if (!currentClusterId.equals("")) {
+
+                        copy.remove(cluster_1);
+                        copy.remove(cluster_2);
+                        joined_clustering_node_result.put(currentClusterId, closeCluster_nodeSet);
+
+
+                        HashSet<String> closeCluster_Set = joined_clustering_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_result.get(currentClusterId);
+                        closeCluster_Set.add(cluster_1);
+                        closeCluster_Set.add(cluster_2);
+                        joined_clustering_result.put(currentClusterId, closeCluster_Set);
+
 
                     }
                 }
-
-                Hash
-                joined_clustering_result.put(topClusterList.get(cluster_index), new HashSet<>());
-
-
-                System.out.println();
             }
 
+            System.out.println();
+            Iterator it = copy.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                String key = (String) pair.getKey();
+                HashSet<Integer> value = (HashSet<Integer>) pair.getValue();
+                joined_clustering_node_result.put(key, value);
+            }
 
+//        }
+            Iterator it_join = joined_clustering_node_result.entrySet().iterator();
+            while (it_join.hasNext()) {
+                Map.Entry pair = (Map.Entry) it_join.next();
+                HashSet<Integer> nodeSet = (HashSet<Integer>) pair.getValue();
+                HashSet<String> nodeSet_str = (HashSet<String>) pair.getValue();
+                closeClusters_list.add(nodeSet_str);
+                ArrayList<Integer> list_int = new ArrayList<Integer>(nodeSet);
+                clusters_changed.put((String) pair.getKey(), list_int);
+
+            }
+
+            processingText.rewriteFile("", analysisDir + combination + "_joined_clusterTMP.txt");
+            processingText.printMemebershipOfCurrentGraph(clusters_changed, combination + "_joined_clusterTMP.txt", false, analysisDir);
         }
-
-        return closeClusters_list;
+        return joined_clustering_node_result;
 
     }
 
@@ -1066,7 +1124,7 @@ public class AnalyzingCommunityDetectionResult {
             String pre_index = "";
 
             while (it.hasNext()) {
-                current_index = ((String) it.next()).trim();
+                current_index = (it.next() + "").trim();
                 System.out.println("current_index: " + current_index);
                 if (current_clustering_result.get(current_index).size() < clusterSizeThreshold || tmp.size() < clusterSizeThreshold) {
                     tmp.addAll(current_clustering_result.get(current_index));

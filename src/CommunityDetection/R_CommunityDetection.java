@@ -234,7 +234,7 @@ public class R_CommunityDetection {
                     System.out.println("printing edge removing result...");
                     printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
                     System.out.println("printing membership of current graph...");
-                    printMemebershipOfCurrentGraph(clusters, outputFile, true);
+                    ioFunc.printMemebershipOfCurrentGraph(clusters, outputFile, true,analysisDir);
 
                     /** split sub-clusters step by step  **/
                     System.out.println("start to split top clusters ...");
@@ -378,7 +378,7 @@ public class R_CommunityDetection {
         printEdgeRemovingResult(currentGraph, analysisDir, cutNum, edgeID_maxBetweenness[1], outputFile);
 
         /**  print clusterTMP.txt file  **/
-        printMemebershipOfCurrentGraph(clusters, outputFile, false);
+        ioFunc.printMemebershipOfCurrentGraph(clusters, outputFile, false,analysisDir);
 //        }
         modularityMap.put(cutNum, new double[]{modularity, Double.parseDouble(edgeID_maxBetweenness[1])});
         modularityArray.add(modularity);
@@ -615,7 +615,7 @@ public class R_CommunityDetection {
 
 
     private HashMap<Integer, HashMap<String, HashSet<Integer>>> getCurrentClusters(String analysisDir, String clusterID) {
-        return new AnalyzingCommunityDetectionResult(analysisDir).getClusteringResultMapforClusterID(clusterID, false);
+        return new AnalyzingCommunityDetectionResult(analysisDir).getClusteringResultMapforClusterID(clusterID, false,false);
 
     }
 
@@ -769,32 +769,7 @@ public class R_CommunityDetection {
         return clusters;
     }
 
-    private void printMemebershipOfCurrentGraph(HashMap<String, ArrayList<Integer>> clusters, String outputFile, boolean isOriginalGraph) {
-        //print
-        StringBuffer membership_print = new StringBuffer();
 
-        membership_print.append("\n---" + clusters.entrySet().size() + " communities\n");
-        Iterator it = clusters.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry cluster = (Map.Entry) it.next();
-            ArrayList<Integer> cluster_content = (ArrayList<Integer>) cluster.getValue();
-
-
-            if (isOriginalGraph || (!isOriginalGraph && cluster_content.size() > 1)) {
-                ArrayList<Integer> mem = (ArrayList<Integer>) cluster.getValue();
-                if (mem != null) {
-                    membership_print.append(cluster.getKey() + ") ");
-                    membership_print.append("[");
-                    for (Integer m : mem) {
-                        membership_print.append(m + " , ");
-                    }
-                    membership_print.append("]\n");
-                }
-            }
-        }
-        //print old edge
-        ioFunc.writeTofile(membership_print.toString(), analysisDir + outputFile);
-    }
 
 
     public void printMemebershipOfCurrentGraph_new(HashMap<String, HashSet<Integer>> clusters, String outputFile) {

@@ -697,6 +697,34 @@ public class ProcessingText {
         }
     }
 
+
+    public void printMemebershipOfCurrentGraph(HashMap<String, ArrayList<Integer>> clusters, String outputFile, boolean isOriginalGraph, String analysisDir) {
+        //print
+        StringBuffer membership_print = new StringBuffer();
+
+        membership_print.append("\n---" + clusters.entrySet().size() + " communities\n");
+        Iterator it = clusters.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry cluster = (Map.Entry) it.next();
+            ArrayList<Integer> cluster_content = (ArrayList<Integer>) cluster.getValue();
+
+
+            if (isOriginalGraph || (!isOriginalGraph && cluster_content.size() > 1)) {
+                ArrayList<Integer> mem = (ArrayList<Integer>) cluster.getValue();
+                if (mem != null) {
+                    membership_print.append(cluster.getKey() + ") ");
+                    membership_print.append("[");
+                    for (Integer m : mem) {
+                        membership_print.append(m + " , ");
+                    }
+                    membership_print.append("]\n");
+                }
+            }
+        }
+        //print old edge
+        writeTofile(membership_print.toString(), analysisDir + outputFile);
+    }
+
     public void writeToJoinClusterFile(String analysisDir, HashMap<String, HashSet<Integer>> joined_clusters, String combination) {
         StringBuilder sb = new StringBuilder();
 //        joined_clusters.forEach((k, v) -> {
@@ -716,12 +744,12 @@ public class ProcessingText {
                 });
         final Iterator<String> cursor = result.keySet().iterator();
         StringBuilder sb_topClusters = new StringBuilder();
-
+sb.append("---"+joined_clusters.size()+" communities\n");
         while (cursor.hasNext()) {
             final String clusterID = cursor.next();
-            sb.append(clusterID + ":" + joined_clusters.get(clusterID).toString() + "\n");
+            sb.append(clusterID + ") " + joined_clusters.get(clusterID).toString() + "\n");
         }
-        new ProcessingText().rewriteFile(sb.toString(), analysisDir + combination+"_joined_cluster.txt");
+        new ProcessingText().rewriteFile(sb.toString(), analysisDir + combination + "_joined_cluster.txt");
     }
 
     public void getDiffText(String forkName, String analysisDir, String originalHtmlPath, String diffFilePath) {

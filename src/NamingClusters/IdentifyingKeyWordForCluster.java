@@ -18,6 +18,7 @@ public class IdentifyingKeyWordForCluster {
     static HashMap<String, String> nodeIdMap = new HashMap<>();
     HashMap<String, String> oneGram_sourceCodeLocMap = new HashMap<>();
     HashMap<String, String> twoGram_sourceCodeLocMap = new HashMap<>();
+    String isJoined_str = "";
 
     public IdentifyingKeyWordForCluster(String sourcecodeDir, String analysisDir, HashMap<String, ArrayList<String>> commitInfoMap) {
         /**  tokenization **/
@@ -72,10 +73,10 @@ public class IdentifyingKeyWordForCluster {
         /** get node label -- node content **/
         if (clusterList.size() == 1) {
             if (n_gram == 1) {
-                processingText.rewriteFile("", analysisDir + splitStep + "_one_keyWord.txt");
+                processingText.rewriteFile("", analysisDir + splitStep + isJoined_str + "_one_keyWord.txt");
                 all_sourceCode_doc.addAll(oneGram_sourceCodeLocMap.values());
             } else if (n_gram == 2) {
-                processingText.rewriteFile("", analysisDir + splitStep + "_two_keyWord.txt");
+                processingText.rewriteFile("", analysisDir + splitStep + isJoined_str + "_two_keyWord.txt");
                 all_sourceCode_doc.addAll(twoGram_sourceCodeLocMap.values());
             }
         }
@@ -114,9 +115,9 @@ public class IdentifyingKeyWordForCluster {
         sb.append(tfidf.calculateTfIdf_new(clusterID_termFrequency));
 
         if (n_gram == 1) {
-            processingText.writeTofile(sb.toString(), analysisDir + splitStep + "_one_keyWord.txt");
+            processingText.writeTofile(sb.toString(), analysisDir + splitStep + isJoined_str + "_one_keyWord.txt");
         } else if (n_gram == 2) {
-            processingText.writeTofile(sb.toString(), analysisDir + splitStep + "_two_keyWord.txt");
+            processingText.writeTofile(sb.toString(), analysisDir + splitStep + isJoined_str + "_two_keyWord.txt");
         }
         return keyWordList;
     }
@@ -137,15 +138,15 @@ public class IdentifyingKeyWordForCluster {
     }
 
 
-    public void findKeyWordForEachSplit(String sourcecodeDir, String analysisDir, String testDir, String splitStep, String repoPath) {
-
+    public void findKeyWordForEachSplit(String sourcecodeDir, String analysisDir, String testDir, String splitStep, String repoPath, boolean isJoined) {
+        this.isJoined_str = isJoined ? "_joined" : "";
         System.out.println("    list top X biggest cluster id");
 
 
         AnalyzingCommunityDetectionResult acdr = new AnalyzingCommunityDetectionResult(analysisDir);
         boolean isOriginalGraph = false;
 
-        HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap = acdr.getClusteringResultMapforClusterID(splitStep, isOriginalGraph);
+        HashMap<Integer, HashMap<String, HashSet<Integer>>> clusterResultMap = acdr.getClusteringResultMapforClusterID(splitStep, isOriginalGraph, isJoined);
 
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
@@ -171,7 +172,7 @@ public class IdentifyingKeyWordForCluster {
         try {
             String[] topClusterID = pt.readResult(analysisDir + "topClusters.txt").split("\n");
             for (String cl : topClusterID) {
-                String twoGramList[] = pt.readResult(analysisDir + splitStep + "_two_keyWord.txt").split("\n");
+                String twoGramList[] = pt.readResult(analysisDir + splitStep + isJoined_str + "_two_keyWord.txt").split("\n");
                 HashSet<String> keywordSet = new HashSet<>();
                 HashSet<String> one_wordSet = new HashSet<>();
 
@@ -179,63 +180,63 @@ public class IdentifyingKeyWordForCluster {
                     String clusterID = two.split(":")[0];
                     if (two.startsWith(cl)) {
 
-                        if (two.replace(cl, "").replace(":", "").replace("[", "").replace("]", "").trim().length() > 0){
+                        if (two.replace(cl, "").replace(":", "").replace("[", "").replace("]", "").trim().length() > 0) {
 
                             int start = two.indexOf("[");
-                        int end = two.indexOf("]");
-                        String[] keywords = two.substring(start + 1, end - 1).split(",");
+                            int end = two.indexOf("]");
+                            String[] keywords = two.substring(start + 1, end - 1).split(",");
 
-                        for (String s : keywords) {
-                            if (s.split("_").length > 1) {
-                                one_wordSet.addAll(new HashSet<String>(Arrays.asList(s.split("_"))));
-                            } else {
-                                one_wordSet.add(s);
+                            for (String s : keywords) {
+                                if (s.split("_").length > 1) {
+                                    one_wordSet.addAll(new HashSet<String>(Arrays.asList(s.split("_"))));
+                                } else {
+                                    one_wordSet.add(s);
+                                }
+                            }
+
+                            keywordSet = new HashSet<String>(Arrays.asList(keywords));
+                            clusterID_keyword.put(clusterID, keywordSet);
+                        } else {
+                            keywordSet = new HashSet<String>();
+                            keywordSet.add("no-meaningful-keyword");
+                            clusterID_keyword.put(clusterID, keywordSet);
+                        }
+                    }
+                }
+
+                String[] oneGramList = pt.readResult(analysisDir + splitStep + isJoined_str + "_one_keyWord.txt").split("\n");
+                for (String one : oneGramList) {
+                    if (one.startsWith(cl) && one.replace(cl, "").replace(":", "").replace("[", "").replace("]", "").trim().length() > 0) {
+
+                        int start = one.indexOf("[");
+                        int end = one.indexOf("]");
+                        String[] keywords = one.substring(start + 1, end - 1).split(",");
+                        for (String oneKey : keywords) {
+                            if (!one_wordSet.contains(oneKey)) {
+                                keywordSet.add(oneKey);
                             }
                         }
-
-                        keywordSet = new HashSet<String>(Arrays.asList(keywords));
-                        clusterID_keyword.put(clusterID, keywordSet);
-                    } else {
-                        keywordSet = new HashSet<String>();
-                        keywordSet.add("no-meaningful-keyword");
-                        clusterID_keyword.put(clusterID, keywordSet);
                     }
                 }
             }
+        } catch (
+                IOException e)
 
-            String[] oneGramList = pt.readResult(analysisDir + splitStep + "_one_keyWord.txt").split("\n");
-            for (String one : oneGramList) {
-                if (one.startsWith(cl) && one.replace(cl, "").replace(":", "").replace("[", "").replace("]", "").trim().length() > 0) {
-
-                    int start = one.indexOf("[");
-                    int end = one.indexOf("]");
-                    String[] keywords = one.substring(start + 1, end - 1).split(",");
-                    for (String oneKey : keywords) {
-                        if (!one_wordSet.contains(oneKey)) {
-                            keywordSet.add(oneKey);
-                        }
-                    }
-                }
-            }
+        {
+            e.printStackTrace();
         }
-    } catch(
-    IOException e)
 
-    {
-        e.printStackTrace();
+        StringBuffer sb = new StringBuffer();
+        clusterID_keyword.forEach((k, v) ->
+
+        {
+
+            sb.append(k + ": " + v.toString());
+
+            sb.append("\n");
+        });
+
+        pt.rewriteFile(sb.toString(), analysisDir + splitStep + isJoined_str + "_keyword.txt");
     }
-
-    StringBuffer sb = new StringBuffer();
-        clusterID_keyword.forEach((k,v)->
-
-    {
-
-        sb.append(k + ": " + v.toString());
-
-        sb.append("\n");
-    });
-
-        pt.rewriteFile(sb.toString(),analysisDir +splitStep +"_keyword.txt");
-}
 
 }

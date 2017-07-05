@@ -33,6 +33,9 @@ public class ParseHtml {
     static String github_page = "https://github.com/";
     Document doc, currentDoc;
     static String analysisDir = "";
+    static String isJoined_str,isJoined_str_opposite ,activity_str= "";
+    boolean isJoined;
+
     String originalPage = "original.html";
     int max_numberOfCut;
     int numberOfBiggestClusters;
@@ -53,10 +56,11 @@ public class ParseHtml {
 
     }
 
-    public String appendTableTitle(int colspan) {
+    public String appendTableTitle(int colspan, String splitStep) {
         return "<table id=\"cluster\">  \n" +
                 "  <tr> \n" +
                 "    <td colspan=\"2\"> <button class=\"btn\" id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
+                "    <td><button><a href=\"./" + splitStep + isJoined_str_opposite + ".html\" class=\"button\">"+activity_str+"</a></button></td>" +
                 "    </td> \n" +
                 "  </tr>\n" +
                 "  <tr>\n" +
@@ -109,7 +113,7 @@ public class ParseHtml {
             currentPage = getLoadBigDiffContentMap(webClient, currentPage, isMarlin);
             System.out.println("done with clicking all the load diff button ");
 
-            getDiffInfo(currentPage,localSourceCodeDirPath+"/INFOX_output/forkAddedNode.txt");
+            getDiffInfo(currentPage, localSourceCodeDirPath + "/INFOX_output/forkAddedNode.txt");
 
         } catch (Exception e) {
             System.out.println("Get page error");
@@ -121,7 +125,7 @@ public class ParseHtml {
 
     }
 
-    private void getDiffInfo(Document currentPage,String outputFile) {
+    private void getDiffInfo(Document currentPage, String outputFile) {
         System.out.println("getting diff info...");
         StringBuilder sb = new StringBuilder();
         ProcessingText processingText = new ProcessingText();
@@ -144,7 +148,7 @@ public class ParseHtml {
                 }
             }
         }
-        processingText.rewriteFile(sb.toString(),outputFile);
+        processingText.rewriteFile(sb.toString(), outputFile);
         System.out.println("done with getting fork added node");
     }
 
@@ -207,9 +211,14 @@ public class ParseHtml {
      * @param forkName
      * @param localSourceCodeDirPath
      */
-    public void generateMocGithubForkPage(String forkName, String localSourceCodeDirPath) {
+    public void generateMocGithubForkPage(String forkName, String localSourceCodeDirPath, boolean isJoined) {
         ProcessingText pt = new ProcessingText();
         this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
+        this.isJoined = isJoined;
+
+        this.isJoined_str = isJoined ? "_joined" : "";
+        this.isJoined_str_opposite = !isJoined ? "_joined" : "";
+        this.activity_str = isJoined ? "back to original clustering" : "joining close clusters";
         try {
             String[] splitSteps = pt.readResult(analysisDir + "splittingSteps.txt").split("\n");
             for (String s : splitSteps) {
@@ -265,7 +274,7 @@ public class ParseHtml {
 
                 HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep);
                 HashMap<String, List<String>> cluster_keyword = new HashMap<>();
-                String keyword[] = pt.readResult(analysisDir + splitStep + "_keyword.txt").split("\n");
+                String keyword[] = pt.readResult(analysisDir + splitStep + isJoined_str + "_keyword.txt").split("\n");
                 for (String kw : keyword) {
                     kw = kw.replace("[", "").replace("]", "");
                     String cid = kw.split(":")[0].trim();
@@ -276,7 +285,7 @@ public class ParseHtml {
 
 
                 System.out.println("generating Cluster Summary Table for current splitting step: " + splitStep);
-                HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword, stopSplitClusters);
+                HashMap<String, String> cluster_color = generateClusterSummaryTable(splitStep, cluster_keyword, stopSplitClusters, isJoined);
 
                 generateHtml(fileList_elements, nodeId_to_clusterID, splitStep, cluster_color, cluster_keyword);
             }
@@ -291,11 +300,11 @@ public class ParseHtml {
     }
 
 
-    private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword, List<String> stopSplitClusters) throws IOException {
+    private HashMap<String, String> generateClusterSummaryTable(String splitStep, HashMap<String, List<String>> cluster_keyword, List<String> stopSplitClusters, boolean isJoined) throws IOException {
         ProcessingText pt = new ProcessingText();
         StringBuilder sb = new StringBuilder();
         int colspan = new DrawTableHierarchy().getTreeHight(splitStep);
-        sb.append(appendTableTitle(colspan));
+        sb.append(appendTableTitle(colspan, splitStep));
 
         String[] clusters = splitStep.split("--");
         for (int i = 0; i < clusters.length; i++) {
@@ -310,8 +319,7 @@ public class ParseHtml {
                 if (!stopSplitClusters.contains(clusterID) && clusterID.split("_").length < max_numberOfCut + 1) {
                     System.out.println(splitStep);
                     nextStep = replaceCurrentStep(splitStep, cid, j);
-//                    System.out.println(nextStep+"\n----------");
-                    nextStepStr = "       <td width=\"80\"><a href=\"./" + nextStep + ".html\" class=\"button\">split</a></td>\n";
+                    nextStepStr = "       <td width=\"80\"><a href=\"./" + nextStep + isJoined_str + ".html\" class=\"button\">split</a></td>\n";
                 } else {
                     nextStepStr = "       <td width=\"80\">no more</td>\n";
                 }
@@ -347,7 +355,7 @@ public class ParseHtml {
 
         sb.append("</table>");
 
-        pt.rewriteFile(sb.toString(), analysisDir + splitStep + ".color");
+        pt.rewriteFile(sb.toString(), analysisDir + splitStep + isJoined_str + ".color");
 
         System.out.println("finished generating summary table");
 
@@ -431,7 +439,7 @@ public class ParseHtml {
         String nextStep = "";
         String[] array = splitStep.split("--");
         for (int i = 0; i < array.length; i++) {
-            String tmpStr ;
+            String tmpStr;
             if (array[i].equals(cid)) {
                 tmpStr = newStep;
             } else {
@@ -451,7 +459,7 @@ public class ParseHtml {
 
     }
 
-    private String generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID, boolean hasPair, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan, HashMap<String, DrawTableHierarchy.Cluster> clusterTree) {
+    private void generate_one_row_of_currentCluster(HashMap<String, List<String>> cluster_keyword, StringBuilder sb, int i, String nextStepStr, String clusterID, boolean hasPair, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan, HashMap<String, DrawTableHierarchy.Cluster> clusterTree) {
         System.out.print("adding one row for current summary table of cluster : " + clusterID + " ...");
 
         BackgroundColor cc = new BackgroundColor();
@@ -475,17 +483,13 @@ public class ParseHtml {
         cluster_color.put(clusterID, color);
 
         /**  keyword **/
-        String keyword_long = cluster_keyword.get(clusterID).toString();
-        String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
-
-
-        int clusterSize = clusterResultMap.get(1).get(clusterID).size();
-//        int clusterSize = allSplittingResult.get(Integer.valueOf(originalClusterID)).get(clusterID.split("_").length - 1).get(clusterID).size();
-
-
-        sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan, clusterTree));
-        System.out.println("done");
-        return sb.toString();
+        if (cluster_keyword.get(clusterID) != null) {
+            String keyword_long = cluster_keyword.get(clusterID).toString();
+            String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
+            int clusterSize = clusterResultMap.get(1).get(clusterID).size();
+            sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan, clusterTree));
+            System.out.println("done");
+        }
     }
 
     private String generateRow(String color, String current_clusterID, String keyword_suffix, String keyword_long, int clusterSize, String nextStepStr, String[] levelColumn_1, String[] levelColumn_2, String joinStep, int colspan, HashMap<String, DrawTableHierarchy.Cluster> clusterTree) {
@@ -522,7 +526,7 @@ public class ParseHtml {
                 }
 
 
-                row_1 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep + ".html\" class=\"button\">" + join + "</a></td>\n";
+                row_1 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep +isJoined_str+ ".html\" class=\"button\">" + join + "</a></td>\n";
             } else {
                 row_1 += " <td  id=\"cel_" + s + "\"></td>\n";
             }
@@ -549,7 +553,6 @@ public class ParseHtml {
         label_to_id = pt.getNodeLabel_to_id_map(analysisDir + "nodeLable2IdMap.txt");
 
         try {
-            System.out.println("read fork added node list..");
             forkAddedNodeList = pt.getForkAddedNodeList(analysisDir + "forkAddedNode.txt");
             for (String nodeLabel : forkAddedNodeList) {
                 String nodeID = label_to_id.get("\"" + nodeLabel + "\"");
@@ -563,7 +566,7 @@ public class ParseHtml {
 
         boolean isOriginalGraph = true;
 
-        clusterResultMap = acdr.getClusteringResultMapforClusterID(splitStep, isOriginalGraph);
+        clusterResultMap = acdr.getClusteringResultMapforClusterID(splitStep, isOriginalGraph, isJoined);
 
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
@@ -600,13 +603,12 @@ public class ParseHtml {
         currentDoc = doc.clone();
         ProcessingText pt = new ProcessingText();
         try {
-            String summaryTable = pt.readResult(analysisDir + splitStep + ".color");
+            String summaryTable = pt.readResult(analysisDir + splitStep + isJoined_str + ".color");
             currentDoc.getElementsByTag("html").first().children().first().before(summaryTable);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // could used forkaddednodelist id file instead of fork added not list todo
         int newCodeSize = forkAddedNodeList.size();
         System.out.println("start to modify each line of fork added code, there are " + newCodeSize + " loc...");
         int i = 1;
@@ -662,7 +664,7 @@ public class ParseHtml {
             }
         }
 
-        pt.rewriteFile(currentDoc.toString(), analysisDir + splitStep + ".html");
+        pt.rewriteFile(currentDoc.toString(), analysisDir + splitStep + isJoined_str + ".html");
         System.out.println("done with current splitstep");
 
     }
