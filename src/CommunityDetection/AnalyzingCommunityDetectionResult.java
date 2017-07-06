@@ -977,63 +977,64 @@ public class AnalyzingCommunityDetectionResult {
             }
 
             for (String pair : shortestPath_nodePair) {
-                String node_1 = pair.split(",")[0];
-                String node_2 = pair.split(",")[1];
+                if (pair.trim().length() > 0) {
+                    String node_1 = pair.split(",")[0];
+                    String node_2 = pair.split(",")[1];
 
-                HashMap<String, String> nodeId_to_clusterID = new ParseHtml().genrate_NodeId_to_clusterIDList_Map(combination);
+                    HashMap<String, String> nodeId_to_clusterID = new ParseHtml().genrate_NodeId_to_clusterIDList_Map(combination);
 
-                String cluster_1 = nodeId_to_clusterID.get(node_1);
-                String cluster_2 = nodeId_to_clusterID.get(node_2);
+                    String cluster_1 = nodeId_to_clusterID.get(node_1);
+                    String cluster_2 = nodeId_to_clusterID.get(node_2);
 
-                final boolean[] checked = {false};
-                joined_clustering_result.values().forEach(x -> {
-                    if (x.contains(cluster_1) && x.contains(cluster_2)) checked[0] = true;
-                });
+                    final boolean[] checked = {false};
+                    joined_clustering_result.values().forEach(x -> {
+                        if (x.contains(cluster_1) && x.contains(cluster_2)) checked[0] = true;
+                    });
 
-                if (!checked[0]) {
-                    String currentClusterId = "";
-                    int cluster_index = 6;
-                    String original_cluster_1 = cluster_1.split("_")[0];
-                    String original_cluster_2 = cluster_2.split("_")[0];
-                    if (topClusterList.contains(original_cluster_1)) {
-                        cluster_index = topClusterList.indexOf(original_cluster_1);
-                        currentClusterId = cluster_1;
-                        if (topClusterList.contains(original_cluster_2)) {
-                            int cluter_2_index_of_top = topClusterList.indexOf(original_cluster_2);
-                            if (cluter_2_index_of_top < cluster_index) {
-                                cluster_index = cluter_2_index_of_top;
-                                currentClusterId = cluster_2;
+                    if (!checked[0]) {
+                        String currentClusterId = "";
+                        int cluster_index = 6;
+                        String original_cluster_1 = cluster_1.split("_")[0];
+                        String original_cluster_2 = cluster_2.split("_")[0];
+                        if (topClusterList.contains(original_cluster_1)) {
+                            cluster_index = topClusterList.indexOf(original_cluster_1);
+                            currentClusterId = cluster_1;
+                            if (topClusterList.contains(original_cluster_2)) {
+                                int cluter_2_index_of_top = topClusterList.indexOf(original_cluster_2);
+                                if (cluter_2_index_of_top < cluster_index) {
+                                    cluster_index = cluter_2_index_of_top;
+                                    currentClusterId = cluster_2;
+                                }
+
                             }
+                        }
+
+                        HashSet<Integer> closeCluster_nodeSet = joined_clustering_node_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_node_result.get(currentClusterId);
+                        for (Integer node : current_clustering_result.get(cluster_1)) {
+                            closeCluster_nodeSet.add(node);
+                        }
+                        for (Integer node : current_clustering_result.get(cluster_2)) {
+                            closeCluster_nodeSet.add(node);
+                        }
+
+                        if (!currentClusterId.equals("")) {
+
+                            copy.remove(cluster_1);
+                            copy.remove(cluster_2);
+                            joined_clustering_node_result.put(currentClusterId, closeCluster_nodeSet);
+
+
+                            HashSet<String> closeCluster_Set = joined_clustering_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_result.get(currentClusterId);
+                            closeCluster_Set.add(cluster_1);
+                            closeCluster_Set.add(cluster_2);
+                            joined_clustering_result.put(currentClusterId, closeCluster_Set);
+
 
                         }
-                    }
-
-                    HashSet<Integer> closeCluster_nodeSet = joined_clustering_node_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_node_result.get(currentClusterId);
-                    for (Integer node : current_clustering_result.get(cluster_1)) {
-                        closeCluster_nodeSet.add(node);
-                    }
-                    for (Integer node : current_clustering_result.get(cluster_2)) {
-                        closeCluster_nodeSet.add(node);
-                    }
-
-                    if (!currentClusterId.equals("")) {
-
-                        copy.remove(cluster_1);
-                        copy.remove(cluster_2);
-                        joined_clustering_node_result.put(currentClusterId, closeCluster_nodeSet);
-
-
-                        HashSet<String> closeCluster_Set = joined_clustering_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_result.get(currentClusterId);
-                        closeCluster_Set.add(cluster_1);
-                        closeCluster_Set.add(cluster_2);
-                        joined_clustering_result.put(currentClusterId, closeCluster_Set);
-
-
                     }
                 }
             }
 
-            System.out.println();
             Iterator it = copy.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();

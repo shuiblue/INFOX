@@ -61,7 +61,13 @@ public class StopWords {
         stopWordList.add("are");
         stopWordList.add("fatal");
         stopWordList.add("could");
-        stopWordList.add("could");
+        stopWordList.add("ofxVideoRecorder");
+        stopWordList.add("code");
+        stopWordList.add("str");
+        stopWordList.add("size_t");
+        stopWordList.add("utf8");
+        stopWordList.add("by");
+        stopWordList.add("null");
     }
 
     public String removeStopWord(String string) {

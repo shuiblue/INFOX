@@ -65,7 +65,7 @@ public class INFOX_main {
             return;
         }
         for (String forkName : forkListArray) {
-//        String forkName = "UltraCombos/ofxVideoRecorder";
+//        String forkName = "DomAmato/arduino";
         String branchName = "";
             boolean hasGroundTruth = false;
             String testCasesDir;
