@@ -24,8 +24,8 @@ public class Main {
      */
     public static void main(String[] args) {
         /**  Step 1， parsing source code to find independent macros, and then generate different macro combinations as ground truth**/
-//        ParsingMacros parsingMacros = new ParsingMacros();
-//        parsingMacros.generatingTestCases_differentMacroCombination();
+        ParsingMacros parsingMacros = new ParsingMacros();
+        parsingMacros.generatingTestCases_differentMacroCombination();
 
         /** Step 2, running tests from each generated folders from step 1 **/
 
@@ -39,13 +39,13 @@ public class Main {
         /**  parse different repositories under testCasesDir  **/
         try {
 
-            String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin";
+            String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testSuricata";
 
             Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro =7; numOfTargetMacro >=7; numOfTargetMacro--) {
+                    for (int numOfTargetMacro =3; numOfTargetMacro <=10; numOfTargetMacro--) {
                         /** generating the parameters for creating dependency graph  **/
                         ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro);
                         /** 1 -- INFOX,
@@ -79,14 +79,14 @@ public class Main {
 
                             /**  testCase specifys the repository that need to be parsed.  **/
                             //TODO: set subdir name for multiple tests
-                            for (int i =1; i <=1; i++) {
+                            for (int i =1; i <=6; i++) {
 
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                                 System.out.println(testCaseDir);
                                 analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re);
-//                                System.out.println(testCaseDir_macrosFromOneFile);
-//                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re);
+                                System.out.println(testCaseDir_macrosFromOneFile);
+                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re);
                             }
                         }
                     }

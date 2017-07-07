@@ -200,10 +200,9 @@ public class ParsingMacros {
 
 
     public static void findIndependentMacros(String fileName) {
+        System.out.print(fileName + "\n");
         String newFileName = iof.changeFileName(fileName);
         HashSet<String> macroListInCurrentFile = new HashSet<>();
-
-
         int linenum = 1;
         ArrayList<ArrayList<String>> macroStack = new ArrayList<>();
         ArrayList<String> currentLevel_macroList = new ArrayList<>();
@@ -338,7 +337,7 @@ public class ParsingMacros {
                                 Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
                                 boolean hasSpecialChar = p.matcher(m).find();
 
-                                if (!m.startsWith("!") && !m.endsWith("_H") && !hasSpecialChar && !m.contains("DEBUG") && !m.contains("=") && !m.contains("#") && !m.contains("||")) {
+                                if (!m.startsWith("!") && !m.endsWith("_H") && !hasSpecialChar && !m.contains("DEBUG")&&!m.contains("TEST") && !m.contains("=") && !m.contains("#") && !m.contains("||")) {
                                     ArrayList<String> wrappedCode = macro_to_locArray.get(m);
                                     String edgeLabel = newFileName + "-" + linenum;
                                     if (!wrappedCode.contains(edgeLabel)) {
@@ -349,7 +348,7 @@ public class ParsingMacros {
                             }
                         }
                         linenum++;
-                        System.out.print(linenum + "\n");
+
                     }
 
 
@@ -375,7 +374,7 @@ public class ParsingMacros {
 
     public static void generatingTestCases_differentMacroCombination() {
         String analysisDirName = "DPGraph";
-        String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin";
+        String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testSuricata";
         ParsingMacros parsingMacros = new ParsingMacros();
         try {
             Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
@@ -384,12 +383,12 @@ public class ParsingMacros {
                     sourcecodeDir = filePath.toString() + FS;
                     parsingMacros.createMacroList(sourcecodeDir);
 
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 3; numOfTargetMacro++) {
-                        for (int i = 3; i <= 3; i++) {
-//                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-//                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
+                        for (int i = 1; i <=6; i++) {
+                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
+                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
 
-                         String   testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
+                            testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                             parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
                         }
                     }

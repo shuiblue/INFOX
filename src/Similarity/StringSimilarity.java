@@ -1,5 +1,6 @@
 package Similarity;
 
+import NamingClusters.Levenshtein;
 import Util.ProcessingText;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import info.debatty.java.stringsimilarity.*;
+
 
 /**
  * Created by shuruiz on 9/12/16.
