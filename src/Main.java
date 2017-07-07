@@ -41,7 +41,7 @@ public class Main {
 
             String testCasesDir ;
             if (current_OS.indexOf("mac") >= 0) {
-                testCasesDir =  "/Users/shuruiz/Work/MarlinRepo/testSuricata";
+                testCasesDir =  "/Users/shuruiz/Work/MarlinRepo/testSuricata"[d;
             } else {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testSuricata";
             }

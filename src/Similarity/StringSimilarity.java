@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import info.debatty.java.stringsimilarity.*;
-
 
 /**
  * Created by shuruiz on 9/12/16.
