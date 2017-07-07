@@ -16,7 +16,7 @@ public class Main {
 
 
     static final String FS = File.separator;
-
+    static String current_OS = System.getProperty("os.name").toLowerCase();
     /**
      * Main method for testing the INFOX method
      *
@@ -39,9 +39,15 @@ public class Main {
         /**  parse different repositories under testCasesDir  **/
         try {
 
-            String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testSuricata";
+            String testCasesDir ;
+            if (current_OS.indexOf("mac") >= 0) {
+                testCasesDir =  "/Users/shuruiz/Work/MarlinRepo/testSuricata";
+            } else {
+                testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testSuricata";
+            }
 
-            Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
+
+                Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
