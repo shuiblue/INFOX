@@ -322,15 +322,16 @@ public class R_CommunityDetection {
         StringBuffer sb = new StringBuffer();
         StringBuffer sb_shortestPath_node = new StringBuffer();
         HashMap<Integer, double[]> shortestDistanceOfNodes = new HashMap<>();
+        String filePath = ("comGraph<-read.graph(\"" + testCaseDir +testDir+ "/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
 //        String filePath = ("comGraph<-read.graph(\"" + sourcecodeDir + analysisDirName + "/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
-//        re.eval(filePath);
-//        re.eval("scomGraph<- simplify(comGraph)");
-//
-//        if (!directedGraph) {
-//            REXP g = re.eval("completeGraph<-as.undirected(scomGraph)");
-//        } else {
-//            REXP g = re.eval("completeGraph<-scomGraph");
-//        }
+        re.eval(filePath);
+        re.eval("scomGraph<- simplify(comGraph)");
+
+        if (!directedGraph) {
+            REXP g = re.eval("completeGraph<-as.undirected(scomGraph)");
+        } else {
+            REXP g = re.eval("completeGraph<-scomGraph");
+        }
 
         for (ArrayList<Integer> pair : combination) {
             ArrayList<Integer> cluster_1 = clusters.get(pair.get(0));
