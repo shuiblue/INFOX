@@ -70,14 +70,14 @@ public class AnalyzingRepository {
         new File(analysisDir).mkdir();
 
         /**  Generating Dependency Graphs for current test case/project  **/
-//        if (!directedGraph) {
-//            DependencyGraph dependencyGraph = new DependencyGraph(parameters[5]);
-//            /**  this function extract changed_code_dependency_graph from complete graph**/
-////            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
-//
-//            /**  this function generate all the graph at the same time **/
-//            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
-//        }
+        if (!directedGraph) {
+            DependencyGraph dependencyGraph = new DependencyGraph(parameters[5]);
+            /**  this function extract changed_code_dependency_graph from complete graph**/
+//            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
+
+            /**  this function generate all the graph at the same time **/
+            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
+        }
 
         /** Community Detection  **/
         boolean hasEdge = new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph);

@@ -291,7 +291,7 @@ public class DependencyGraph {
 
         /**------------ Preparing for writing into output files  --------------**/
         processingText.rewriteFile("", edgeListTxt);
-        processingText.rewriteFile("", compact_graph_edgeList_txt);
+//        processingText.rewriteFile("", compact_graph_edgeList_txt);
         processingText.rewriteFile("", parsedLineTxt);
 
         changedFiles = new HashSet<>();
@@ -347,13 +347,13 @@ public class DependencyGraph {
 
         /** generating edges for consecutive lines  **/
         if (CONSECUTIVE) {
-//            createNeighborEdges();
+            createNeighborEdges();
         }
 
         /****   Write dependency graphs into pajek files  ****/
         processingText.writeToPajekFile(dependencyGraph, nodeList, testCaseDir, testDir, "changedCode.pajek.net", forkaddedNodeList);
         processingText.writeToPajekFile(completeGraph, nodeList, testCaseDir, testDir, "complete.pajek.net", forkaddedNodeList);
-        processingText.writeToPajekFile(compactGraph, compact_nodeList, testCaseDir, testDir, "compact.pajek.net", forkaddedNodeList);
+//        processingText.writeToPajekFile(compactGraph, compact_nodeList, testCaseDir, testDir, "compact.pajek.net", forkaddedNodeList);
 
 
         /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
@@ -1728,15 +1728,15 @@ public class DependencyGraph {
         }
 //        System.out.println(exprLocation);
         // --------for compact graph--------------
-        String filename = exprLocation.split("-")[0];
-        if (!changedFiles.contains(filename)) {
-            exprLocation = filename + "-all";
-        }
-        if (!compact_nodeList.containsKey(exprLocation)) {
-            compact_graph_node_id++;
-            compact_nodeList.put(exprLocation, compact_graph_node_id);
-            compactGraph.put(exprLocation, new HashSet<>());
-        }
+//        String filename = exprLocation.split("-")[0];
+//        if (!changedFiles.contains(filename)) {
+//            exprLocation = filename + "-all";
+//        }
+//        if (!compact_nodeList.containsKey(exprLocation)) {
+//            compact_graph_node_id++;
+//            compact_nodeList.put(exprLocation, compact_graph_node_id);
+//            compactGraph.put(exprLocation, new HashSet<>());
+//        }
 
 
     }
@@ -2006,52 +2006,52 @@ public class DependencyGraph {
             int declId = nodeList.get(decl_position);
 
             //  --------------for compact graph-------------------------
-            String dependNode_file = depen_position.split("-")[0];
-            String declNode_file = decl_position.split("-")[0];
-            String compact_depend_label, compact_decl_label;
-            HashSet<String[]> compact_dependNodes;
-            if (!changedFiles.contains(dependNode_file)) {
-                compact_depend_label = dependNode_file + "-all";
-            } else {
-                compact_depend_label = depen_position;
-            }
-            if (!changedFiles.contains(declNode_file)) {
-                compact_decl_label = declNode_file + "-all";
-            } else {
-                compact_decl_label = decl_position;
-            }
-            if (!compact_decl_label.equals(compact_depend_label)) {
-                String edge = compact_depend_label + "," + compact_decl_label + "," + edgeLabel;
-                processingText.writeTofile(edge + "\n", compact_graph_edgeList_txt);
-                compact_edgeList.add(edge);
-                compact_dependNodes = compactGraph.get(compact_decl_label);
-                if (compact_dependNodes == null) {
-                    compact_dependNodes = new HashSet<>();
-                }
-                String[] tmpEdge;
-                //--------------------weight-----------------------------------------
-                //         edge between fork added node , weight is bigger
-//                if (forkaddedNodeList.contains(depen_position + " ") && forkaddedNodeList.contains(decl_position + " ")) {
-//                    tmpEdge = new String[]{depen_position, edgeLabel, "3"};
-//                }else{
-//                    tmpEdge = new String[]{depen_position, edgeLabel, "1"};
+//            String dependNode_file = depen_position.split("-")[0];
+//            String declNode_file = decl_position.split("-")[0];
+//            String compact_depend_label, compact_decl_label;
+//            HashSet<String[]> compact_dependNodes;
+//            if (!changedFiles.contains(dependNode_file)) {
+//                compact_depend_label = dependNode_file + "-all";
+//            } else {
+//                compact_depend_label = depen_position;
+//            }
+//            if (!changedFiles.contains(declNode_file)) {
+//                compact_decl_label = declNode_file + "-all";
+//            } else {
+//                compact_decl_label = decl_position;
+//            }
+//            if (!compact_decl_label.equals(compact_depend_label)) {
+//                String edge = compact_depend_label + "," + compact_decl_label + "," + edgeLabel;
+//                processingText.writeTofile(edge + "\n", compact_graph_edgeList_txt);
+//                compact_edgeList.add(edge);
+//                compact_dependNodes = compactGraph.get(compact_decl_label);
+//                if (compact_dependNodes == null) {
+//                    compact_dependNodes = new HashSet<>();
 //                }
-
-                //Another solution of weights
-                if (edgeLabel.contains("neighbor")) {
-                    tmpEdge = new String[]{compact_depend_label, edgeLabel, "1"};
-                } else {
-                    tmpEdge = new String[]{compact_depend_label, edgeLabel, "5"};
-                }
-
-                //------------compact graph---------------
-
-                if (!compact_decl_label.equals(compact_depend_label)) {
-                    compact_dependNodes.add(tmpEdge);
-                    compactGraph.put(compact_decl_label, compact_dependNodes);
-                }
-
-            }
+//                String[] tmpEdge;
+//                //--------------------weight-----------------------------------------
+//                //         edge between fork added node , weight is bigger
+////                if (forkaddedNodeList.contains(depen_position + " ") && forkaddedNodeList.contains(decl_position + " ")) {
+////                    tmpEdge = new String[]{depen_position, edgeLabel, "3"};
+////                }else{
+////                    tmpEdge = new String[]{depen_position, edgeLabel, "1"};
+////                }
+//
+//                //Another solution of weights
+//                if (edgeLabel.contains("neighbor")) {
+//                    tmpEdge = new String[]{compact_depend_label, edgeLabel, "1"};
+//                } else {
+//                    tmpEdge = new String[]{compact_depend_label, edgeLabel, "5"};
+//                }
+//
+//                //------------compact graph---------------
+//
+//                if (!compact_decl_label.equals(compact_depend_label)) {
+//                    compact_dependNodes.add(tmpEdge);
+//                    compactGraph.put(compact_decl_label, compact_dependNodes);
+//                }
+//
+//            }
 
             if (dependId != declId) {
                 processingText.writeTofile(depen_position + "," + decl_position + "," + edgeLabel + "\n", edgeListTxt);

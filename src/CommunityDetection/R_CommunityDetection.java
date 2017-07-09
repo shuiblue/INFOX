@@ -276,21 +276,20 @@ public class R_CommunityDetection {
 
         int edgeID = Integer.valueOf(edgeID_maxBetweenness[0]);
         String edge_from_to;
-        if(previous_edgelist!=null) {
-             edge_from_to = (int) previous_edgelist[edgeID - 1][0] + "%--%" + (int) previous_edgelist[edgeID - 1][1];
-        }else{
-         edge_from_to = (int) edgelist[edgeID - 1][0] + "%--%" + (int) edgelist[edgeID - 1][1];
+        if (previous_edgelist != null) {
+            edge_from_to = (int) previous_edgelist[edgeID - 1][0] + "%--%" + (int) previous_edgelist[edgeID - 1][1];
+        } else {
+            edge_from_to = (int) edgelist[edgeID - 1][0] + "%--%" + (int) edgelist[edgeID - 1][1];
 
         }
         //remove edge
-        re.eval("g<-g-E(g)["+edge_from_to+"]");
+        re.eval("g<-g-E(g)[" + edge_from_to + "]");
 
         REXP edgelist_R = re.eval("cbind( get.edgelist(g) , round( E(g)$weight, 3 ))", true);
         current_edgelist = edgelist_R.asDoubleMatrix();
 
 
-
-        String remove_completeGraph_edge = "completeGraph<-completeGraph-E(completeGraph)["+edge_from_to + "]";
+        String remove_completeGraph_edge = "completeGraph<-completeGraph-E(completeGraph)[" + edge_from_to + "]";
         System.out.println(remove_completeGraph_edge);
         re.eval(remove_completeGraph_edge);
 
@@ -322,7 +321,7 @@ public class R_CommunityDetection {
         StringBuffer sb = new StringBuffer();
         StringBuffer sb_shortestPath_node = new StringBuffer();
         HashMap<Integer, double[]> shortestDistanceOfNodes = new HashMap<>();
-        String filePath = ("comGraph<-read.graph(\"" + testCaseDir +testDir+ "/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
+        String filePath = ("comGraph<-read.graph(\"" + testCaseDir + "/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
 //        String filePath = ("comGraph<-read.graph(\"" + sourcecodeDir + analysisDirName + "/complete.pajek.net\", format=\"pajek\")").replace("\\", "/");
         re.eval(filePath);
         re.eval("scomGraph<- simplify(comGraph)");
@@ -360,10 +359,10 @@ public class R_CommunityDetection {
 
                         if (shortestPath > c1_c2) {
                             shortestPath = c1_c2;
-                            if (shortestPath ==10) {
+                            if (shortestPath == 10) {
 
-                                System.out.println("c1: " + nodelist[c1-1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2);
-                                sb_shortestPath_node.append("c1: " + nodelist[c1-1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2+"\n");
+                                System.out.println("c1: " + nodelist[c1 - 1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2);
+                                sb_shortestPath_node.append("c1: " + nodelist[c1 - 1] + " , c2: " + nodelist[c2] + " shortestPath: " + c1_c2 + "\n");
                             }
                         }
                     }
