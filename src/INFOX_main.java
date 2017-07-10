@@ -26,9 +26,17 @@ public class INFOX_main {
      * @param args
      */
     public static void main(String[] args) {
+        String testCasesDir ;
+        if (current_OS.indexOf("mac") >= 0) {
+            testCasesDir =  "/Users/shuruiz/Work/MarlinRepo/testSuricata";
+        } else {
+            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testclamav";
+        }
+        Root_Dir = new ProcessingText().getRootDir();
+
         /**  Step 1， parsing source code to find independent macros, and then generate different macro combinations as ground truth**/
         ParsingMacros parsingMacros = new ParsingMacros();
-        parsingMacros.generatingTestCases_differentMacroCombination();
+        parsingMacros.generatingTestCases_differentMacroCombination(testCasesDir);
 
         /** Step 2, running tests from each generated folders from step 1 **/
 
@@ -42,13 +50,7 @@ public class INFOX_main {
         /**  parse different repositories under testCasesDir  **/
         try {
 
-            String testCasesDir ;
-            if (current_OS.indexOf("mac") >= 0) {
-                testCasesDir =  "/Users/shuruiz/Work/MarlinRepo/testSuricata";
-            } else {
-                testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testclamav";
-            }
-            Root_Dir = new ProcessingText().getRootDir();
+
 
                 Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {

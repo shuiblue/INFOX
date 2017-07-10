@@ -369,12 +369,11 @@ public class ParsingMacros {
 
     public static void main(String[] args) {
 
-        generatingTestCases_differentMacroCombination();
+//        generatingTestCases_differentMacroCombination();
     }
 
-    public static void generatingTestCases_differentMacroCombination() {
+    public static void generatingTestCases_differentMacroCombination(  String testCasesDir) {
         String analysisDirName = "DPGraph";
-        String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testSuricata";
         ParsingMacros parsingMacros = new ParsingMacros();
         try {
             Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
