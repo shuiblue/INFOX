@@ -18,6 +18,44 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ProcessingText {
+    public void deleteDir(File file) throws IOException {
+
+        if (file.isDirectory()) {
+
+            //directory is empty, then delete it
+            if (file.list().length == 0) {
+
+                file.delete();
+                System.out.println("Directory is deleted : "
+                        + file.getAbsolutePath());
+
+            } else {
+
+                //list all the directory contents
+                String files[] = file.list();
+
+                for (String temp : files) {
+                    //construct the file structure
+                    File fileDelete = new File(file, temp);
+
+                    //recursive delete
+                    deleteDir(fileDelete);
+                }
+
+                //check the directory again, if empty then delete it
+                if (file.list().length == 0) {
+                    file.delete();
+                    System.out.println("Directory is deleted : "
+                            + file.getAbsolutePath());
+                }
+            }
+
+        } else {
+            //if file, then delete it
+            file.delete();
+            System.out.println("File is deleted : " + file.getAbsolutePath());
+        }
+    }
 
     public void writeTofile(String content, String filepath) {
 
@@ -52,6 +90,17 @@ public class ProcessingText {
             bw.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static String getRootDir() {
+         String current_OS = System.getProperty("os.name").toLowerCase();
+        if (current_OS.indexOf("mac") >= 0) {
+            return "/Users/shuruiz/Work/";
+        } else if (current_OS.indexOf("windows") >= 0) {
+            return "C:\\Users\\shuruiz\\Documents\\";
+        } else {
+            return "/home/feature/shuruiz/";
         }
     }
 

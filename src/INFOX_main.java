@@ -1,5 +1,6 @@
 import DependencyGraph.AnalyzingRepository;
 import Util.ParsingMacros;
+import Util.ProcessingText;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
@@ -17,6 +18,8 @@ public class INFOX_main {
 
     static final String FS = File.separator;
     static String current_OS = System.getProperty("os.name").toLowerCase();
+    static String tmpXmlPath = "tmpXMLFile" + FS;
+    static String Root_Dir = "";
     /**
      * Main method for testing the INFOX method
      *
@@ -45,7 +48,7 @@ public class INFOX_main {
             } else {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testclamav";
             }
-
+            Root_Dir = new ProcessingText().getRootDir();
 
                 Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
@@ -101,7 +104,11 @@ public class INFOX_main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        try {
+            new ProcessingText().deleteDir(new File(Root_Dir + tmpXmlPath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
