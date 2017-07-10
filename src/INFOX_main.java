@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Created by shuruiz on 6/2/2016.
  */
-public class Main {
+public class INFOX_main {
 
 
     static final String FS = File.separator;
