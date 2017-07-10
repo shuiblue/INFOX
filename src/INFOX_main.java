@@ -24,8 +24,8 @@ public class INFOX_main {
      */
     public static void main(String[] args) {
         /**  Step 1， parsing source code to find independent macros, and then generate different macro combinations as ground truth**/
-//        ParsingMacros parsingMacros = new ParsingMacros();
-//        parsingMacros.generatingTestCases_differentMacroCombination();
+        ParsingMacros parsingMacros = new ParsingMacros();
+        parsingMacros.generatingTestCases_differentMacroCombination();
 
         /** Step 2, running tests from each generated folders from step 1 **/
 
@@ -43,7 +43,7 @@ public class INFOX_main {
             if (current_OS.indexOf("mac") >= 0) {
                 testCasesDir =  "/Users/shuruiz/Work/MarlinRepo/testSuricata";
             } else {
-                testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testSuricata";
+                testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testclamav";
             }
 
 
