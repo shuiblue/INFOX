@@ -115,9 +115,9 @@ public class IdentifyingKeyWordForCluster {
         sb.append(tfidf.calculateTfIdf_new(clusterID_termFrequency));
 
         if (n_gram == 1) {
-            processingText.writeTofile(sb.toString(), analysisDir + splitStep + isJoined_str + "_one_keyWord.txt");
+            processingText.rewriteFile(sb.toString(), analysisDir + splitStep + isJoined_str + "_one_keyWord.txt");
         } else if (n_gram == 2) {
-            processingText.writeTofile(sb.toString(), analysisDir + splitStep + isJoined_str + "_two_keyWord.txt");
+            processingText.rewriteFile(sb.toString(), analysisDir + splitStep + isJoined_str + "_two_keyWord.txt");
         }
         return keyWordList;
     }
@@ -150,7 +150,6 @@ public class IdentifyingKeyWordForCluster {
 
         clusterResultMap.forEach((k, v) -> {
             HashMap<String, HashSet<Integer>> currentClusterMap = v;
-
             /**  calculate tfidf  to identifing keywords from each cluster**/
             System.out.println("        identifying keywords from one gram list...");
             findKeyWordsFor_eachSplitStep(analysisDir, testDir, currentClusterMap, 1, splitStep);

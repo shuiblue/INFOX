@@ -486,9 +486,12 @@ public class ParseHtml {
         if (cluster_keyword.get(clusterID) != null) {
             String keyword_long = cluster_keyword.get(clusterID).toString();
             String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
-            int clusterSize = clusterResultMap.get(1).get(clusterID).size();
-            sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan, clusterTree));
-            System.out.println("done");
+            HashSet<Integer> nodeSet = clusterResultMap.get(1).get(clusterID);
+            if(nodeSet!=null) {
+                int clusterSize = nodeSet.size();
+                sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan, clusterTree));
+                System.out.println("done");
+            }
         }
     }
 
@@ -626,24 +629,26 @@ public class ParseHtml {
 
                 ArrayList<String> topClusterList = pt.getListFromFile(analysisDir, "topClusters.txt");
                 if (pt.isTopCluster(topClusterList, clusterid)) {
-                    String keywod_prefix = cluster_keyword.get(clusterid).get(0).trim();
-                    keywod_prefix = keywod_prefix.split("").length > 3 ? keywod_prefix.substring(0, 3).replace("[", "") + "." : keywod_prefix;
+                    List<String> keywordList = cluster_keyword.get(clusterid);
+                    if(keywordList!=null) {
+                        String keywod_prefix = keywordList.get(0).trim();
+                        keywod_prefix = keywod_prefix.split("").length > 3 ? keywod_prefix.substring(0, 3).replace("[", "") + "." : keywod_prefix;
 
-                    Element currentFile = currentDoc.getElementsByAttributeValueMatching("data-path", fileName).next().first();
-                    Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
-                    Element lineElement = getElement(lineElements);
+                        Element currentFile = currentDoc.getElementsByAttributeValueMatching("data-path", fileName).next().first();
+                        Elements lineElements = currentFile.getElementsByAttributeValue("data-line-number", lineNumber);
+                        Element lineElement = getElement(lineElements);
 
-                    if (lineElement != null) {
-                        String styleStr = "background-color:"
-                                + cluster_color.get(clusterid)
-                                + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
-                                "  font-size:12px;\n" +
-                                "  line-height:20px;\n" +
-                                "  text-align:right;\"";
+                        if (lineElement != null) {
+                            String styleStr = "background-color:"
+                                    + cluster_color.get(clusterid)
+                                    + ";font-family:SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;\n" +
+                                    "  font-size:12px;\n" +
+                                    "  line-height:20px;\n" +
+                                    "  text-align:right;\"";
 
-                        lineElement.attr("class", "infox_" + clusterid.trim()).attr("style", styleStr).text(keywod_prefix);
+                            lineElement.attr("class", "infox_" + clusterid.trim()).attr("style", styleStr).text(keywod_prefix);
+                        }
                     }
-
                 } else {
                     String keywod_prefix = "other";
                     Element currentFile = currentDoc.getElementsByAttributeValueMatching("data-path", fileName).next().first();

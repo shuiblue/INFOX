@@ -65,7 +65,7 @@ public class INFOX_main {
             return;
         }
         for (String forkName : forkListArray) {
-//        String forkName = "DomAmato/arduino";
+//        String forkName = "sorki/Smoothieware";
         String branchName = "";
             boolean hasGroundTruth = false;
             String testCasesDir;
