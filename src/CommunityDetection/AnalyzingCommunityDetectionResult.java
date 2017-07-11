@@ -1188,7 +1188,7 @@ public class AnalyzingCommunityDetectionResult {
                         }
                         for (int i = 0; i < clusters.size(); i++) {
                             String s = clusters.get(i);
-                            if (!s.equals("") && s.contains(cid+")")) {
+                            if (!s.equals("") && (cid.equals("original")||s.contains(cid+")"))) {
                                 String index = "";
                                 if (isOriginal) {
                                     index = s.substring(0, s.indexOf(")")).trim();
