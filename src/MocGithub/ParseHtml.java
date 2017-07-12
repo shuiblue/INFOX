@@ -7,7 +7,6 @@ import Util.ProcessingText;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
@@ -36,6 +35,7 @@ public class ParseHtml {
     static String isJoined_str,isJoined_str_opposite ,activity_str= "";
     boolean isJoined;
 
+    HashMap<String, HashSet<Integer>> originalClusterMap = new HashMap<>();
     String originalPage = "original.html";
     int max_numberOfCut;
     int numberOfBiggestClusters;
@@ -271,8 +271,12 @@ public class ParseHtml {
             for (String splitStep : combination_list) {
 
                 List<String> stopSplitClusters = Arrays.asList(new ProcessingText().readResult(analysisDir + "noSplittingStepList.txt").split("\n"));
+                HashMap<Integer, HashMap<String, HashSet<Integer>>> originalCluster = new AnalyzingCommunityDetectionResult(analysisDir).getClusteringResultMapforClusterID("original", true, false);
+                for (Map.Entry<Integer, HashMap<String, HashSet<Integer>>> entry : originalCluster.entrySet()) {
+                    originalClusterMap = entry.getValue();
+                }
 
-                HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep);
+                HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep,originalClusterMap);
                 HashMap<String, List<String>> cluster_keyword = new HashMap<>();
                 String keyword[] = pt.readResult(analysisDir + splitStep + isJoined_str + "_keyword.txt").split("\n");
                 for (String kw : keyword) {
@@ -544,7 +548,7 @@ public class ParseHtml {
     }
 
 
-    public HashMap<String, String> genrate_NodeId_to_clusterIDList_Map(String splitStep) {
+    public HashMap<String, String> genrate_NodeId_to_clusterIDList_Map(String splitStep, HashMap<String, HashSet<Integer>> originalClusterMap) {
         otherClusterSize = 0;
         Set<String> topClusterSet = new HashSet<String>(Arrays.asList(splitStep.replaceAll("--", "~").split("~")));
 
@@ -559,7 +563,7 @@ public class ParseHtml {
             forkAddedNodeList = pt.getForkAddedNodeList(analysisDir + "forkAddedNode.txt");
             for (String nodeLabel : forkAddedNodeList) {
                 String nodeID = label_to_id.get("\"" + nodeLabel + "\"");
-                if (nodeID != null) {
+               if (nodeID != null) {
                     nodeId_to_clusterID_Map.put(nodeID, "");
                 }
             }
@@ -586,10 +590,25 @@ public class ParseHtml {
         });
 
 
+        nodeId_to_clusterID_Map.forEach((k,v)->{
+            if(v.equals("")){
+              nodeId_to_clusterID_Map.put(k,getClusterID(k,originalClusterMap));
+            }
+        });
+
         return nodeId_to_clusterID_Map;
     }
 
+    public String getClusterID(String nodeid, HashMap<String, HashSet<Integer>> originalClusterMap){
+        final String[] clusterid = {""};
+        originalClusterMap.forEach((k,v)->{
+            if(v.contains(Integer.parseInt(nodeid))){
+                clusterid[0] = k;
 
+            }
+        });
+        return clusterid[0];
+    }
     /**
      * This function generate html file based on clustering result, basically,
      * 1. modify the background color of changed code for different split step

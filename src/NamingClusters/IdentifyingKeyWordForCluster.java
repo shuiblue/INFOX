@@ -92,7 +92,7 @@ public class IdentifyingKeyWordForCluster {
             if (processingText.isTopCluster(topClusterList, clusterID)) {
                 System.out.println("parsing cluster: " + clusterID + " 's keyword..");
                 /** add source code **/
-                final HashMap<String, Integer>[] term_count = new HashMap[]{new HashMap<>()};
+               final HashMap<String, Integer>[] term_count = new HashMap[]{new HashMap<>()};
 
                 for (Integer cl_int : v) {
                     String cl = cl_int.toString();
