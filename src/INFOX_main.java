@@ -29,9 +29,9 @@ public class INFOX_main {
     public static void main(String[] args) {
         String testCasesDir;
         if (current_OS.indexOf("mac") >= 0) {
-            testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testclamav";
+            testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testVim";
         } else {
-            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testclamav";
+            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testVim";
         }
         Root_Dir = new ProcessingText().getRootDir();
 
