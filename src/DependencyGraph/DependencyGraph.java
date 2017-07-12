@@ -277,12 +277,7 @@ public class DependencyGraph {
         this.testDir = testDir;
         gotoMap = new HashMap<>();
 
-        if (current_OS.equals("MAC")) {
-            Root_Dir = "/Users/shuruiz/Work/";
-        } else if (current_OS == "WINDOWS") {
-            Root_Dir = "C:\\Users\\shuruiz\\Documents\\";
-        }
-
+        Root_Dir = processingText.getRootDir();
         /**------------ Specify paths --------------**/
         forkAddedNodeTxt = testCaseDir + "forkAddedNode.txt";
         edgeListTxt = analysisDir + "edgeList.txt";
