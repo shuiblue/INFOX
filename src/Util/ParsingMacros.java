@@ -385,7 +385,7 @@ public class ParsingMacros {
                     sourcecodeDir = filePath.toString() + FS;
                     parsingMacros.createMacroList(sourcecodeDir);
 
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 4; numOfTargetMacro++) {
                         for (int i = 1; i <= 6; i++) {
                             String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                             parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
