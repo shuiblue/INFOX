@@ -54,7 +54,7 @@ public class INFOX_main {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 10; numOfTargetMacro--) {
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 5; numOfTargetMacro--) {
                         /** generating the parameters for creating dependency graph  **/
                         ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro);
                         /** 1 -- INFOX,
