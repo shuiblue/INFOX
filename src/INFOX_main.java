@@ -75,6 +75,7 @@ public class INFOX_main {
             } else {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
             }
+
             File dir = new File(testCasesDir + "/" + forkName);
             if (dir.exists()) {
                 continue;

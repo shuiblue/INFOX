@@ -1184,16 +1184,10 @@ public class AnalyzingCommunityDetectionResult {
             for (String cid : tmp) {
                 String clusterID = cid;
 
-//            todo test    if ((clusters.size() > 2 || (!isOriginal && clusters.size() == 2))) {
                 if ((clusters.size() > 1 || (isOriginal&&clusters.size() == 1))) {
-
-//                 todo       if (clusters.size() > 3) {
-//                            isOriginal = true;
-//                        }
                         for (int i = 0; i < clusters.size(); i++) {
                             String s = clusters.get(i);
-                            if (!s.equals("") && (!isJoined&&s.contains(")"))||(isJoined&&s.contains(cid+")"))) {
-//                            if (!s.equals("") && (cid.equals("original")||s.contains(cid+")"))) {
+                            if (clusterID.equals("original")||!s.equals("") && s.contains(cid+")")) {
                                 String index = "";
                                 if (isOriginal) {
                                     index = s.substring(0, s.indexOf(")")).trim();
@@ -1208,7 +1202,7 @@ public class AnalyzingCommunityDetectionResult {
                                           }
                                         }
 
-                                        if (!isGeneratedClusters) {
+                                        if (isGeneratedClusters) {
                                             index = clusterID;
                                         } else {
                                             index = clusterID + "_" + (i + 1);
