@@ -57,6 +57,49 @@ public class ProcessingText {
         }
     }
 
+    public static void copyFolder(File src, File dest)
+            throws IOException {
+
+        if (src.isDirectory()) {
+
+            //if directory not exists, create it
+            if (!dest.exists()) {
+                dest.mkdir();
+                System.out.println("Directory copied from "
+                        + src + "  to " + dest);
+            }
+
+            //list all the directory contents
+            String files[] = src.list();
+
+            for (String file : files) {
+                //construct the src and dest file structure
+                File srcFile = new File(src, file);
+                File destFile = new File(dest, file);
+                //recursive copy
+                copyFolder(srcFile, destFile);
+            }
+
+        } else {
+            //if file, then copy it
+            //Use bytes stream to support all file types
+            InputStream in = new FileInputStream(src);
+            OutputStream out = new FileOutputStream(dest);
+
+            byte[] buffer = new byte[1024];
+
+            int length;
+            //copy the file content in bytes
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+
+            in.close();
+            out.close();
+            System.out.println("File copied from " + src + " to " + dest);
+        }
+    }
+
     public void writeTofile(String content, String filepath) {
 
         try {
@@ -93,8 +136,13 @@ public class ProcessingText {
         }
     }
 
+    public boolean isLib(Path filePath) {
+        String fileP = filePath.toString();
+        return fileP.contains("win32") || fileP.contains("llvm");
+    }
+
     public static String getRootDir() {
-         String current_OS = System.getProperty("os.name").toLowerCase();
+        String current_OS = System.getProperty("os.name").toLowerCase();
         if (current_OS.indexOf("mac") >= 0) {
             return "/Users/shuruiz/Work/";
         } else if (current_OS.indexOf("windows") >= 0) {
@@ -365,7 +413,7 @@ public class ProcessingText {
      * @return origin file name
      */
     public String getOriginFileName(String nodeLabel) {
-        return nodeLabel.split("-")[0].replace("~", "/").replace("H", ".h").replace("CPP", ".cpp").replaceAll("[C]$",".c");
+        return nodeLabel.split("-")[0].replace("~", "/").replace("H", ".h").replace("CPP", ".cpp").replaceAll("[C]$", ".c");
 
     }
 
@@ -451,7 +499,7 @@ public class ProcessingText {
             int index = line.indexOf("/*");
             line = line.substring(0, index);
         }
-        if (line.startsWith("*")  || line.startsWith("//")) {
+        if (line.startsWith("*") || line.startsWith("//")) {
             line = "";
         }
 

@@ -20,15 +20,16 @@ public class INFOX_main {
     static String current_OS = System.getProperty("os.name").toLowerCase();
     static String tmpXmlPath = "tmpXMLFile" + FS;
     static String Root_Dir = "";
+
     /**
      * Main method for testing the INFOX method
      *
      * @param args
      */
     public static void main(String[] args) {
-        String testCasesDir ;
+        String testCasesDir;
         if (current_OS.indexOf("mac") >= 0) {
-            testCasesDir =  "/Users/shuruiz/Work/MarlinRepo/testSuricata";
+            testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testclamav";
         } else {
             testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testclamav";
         }
@@ -49,14 +50,11 @@ public class INFOX_main {
         AnalyzingRepository analyzeRepo = new AnalyzingRepository();
         /**  parse different repositories under testCasesDir  **/
         try {
-
-
-
-                Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
+            Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro =3; numOfTargetMacro <=10; numOfTargetMacro--) {
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 10; numOfTargetMacro--) {
                         /** generating the parameters for creating dependency graph  **/
                         ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro);
                         /** 1 -- INFOX,
@@ -90,7 +88,7 @@ public class INFOX_main {
 
                             /**  testCase specifys the repository that need to be parsed.  **/
                             //TODO: set subdir name for multiple tests
-                            for (int i =1; i <=6; i++) {
+                            for (int i = 1; i <= 6; i++) {
 
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;

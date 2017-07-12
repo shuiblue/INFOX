@@ -5,9 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparingInt;
 
 /**
  * Created by shuruiz on 11/6/16.
@@ -32,9 +36,11 @@ public class ParsingMacros {
         File dir1 = new File(sourcecodeDir);
         try {
             Files.walk(Paths.get(sourcecodeDir)).forEach(filePath -> {
-                String fileName = String.valueOf(filePath.toString().replace(sourcecodeDir, ""));
-                if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
-                    findIndependentMacros(fileName);
+                if (!new ProcessingText().isLib(filePath)) {
+                    String fileName = String.valueOf(filePath.toString().replace(sourcecodeDir, ""));
+                    if (fileName.endsWith(".cpp") || fileName.endsWith(".h") || fileName.endsWith(".c")) {
+                        findIndependentMacros(fileName);
+                    }
                 }
             });
         } catch (IOException e) {
@@ -99,12 +105,15 @@ public class ParsingMacros {
                 if (!macrosInOneFile) {
                     keys = new ArrayList<String>(macro_to_locArray.keySet());
                 } else {
-                    // for marlin:  "Marlin~Marlin_mainCPP";
+                    List<String> values = file_to_MacroList
+                            .entrySet()
+                            .stream()
+                            .sorted((left, right) ->
+                                    Integer.compare(right.getValue().size(), left.getValue().size()))
+                            .map(x -> x.getKey())
+                            .collect(Collectors.toList());
 
-                    //----cherokee-------
-                    //"Cherokee~cherokee~utilC" -> " size = 29"
-                    //"Cherokee~cherokee~socketC" -> " size = 17"
-                    String fileName = "Cherokee~cherokee~utilC";
+                    String fileName = values.get(0);
                     keys = new ArrayList(file_to_MacroList.get(fileName));
                     for (String k : keys) {
                         totalSize += macro_to_locArray.get(k).size();
@@ -140,12 +149,6 @@ public class ParsingMacros {
                         }
                     }
                 }
-                /*  for testing Marlin*/
-//                targetMacroList = new ArrayList<>();
-//                targetMacroList.add("E2_IS_TMC");
-//                targetMacroList.add("MESH_BED_LEVELING");
-//                targetMacroList.add("REVERSE_MENU_DIRECTION");
-//                targetMacroList.add("Z_PROBE_ALLEN_KEY_DEPLOY_3_X");
 
             }
         }
@@ -337,7 +340,7 @@ public class ParsingMacros {
                                 Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
                                 boolean hasSpecialChar = p.matcher(m).find();
 
-                                if (!m.startsWith("!") && !m.endsWith("_H") && !hasSpecialChar && !m.contains("DEBUG")&&!m.contains("TEST") && !m.contains("=") && !m.contains("#") && !m.contains("||")) {
+                                if (!m.startsWith("!") && !m.endsWith("_H") && !hasSpecialChar && !m.contains("DEBUG") && !m.contains("TEST") && !m.contains("=") && !m.contains("#") && !m.contains("||")) {
                                     ArrayList<String> wrappedCode = macro_to_locArray.get(m);
                                     String edgeLabel = newFileName + "-" + linenum;
                                     if (!wrappedCode.contains(edgeLabel)) {
@@ -372,30 +375,40 @@ public class ParsingMacros {
 //        generatingTestCases_differentMacroCombination();
     }
 
-    public static void generatingTestCases_differentMacroCombination(  String testCasesDir) {
+    public static void generatingTestCases_differentMacroCombination(String testCasesDir) {
         String analysisDirName = "DPGraph";
         ParsingMacros parsingMacros = new ParsingMacros();
         try {
             Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
 
-                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir) && !filePath.toString().contains("DPGraph")) {
+//                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir) && !filePath.toString().contains("DPGraph")) {
                     sourcecodeDir = filePath.toString() + FS;
-                    parsingMacros.createMacroList(sourcecodeDir);
-
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
-                        for (int i = 1; i <=6; i++) {
-                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
-
-                            testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
-                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
-                        }
-                    }
-                }
+//                    parsingMacros.createMacroList(sourcecodeDir);
+//
+//                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
+//                        for (int i = 1; i <= 6; i++) {
+//                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
+//                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+//
+//                            testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
+//                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
+//                        }
+//                    }
+//                }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        String[]  dirArray={"testINFOX","testMS","testMS_plus_CF_Hierachy","testINFOX_NO_DefUse", "testINFOX_NO_ControlF","testINFOX_NO_Hierarchy","testINFOX_NO_Consec","testMS_NO_Consec"};
+        for(String target:dirArray){
+            try {
+                new ProcessingText().copyFolder(new File(sourcecodeDir+analysisDirName),new File(sourcecodeDir+target));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }
