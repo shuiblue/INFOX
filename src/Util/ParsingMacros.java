@@ -381,20 +381,20 @@ public class ParsingMacros {
         try {
             Files.walk(Paths.get(testCasesDir), 1).forEach(filePath -> {
 
-//                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir) && !filePath.toString().contains("DPGraph")) {
+                if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir) && !filePath.toString().contains("DPGraph")) {
                     sourcecodeDir = filePath.toString() + FS;
-//                    parsingMacros.createMacroList(sourcecodeDir);
-//
-//                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
-//                        for (int i = 1; i <= 6; i++) {
-//                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-//                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
-//
-//                            testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
-//                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
-//                        }
-//                    }
-//                }
+                    parsingMacros.createMacroList(sourcecodeDir);
+
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
+                        for (int i = 1; i <= 6; i++) {
+                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
+                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+
+                            testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
+                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
+                        }
+                    }
+                }
             });
         } catch (IOException e) {
             e.printStackTrace();
