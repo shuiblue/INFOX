@@ -539,14 +539,17 @@ public class AnalyzingCommunityDetectionResult {
 
     private ArrayList<String> getTopClusterList() {
         ArrayList<String> topClusterList = new ArrayList<>();
-        String[] topClusters = null;
-        try {
-            topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (String tc : topClusters) {
-            topClusterList.add(tc);
+
+        if (new File(analysisDir + "topClusters.txt").exists()) {
+            String[] topClusters = null;
+            try {
+                topClusters = new ProcessingText().readResult(analysisDir + "topClusters.txt").split("\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for (String tc : topClusters) {
+                topClusterList.add(tc);
+            }
         }
         return topClusterList;
     }
@@ -836,7 +839,7 @@ public class AnalyzingCommunityDetectionResult {
 
                     if (pre_numberOfCommunites != numberOfCommunities) {
 
-                        ArrayList<String> clusters =getClusters(result);
+                        ArrayList<String> clusters = getClusters(result);
 
 //                        if (clusterResultMap.size() == 0) {
 //                            initialNumOfClusters = numberOfCommunities;
@@ -961,7 +964,7 @@ public class AnalyzingCommunityDetectionResult {
 //                String[] clusterArray = clusterResultListString.split("communities")[1].split("\n");
 //                clusters = new ArrayList(Arrays.asList(clusterArray));
 
-                clusters=getClusters(clusterResultListString);
+                clusters = getClusters(clusterResultListString);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -986,7 +989,7 @@ public class AnalyzingCommunityDetectionResult {
                     String node_1 = pair.split(",")[0];
                     String node_2 = pair.split(",")[1];
 
-                    HashMap<String, String> nodeId_to_clusterID = new ParseHtml().genrate_NodeId_to_clusterIDList_Map(combination,originalClusterMap);
+                    HashMap<String, String> nodeId_to_clusterID = new ParseHtml().genrate_NodeId_to_clusterIDList_Map(combination, originalClusterMap);
 
                     String cluster_1 = nodeId_to_clusterID.get(node_1);
                     String cluster_2 = nodeId_to_clusterID.get(node_2);
@@ -1015,10 +1018,10 @@ public class AnalyzingCommunityDetectionResult {
                         }
 
                         HashSet<Integer> closeCluster_nodeSet = joined_clustering_node_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_node_result.get(currentClusterId);
-                        for (Integer node : current_clustering_result.get(cluster_1)!=null?current_clustering_result.get(cluster_1):originalClusterMap.get(cluster_1)) {
+                        for (Integer node : current_clustering_result.get(cluster_1) != null ? current_clustering_result.get(cluster_1) : originalClusterMap.get(cluster_1)) {
                             closeCluster_nodeSet.add(node);
                         }
-                        for (Integer node : current_clustering_result.get(cluster_2)!=null?current_clustering_result.get(cluster_2):originalClusterMap.get(cluster_2)) {
+                        for (Integer node : current_clustering_result.get(cluster_2) != null ? current_clustering_result.get(cluster_2) : originalClusterMap.get(cluster_2)) {
                             closeCluster_nodeSet.add(node);
                         }
 
@@ -1184,62 +1187,61 @@ public class AnalyzingCommunityDetectionResult {
             for (String cid : tmp) {
                 String clusterID = cid;
 
-                if ((clusters.size() > 1 || (isOriginal&&clusters.size() == 1))) {
-                        for (int i = 0; i < clusters.size(); i++) {
-                            String s = clusters.get(i);
-                            if (clusterID.equals("original")||!s.equals("") && s.contains(cid+")")) {
-                                String index = "";
-                                if (isOriginal) {
-                                    index = s.substring(0, s.indexOf(")")).trim();
-                                } else {
-                                    boolean isGeneratedClusters=true;
-                                    if (!isJoined) {
-
-                                        for(String tstr:tmp){
-                                          if(  topClusters.contains(tstr.split("_")[0])==false){
-                                              isGeneratedClusters=false;
-                                              break;
-                                          }
+                if ((clusters.size() > 1 || (isOriginal && clusters.size() == 1))) {
+                    for (int i = 0; i < clusters.size(); i++) {
+                        String s = clusters.get(i);
+                        if (clusterID.equals("original") || !s.equals("") && s.contains(cid + ")")||topClusters.size()==0) {
+                            String index = "";
+                            if (isOriginal) {
+                                index = s.substring(0, s.indexOf(")")).trim();
+                            } else {
+                                boolean isGeneratedClusters = true;
+                                if (!isJoined) {
+                                        for (String tstr : tmp) {
+                                            if (topClusters.contains(tstr.split("_")[0]) == false) {
+                                                isGeneratedClusters = false;
+                                                break;
+                                            }
                                         }
 
-                                        if (isGeneratedClusters) {
-                                            index = clusterID;
-                                        } else {
-                                            index = clusterID + "_" + (i + 1);
-                                        }
-                                    } else {
+                                    if (isGeneratedClusters||clusters.size()==1) {
                                         index = clusterID;
-                                    }
-                                }
-                                boolean isTopCluster = true;
-
-                                if (isJoined) {
-                                    if (topClusters.contains(index.split("_")[0])) {
-                                        isTopCluster = true;
                                     } else {
-                                        isTopCluster = false;
+                                        index = clusterID + "_" + (i + 1);
                                     }
-                                }
-                                if(current_clustering_result.get(index)!=null){
-                                    break;
-                                }
-                                if (isTopCluster) {
-
-                                    String str = s.substring(s.indexOf("[") + 1).replace("]", "");
-                                    String[] nodeList = str.split(",");
-                                    HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
-                                    HashSet<Integer> cluster_nodeid_Set = new HashSet<>();
-                                    Iterator<String> it = cluster_nodeSet.iterator();
-                                    while (it.hasNext()) {
-                                        String istr = it.next().trim();
-                                        if (istr.length() > 0) {
-                                            cluster_nodeid_Set.add(Integer.valueOf(istr));
-                                        }
-                                    }
-                                    current_clustering_result.put(index, cluster_nodeid_Set);
+                                } else {
+                                    index = clusterID;
                                 }
                             }
+                            boolean isTopCluster = true;
+
+                            if (isJoined) {
+                                if (topClusters.contains(index.split("_")[0])) {
+                                    isTopCluster = true;
+                                } else {
+                                    isTopCluster = false;
+                                }
+                            }
+                            if (current_clustering_result.get(index) != null) {
+                                break;
+                            }
+                            if (isTopCluster) {
+
+                                String str = s.substring(s.indexOf("[") + 1).replace("]", "");
+                                String[] nodeList = str.split(",");
+                                HashSet<String> cluster_nodeSet = new HashSet<>(Arrays.asList(nodeList));
+                                HashSet<Integer> cluster_nodeid_Set = new HashSet<>();
+                                Iterator<String> it = cluster_nodeSet.iterator();
+                                while (it.hasNext()) {
+                                    String istr = it.next().trim();
+                                    if (istr.length() > 0) {
+                                        cluster_nodeid_Set.add(Integer.valueOf(istr));
+                                    }
+                                }
+                                current_clustering_result.put(index, cluster_nodeid_Set);
+                            }
                         }
+                    }
 
                 } else {
                     String s = clusters.get(0);
@@ -1261,7 +1263,7 @@ public class AnalyzingCommunityDetectionResult {
                 }
             }
         }
-        return current_clustering_result;
+            return current_clustering_result;
     }
 
     /**
