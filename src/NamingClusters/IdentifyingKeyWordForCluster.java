@@ -236,6 +236,7 @@ public class IdentifyingKeyWordForCluster {
         });
 
         pt.rewriteFile(sb.toString(), analysisDir + splitStep + isJoined_str + "_keyword.txt");
+        System.out.println("done with generating keyword for "+splitStep);
     }
 
 }

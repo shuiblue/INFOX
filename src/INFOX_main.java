@@ -64,8 +64,8 @@ public class INFOX_main {
             System.out.println("Cannot load R");
             return;
         }
-        for (String forkName : forkListArray) {
-//        String forkName = "TkkrLab/Smoothieware";
+//        for (String forkName : forkListArray) {
+        String forkName = "chrisbrent/Smoothieware";
         String branchName = "";
             boolean hasGroundTruth = false;
             String testCasesDir;
@@ -76,10 +76,10 @@ public class INFOX_main {
                 testCasesDir = "/home/feature/shuruiz/INFOX_testCases/";
             }
 
-            File dir = new File(testCasesDir + "/" + forkName);
-            if (dir.exists()) {
-                continue;
-            }
+//            File dir = new File(testCasesDir + "/" + forkName);
+//            if (dir.exists()) {
+//                continue;
+//            }
 
 
             Root_Dir = new ProcessingText().getRootDir();
@@ -137,4 +137,4 @@ public class INFOX_main {
     }
 
 
-}
+//}

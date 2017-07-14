@@ -135,15 +135,17 @@ public class ParseHtml {
         Elements diff_elements = currentPage.getElementsByClass("js-file-content");
         for (int i = 0; i < diff_elements.size(); i++) {
             String currentFile = file_elements.get(i).text();
-            String newFileName = processingText.changeFileName(currentFile);
-            Elements tr_list = diff_elements.get(i).getElementsByTag("tr");
-            for (Element tr : tr_list) {
-                Elements td_list = tr.getElementsByTag("td");
-                if (td_list.size() == 3) {
-                    String line = td_list.last().text();
-                    if (line.trim().startsWith("+") && processingText.isCode(line.replaceAll("^[+]", ""))) {
-                        String lineNumber = td_list.get(1).attr("data-line-number");
-                        sb.append(newFileName + "-" + lineNumber + "\n");
+            if (processingText.isCFile_general(currentFile)) {
+                String newFileName = processingText.changeFileName(currentFile);
+                Elements tr_list = diff_elements.get(i).getElementsByTag("tr");
+                for (Element tr : tr_list) {
+                    Elements td_list = tr.getElementsByTag("td");
+                    if (td_list.size() == 3) {
+                        String line = td_list.last().text();
+                        if (line.trim().startsWith("+") && processingText.isCode(line.replaceAll("^[+]", ""))) {
+                            String lineNumber = td_list.get(1).attr("data-line-number");
+                            sb.append(newFileName + "-" + lineNumber + "\n");
+                        }
                     }
                 }
             }
