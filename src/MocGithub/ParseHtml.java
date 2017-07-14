@@ -32,7 +32,7 @@ public class ParseHtml {
     static String github_page = "https://github.com/";
     Document doc, currentDoc;
     static String analysisDir = "";
-    static String isJoined_str,isJoined_str_opposite ,activity_str= "";
+    static String isJoined_str, isJoined_str_opposite, activity_str = "";
     boolean isJoined;
 
     HashMap<String, HashSet<Integer>> originalClusterMap = new HashMap<>();
@@ -60,7 +60,7 @@ public class ParseHtml {
         return "<table id=\"cluster\">  \n" +
                 "  <tr> \n" +
                 "    <td colspan=\"2\"> <button class=\"btn\" id=\"btn_hide_non_cluster_rows\" onclick=\"hide_non_cluster_rows()\">Hide non cluster code</button>\n" +
-                "    <td><button><a href=\"./" + splitStep + isJoined_str_opposite + ".html\" class=\"button\">"+activity_str+"</a></button></td>" +
+                "    <td><button><a href=\"./" + splitStep + isJoined_str_opposite + ".html\" class=\"button\">" + activity_str + "</a></button></td>" +
                 "    </td> \n" +
                 "  </tr>\n" +
                 "  <tr>\n" +
@@ -276,7 +276,7 @@ public class ParseHtml {
                     originalClusterMap = entry.getValue();
                 }
 
-                HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep,originalClusterMap);
+                HashMap<String, String> nodeId_to_clusterID = genrate_NodeId_to_clusterIDList_Map(splitStep, originalClusterMap);
                 HashMap<String, List<String>> cluster_keyword = new HashMap<>();
                 String keyword[] = pt.readResult(analysisDir + splitStep + isJoined_str + "_keyword.txt").split("\n");
                 for (String kw : keyword) {
@@ -318,6 +318,9 @@ public class ParseHtml {
             String nextStep, nextStepStr;
             String[] subClusterArray = cid.split("~");
 
+            DrawTableHierarchy drawTableHierarchy = new DrawTableHierarchy();
+            drawTableHierarchy.calculatingArray(analysisDir, cid);
+
             for (int j = 0; j < subClusterArray.length; j++) {
                 String clusterID = subClusterArray[j];
                 if (!stopSplitClusters.contains(clusterID) && clusterID.split("_").length < max_numberOfCut + 1) {
@@ -332,9 +335,6 @@ public class ParseHtml {
                 if (j + 1 < subClusterArray.length) {
                     hasPair = hasPair(subClusterArray[j], subClusterArray[j + 1]);
                 }
-
-                DrawTableHierarchy drawTableHierarchy = new DrawTableHierarchy();
-                drawTableHierarchy.calculatingArray(analysisDir, cid);
                 HashMap<String, DrawTableHierarchy.Cluster> clusterTree = drawTableHierarchy.getClusterTree();
                 System.out.print("get split step hierachy array ...");
                 String[][] hierarchyArray = drawTableHierarchy.getHierachyStringFromText(analysisDir, cid);
@@ -491,7 +491,7 @@ public class ParseHtml {
             String keyword_long = cluster_keyword.get(clusterID).toString();
             String keyword_prefix = keyword_long.trim().substring(0, 6).replace("[", "") + ".";
             HashSet<Integer> nodeSet = clusterResultMap.get(1).get(clusterID);
-            if(nodeSet!=null) {
+            if (nodeSet != null) {
                 int clusterSize = nodeSet.size();
                 sb.append(generateRow(color, clusterID, keyword_prefix, keyword_long, clusterSize, nextStepStr, levelColumn_1, levelColumn_2, joinStep, colspan, clusterTree));
                 System.out.println("done");
@@ -533,7 +533,7 @@ public class ParseHtml {
                 }
 
 
-                row_1 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep +isJoined_str+ ".html\" class=\"button\">" + join + "</a></td>\n";
+                row_1 += " <td  id=\"cel_" + s + "\"><a href=\"./" + joinStep + isJoined_str + ".html\" class=\"button\">" + join + "</a></td>\n";
             } else {
                 row_1 += " <td  id=\"cel_" + s + "\"></td>\n";
             }
@@ -563,7 +563,7 @@ public class ParseHtml {
             forkAddedNodeList = pt.getForkAddedNodeList(analysisDir + "forkAddedNode.txt");
             for (String nodeLabel : forkAddedNodeList) {
                 String nodeID = label_to_id.get("\"" + nodeLabel + "\"");
-               if (nodeID != null) {
+                if (nodeID != null) {
                     nodeId_to_clusterID_Map.put(nodeID, "");
                 }
             }
@@ -590,25 +590,26 @@ public class ParseHtml {
         });
 
 
-        nodeId_to_clusterID_Map.forEach((k,v)->{
-            if(v.equals("")){
-              nodeId_to_clusterID_Map.put(k,getClusterID(k,originalClusterMap));
+        nodeId_to_clusterID_Map.forEach((k, v) -> {
+            if (v.equals("")) {
+                nodeId_to_clusterID_Map.put(k, getClusterID(k, originalClusterMap));
             }
         });
 
         return nodeId_to_clusterID_Map;
     }
 
-    public String getClusterID(String nodeid, HashMap<String, HashSet<Integer>> originalClusterMap){
+    public String getClusterID(String nodeid, HashMap<String, HashSet<Integer>> originalClusterMap) {
         final String[] clusterid = {""};
-        originalClusterMap.forEach((k,v)->{
-            if(v.contains(Integer.parseInt(nodeid))){
+        originalClusterMap.forEach((k, v) -> {
+            if (v.contains(Integer.parseInt(nodeid))) {
                 clusterid[0] = k;
 
             }
         });
         return clusterid[0];
     }
+
     /**
      * This function generate html file based on clustering result, basically,
      * 1. modify the background color of changed code for different split step
@@ -649,7 +650,7 @@ public class ParseHtml {
                 ArrayList<String> topClusterList = pt.getListFromFile(analysisDir, "topClusters.txt");
                 if (pt.isTopCluster(topClusterList, clusterid)) {
                     List<String> keywordList = cluster_keyword.get(clusterid);
-                    if(keywordList!=null) {
+                    if (keywordList != null) {
                         String keywod_prefix = keywordList.get(0).trim();
                         keywod_prefix = keywod_prefix.split("").length > 3 ? keywod_prefix.substring(0, 3).replace("[", "") + "." : keywod_prefix;
 

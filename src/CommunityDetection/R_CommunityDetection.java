@@ -440,6 +440,8 @@ public class R_CommunityDetection {
 
                 });
 
+        processText.rewriteFile(result.keySet().toString().trim().replace("[","").replace("]","").replace(", ","\n"), analysisDir + "topClusters.txt");
+
         final Iterator<String> cursor = result.keySet().iterator();
         StringBuilder sb_topClusters = new StringBuilder();
 
@@ -460,7 +462,7 @@ public class R_CommunityDetection {
                 clusterSubGraphs(clusterNodeList, re, testCaseDir, testDir, cutNum, directedGraph, clusterID, 1);
             }
         }
-        processText.rewriteFile(sb_topClusters.toString(), analysisDir + "topClusters.txt");
+
     }
 
     /**
@@ -718,8 +720,6 @@ public class R_CommunityDetection {
      * @return
      */
     private ArrayList<ArrayList<String>> getPairsOfCommunities(HashMap<String, ArrayList<Integer>> clusters) {
-
-//        ArrayList<HashSet<String>> combination_Set = new ArrayList<>();
         ArrayList<ArrayList<String>> combination_List = new ArrayList<>();
         Set<String> keyset = clusters.keySet();
 
@@ -731,25 +731,9 @@ public class R_CommunityDetection {
                     pair.add(clusterIDList.get(j));
                         ArrayList<String> pairList = new ArrayList<>();
                         pairList.addAll(pair);
-//                        combination_Set.add(pair);
                         combination_List.add(pairList);
                 }
             }
-//        for (String s : keyset) {
-//            for (String c : keyset) {
-//                HashSet<String> pair = new HashSet<>();
-//                if (!s.equals(c)) {
-//                    pair.add(s);
-//                    pair.add(c);
-//                    if (!combination_Set.contains(pair)) {
-//                        ArrayList<String> pairList = new ArrayList<>();
-//                        pairList.addAll(pair);
-//                        combination_Set.add(pair);
-//                        combination_List.add(pairList);
-//                    }
-//                }
-//            }
-//        }
         return combination_List;
     }
 
