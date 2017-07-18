@@ -34,6 +34,7 @@ public class INFOX_main {
             if (current_OS.indexOf("mac") >= 0) {
                 experimentParameters = new ProcessingText().readResult("./INFOX/testCases/" + paramFile).split("\n");
             }else {
+                System.out.println(current_OS);
                 experimentParameters = new ProcessingText().readResult("./testCases/" + paramFile).split("\n");
             }
         } catch (IOException e) {
