@@ -31,7 +31,11 @@ public class INFOX_main {
         String paramFile = "test_param.txt";
         String[] experimentParameters = new String[7];
         try {
-            experimentParameters = new ProcessingText().readResult("./INFOX/testCases/" + paramFile).split("\n");
+            if (current_OS.indexOf("mac") >= 0) {
+                experimentParameters = new ProcessingText().readResult("./INFOX/testCases/" + paramFile).split("\n");
+            }else {
+                experimentParameters = new ProcessingText().readResult("./testCases/" + paramFile).split("\n");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
