@@ -6,9 +6,11 @@ import CommunityDetection.R_CommunityDetection;
 import NamingClusters.GetCommitMsg;
 import NamingClusters.IdentifyingKeyWordForCluster;
 import NamingClusters.Tokenizer;
+import Util.ProcessingText;
 import org.rosuda.JRI.Rengine;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -72,11 +74,27 @@ public class AnalyzingRepository {
         /**  Generating Dependency Graphs for current test case/project  **/
         if (!directedGraph) {
             DependencyGraph dependencyGraph = new DependencyGraph(parameters[5]);
-            /**  this function extract changed_code_dependency_graph from complete graph**/
-//            dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
 
-            /**  this function generate all the graph at the same time **/
-            dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
+
+            if (analysisDir.contains("3macros/1/")) {
+                /**  this function generate all the graph at the same time **/
+                dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
+
+                String[] approaches = {"testINFOX", "testMS", "testMS_plus_CF_Hierachy","testINFOX_NO_DefUse", "testINFOX_NO_ControlF", "testINFOX_NO_Hierarchy", "testINFOX_NO_Consec", "testMS_NO_Consec"};
+                for(String app: approaches){
+
+                    try {
+                        new ProcessingText().copyFolder(new File(sourcecodeDir+"testINFOX/complete.pajek.net"),new File(sourcecodeDir+app+"/complete.pajek.net"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                /**  this function extract changed_code_dependency_graph from complete graph**/
+                dependencyGraph.generateChangedDependencyGraphFromCompleteGraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, re);
+
+            }
+
         }
 
         /** Community Detection  **/
@@ -110,7 +128,7 @@ public class AnalyzingRepository {
             }
 //        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
 
-        /** parse commit msg for each node **/
+            /** parse commit msg for each node **/
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
 //        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
 

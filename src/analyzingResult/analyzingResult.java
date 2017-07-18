@@ -20,18 +20,19 @@ public class analyzingResult {
     static int total_num_of_cuts = 5;
     static boolean isMs = false;
     static String csvPathList_txt = "csvPath_List.txt";
-    static String outputFile = "maxAcc.csv";
+    static String outputFile = "accuracy.csv";
     static ProcessingText processingText = new ProcessingText();
-    static  int STOP_CRITERIA = 50;
+    static int STOP_CRITERIA = 50;
 
     public static void collect_AllCSV_to_oneplace(String analysisDirName) {
+
         dpPath = testCasesDir + analysisDirName + FS;
 //        String[] paths = { "macros"};
         String[] paths = {"macros", "macros_oneFile"};
         StringBuilder sb = new StringBuilder();
         for (int i = 3; i <= 15; i++) {
             for (String path : paths) {
-                for (int j =1; j <= 3; j++) {
+                for (int j = 1; j <= 6; j++) {
 
                     try {
                         String testDir = dpPath + i + path + FS + j + FS;
@@ -50,7 +51,7 @@ public class analyzingResult {
                                                         String[] sub_names = sub_dir.list();
                                                         for (String sn : sub_names) {
 //                                                            if (sn.contains("resultTable_joinThreshold")) {
-                                                            if (sn.contains("resultTable_joinThreshold")&&sn.contains("50.csv")) {
+                                                            if (sn.contains("resultTable_joinThreshold") && sn.contains("50.csv")) {
                                                                 sb.append(sub_dir + FS + sn + "\n");
                                                             }
                                                         }
@@ -100,8 +101,9 @@ public class analyzingResult {
     }
 
 
-    private static void findMaxAccuracyPoint(String[] listOfCSV, String analysisDirName, boolean isMs) {
+    private static void findMaxAccuracyPoint(String[] listOfCSV, String analysisDirName, boolean isMs,boolean findMaxAcc) {
 
+        outputFile=findMaxAcc?"max_"+outputFile:outputFile;
         if (isMs) {
             new ProcessingText().rewriteFile("filePath, accuracy\n", testCasesDir + analysisDirName + FS + outputFile);
 
@@ -127,12 +129,8 @@ public class analyzingResult {
                     inital_cutList = null;
                 }
                 pre_TestCase = currentTestCase;
-//            if(!csvFile.contains("47110")&&!csvFile.contains("58110")&&!csvFile.contains("69110")&&!csvFile.contains("710110")&&!csvFile.contains("811110")
-//                    &&!csvFile.contains("912110")&&!csvFile.contains("1013110")&&!csvFile.contains("111410110")&&!csvFile.contains("1215110")&&!csvFile.contains("1316110")
-//                    &&!csvFile.contains("1417110")&&!csvFile.contains("1518110")
-//                    ) {
 
-                double maxAcc = 0;
+                double max_acc = 0;
                 int clusterInc = -1;
 
                 try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
@@ -146,7 +144,7 @@ public class analyzingResult {
                             int edgeRemoved_current = Integer.valueOf(cutList[1]);
 
 
-                            if (!isMs) {
+                            if (!isMs && !findMaxAcc) {
 
                                 if (edgeRemoved_current < stop_split_if_num_of_removedEdge_larger_than) {
                                     if (inital_cutList == null) {
@@ -156,8 +154,8 @@ public class analyzingResult {
                                     current_cutList = cutList;
                                     cuts_total++;
                                     if (cuts_total > total_num_of_cuts) {
-                                        System.out.println(pre_TestCase + "  never stop if split stop criteria is" + stop_split_if_num_of_removedEdge_larger_than);
-                                        double acc_now= Double.valueOf(current_cutList[7].split("=")[0]);
+                                        System.out.println(pre_TestCase + "  never stop if split stop criteria is " + stop_split_if_num_of_removedEdge_larger_than);
+                                        double acc_now = Double.valueOf(current_cutList[7].split("=")[0]);
                                         sb.append(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + ", 0 ," + acc_now + "\n");
 
 //                                        sb.append(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + ", 0 ," + Double.valueOf(inital_cutList[5].split("=")[0]) + "\n");
@@ -169,51 +167,53 @@ public class analyzingResult {
                                 } else {
                                     double join_acc;
                                     if (edgeRemoved_current == stop_split_if_num_of_removedEdge_larger_than) {
-                                         join_acc = Double.valueOf(current_cutList[7].split("=")[0]);
+                                        join_acc = Double.valueOf(current_cutList[7].split("=")[0]);
 
                                     } else {
-                                         join_acc = Double.valueOf(previous_cutList[7].split("=")[0]);
+                                        join_acc = Double.valueOf(previous_cutList[7].split("=")[0]);
                                     }
-                                        int join_stop_when_feature_size_larger_than = Integer.valueOf(csvFile.split("-")[1].replace(".csv", ""));
-                                        if (join_stop_when_feature_size_larger_than ==STOP_CRITERIA&&(join_stop_when_feature_size_larger_than+"").endsWith("0")) {
-//                                        if (join_stop_when_feature_size_larger_than <= 90) {
-//                                            if (!checked_no_split_acc) {
-//                                                sb.append(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + ", 0 ," + acc + "\n");
-//                                                System.out.println(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + "," + join_stop_when_feature_size_larger_than + "," + join_acc + "\n");
-//
-//                                                checked_no_split_acc = true;
-//                                            }else {
-
-                                                sb.append(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + "," + join_stop_when_feature_size_larger_than + "," + join_acc + "\n");
-                                                System.out.println(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + "," + join_stop_when_feature_size_larger_than + "," + join_acc + "\n");
-
-//                                            }
-                                            break;
-                                        }
+                                    int join_stop_when_feature_size_larger_than = Integer.valueOf(csvFile.split("-")[1].replace(".csv", ""));
+                                    if (join_stop_when_feature_size_larger_than == STOP_CRITERIA && (join_stop_when_feature_size_larger_than + "").endsWith("0")) {
+                                        sb.append(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + "," + join_stop_when_feature_size_larger_than + "," + join_acc + "\n");
+                                        System.out.println(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + "," + join_stop_when_feature_size_larger_than + "," + join_acc + "\n");
+                                        break;
+                                    }
                                 }
-                            } else {  //MS
+                            } else if(isMs){  //MS
                                 sb.append(csvFile + "," + acc + "\n");
                                 System.out.println(csvFile + "," + stop_split_if_num_of_removedEdge_larger_than + "," + acc);
+                            } else if(findMaxAcc){
+                                System.out.println();
+                               double current_acc =  Double.valueOf(cutList[6].split("=")[0]);
+                               double join_acc = Double.valueOf(cutList[7].split("=")[0]);
+                               double current_acc_max = current_acc>join_acc?current_acc:join_acc;
+
+                                max_acc = current_acc_max>max_acc?current_acc_max:max_acc;
                             }
                         }
+                    }
+
+                    if(findMaxAcc){
+                        sb.append(csvFile + "," + max_acc + "\n");
+                        System.out.println(csvFile  + "," + max_acc);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-//        }
             new ProcessingText().writeTofile(sb.toString(), testCasesDir + analysisDirName + FS + outputFile);
         }
     }
 
     public static void main(String[] args) {
 
-
-        for (int method =1; method <= 1; method++) {
+        boolean findMaxAcc = false;
+        for (int method = 1; method <=1; method++) {
             String analysisDirName = "";
 
             if (method == 1) {
                 analysisDirName = "testINFOX";
+                findMaxAcc=true;
             } else if (method == 2) {
                 analysisDirName = "testMS";
                 isMs = true;
@@ -246,7 +246,7 @@ public class analyzingResult {
 
 
             /**  generate a csv to find the max acc and corresponding 1)  #cluster_inc  and 2) #edgeRemoved. **/
-            findMaxAccuracyPoint(listOfCSV, analysisDirName, isMs);
+            findMaxAccuracyPoint(listOfCSV, analysisDirName, isMs,findMaxAcc);
 
 
 //        for (String csv : listOfCSV) {

@@ -27,11 +27,22 @@ public class INFOX_main {
      * @param args
      */
     public static void main(String[] args) {
+
+        String paramFile = "test_param.txt";
+        String[] experimentParameters = new String[7];
+        try {
+            experimentParameters = new ProcessingText().readResult("./INFOX/testCases/" + paramFile).split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String projectName = experimentParameters[0];
+
         String testCasesDir;
         if (current_OS.indexOf("mac") >= 0) {
-            testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMPsolve";
+            testCasesDir = "/Users/shuruiz/Work/MarlinRepo/"+projectName;
         } else {
-            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/testMPsolve";
+            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/"+projectName;
         }
         Root_Dir = new ProcessingText().getRootDir();
 
@@ -54,7 +65,7 @@ public class INFOX_main {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 4; numOfTargetMacro--) {
+                    for (int numOfTargetMacro =3; numOfTargetMacro <= 4; numOfTargetMacro++) {
                         /** generating the parameters for creating dependency graph  **/
                         ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro);
                         /** 1 -- INFOX,
@@ -89,6 +100,7 @@ public class INFOX_main {
                             /**  testCase specifys the repository that need to be parsed.  **/
                             //TODO: set subdir name for multiple tests
                             for (int i = 1; i <= 6; i++) {
+
 
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
@@ -127,7 +139,7 @@ public class INFOX_main {
     private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro) {
 
         ArrayList<int[]> parameterArray = new ArrayList<>();
-        for (int i = 1; i <= 1; i++) {
+        for (int i = 3; i <= 8; i++) {
             int[] param = new int[6];
             param[0] = numOfTargetMacro;
 //            param[1] = numOfTargetMacro + 3;  // int numberOfCuts = numOfTargetMacro + 3;

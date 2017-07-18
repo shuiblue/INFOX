@@ -50,10 +50,16 @@ public class ParsingMacros {
 
         /**   print macro size **/
         StringBuilder sb = new StringBuilder();
+        StringBuilder non_zero_sb = new StringBuilder();
         for (Map.Entry<String, ArrayList<String>> entry : macro_to_locArray.entrySet()) {
-            sb.append(entry.getKey() + " : " + entry.getValue().size() + "\n");
+            int size = entry.getValue().size();
+            sb.append(entry.getKey() + " : " + size + "\n");
+            if (size > 0) {
+                non_zero_sb.append(entry.getKey() + " : " + size + "\n");
+            }
         }
         iof.rewriteFile(sb.toString(), sourcecodeDir + "macroSize.txt");
+        iof.rewriteFile(non_zero_sb.toString(), sourcecodeDir + "non_zero_macroSize.txt");
     }
 
 
@@ -100,7 +106,13 @@ public class ParsingMacros {
             num_bigSize_Macro = numberOfTargetMacros - num_smallSize_Macro;
         }
         for (Map.Entry<String, ArrayList<String>> entry : macro_to_locArray.entrySet()) {
+            int findRandomeCombination_times = 0;
+            int previousTargetMacroListSize = 0;
             while (targetMacroList.size() < numberOfTargetMacros) {
+
+                if (findRandomeCombination_times > 10) {
+                    return new ArrayList<>();
+                }
                 Random random = new Random();
                 if (!macrosInOneFile) {
                     keys = new ArrayList<String>(macro_to_locArray.keySet());
@@ -115,15 +127,18 @@ public class ParsingMacros {
 
                     String fileName = values.get(0);
                     keys = new ArrayList(file_to_MacroList.get(fileName));
+                    ArrayList<Integer> sizeList = new ArrayList<>();
                     for (String k : keys) {
-                        totalSize += macro_to_locArray.get(k).size();
+                        int size = macro_to_locArray.get(k).size();
+                        totalSize += size;
+                        sizeList.add(size);
                     }
 
-                    sizeThreshold = totalSize / keys.size();
+                    Collections.sort(sizeList);
+                    sizeThreshold =sizeList.get(sizeList.size()/2);
 
                 }
                 String key = keys.get(random.nextInt(keys.size()));
-
 
                 Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
                 boolean hasSpecialChar = p.matcher(key).find();
@@ -145,9 +160,16 @@ public class ParsingMacros {
                         if (smallMacros.size() == 0 || (smallMacros.size() < num_smallSize_Macro && noFeatureInteraction(targetMacroList, key))) {
                             smallMacros.add(key);
                             targetMacroList.add(key);
+
                             System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
                         }
                     }
+
+                }
+                if (targetMacroList.size() == previousTargetMacroListSize) {
+                    findRandomeCombination_times++;
+                } else {
+                    previousTargetMacroListSize = targetMacroList.size();
                 }
 
             }
@@ -188,7 +210,6 @@ public class ParsingMacros {
     private boolean noFeatureInteraction(ArrayList<String> selectedMacros, String candidate_macro) {
 
         for (String macro : selectedMacros) {
-            macro = "FAST_PWM_FAN";
             if (macro_to_interactedMacroList.get(candidate_macro) != null && macro_to_interactedMacroList.get(candidate_macro).contains(macro)) {
                 return false;
             }
@@ -220,118 +241,120 @@ public class ParsingMacros {
 
 
                         if (line.replace(" ", "").startsWith("#if") || line.replace(" ", "").startsWith("#elif")) {
-
+                            if (!isStopWord(line)) {
 //                            String clearLine = iof.removeComments(line);
-                            line = iof.removeComments(line);
-                            if (!(line.contains("||") && line.contains("&&")) && !line.replace(" ", "").contains("!define") && !line.contains("=") && !line.contains(">") && !line.contains("<")) {
-                                if ((line.contains(" ENABLED(") || line.contains("defined(")) && !line.contains("#elif")) {
-                                    currentLevel_macroList = new ArrayList<>();
-                                    String[] conditions = line.split("\\|\\|");
-                                    for (String c : conditions) {
-                                        if (c.contains("ENABLED(") || c.contains("defined(")) {
-                                            int leftPare = c.indexOf("(");
-                                            int rightPare = c.indexOf(")");
-                                            currentLevel_macroList.add(c.substring(leftPare + 1, rightPare).trim());
-                                        } else if (c.contains("#if ")) {
-                                            String macro = c.substring(4).trim();
-                                            currentLevel_macroList.add(macro);
-                                        }
-                                    }
-                                } else if (line.replace(" ", "").contains("#ifdef") && !line.contains("defined(")) {
-                                    currentLevel_macroList = new ArrayList<>();
-                                    currentLevel_macroList.add(iof.removeComments(line.replace(" ", "").substring(6)));
-                                } else if (line.replace(" ", "").contains("#ifndef")) {
-                                    currentLevel_macroList = new ArrayList<>();
-                                    currentLevel_macroList.add("!" + line.substring(8).trim());
-                                } else if (line.replace(" ", "").contains("#DISABLED(")) {
-
-                                    int leftPare = line.indexOf("(");
-                                    int rightPare = line.indexOf(")");
-                                    currentLevel_macroList.add("!" + line.substring(leftPare + 1, rightPare).trim());
-                                } else if (line.replace(" ", "").contains("#elif")) {
-                                    currentLevel_macroList = new ArrayList<>();
-                                    if (line.contains("ENABLED(")) {
-                                        int leftPare = line.indexOf("(");
-                                        int rightPare = line.indexOf(")");
-                                        currentLevel_macroList.add(line.substring(leftPare + 1, rightPare).trim());
-                                    } else {
-
-                                        currentLevel_macroList.add(line.replace(" ", "").substring(5));
-                                    }
-                                    macroStack.remove(macroStack.get(macroStack.size() - 1));
-                                } else if (line.replace(" ", "").contains("#if")) {
-                                    System.out.print("");
-
-                                    Pattern p = Pattern.compile("[a-zA-Z_]");
-                                    boolean hasAlphabet = p.matcher(line.replace(" ", "").replace("#if", "")).find();
-                                    if (hasAlphabet) {
-                                        System.out.print("");
-                                        currentLevel_macroList.add(line.replace(" ", "").substring(3));
-
-                                    }
-
-                                }
-
-                                macroStack.add(currentLevel_macroList);
-
-                                for (String macro : currentLevel_macroList) {
-                                    Pattern p = Pattern.compile("[a-zA-Z_]");
-                                    boolean hasAlphabet = p.matcher(macro).find();
-
-                                    if (!macro.startsWith("!") && !macro.endsWith("_H") && hasAlphabet) {
-                                        macroListInCurrentFile.add(macro);
-                                        if (macroStack.size() > 1) {
-                                            ArrayList<String> previousMacro = macroStack.get(macroStack.size() - 2);
-                                            ArrayList<String> interactedMacroList = new ArrayList<>();
-                                            for (String pre_macro : previousMacro) {
-                                                if (macro_to_interactedMacroList.get(pre_macro) != null) {
-                                                    interactedMacroList = macro_to_interactedMacroList.get(pre_macro);
-                                                }
-                                                interactedMacroList.add(macro);
-
-
-                                                macro_to_interactedMacroList.put(pre_macro, interactedMacroList);
-
+                                line = iof.removeComments(line);
+                                if (!line.contains("||") && !line.contains("&&") && !line.replace(" ", "").contains("!define") && !line.contains("=") && !line.contains(">") && !line.contains("<")) {
+                                    if ((line.contains(" ENABLED(") || line.contains("defined(")) && !line.contains("#elif")) {
+                                        currentLevel_macroList = new ArrayList<>();
+                                        String[] conditions = line.split("\\|\\|");
+                                        for (String c : conditions) {
+                                            if (c.contains("ENABLED(") || c.contains("defined(")) {
+                                                int leftPare = c.indexOf("(");
+                                                int rightPare = c.indexOf(")");
+                                                currentLevel_macroList.add(c.substring(leftPare + 1, rightPare).trim());
+                                            } else if (c.contains("#if ")) {
+                                                String macro = c.substring(4).trim();
+                                                currentLevel_macroList.add(macro);
                                             }
                                         }
+                                    } else if (line.replace(" ", "").contains("#ifdef") && !line.contains("defined(")) {
+                                        currentLevel_macroList = new ArrayList<>();
+                                        currentLevel_macroList.add(iof.removeComments(line.replace(" ", "").substring(6)));
+                                    } else if (line.replace(" ", "").contains("#ifndef")) {
+                                        currentLevel_macroList = new ArrayList<>();
+                                        currentLevel_macroList.add("!" + line.substring(8).trim());
+                                    } else if (line.replace(" ", "").contains("#DISABLED(")) {
 
-                                        if (macro_to_locArray.get(macro) == null) {
-                                            ArrayList<String> wrappedCode = new ArrayList<>();
-                                            macro_to_locArray.put(macro, wrappedCode);
+                                        int leftPare = line.indexOf("(");
+                                        int rightPare = line.indexOf(")");
+                                        currentLevel_macroList.add("!" + line.substring(leftPare + 1, rightPare).trim());
+                                    } else if (line.replace(" ", "").contains("#elif")) {
+                                        currentLevel_macroList = new ArrayList<>();
+                                        if (line.contains("ENABLED(") || line.contains("defined(")) {
+                                            int leftPare = line.indexOf("(");
+                                            int rightPare = line.indexOf(")");
+                                            currentLevel_macroList.add(line.substring(leftPare + 1, rightPare).trim());
+                                        } else {
+
+                                            currentLevel_macroList.add(line.replace(" ", "").substring(5));
+                                        }
+                                        if (macroStack.size() > 1) {
+                                            macroStack.remove(macroStack.get(macroStack.size() - 1));
+                                        }
+                                    } else if (line.replace(" ", "").contains("#if")) {
+                                        System.out.print("");
+
+                                        Pattern p = Pattern.compile("[a-zA-Z_]");
+                                        boolean hasAlphabet = p.matcher(line.replace(" ", "").replace("#if", "")).find();
+                                        if (hasAlphabet) {
+                                            currentLevel_macroList.add(line.replace(" ", "").substring(3));
+                                        }
+
+                                    }
+
+                                    macroStack.add(currentLevel_macroList);
+
+                                    for (String macro : currentLevel_macroList) {
+                                        Pattern p = Pattern.compile("[a-zA-Z_]");
+                                        boolean hasAlphabet = p.matcher(macro).find();
+
+                                        if (!macro.startsWith("!") && !macro.endsWith("_H") && hasAlphabet && !isStopWord(macro)) {
+                                            macroListInCurrentFile.add(macro);
+                                            if (macroStack.size() > 1) {
+                                                ArrayList<String> previousMacro = macroStack.get(macroStack.size() - 2);
+                                                ArrayList<String> interactedMacroList = new ArrayList<>();
+                                                for (String pre_macro : previousMacro) {
+                                                    if (macro_to_interactedMacroList.get(pre_macro) != null) {
+                                                        interactedMacroList = macro_to_interactedMacroList.get(pre_macro);
+                                                    }
+                                                    interactedMacroList.add(macro);
+
+
+                                                    macro_to_interactedMacroList.put(pre_macro, interactedMacroList);
+
+                                                }
+                                            }
+
+                                            if (macro_to_locArray.get(macro) == null) {
+                                                ArrayList<String> wrappedCode = new ArrayList<>();
+                                                macro_to_locArray.put(macro, wrappedCode);
+                                            }
                                         }
                                     }
+                                } else {
+                                    currentLevel_macroList = new ArrayList<>();
+                                    currentLevel_macroList.add(line);
+                                    macroStack.add(currentLevel_macroList);
                                 }
-                            } else {
-                                currentLevel_macroList = new ArrayList<>();
-                                currentLevel_macroList.add(line);
-                                macroStack.add(currentLevel_macroList);
                             }
-
                         } else if (line.replace(" ", "").contains("#endif") || line.replace(" ", "").contains("#else")) {
-                            if (macroStack.size() == 0) {
-                                break;
-                            }
-                            ArrayList<String> removedMacro = macroStack.get(macroStack.size() - 1);
-                            for (String rm : removedMacro) {
-                                Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
-                                boolean hasSpecialChar = p.matcher(rm).find();
-
-                                if (!rm.startsWith("!") && !rm.endsWith("_H") && !hasSpecialChar) {
-                                    macro_to_locArray.get(rm).add(newFileName + "-" + linenum);
+                            if (!isStopWord(line)) {
+                                if (macroStack.size() == 0) {
+                                    break;
                                 }
-                            }
-                            macroStack.remove(removedMacro);
-                            if (macroStack.size() > 1) {
-                                currentLevel_macroList = macroStack.get(macroStack.size() - 1);
-                            } else {
-                                currentLevel_macroList = new ArrayList<>();
-                            }
-                            if (line.replace(" ", "").contains("#else")) {
-                                ArrayList<String> not_removedMacros = new ArrayList<>();
+                                ArrayList<String> removedMacro = macroStack.get(macroStack.size() - 1);
                                 for (String rm : removedMacro) {
-                                    not_removedMacros.add("!" + rm);
+                                    Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
+                                    boolean hasSpecialChar = p.matcher(rm).find();
+
+                                    if (!rm.startsWith("!") && !rm.endsWith("_H") && !hasSpecialChar && !isStopWord(rm)) {
+                                        macro_to_locArray.get(rm).add(newFileName + "-" + linenum);
+                                    }
                                 }
-                                macroStack.add(not_removedMacros);
+                                macroStack.remove(removedMacro);
+                                if (macroStack.size() > 1) {
+                                    currentLevel_macroList = macroStack.get(macroStack.size() - 1);
+                                } else {
+                                    currentLevel_macroList = new ArrayList<>();
+                                }
+                                if (line.replace(" ", "").contains("#else")) {
+                                    ArrayList<String> not_removedMacros = new ArrayList<>();
+                                    for (String rm : removedMacro) {
+                                        not_removedMacros.add("!" + rm);
+                                    }
+                                    macroStack.add(not_removedMacros);
+                                }
                             }
                         }
 
@@ -340,7 +363,7 @@ public class ParsingMacros {
                                 Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
                                 boolean hasSpecialChar = p.matcher(m).find();
 
-                                if (!m.startsWith("!") && !m.endsWith("_H") && !hasSpecialChar && !m.contains("DEBUG") && !m.contains("TEST") && !m.contains("=") && !m.contains("#") && !m.contains("||")) {
+                                if (!m.startsWith("!") && !m.endsWith("_H") && !hasSpecialChar && !isStopWord(m) && !m.contains("=") && !m.contains("#") && !m.contains("||")) {
                                     ArrayList<String> wrappedCode = macro_to_locArray.get(m);
                                     String edgeLabel = newFileName + "-" + linenum;
                                     if (!wrappedCode.contains(edgeLabel)) {
@@ -350,6 +373,7 @@ public class ParsingMacros {
                                 }
                             }
                         }
+
                         linenum++;
 
                     }
@@ -370,6 +394,16 @@ public class ParsingMacros {
 
     }
 
+    private static boolean isStopWord(String macro) {
+
+        return macro.contains("_cplusplus")
+                || macro.contains("GNUC")
+                || macro.contains("DEBUG")
+                || macro.contains("TEST")
+                || macro.contains("_WIN32")
+                || macro.contains("_WIN64");
+    }
+
     public static void main(String[] args) {
 
 //        generatingTestCases_differentMacroCombination();
@@ -385,13 +419,26 @@ public class ParsingMacros {
                     sourcecodeDir = filePath.toString() + FS;
                     parsingMacros.createMacroList(sourcecodeDir);
 
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 4; numOfTargetMacro++) {
-                        for (int i = 1; i <= 6; i++) {
-                            String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+                    boolean generatingMoreCombination = true;
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
+                        if (generatingMoreCombination) {
+                            for (int i = 1; i <= 6; i++) {
+                                String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
+                                ArrayList<String> targetList = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+                                if (targetList.size() == 0) {
+                                    generatingMoreCombination = false;
+                                    break;
+                                }
 
-                            testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
-                            parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
+                                testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
+                                targetList = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
+                                if (targetList.size() == 0) {
+                                    generatingMoreCombination = false;
+                                    break;
+                                }
+                            }
+                        } else {
+                            break;
                         }
                     }
                 }
@@ -400,10 +447,10 @@ public class ParsingMacros {
             e.printStackTrace();
         }
 
-        String[]  dirArray={"testINFOX","testMS","testMS_plus_CF_Hierachy","testINFOX_NO_DefUse", "testINFOX_NO_ControlF","testINFOX_NO_Hierarchy","testINFOX_NO_Consec","testMS_NO_Consec"};
-        for(String target:dirArray){
+        String[] dirArray = {"testINFOX", "testMS", "testMS_plus_CF_Hierachy", "testINFOX_NO_DefUse", "testINFOX_NO_ControlF", "testINFOX_NO_Hierarchy", "testINFOX_NO_Consec", "testMS_NO_Consec"};
+        for (String target : dirArray) {
             try {
-                new ProcessingText().copyFolder(new File(sourcecodeDir+analysisDirName),new File(sourcecodeDir+target));
+                new ProcessingText().copyFolder(new File(sourcecodeDir + analysisDirName), new File(sourcecodeDir + target));
             } catch (IOException e) {
                 e.printStackTrace();
             }

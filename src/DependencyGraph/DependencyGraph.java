@@ -354,7 +354,44 @@ public class DependencyGraph {
         /*re-write source code to StringList.txt, remove all the symbols for similarity calculation
              ------ similarity calculation purpose---------     */
         writeStringsToFile(sourceCodeLocMap);
+        // get forkAddedNodeId LIST
+        String graphPath = testCaseDir + "/complete.pajek.net";
+        String completeGraph = null;
+        try {
+            completeGraph = processingText.readResult(graphPath);
 
+            //get node list
+            StringBuilder stringBuilder = new StringBuilder();
+            String nodeListString = completeGraph.split("\\*arcs")[0];
+            String[] nodeList = nodeListString.split("\n");
+            for (String line : nodeList) {
+                if (!line.startsWith("*")) {
+                    String label = line.split(" ")[1];
+                    String id = line.split(" ")[0];
+                    label_to_id.put(label, id);
+                    stringBuilder.append(label + ":" + id + "\n");
+                }
+            }
+            processingText.rewriteFile(stringBuilder.toString(), analysisDir + "nodeLable2IdMap.txt");
+
+            //get edgelist
+            String edgeListString = completeGraph.split("\\*arcs")[1];
+            String[] edgeList = edgeListString.split("\n");
+
+
+            StringBuilder sb_forkAddedNode_id = new StringBuilder();
+            for (String s : forkaddedNodeList) {
+                if (label_to_id.get("\"" + s + "\"") != null) {
+                    sb_forkAddedNode_id.append(label_to_id.get("\"" + s + "\"") + ",");
+                }
+            }
+            processingText.rewriteFile(sb_forkAddedNode_id.toString(), testCaseDir + "forkAddedNodeID.txt");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Done with generating dependency graph!");
 
         return edgeList;
     }
