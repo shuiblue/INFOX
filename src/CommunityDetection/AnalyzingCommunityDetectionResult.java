@@ -93,9 +93,9 @@ public class AnalyzingCommunityDetectionResult {
             printResultTable(resultTable, communityColorList, numberOfCommunities, isJoiningTable, clusterSizeThreshold);
 //            printResultTable(resultTable, communityColorList, numberOfCommunities, macroList);
 //**/
-            if (!isMS_CLUSTERCHANGES) {
-                printClusterDistanceTable(numberOfCommunities);
-            }
+//          todo  if (!isMS_CLUSTERCHANGES) {
+//                printClusterDistanceTable(numberOfCommunities);
+//            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -305,11 +305,11 @@ public class AnalyzingCommunityDetectionResult {
         }
         ColorCode colorCode = new ColorCode(sourcecodeDir, testCaseDir, testDir, forkAddedNode, isMS_CLUSTERCHANGES);
 //      /**   testing purpose  removed contemperary
-        try {
-            colorCode.createSourceFileHtml();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+// todo        try {
+//            colorCode.createSourceFileHtml();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 //       **/
         try {
@@ -376,14 +376,7 @@ public class AnalyzingCommunityDetectionResult {
                         generatingClusteringTable(testCaseDir, testDir, numberOfCommunities, false, 0);
 
                         /**  combining multifles in order to generate html files **/
-                        colorCode.combineFiles(numberOfCommunities, clusterSizeThreshold);
-
-
-
-//
-//                        colorCode.combineFiles(numberOfCommunities, clusterSizeThreshold);
-
-//
+// todo                        colorCode.combineFiles(numberOfCommunities, clusterSizeThreshold);
 
                         pre_numberOfCommunites = numberOfCommunities;
 
