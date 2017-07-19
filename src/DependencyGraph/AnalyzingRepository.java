@@ -79,12 +79,12 @@ public class AnalyzingRepository {
             if (analysisDir.contains("3macros/1/")) {
                 /**  this function generate all the graph at the same time **/
                 dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
+                String[] approaches = {"testINFOX", "testMS", "testMS_plus_CF_Hierachy", "testINFOX_NO_DefUse", "testINFOX_NO_ControlF", "testINFOX_NO_Hierarchy", "testINFOX_NO_Consec", "testMS_NO_Consec"};
 
-                String[] approaches = {"testINFOX", "testMS", "testMS_plus_CF_Hierachy","testINFOX_NO_DefUse", "testINFOX_NO_ControlF", "testINFOX_NO_Hierarchy", "testINFOX_NO_Consec", "testMS_NO_Consec"};
-                for(String app: approaches){
-
+                System.out.println("copy complete graph to root..");
+                for (String app : approaches) {
                     try {
-                        new ProcessingText().copyFolder(new File(sourcecodeDir+"testINFOX/complete.pajek.net"),new File(sourcecodeDir+app+"/complete.pajek.net"));
+                        new ProcessingText().copyFolder(new File(testCaseDir + "complete.pajek.net"), new File(sourcecodeDir + app + "/complete.pajek.net"));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -101,43 +101,18 @@ public class AnalyzingRepository {
         boolean hasEdge = new R_CommunityDetection().detectingCommunitiesWithIgraph(sourcecodeDir, analysisDirName, testCaseDir, testDir, numOfCuts, re, directedGraph);
 
         if (hasEdge) {
-//        if (hasEdge) {
             /** Generating html to visualize source code, set background and left side bar color for new code  **/
             AnalyzingCommunityDetectionResult analyzingCommunityDetectionResult = new AnalyzingCommunityDetectionResult(sourcecodeDir, testCaseDir, testDir, isMS_CLUSTERCHANGES);
 
-
-            int[] avgFeatureSize_maxSize = analyzingCommunityDetectionResult.generateGroundTruthMap();
-            HashMap<Integer, ArrayList<String>> clusterList;
+            analyzingCommunityDetectionResult.generateGroundTruthMap();
             if (!isMS_CLUSTERCHANGES) {
-//                int avgFeatureSize = avgFeatureSize_maxSize[0];
-//                int maxFeatureSize = avgFeatureSize_maxSize[1];
-                int maxFeatureSize = 100;
-//                int clusterSizeThreshold = avgFeatureSize / 2;
                 int clusterSizeThreshold = 50;
                 System.out.println("clusterSizeThreshold: " + clusterSizeThreshold);
-//                while (clusterSizeThreshold < maxFeatureSize) {
-//
-//                   clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
-//                    clusterSizeThreshold += 10;
-//
-//                }
-                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
+                analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(clusterSizeThreshold);
 
             } else {
-                clusterList = analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0);
+                analyzingCommunityDetectionResult.parseEachUsefulClusteringResult(0);
             }
-//        new Tokenizer().tokenizeSourceCode(sourcecodeDir, testCaseDir);
-
-            /** parse commit msg for each node **/
-//        new GetCommitMsg(testCaseDir, testDir, clusterList,1);
-//        new GetCommitMsg(testCaseDir, testDir, clusterList,2);
-
-
-            /**  calculate tfidf  to identifing keywords from each cluster**/
-//        IdentifyingKeyWordForCluster identifyingKeyWordForCluster = new IdentifyingKeyWordForCluster();
-//
-//        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 1);
-//        identifyingKeyWordForCluster.findKeyWordsForEachCut(testCaseDir, testDir, clusterList, 2);
 
         }
     }
