@@ -110,7 +110,8 @@ public class ParsingMacros {
             int previousTargetMacroListSize = 0;
             while (targetMacroList.size() < numberOfTargetMacros) {
 
-                if (findRandomeCombination_times > 10) {
+                if (findRandomeCombination_times > 30) {
+                    System.out.println("cannot generate more");
                     return new ArrayList<>();
                 }
                 Random random = new Random();
@@ -135,7 +136,7 @@ public class ParsingMacros {
                     }
 
                     Collections.sort(sizeList);
-                    sizeThreshold =sizeList.get(sizeList.size()/2);
+                    sizeThreshold = sizeList.get(sizeList.size() / 2);
 
                 }
                 String key = keys.get(random.nextInt(keys.size()));
@@ -154,14 +155,14 @@ public class ParsingMacros {
                         if (bigMacros.size() == 0 || (bigMacros.size() < num_bigSize_Macro && noFeatureInteraction(targetMacroList, key))) {
                             bigMacros.add(key);
                             targetMacroList.add(key);
-                            System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
+//                            System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
                         }
                     } else if (size < sizeThreshold) {
                         if (smallMacros.size() == 0 || (smallMacros.size() < num_smallSize_Macro && noFeatureInteraction(targetMacroList, key))) {
                             smallMacros.add(key);
                             targetMacroList.add(key);
 
-                            System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
+//                            System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
                         }
                     }
 
@@ -203,7 +204,7 @@ public class ParsingMacros {
         iof.rewriteFile(sb.toString(), testCaseDir + "/forkAddedNode.txt");
         iof.rewriteFile(sb_cluster.toString(), testCaseDir + "/expectCluster.txt");
 
-
+        System.out.println("done");
         return targetMacroList;
     }
 
@@ -224,7 +225,7 @@ public class ParsingMacros {
 
 
     public static void findIndependentMacros(String fileName) {
-        System.out.print(fileName + "\n");
+//        System.out.print(fileName + "\n");
         String newFileName = iof.changeFileName(fileName);
         HashSet<String> macroListInCurrentFile = new HashSet<>();
         int linenum = 1;
@@ -283,7 +284,6 @@ public class ParsingMacros {
                                             macroStack.remove(macroStack.get(macroStack.size() - 1));
                                         }
                                     } else if (line.replace(" ", "").contains("#if")) {
-                                        System.out.print("");
 
                                         Pattern p = Pattern.compile("[a-zA-Z_]");
                                         boolean hasAlphabet = p.matcher(line.replace(" ", "").replace("#if", "")).find();
@@ -417,28 +417,25 @@ public class ParsingMacros {
 
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir) && !filePath.toString().contains("DPGraph")) {
                     sourcecodeDir = filePath.toString() + FS;
+                    System.out.println("parse source code to get all independent macros...");
                     parsingMacros.createMacroList(sourcecodeDir);
 
-                    boolean generatingMoreCombination = true;
                     for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
-                        if (generatingMoreCombination) {
                             for (int i = 1; i <= 6; i++) {
+                                System.out.println(numOfTargetMacro + " macros , test case " + i);
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
                                 ArrayList<String> targetList = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
                                 if (targetList.size() == 0) {
-                                    generatingMoreCombination = false;
-                                    break;
+                                    continue;
                                 }
+
+                                System.out.println(numOfTargetMacro + " macros from one file , test case " + i);
 
                                 testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 targetList = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
                                 if (targetList.size() == 0) {
-                                    generatingMoreCombination = false;
-                                    break;
+                                    continue;
                                 }
-                            }
-                        } else {
-                            break;
                         }
                     }
                 }

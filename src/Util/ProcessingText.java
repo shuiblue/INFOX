@@ -65,8 +65,8 @@ public class ProcessingText {
             //if directory not exists, create it
             if (!dest.exists()) {
                 dest.mkdir();
-                System.out.println("Directory copied from "
-                        + src + "  to " + dest);
+//                System.out.println("Directory copied from "
+//                        + src + "  to " + dest);
             }
 
             //list all the directory contents
@@ -96,7 +96,7 @@ public class ProcessingText {
 
             in.close();
             out.close();
-            System.out.println("File copied from " + src + " to " + dest);
+//            System.out.println("File copied from " + src + " to " + dest);
         }
     }
 

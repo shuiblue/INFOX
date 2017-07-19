@@ -33,7 +33,7 @@ public class INFOX_main {
         try {
             if (current_OS.indexOf("mac") >= 0) {
                 experimentParameters = new ProcessingText().readResult("./INFOX/testCases/" + paramFile).split("\n");
-            }else {
+            } else {
                 System.out.println(current_OS);
                 experimentParameters = new ProcessingText().readResult("./testCases/" + paramFile).split("\n");
             }
@@ -45,15 +45,15 @@ public class INFOX_main {
 
         String testCasesDir;
         if (current_OS.indexOf("mac") >= 0) {
-            testCasesDir = "/Users/shuruiz/Work/MarlinRepo/"+projectName;
+            testCasesDir = "/Users/shuruiz/Work/MarlinRepo/" + projectName;
         } else {
-            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/"+projectName;
+            testCasesDir = "/home/feature/shuruiz/INFOX_testCases/" + projectName;
         }
         Root_Dir = new ProcessingText().getRootDir();
 
         /**  Step 1， parsing source code to find independent macros, and then generate different macro combinations as ground truth**/
-        ParsingMacros parsingMacros = new ParsingMacros();
-        parsingMacros.generatingTestCases_differentMacroCombination(testCasesDir);
+//        ParsingMacros parsingMacros = new ParsingMacros();
+//        parsingMacros.generatingTestCases_differentMacroCombination(testCasesDir);
 
         /** Step 2, running tests from each generated folders from step 1 **/
 
@@ -70,7 +70,7 @@ public class INFOX_main {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro =3; numOfTargetMacro <= 4; numOfTargetMacro++) {
+                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
                         /** generating the parameters for creating dependency graph  **/
                         ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro);
                         /** 1 -- INFOX,
@@ -109,10 +109,14 @@ public class INFOX_main {
 
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
                                 String testCaseDir_macrosFromOneFile = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-                                System.out.println(testCaseDir);
-                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re);
-                                System.out.println(testCaseDir_macrosFromOneFile);
-                                analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re);
+                                if (new File(testCaseDir).exists()) {
+                                    System.out.println(testCaseDir);
+                                    analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir, param, re);
+                                }
+                                if (new File(testCaseDir_macrosFromOneFile).exists()) {
+                                    System.out.println(testCaseDir_macrosFromOneFile);
+                                    analyzeRepo.analyzeRepository(sourcecodeDir, analysisDirName, testCaseDir_macrosFromOneFile, param, re);
+                                }
                             }
                         }
                     }
@@ -144,7 +148,7 @@ public class INFOX_main {
     private static ArrayList<int[]> getParameterSetting(int numOfTargetMacro) {
 
         ArrayList<int[]> parameterArray = new ArrayList<>();
-        for (int i = 3; i <= 8; i++) {
+        for (int i = 1; i <= 8; i++) {
             int[] param = new int[6];
             param[0] = numOfTargetMacro;
 //            param[1] = numOfTargetMacro + 3;  // int numberOfCuts = numOfTargetMacro + 3;
