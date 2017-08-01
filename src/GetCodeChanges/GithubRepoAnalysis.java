@@ -144,8 +144,7 @@ public class GithubRepoAnalysis {
 
     public static void main(String[] args) {
         GithubRepoAnalysis githubRepoAnalysis = new GithubRepoAnalysis();
-//        String projectName = "OpenCV";
-        String projectName = "hubicfuse";
+        String projectName = "CuraEngine";
         String folder = "check" + projectName + "ForkSize/";
         String root = "/Users/shuruiz/Work/checkProjectSize/";
         String token = null;
