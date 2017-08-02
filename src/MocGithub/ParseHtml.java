@@ -244,7 +244,14 @@ public class ParseHtml {
 
             //remove background color for line-number columns
             String css = pt.readResult(workingDir + "/src/files/stylesheet.css");
-            doc.getElementsByTag("header").append(css);
+
+            Elements headerEles =  doc.getElementsByTag("header");
+            if(headerEles.size()>0) {
+                doc.getElementsByTag("header").append(css);
+            }else{
+                Element headerEle = doc.children().get(0).child(0);
+                headerEle.append(css);
+            }
 
 //            String jqueryLink = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>";
 //            doc.getElementsByTag("header").append(jqueryLink);
