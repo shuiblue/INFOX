@@ -505,7 +505,7 @@ public class AnalyzingCommunityDetectionResult {
 
 
         /** for original clustering result , generate corresponding table, html ...**/
-        System.out.println("    analyzing original chenged code graph, get original cluster mapping...");
+        System.out.println("    analyzing original changed code graph, get original cluster mapping...");
         parseEachUsefulClusteringResult(clusterSizeThreshold, hasGroundTruth, originCombination, true);
         HashMap<Integer, HashMap<String, HashSet<Integer>>> originalCluster = getClusteringResultMapforClusterID(originCombination, true, false);
         for (Map.Entry<Integer, HashMap<String, HashSet<Integer>>> entry : originalCluster.entrySet()) {
@@ -1159,7 +1159,7 @@ public class AnalyzingCommunityDetectionResult {
                     }
                 }
 
-                if (current_clustering_result.get(current_index).size() < clusterSizeThreshold || tmp.size() < clusterSizeThreshold) {
+                if (current_clustering_result.get(current_index).size() < clusterSizeThreshold || (tmp.size()>0&& tmp.size() < clusterSizeThreshold)) {
                     tmp.addAll(current_clustering_result.get(current_index));
                     joined_clusters.remove(current_index);
                     pre_index = current_index;
@@ -1193,13 +1193,16 @@ public class AnalyzingCommunityDetectionResult {
     private HashMap<String, HashSet<Integer>> generateCurrentClusteringResultMap(ArrayList<String> clusters, String splitStep, boolean isOriginal, boolean isJoined) {
         HashMap<String, HashSet<Integer>> current_clustering_result = new HashMap<>();
         ArrayList<String> topClusters = getTopClusterList();
-        String[] splitArray = splitStep.split("--");
+        String[] splitArray = new String[1];
+
+            splitArray = splitStep.split("--");
+
         for (String cluster : splitArray) {
             String[] tmp = cluster.split("~");
             for (String cid : tmp) {
                 String clusterID = cid;
                 String s = "", index = "";
-                if (clusters.size() > 2 ||(clusters.size()==2&&isJoined)) {
+                if (clusters.size() > 2 ||(clusters.size()==2&&isJoined)||isOriginal||(clusters.size()==2&&!splitStep.contains("~"))) {
                     for (int i = 0; i < clusters.size(); i++) {
                         s = clusters.get(i);
                         index = s.substring(0, s.indexOf(")")).trim();
