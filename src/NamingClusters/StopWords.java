@@ -68,6 +68,10 @@ public class StopWords {
         stopWordList.add("utf8");
         stopWordList.add("by");
         stopWordList.add("null");
+        stopWordList.add("printf");
+        stopWordList.add("this");
+        stopWordList.add("string");
+        stopWordList.add("public");
     }
 
     public String removeStopWord(String string) {

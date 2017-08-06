@@ -154,6 +154,7 @@ public class GenerateCombination {
                 int index = clusterid.length - 1;
                 String cluster = clusterid[0];
 
+
                 HashMap<Integer, ArrayList<String>> split_nodelist = resultMap.get(cluster);
                 split_nodelist.get(index).add(stopCluster);
                 resultMap.put(cluster, split_nodelist);
