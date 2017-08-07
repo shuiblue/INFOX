@@ -599,8 +599,15 @@ public class ParseHtml {
         });
 
 
+        final boolean[] checkOthers = {false};
         nodeId_to_clusterID_Map.forEach((k, v) -> {
             if (v.equals("")) {
+                if(otherClusterSize==0){
+                    checkOthers[0] =true;
+                }
+                if(checkOthers[0]){
+                    otherClusterSize++;
+                }
                 nodeId_to_clusterID_Map.put(k, getClusterID(k, originalClusterMap));
             }
         });

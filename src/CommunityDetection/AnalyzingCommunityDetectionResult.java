@@ -866,7 +866,7 @@ public class AnalyzingCommunityDetectionResult {
                                 /**   get joined clusters   **/
                                 joined_clusters = getJoinedClusters(colorCode, combination, clusters, current_clustering_result, clusterSizeThreshold, closeClusters_list);
                             } else {
-                                joined_clusters = getJoinedClustersForSplittingStep(combination);
+                                joined_clusters = getJoinedClustersForSplittingStep(combination, clusterSizeThreshold);
                             }
 
 
@@ -932,7 +932,7 @@ public class AnalyzingCommunityDetectionResult {
         return clusterResultMap;
     }
 
-    private HashMap<String, HashSet<Integer>> getJoinedClustersForSplittingStep(String combination) {
+    private HashMap<String, HashSet<Integer>> getJoinedClustersForSplittingStep(String combination, int clusterSizeThreshold) {
         ProcessingText processingText = new ProcessingText();
         ArrayList<String> topClusterList = getTopClusterList();
         ArrayList<HashSet<String>> closeClusters_list = new ArrayList<>();
@@ -1000,9 +1000,18 @@ public class AnalyzingCommunityDetectionResult {
                         String original_cluster_1 = cluster_1.split("_")[0];
                         String original_cluster_2 = cluster_2.split("_")[0];
                         if (topClusterList.contains(original_cluster_1)) {
+                            int cluster_1_size = topClustersSplittingResult.get(Integer.valueOf(original_cluster_1)).get(0).get(original_cluster_1).size();
+                            if(cluster_1_size>clusterSizeThreshold){
+                                continue;
+                            }
+                            int cluster_2_size =0;
                             cluster_index = topClusterList.indexOf(original_cluster_1);
                             currentClusterId = cluster_1;
                             if (topClusterList.contains(original_cluster_2)) {
+                                cluster_2_size = topClustersSplittingResult.get(Integer.valueOf(original_cluster_2)).get(0).values().size();
+                                if(cluster_2_size>clusterSizeThreshold){
+                                    continue;
+                                }
                                 int cluter_2_index_of_top = topClusterList.indexOf(original_cluster_2);
                                 if (cluter_2_index_of_top < cluster_index) {
                                     cluster_index = cluter_2_index_of_top;
@@ -1046,8 +1055,10 @@ public class AnalyzingCommunityDetectionResult {
 
                         }
 
+
                         closeCluster_nodeSet.addAll(current_clustering_result.get(cluster_1) != null ? current_clustering_result.get(cluster_1) : originalClusterMap.get(cluster_1));
                         closeCluster_nodeSet.addAll(current_clustering_result.get(cluster_2) != null ? current_clustering_result.get(cluster_2) : originalClusterMap.get(cluster_2));
+
                     }
                 }
             }
@@ -1153,8 +1164,8 @@ public class AnalyzingCommunityDetectionResult {
                 if (topClusterList.contains(current_index)) {
                     int current_topcluster_index = topClusterList.indexOf(current_index);
                     if (current_topcluster_index < pre_topcluster_index) {
-                        if (pre_topcluster_index < topClusterList.size()) {
-                        }
+//                        if (pre_topcluster_index < topClusterList.size()) {
+//                        }
                         pre_topcluster_index = current_topcluster_index;
                     }
                 }
@@ -1172,10 +1183,10 @@ public class AnalyzingCommunityDetectionResult {
             if (current_index != "") {
                 if (pre_topcluster_index < topClusterList.size()) {
 
-                    if(joined_clusters.get(topClusterList.get(pre_topcluster_index)) != null) {
+                    if (joined_clusters.get(topClusterList.get(pre_topcluster_index)) != null) {
                         joined_clusters.get(topClusterList.get(pre_topcluster_index)).addAll(tmp);
-                    }else{
-                        joined_clusters.put(topClusterList.get(pre_topcluster_index),tmp);
+                    } else {
+                        joined_clusters.put(topClusterList.get(pre_topcluster_index), tmp);
                     }
                 } else {
                     joined_clusters.put(current_index, tmp);
@@ -1200,7 +1211,7 @@ public class AnalyzingCommunityDetectionResult {
         String[] splitArray = new String[1];
 
         splitArray = splitStep.split("--");
-        if (!isOriginal&&!splitStep.contains("_") && !splitStep.contains("~")) {
+        if (!isOriginal && !splitStep.contains("_") && !splitStep.contains("~")) {
             isOriginal = true;
         }
 
@@ -1209,7 +1220,7 @@ public class AnalyzingCommunityDetectionResult {
             for (String cid : tmp) {
                 String clusterID = cid;
                 String s = "", index = "";
-                if (!splitStep.equals("original")&&!isJoined && clusters.size() == 2 && ((!isOriginal)||!splitStep.contains("--")) ){
+                if (!splitStep.equals("original") && !isJoined && clusters.size() == 2 && ((!isOriginal) || !splitStep.contains("--"))) {
 
                     for (int i = 0; i < clusters.size(); i++) {
                         s = clusters.get(i);
@@ -1219,7 +1230,8 @@ public class AnalyzingCommunityDetectionResult {
                             current_clustering_result.put(index, cluster_nodeid_Set);
                         }
                     }
-                } else if (clusters.size() > 2 || (clusters.size() == 2 && isJoined) || isOriginal || (clusters.size() == 2 && !splitStep.contains("~"))) {
+                } else if (clusters.size() > 2 || (clusters.size() == 2 && isJoined) || (isOriginal && clusters.size() > 1) || (clusters.size() == 2 && !splitStep.contains("~"))) {
+
                     for (int i = 0; i < clusters.size(); i++) {
                         s = clusters.get(i);
                         index = s.substring(0, s.indexOf(")")).trim();

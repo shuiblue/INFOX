@@ -65,6 +65,7 @@ public class INFOX_main {
             return;
         }
         for (String forkName : forkListArray) {
+            System.out.println("start to analyzing ..  " +forkName);
         String branchName = "";
             boolean hasGroundTruth = false;
             String testCasesDir;
