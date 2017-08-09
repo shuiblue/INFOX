@@ -92,8 +92,8 @@ public class ColorCode {
                         sb.append(line.replace("<", "&lt;").replace(">", "&gt;"));
                         sb.append("</front>\n");
 
-                        boolean isNewCode = forkAddedNode.contains(old_lable+"\n");
-                        if (!isNewCode || (isNewCode &&(line.trim().startsWith("//") || line.trim().startsWith("/*") || line.trim().startsWith("*")))){
+                        boolean isNewCode = forkAddedNode.contains(old_lable + "\n");
+                        if (!isNewCode || (isNewCode && (line.trim().startsWith("//") || line.trim().startsWith("/*") || line.trim().startsWith("*")))) {
                             jsContent.append("$(\"#" + lable + "\").toggle()\n");
                         }
 
@@ -162,10 +162,9 @@ public class ColorCode {
      * @param nodeMap
      * @param expectNodeMap
      * @param clusterSizeThreshold
-
      * @param hasGroundTruth
      */
-    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap, HashMap<Integer, String> nodeMap, HashMap<String, String> expectNodeMap, int clusterSizeThreshold, boolean hasGroundTruth,String originalCombination) {
+    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap, HashMap<Integer, String> nodeMap, HashMap<String, String> expectNodeMap, int clusterSizeThreshold, boolean hasGroundTruth, String originalCombination) {
 //    public void writeClusterToCSS(ArrayList<String> clusters, int numberOfClusters, HashMap<Integer, ArrayList<String>> clusterResultMap, HashMap<Integer, String> nodeMap, HashMap<String, String> expectNodeMap, int clusterSizeThreshold) {
 
         BackgroundColor bgcolor = new BackgroundColor();
@@ -434,8 +433,9 @@ public class ColorCode {
         bigSizeClusterList = new HashSet<>();
         ArrayList<String> distanceArray;
 //        String distanceFile = analysisDir + combination + "_distanceBetweenCommunityies.txt";
-        String distanceFile = analysisDir +  "original_distanceBetweenCommunityies.txt";
+        String distanceFile = analysisDir + "original_distanceBetweenCommunityies.txt";
         closeClusterList = new ArrayList<>();
+        HashSet<String> checkedClusters = new HashSet<>();
         try {
             String distanceString = processingText.readResult(distanceFile);
             distanceArray = new ArrayList(Arrays.asList(distanceString.split("\n")));
@@ -468,30 +468,55 @@ public class ColorCode {
                     if (closeClusterList.size() > 0) {
                         for (HashSet<String> clusterlist : closeClusterList) {
                             if (!existEdge) {
-                                if (clusterlist.contains(str.split(",")[0])) {
-                                    clusterlist.add(str.split(",")[1]);
-                                    existEdge = true;
-                                } else if (clusterlist.contains(str.split(",")[1])) {
-                                    clusterlist.add(str.split(",")[0]);
-                                    existEdge = true;
+                                if ((!bigSizeClusterList.contains(cluster_1) && bigSizeClusterList.contains(cluster_2))
+                                        || (bigSizeClusterList.contains(cluster_1) && !bigSizeClusterList.contains(cluster_2))
+                                        || (!bigSizeClusterList.contains(cluster_1) && !bigSizeClusterList.contains(cluster_2))) {
+
+                                    if (clusterlist.contains(cluster_1)) {
+                                        clusterlist.add(cluster_2);
+                                        existEdge = true;
+                                        checkedClusters.add(cluster_2);
+
+                                    } else if (clusterlist.contains(cluster_2)) {
+                                        clusterlist.add(cluster_1);
+                                        existEdge = true;
+                                        checkedClusters.add(cluster_1);
+                                    }
                                 }
                             } else {
-                                if (clusterlist.contains(str.split(",")[0]) || clusterlist.contains(str.split(",")[1])) {
+                                if ((clusterlist.contains(cluster_1)) || (clusterlist.contains(cluster_2))) {
+
                                     redundantClusterListIndex.add(closeClusterList.indexOf(clusterlist));
                                 }
+
                             }
                         }
                     }
 
                     for (int index : redundantClusterListIndex) {
-                        closeClusterList.set(index, new HashSet<>());
+                        boolean joinAll = true;
+                        HashSet<String> redundantCluster = closeClusterList.get(index);
+                        for (String big : bigSizeClusterList) {
+                            if (redundantCluster.contains(big)) {
+                                redundantCluster.remove(cluster_1);
+                                redundantCluster.remove(cluster_2);
+                                joinAll = false;
+                            }
+                        }
+                        if (joinAll) {
+                            closeClusterList.set(index, new HashSet<>());
+                        }
                     }
 
                     if (!existEdge) {
-                        HashSet<String> list = new HashSet<>();
-                        list.add(cluster_1);
-                        list.add(cluster_2);
-                        closeClusterList.add(list);
+                        if ((!bigSizeClusterList.contains(cluster_1) && bigSizeClusterList.contains(cluster_2))
+                                || (bigSizeClusterList.contains(cluster_1) && !bigSizeClusterList.contains(cluster_2))
+                                || (!bigSizeClusterList.contains(cluster_1) && !bigSizeClusterList.contains(cluster_2))) {
+                            HashSet<String> list = new HashSet<>();
+                            list.add(cluster_1);
+                            list.add(cluster_2);
+                            closeClusterList.add(list);
+                        }
                     }
                 }
 
@@ -508,13 +533,13 @@ public class ColorCode {
         }
 
         StringBuilder sb = new StringBuilder();
-        for(HashSet<String> set : closeClusterList){
-            if(set.size()>0) {
+        for (HashSet<String> set : closeClusterList) {
+            if (set.size() > 0) {
                 sb.append(set.toString() + "\n");
             }
         }
 
-        processingText.rewriteFile(sb.toString(),analysisDir+combination+"_closedClusters.txt");
+        processingText.rewriteFile(sb.toString(), analysisDir + combination + "_closedClusters.txt");
         return closeClusterList;
     }
 
@@ -541,7 +566,7 @@ public class ColorCode {
         String endtxt = "end.txt";
 
         String html = isJoinCluster ? "join-" + numberOfClusters + ".html" : numberOfClusters + ".html";
-        String css = isJoinCluster ? numberOfClusters + "_join_bigSize-" + clusterSizeThreshold+".css"  : numberOfClusters + ".css";
+        String css = isJoinCluster ? numberOfClusters + "_join_bigSize-" + clusterSizeThreshold + ".css" : numberOfClusters + ".css";
         String colorFile = isJoinCluster ? numberOfClusters + "_join_bigSize-" + clusterSizeThreshold + ".color" : numberOfClusters + ".color";
         try {
             //write code.html

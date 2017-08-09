@@ -859,14 +859,28 @@ public class AnalyzingCommunityDetectionResult {
 //                            if (isOriginalGraph) {
 
                             /**  get list of clusterSet, each list represent a set of clusters that close to each other **/
-                            ArrayList<HashSet<String>> closeClusters_list;
+                            ArrayList<HashSet<String>> closeClusters_list = new ArrayList<>();
 
                             if (combination.equals("original")) {
                                 closeClusters_list = colorCode.joiningCloseClusters(clusters, combination, clusterSizeThreshold);
                                 /**   get joined clusters   **/
                                 joined_clusters = getJoinedClusters(colorCode, combination, clusters, current_clustering_result, clusterSizeThreshold, closeClusters_list);
                             } else {
-                                joined_clusters = getJoinedClustersForSplittingStep(combination, clusterSizeThreshold);
+
+                                try {
+                                    String[] origin_closeCluster = processingText.readResult(analysisDir + "original_closedClusters.txt").split("\n");
+
+                                    for (String list : origin_closeCluster) {
+                                        HashSet<String> set = new HashSet<>();
+                                        for (String s : list.replace("[", "").replace("]", "").split(",")) {
+                                            set.add(s.trim());
+                                        }
+                                        closeClusters_list.add(set);
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                joined_clusters = getJoinedClustersForSplittingStep(combination, clusterSizeThreshold, closeClusters_list);
                             }
 
 
@@ -932,10 +946,9 @@ public class AnalyzingCommunityDetectionResult {
         return clusterResultMap;
     }
 
-    private HashMap<String, HashSet<Integer>> getJoinedClustersForSplittingStep(String combination, int clusterSizeThreshold) {
+    private HashMap<String, HashSet<Integer>> getJoinedClustersForSplittingStep(String combination, int clusterSizeThreshold, ArrayList<HashSet<String>> closeClusters_list) {
         ProcessingText processingText = new ProcessingText();
         ArrayList<String> topClusterList = getTopClusterList();
-        ArrayList<HashSet<String>> closeClusters_list = new ArrayList<>();
         HashMap<String, HashSet<Integer>> joined_clustering_node_result = new HashMap<>();
         HashMap<String, HashSet<String>> joined_clustering_result = new HashMap<>();
 
@@ -979,6 +992,7 @@ public class AnalyzingCommunityDetectionResult {
                 e.printStackTrace();
             }
 
+
             for (String pair : shortestPath_nodePair) {
                 if (pair.trim().length() > 0) {
                     String node_1 = pair.split(",")[0];
@@ -999,19 +1013,16 @@ public class AnalyzingCommunityDetectionResult {
                         int cluster_index = 6;
                         String original_cluster_1 = cluster_1.split("_")[0];
                         String original_cluster_2 = cluster_2.split("_")[0];
+                        int cluster_1_size = 0, cluster_2_size = 0;
+
                         if (topClusterList.contains(original_cluster_1)) {
-                            int cluster_1_size = topClustersSplittingResult.get(Integer.valueOf(original_cluster_1)).get(0).get(original_cluster_1).size();
-                            if(cluster_1_size>clusterSizeThreshold){
-                                continue;
-                            }
-                            int cluster_2_size =0;
+                            cluster_1_size = topClustersSplittingResult.get(Integer.valueOf(original_cluster_1)).get(0).get(original_cluster_1).size();
+
                             cluster_index = topClusterList.indexOf(original_cluster_1);
                             currentClusterId = cluster_1;
                             if (topClusterList.contains(original_cluster_2)) {
-                                cluster_2_size = topClustersSplittingResult.get(Integer.valueOf(original_cluster_2)).get(0).values().size();
-                                if(cluster_2_size>clusterSizeThreshold){
-                                    continue;
-                                }
+                                cluster_2_size = topClustersSplittingResult.get(Integer.valueOf(original_cluster_2)).get(0).get(original_cluster_2).size();
+
                                 int cluter_2_index_of_top = topClusterList.indexOf(original_cluster_2);
                                 if (cluter_2_index_of_top < cluster_index) {
                                     cluster_index = cluter_2_index_of_top;
@@ -1021,44 +1032,65 @@ public class AnalyzingCommunityDetectionResult {
                             }
                         }
 
+                        boolean biggerThanThreshold = false;
+                        if (cluster_2_size > clusterSizeThreshold && cluster_1_size > clusterSizeThreshold) {
+                            biggerThanThreshold = true;
+                        }
+
                         HashSet<Integer> closeCluster_nodeSet = joined_clustering_node_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_node_result.get(currentClusterId);
 
                         if (!currentClusterId.equals("")) {
 
                             if (!cluster_1.contains("_")) {
-                                copy.remove(cluster_1);
+                            copy.remove(cluster_1);
                             }
                             if (!cluster_2.contains("_")) {
-                                copy.remove(cluster_2);
+                            copy.remove(cluster_2);
                             }
                             final boolean[] existGroup = {false};
-                            joined_clustering_result.forEach((k, v) -> {
-                                if (v.contains(cluster_1)) {
-                                    v.add(cluster_2);
-                                    existGroup[0] = true;
+                            if (!biggerThanThreshold) {
 
-                                    joined_clustering_node_result.put(k, closeCluster_nodeSet);
-                                } else if (v.contains(cluster_2)) {
-                                    v.add(cluster_1);
-                                    existGroup[0] = true;
+                                joined_clustering_result.forEach((k, v) -> {
+                                    if (v.contains(cluster_1)) {
+                                        for (HashSet<String> closecluster : closeClusters_list) {
+                                            if (closecluster.contains(original_cluster_1) && closecluster.contains(original_cluster_2)) {
+                                                v.add(cluster_2);
+                                                existGroup[0] = true;
 
-                                    joined_clustering_node_result.put(k, closeCluster_nodeSet);
+                                                joined_clustering_node_result.put(k, closeCluster_nodeSet);
+                                                break;
+                                            }
+                                        }
+                                    } else if (v.contains(cluster_2)) {
+                                        for (HashSet<String> closecluster : closeClusters_list) {
+                                            if (closecluster.contains(original_cluster_1) && closecluster.contains(original_cluster_2)) {
+                                                v.add(cluster_1);
+                                                existGroup[0] = true;
+
+                                                joined_clustering_node_result.put(k, closeCluster_nodeSet);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                });
+
+                                if (!existGroup[0]) {
+                                    for (HashSet<String> closecluster : closeClusters_list) {
+                                        if (closecluster.contains(original_cluster_1) && closecluster.contains(original_cluster_2)) {
+
+                                            HashSet<String> closeCluster_Set = joined_clustering_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_result.get(currentClusterId);
+                                            closeCluster_Set.add(cluster_1);
+                                            closeCluster_Set.add(cluster_2);
+                                            joined_clustering_result.put(currentClusterId, closeCluster_Set);
+                                            joined_clustering_node_result.put(currentClusterId, new HashSet<>());
+
+                                            closeCluster_nodeSet.addAll(current_clustering_result.get(cluster_1) != null ? current_clustering_result.get(cluster_1) : originalClusterMap.get(cluster_1));
+                                            closeCluster_nodeSet.addAll(current_clustering_result.get(cluster_2) != null ? current_clustering_result.get(cluster_2) : originalClusterMap.get(cluster_2));
+                                        }
+                                    }
                                 }
-                            });
-
-                            if (!existGroup[0]) {
-                                HashSet<String> closeCluster_Set = joined_clustering_result.get(currentClusterId) == null ? new HashSet<>() : joined_clustering_result.get(currentClusterId);
-                                closeCluster_Set.add(cluster_1);
-                                closeCluster_Set.add(cluster_2);
-                                joined_clustering_result.put(currentClusterId, closeCluster_Set);
                             }
-
                         }
-
-
-                        closeCluster_nodeSet.addAll(current_clustering_result.get(cluster_1) != null ? current_clustering_result.get(cluster_1) : originalClusterMap.get(cluster_1));
-                        closeCluster_nodeSet.addAll(current_clustering_result.get(cluster_2) != null ? current_clustering_result.get(cluster_2) : originalClusterMap.get(cluster_2));
-
                     }
                 }
             }
@@ -1081,6 +1113,15 @@ public class AnalyzingCommunityDetectionResult {
                 if (closeCluster_set != null) {
                     for (String s : closeCluster_set) {
                         nodeSet.addAll(current_clustering_result.get(s) != null ? current_clustering_result.get(s) : originalClusterMap.get(s));
+                        for(HashSet<String> original_close_cluster:closeClusters_list){
+                            if(original_close_cluster.contains(s)){
+                                for(String c:original_close_cluster){
+                                    if(!closeCluster_set.contains(c)&&!topClusterList.contains(c)) {
+                                        nodeSet.addAll(current_clustering_result.get(c) != null ? current_clustering_result.get(c) : originalClusterMap.get(c));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -1092,6 +1133,8 @@ public class AnalyzingCommunityDetectionResult {
             processingText.rewriteFile("", analysisDir + combination + "_joined_clusterTMP.txt");
             processingText.printMemebershipOfCurrentGraph(clusters_changed, combination + "_joined_clusterTMP.txt", false, analysisDir);
         }
+
+
         return joined_clustering_node_result;
 
     }
