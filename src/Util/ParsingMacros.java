@@ -365,11 +365,13 @@ public class ParsingMacros {
 
                                 if (!m.startsWith("!") && !m.endsWith("_H") && !hasSpecialChar && !isStopWord(m) && !m.contains("=") && !m.contains("#") && !m.contains("||")) {
                                     ArrayList<String> wrappedCode = macro_to_locArray.get(m);
-                                    String edgeLabel = newFileName + "-" + linenum;
-                                    if (!wrappedCode.contains(edgeLabel)) {
-                                        wrappedCode.add(edgeLabel);
+                                    if (wrappedCode != null) {
+                                        String edgeLabel = newFileName + "-" + linenum;
+                                        if (!wrappedCode.contains(edgeLabel)) {
+                                            wrappedCode.add(edgeLabel);
+                                        }
+                                        macro_to_locArray.put(m, wrappedCode);
                                     }
-                                    macro_to_locArray.put(m, wrappedCode);
                                 }
                             }
                         }

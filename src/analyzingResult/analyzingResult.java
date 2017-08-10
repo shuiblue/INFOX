@@ -14,7 +14,8 @@ import java.nio.file.Paths;
  */
 public class analyzingResult {
     //    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testINFOX/Marlin/DPGraph/";
-    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin/Marlin/";
+//    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin/Marlin/";
+    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testopenvpn/openvpn/";
     static final String FS = File.separator;
     static String dpPath = "";
     static int total_num_of_cuts = 5;
@@ -50,8 +51,8 @@ public class analyzingResult {
                                                     if (sub_dir.exists() && sub_dir.isDirectory()) {
                                                         String[] sub_names = sub_dir.list();
                                                         for (String sn : sub_names) {
-//                                                            if (sn.contains("resultTable_joinThreshold")) {
-                                                            if (sn.contains("resultTable_joinThreshold") && sn.contains("50.csv")) {
+                                                            if (sn.contains("resultTable_joinThreshold")) {
+//                                                            if (sn.contains("resultTable_joinThreshold") && sn.contains("50.csv")) {
                                                                 sb.append(sub_dir + FS + sn + "\n");
                                                             }
                                                         }

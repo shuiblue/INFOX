@@ -229,7 +229,6 @@ public class DependencyGraph {
             re.eval("oldg<-read_graph(\"" + graphPath + "\", format=\'pajek\')");
             re.eval("subv <- c(" + sb_forkAddedNode.toString().substring(0, sb_forkAddedNode.toString().length() - 1) + ")");
             re.eval("subg<-induced.subgraph(graph=oldg,vids=subv)");
-            re.eval(" write_graph(subg,\"/Users/shuruiz/Box Sync/community detection tool/igraph/22.pajek.net\", format=\"pajek\")");
 
 
             REXP edgelist_R = re.eval("cbind( get.edgelist(subg) , round( E(subg)$weight, 3 ))", true);
