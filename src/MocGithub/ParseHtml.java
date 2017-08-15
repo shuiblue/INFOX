@@ -85,7 +85,8 @@ public class ParseHtml {
         ProcessingText processingText = new ProcessingText();
         System.out.println("get original diff page");
         this.analysisDir = localSourceCodeDirPath + "INFOX_output/";
-        WebClient webClient = new WebClient(BrowserVersion.CHROME);
+//        WebClient webClient = new WebClient(BrowserVersion.CHROME);
+        WebClient webClient = new WebClient();
         // turn off htmlunit warnings
         LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
