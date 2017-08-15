@@ -118,6 +118,7 @@ public class AnalyzingRepository {
 
         /** Community Detection  **/
         R_CommunityDetection communityDetection = new R_CommunityDetection(sourcecodeDir, analysisDirName, testCaseDir, testDir, re,max_numberOfCut,numberOfBiggestClusters,  clusterSizeThreshold);
+        ProcessingText.sleep();
         communityDetection.clustering_CodeChanges(testCaseDir, testDir, re, directedGraph,true,"original");
 
         /** Generating html to visualize source code, set background and left side bar color for new code  **/
