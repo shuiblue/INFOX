@@ -416,6 +416,7 @@ public class ParsingMacros {
                 || macro.contains("GNUC")
                 || macro.contains("DEBUG")
                 || macro.contains("TEST")
+                || macro.contains("HAVE_CONFIG_H")
                 || macro.contains("_WIN32")
                 || macro.contains("_WIN64");
     }
