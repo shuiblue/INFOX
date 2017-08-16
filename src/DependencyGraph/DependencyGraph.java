@@ -311,7 +311,8 @@ public class DependencyGraph {
                     if (!filePath.toString().contains("pixman-arm-neon-asm.h")
                             && !filePath.toString().contains("SkBitmapSamplerTemplate.h")
                             && !filePath.toString().contains("prstrms.h")
-                            && !filePath.toString().contains("/js/")) {
+                            && !filePath.toString().contains("/js/")
+                            && !filePath.toString().contains("/doc/")) {
 
                         int mb = 1024 * 1024;
                         long mem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / mb;

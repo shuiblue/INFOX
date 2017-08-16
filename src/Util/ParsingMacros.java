@@ -94,7 +94,21 @@ public class ParsingMacros {
             for (Map.Entry<String, ArrayList<String>> entry : macro_to_locArray.entrySet()) {
                 totalSize += entry.getValue().size();
             }
-            sizeThreshold = totalSize / macro_to_locArray.size();
+//            sizeThreshold = totalSize / macro_to_locArray.size();
+
+            keys = new ArrayList<String>(macro_to_locArray.keySet());
+            ArrayList<Integer> sizeList = new ArrayList<>();
+            for (String k : keys) {
+                int size = macro_to_locArray.get(k).size();
+                if(size>0) {
+                    totalSize += size;
+                    sizeList.add(size);
+                }
+            }
+
+            Collections.sort(sizeList);
+            sizeThreshold = sizeList.get(sizeList.size() / 2);
+
         }
 
 
@@ -110,7 +124,7 @@ public class ParsingMacros {
             int previousTargetMacroListSize = 0;
             while (targetMacroList.size() < numberOfTargetMacros) {
 
-                if (findRandomeCombination_times > 30) {
+                if (findRandomeCombination_times > 300) {
                     System.out.println("cannot generate more");
                     return new ArrayList<>();
                 }
@@ -157,7 +171,7 @@ public class ParsingMacros {
                             targetMacroList.add(key);
 //                            System.out.println("Item : " + key + " Count : " + macro_to_locArray.get(key).size());
                         }
-                    } else if (size < sizeThreshold) {
+                    } else if (size <= sizeThreshold) {
                         if (smallMacros.size() == 0 || (smallMacros.size() < num_smallSize_Macro && noFeatureInteraction(targetMacroList, key))) {
                             smallMacros.add(key);
                             targetMacroList.add(key);
@@ -174,18 +188,18 @@ public class ParsingMacros {
                 }
 
             }
+            break;
         }
 
         /** store macro name into file, which helps to generate the final html **/
-        StringBuffer sb_html = new StringBuffer();
+//        StringBuffer sb_html = new StringBuffer();
         StringBuffer sb_featureList = new StringBuffer();
         for (int i = 1; i <= targetMacroList.size(); i++) {
-            sb_html.append("<h3>" + i + ") " + targetMacroList.get(i - 1) + "</h3>\n");
+//            sb_html.append("<h3>" + i + ") " + targetMacroList.get(i - 1) + "</h3>\n");
             sb_featureList.append(targetMacroList.get(i - 1) + "\n");
         }
-        iof.rewriteFile(sb_html.toString(), testCaseDir + "/testedMacros.txt");
+//        iof.rewriteFile(sb_html.toString(), testCaseDir + "/testedMacros.txt");
         iof.rewriteFile(sb_featureList.toString(), testCaseDir + "/featureList.txt");
-
 
         /**--------- used for parsing #ifdef to generate ground truth---------------
          parsing source code to find LOC wrapped by those macros and generating forkAddedNode.txt file **/
@@ -426,7 +440,7 @@ public class ParsingMacros {
                             for (int i = 1; i <= 6; i++) {
                                 System.out.println(numOfTargetMacro + " macros , test case " + i);
                                 String testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros_oneFile" + FS + i + FS;
-                                ArrayList<String> targetList = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+                                ArrayList<String> targetList = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
                                 if (targetList.size() == 0) {
                                     continue;
                                 }
@@ -434,8 +448,8 @@ public class ParsingMacros {
                                 System.out.println(numOfTargetMacro + " macros from one file , test case " + i);
 
                                 testCaseDir = sourcecodeDir + analysisDirName + FS + numOfTargetMacro + "macros" + FS + i + FS;
-                                targetList = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, false);
-                                if (targetList.size() == 0) {
+                                ArrayList<String> targetList_onefile = parsingMacros.selectTargetMacros(sourcecodeDir, testCaseDir, numOfTargetMacro, i, true);
+                                if (targetList_onefile.size() == 0) {
                                     continue;
                                 }
                         }
