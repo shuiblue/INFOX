@@ -76,7 +76,7 @@ public class AnalyzingRepository {
             DependencyGraph dependencyGraph = new DependencyGraph(parameters[5]);
 
 
-            if (analysisDir.contains("3macros/1/")) {
+            if (analysisDir.contains("3macros/1/")||analysisDir.contains("3macros_oneFile/1/")) {
                 /**  this function generate all the graph at the same time **/
                 dependencyGraph.getDependencyGraphForProject(sourcecodeDir, testCaseDir, testDir);
                 String[] approaches = {"testINFOX", "testMS", "testMS_plus_CF_Hierachy", "testINFOX_NO_DefUse", "testINFOX_NO_ControlF", "testINFOX_NO_Hierarchy", "testINFOX_NO_Consec", "testMS_NO_Consec"};
