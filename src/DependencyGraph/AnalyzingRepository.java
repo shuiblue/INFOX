@@ -69,7 +69,12 @@ public class AnalyzingRepository {
 
         String analysisDir = testCaseDir + testDir + FS;
         System.out.println("~~~~~~~current configuration: " + testDir + "~~");
-        new File(analysisDir).mkdir();
+
+        if(!new File(analysisDir).exists()) {
+            new File(analysisDir).mkdir();
+        }else{
+            return;
+        }
 
         /**  Generating Dependency Graphs for current test case/project  **/
         if (!directedGraph) {

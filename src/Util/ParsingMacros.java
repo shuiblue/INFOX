@@ -418,6 +418,7 @@ public class ParsingMacros {
                 || macro.contains("TEST")
                 || macro.contains("HAVE_CONFIG_H")
                 || macro.contains("_WIN32")
+                || (macro.startsWith("HAVE_")&&macro.endsWith("_H"))
                 || macro.contains("_WIN64");
     }
 
