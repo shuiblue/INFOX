@@ -52,8 +52,8 @@ public class INFOX_main {
         Root_Dir = new ProcessingText().getRootDir();
 
         /**  Step 1， parsing source code to find independent macros, and then generate different macro combinations as ground truth**/
-        ParsingMacros parsingMacros = new ParsingMacros();
-        parsingMacros.generatingTestCases_differentMacroCombination(testCasesDir);
+//        ParsingMacros parsingMacros = new ParsingMacros();
+//        parsingMacros.generatingTestCases_differentMacroCombination(testCasesDir);
 
         /** Step 2, running tests from each generated folders from step 1 **/
 
@@ -70,7 +70,7 @@ public class INFOX_main {
                 if (Files.isDirectory(filePath) && !filePath.toString().equals(testCasesDir)) {
                     String sourcecodeDir = filePath.toString() + FS;
 
-                    for (int numOfTargetMacro = 3; numOfTargetMacro <= 15; numOfTargetMacro++) {
+                    for (int numOfTargetMacro = 5; numOfTargetMacro <= 15; numOfTargetMacro++) {
                         /** generating the parameters for creating dependency graph  **/
                         ArrayList<int[]> parameterArray = getParameterSetting(numOfTargetMacro);
                         /** 1 -- INFOX,

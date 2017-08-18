@@ -15,13 +15,13 @@ import java.nio.file.Paths;
 public class analyzingResult {
     //    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testINFOX/Marlin/DPGraph/";
 //    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testMarlin/Marlin/";
-    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testopenvpn/openvpn/";
+    static String testCasesDir = "/Users/shuruiz/Work/MarlinRepo/testxterm/xterm/";
     static final String FS = File.separator;
     static String dpPath = "";
     static int total_num_of_cuts = 5;
     static boolean isMs = false;
     static String csvPathList_txt = "csvPath_List.txt";
-    static String outputFile = "accuracy.csv";
+
     static ProcessingText processingText = new ProcessingText();
     static int STOP_CRITERIA = 50;
 
@@ -104,12 +104,13 @@ public class analyzingResult {
 
     private static void findMaxAccuracyPoint(String[] listOfCSV, String analysisDirName, boolean isMs,boolean findMaxAcc) {
 
+        String outputFile = "accuracy.csv";
         outputFile=findMaxAcc?"max_"+outputFile:outputFile;
         if (isMs) {
             new ProcessingText().rewriteFile("filePath, accuracy\n", testCasesDir + analysisDirName + FS + outputFile);
 
         } else {
-            new ProcessingText().rewriteFile("filePath, split_stop, join_stop, accuracy\n", testCasesDir + analysisDirName + FS + outputFile);
+            new ProcessingText().rewriteFile("filePath,  accuracy\n", testCasesDir + analysisDirName + FS + outputFile);
 
 
         }
@@ -209,7 +210,7 @@ public class analyzingResult {
     public static void main(String[] args) {
 
         boolean findMaxAcc = false;
-        for (int method = 1; method <=1; method++) {
+        for (int method =1; method <=8; method++) {
             String analysisDirName = "";
 
             if (method == 1) {
@@ -223,12 +224,16 @@ public class analyzingResult {
                 isMs = true;
             } else if (method == 4) {
                 analysisDirName = "testINFOX_NO_DefUse";
+                findMaxAcc=true;
             } else if (method == 5) {
                 analysisDirName = "testINFOX_NO_ControlF";
+                findMaxAcc=true;
             } else if (method == 6) {
                 analysisDirName = "testINFOX_NO_Hierarchy";
+                findMaxAcc=true;
             } else if (method == 7) {
                 analysisDirName = "testINFOX_NO_Consec";
+                findMaxAcc=true;
             } else if (method == 8) {
                 analysisDirName = "testMS_NO_Consec";
                 isMs = true;
