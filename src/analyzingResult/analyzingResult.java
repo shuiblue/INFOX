@@ -19,7 +19,7 @@ public class analyzingResult {
     static final String FS = File.separator;
     static String dpPath = "";
     static int total_num_of_cuts = 5;
-    static boolean isMs = false;
+
     static String csvPathList_txt = "csvPath_List.txt";
 
     static ProcessingText processingText = new ProcessingText();
@@ -209,19 +209,21 @@ public class analyzingResult {
 
     public static void main(String[] args) {
 
-        boolean findMaxAcc = false;
-        for (int method =1; method <=8; method++) {
+        for (int method =8; method <=8; method++) {
             String analysisDirName = "";
-
+            boolean isMs = false;
+            boolean findMaxAcc = false;
             if (method == 1) {
                 analysisDirName = "testINFOX";
                 findMaxAcc=true;
             } else if (method == 2) {
                 analysisDirName = "testMS";
                 isMs = true;
+                findMaxAcc = false;
             } else if (method == 3) {
                 analysisDirName = "testMS_plus_CF_Hierachy";
                 isMs = true;
+                findMaxAcc = false;
             } else if (method == 4) {
                 analysisDirName = "testINFOX_NO_DefUse";
                 findMaxAcc=true;
@@ -237,6 +239,7 @@ public class analyzingResult {
             } else if (method == 8) {
                 analysisDirName = "testMS_NO_Consec";
                 isMs = true;
+                findMaxAcc = false;
             }
 
 
