@@ -186,11 +186,11 @@ public class DependencyGraph {
         String newFileName = ProcessingText.changeFileName(fileName);
 
 		/*  for Apache
-        if (!newFileName.equals("server/util_expr_parseC")) {
- 		*/
+		 *  if (!newFileName.equals("server/util_expr_parseC")) {
+ 		 */
 
       	/* for Marlin
-      	if (!fileName.contains("pcre_globals")) {*/
+		 * if (!fileName.contains("pcre_globals")) {*/
         String parentLocation = "";
         parseDependencyForSubTree(root, newFileName, 1, parentLocation);
 
