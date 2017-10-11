@@ -185,12 +185,12 @@ public class DependencyGraph {
         //Rewrite the file name for html purpose
         String newFileName = ProcessingText.changeFileName(fileName);
 
-/*  for Apache
-                if (!newFileName.equals("server/util_expr_parseC")) {
- */
+        /*  for Apache
+        if (!newFileName.equals("server/util_expr_parseC")) {
+        */
 
-      /* for Marlin
-      if (!fileName.contains("pcre_globals")) {*/
+        /* for Marlin
+        if (!fileName.contains("pcre_globals")) {*/
         String parentLocation = "";
         parseDependencyForSubTree(root, newFileName, 1, parentLocation);
 
@@ -1051,24 +1051,26 @@ public class DependencyGraph {
 
     int stringID = 0;
 
-//    private void storeStrings(String location, String content) {
-////TODO: FORK ADDED NODE
-//        if (forkaddedNodeList.contains(location + "\r")) {
-////        if (true) {
-//            String strList ;
-//            if (idMap.get(location) != null) {
-//                int strID = idMap.get(location);
-//                strList = candidateStrings.get(strID);
-//                strList += " " + content;
-//                candidateStrings.set(strID, strList);
-//            } else {
-//                strList = " " + content;
-//                idMap.put(nodeList.get(location), stringID);
-//                stringID++;
-//            }
-//            candidateStrings.add(strList.replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("[^a-zA-Z ]", " ").replaceAll("\\s+", " "));
-//        }
-//    }
+/*
+    private void storeStrings(String location, String content) {
+        //TODO: FORK ADDED NODE
+        if (forkaddedNodeList.contains(location + "\r")) {
+//        if (true) {
+            String strList ;
+            if (idMap.get(location) != null) {
+                int strID = idMap.get(location);
+                strList = candidateStrings.get(strID);
+                strList += " " + content;
+                candidateStrings.set(strID, strList);
+            } else {
+                strList = " " + content;
+                idMap.put(nodeList.get(location), stringID);
+                stringID++;
+            }
+            candidateStrings.add(strList.replace("\\n", " ").replace("\n", "").replace("%i", "").replaceAll("[^a-zA-Z ]", " ").replaceAll("\\s+", " "));
+        }
+    }
+*/
 
     /**
      * * This function find variables exist in expression, and create edges if needed
